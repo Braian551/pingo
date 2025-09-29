@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:ping_go/src/features/auth/presentation/screens/home_auth.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/register_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/phone_auth_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/email_auth_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/email_verification_screen.dart';
 // import 'package:ping_go/src/features/map/presentation/screens/location_selection_screen.dart'; // COMENTADO - YA NO SE USA
-import 'package:ping_go/src/features/ride/presentation/screens/home_screen.dart';
+// ride HomeScreen still available but the authenticated entrypoint should be HomeAuth
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
+import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 
 class AppRouter {
@@ -54,7 +55,8 @@ class AppRouter {
           );
         }
       case RouteNames.home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        // Cuando el usuario se autentique debe ir a HomeAuth (pantalla principal auth)
+        return MaterialPageRoute(builder: (_) => const HomeAuth());
       // Agregar más rutas aquí
       default:
         return MaterialPageRoute(

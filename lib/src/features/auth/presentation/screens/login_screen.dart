@@ -29,7 +29,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     
     // Prellenar email si viene de verificación
-    if (widget.email != null && widget.prefilled == true) {
+    // If an email was provided via args, fill the controller; otherwise we'll try session when building
+    if (widget.email != null) {
       _emailController.text = widget.email!;
     }
   }
@@ -46,21 +47,30 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = true);
 
       try {
-        // Verificar credenciales con tu servicio real
-        final userExists = await UserService.checkUserExists(_emailController.text);
-        
-        if (userExists) {
-          // Aquí iría la verificación real de contraseña con tu backend
-          // Por ahora simulamos login exitoso
+        // Llamar al endpoint de login (email + password)
+        // Resolve email: prefer controller (argument), otherwise try saved session
+        String emailToUse = _emailController.text;
+        if (emailToUse.isEmpty) {
+          final sess = await UserService.getSavedSession();
+          if (sess != null && sess['email'] != null) emailToUse = sess['email'] as String;
+        }
+
+        final resp = await UserService.login(email: emailToUse, password: _passwordController.text);
+        print('Login response: $resp');
+
+          if (resp['success'] == true) {
           _showSuccess('¡Bienvenido de nuevo!');
-          
           await Future.delayed(const Duration(milliseconds: 500));
-          
+          // Guardar sesión localmente
+          try {
+            await UserService.saveSession(resp['data']?['user'] ?? {'email': emailToUse});
+          } catch (_) {}
+
           if (mounted) {
-            Navigator.pushReplacementNamed(context, RouteNames.home);
+            Navigator.pushReplacementNamed(context, RouteNames.home, arguments: {'email': emailToUse});
           }
         } else {
-          _showError('Usuario no encontrado. Por favor regístrate.');
+          _showError(resp['message'] ?? 'Credenciales inválidas');
         }
       } catch (e) {
         _showError('Error al iniciar sesión: $e');
@@ -92,22 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _navigateToRegister() {
-    Navigator.pushReplacementNamed(
-      context,
-      RouteNames.register,
-      arguments: {
-        'email': _emailController.text.isNotEmpty ? _emailController.text : '',
-        'userName': _emailController.text.isNotEmpty 
-            ? _emailController.text.split('@')[0] 
-            : '',
-      },
-    );
-  }
 
-  void _navigateToEmailAuth() {
-    Navigator.pushNamed(context, RouteNames.emailAuth);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
             
             // Título
             const Text(
-              'Iniciar Sesión',
+              'Confirma tu contraseña',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -139,10 +134,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             
             const SizedBox(height: 8),
-            
+
             // Subtítulo
             const Text(
-              'Ingresa a tu cuenta para continuar',
+              'Ingresa tu contraseña para continuar',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
@@ -156,40 +151,23 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  // Campo de email
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Correo electrónico',
-                      labelStyle: const TextStyle(color: Colors.white70),
-                      prefixIcon: const Icon(Icons.email, color: Color(0xFF39FF14)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.white30),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.white30),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF39FF14)),
+                  // Mostrar el email que se usará (no editable) si está disponible
+                  if (_emailController.text.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.email, color: Color(0xFF39FF14)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _emailController.text,
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu correo electrónico';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                        return 'Por favor ingresa un correo válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 20),
                   
                   // Campo de contraseña
                   TextFormField(
@@ -281,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             )
                           : const Text(
-                              'Iniciar Sesión',
+                              'Continuar',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -290,154 +268,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   
-                  // Separador
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                          color: Colors.white30,
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'o',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                          color: Colors.white30,
-                        ),
-                      ),
-                    ],
-                  ),
                   
-                  const SizedBox(height: 24),
                   
-                  // Botones alternativos
-                  Column(
-                    children: [
-                      // Iniciar con Google
-                      _buildSocialButton(
-                        icon: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
-                          height: 24,
-                          width: 24,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.g_mobiledata,
-                              size: 24,
-                              color: Colors.black,
-                            );
-                          },
-                        ),
-                        text: 'Continuar con Google',
-                        backgroundColor: Colors.white,
-                        textColor: Colors.black,
-                        onPressed: () {
-                          _showError('Login con Google en desarrollo');
-                        },
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Iniciar con Apple
-                      _buildSocialButton(
-                        icon: const Icon(
-                          Icons.apple,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        text: 'Continuar con Apple',
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        borderColor: Colors.white.withOpacity(0.3),
-                        onPressed: () {
-                          _showError('Login con Apple en desarrollo');
-                        },
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Iniciar con teléfono
-                      _buildSocialButton(
-                        icon: const Icon(
-                          Icons.phone_iphone_outlined,
-                          color: Colors.black,
-                          size: 24,
-                        ),
-                        text: 'Continuar con teléfono',
-                        backgroundColor: const Color(0xFF39FF14),
-                        textColor: Colors.black,
-                        onPressed: () {
-                          _showError('Login con teléfono en desarrollo');
-                        },
-                      ),
-                    ],
-                  ),
+                 
                   
-                  const SizedBox(height: 32),
+                
                   
-                  // Registrarse
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        '¿No tienes cuenta? ',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: _navigateToRegister,
-                        child: const Text(
-                          'Regístrate',
-                          style: TextStyle(
-                            color: Color(0xFF39FF14),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Volver a verificación de email
-                  if (widget.prefilled != true)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          '¿Necesitas verificar tu email? ',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _navigateToEmailAuth,
-                          child: const Text(
-                            'Verificar ahora',
-                            style: TextStyle(
-                              color: Color(0xFF39FF14),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  // Nota: se ha removido el prompt de verificación de email
                 ],
               ),
             ),
@@ -447,47 +286,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialButton({
-    required Widget icon,
-    required String text,
-    required Color backgroundColor,
-    required Color textColor,
-    Color borderColor = Colors.transparent,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      height: 50,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: borderColor,
-              width: 1.2,
-            ),
-          ),
-          elevation: 0,
-          shadowColor: Colors.transparent,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(width: 12),
-            Text(
-              text,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: textColor,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 }

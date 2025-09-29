@@ -45,7 +45,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: const Icon(
                     Icons.sports_motorsports_outlined,
                     size: 85,
-                    color: Colors.white, // Este color será reemplazado por el gradiente
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -86,7 +86,7 @@ class WelcomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    // Iniciar con Google - Corregido
+                    // Iniciar con Google
                     _buildSocialButton(
                       icon: Image.network(
                         'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
@@ -104,7 +104,7 @@ class WelcomeScreen extends StatelessWidget {
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
                       onPressed: () {
-                        // Lógica para inicio con Google
+                        // TODO: Integrar Google Sign-In
                       },
                     ),
                     
@@ -122,7 +122,7 @@ class WelcomeScreen extends StatelessWidget {
                       textColor: Colors.white,
                       borderColor: Colors.white.withOpacity(0.3),
                       onPressed: () {
-                        // Lógica para inicio con Apple
+                        // TODO: Integrar Apple Sign-In
                       },
                     ),
                     

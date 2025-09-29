@@ -30,11 +30,10 @@ class MyApp extends StatelessWidget {
       listen: false,
     );
 
-    // Inicializar la base de datos cuando se carga la app si está habilitado
+    // Inicializar la base de datos en background cuando se carga la app
     if (enableDatabaseInit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        databaseProvider.initializeDatabase();
-      });
+      // No bloqueamos la UI: inicializamos en background y dejamos que el RouterScreen se muestre.
+      Future.microtask(() => databaseProvider.initializeDatabase());
     }
 
     return MaterialApp(
@@ -48,104 +47,15 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      onGenerateRoute: AppRouter.generateRoute,
+  onGenerateRoute: AppRouter.generateRoute,
+  navigatorObservers: [RouteLogger()],
       initialRoute: '/',
-      home: Consumer<DatabaseProvider>(
-        builder: (context, databaseProvider, child) {
-          if (databaseProvider.isConnected) {
-            return const RouterScreen();
-          } else if (databaseProvider.errorMessage.isNotEmpty) {
-            return _buildErrorScreen(
-              databaseProvider.errorMessage,
-              databaseProvider,
-            );
-          } else {
-            return _buildLoadingScreen();
-          }
-        },
-      ),
+      // Mostrar la navegación inmediatamente; la conexión a la DB sucede en segundo plano.
+      home: const RouterScreen(),
     );
   }
 
-  Widget _buildLoadingScreen() {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF39FF14)),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Conectando con la base de datos...',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorScreen(
-    String errorMessage,
-    DatabaseProvider databaseProvider,
-  ) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 50),
-              const SizedBox(height: 20),
-              Text(
-                'Error de conexión',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                errorMessage,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  databaseProvider.initializeDatabase();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF39FF14),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 15,
-                  ),
-                ),
-                child: const Text(
-                  'Reintentar conexión',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Asegúrate de que MySQL esté ejecutándose\nen localhost:3306',
-                style: TextStyle(color: Colors.white54, fontSize: 12),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Note: Database connection UI is now shown as a small banner overlay in RouterScreen.
 }
 
 // Widget para manejar la navegación normal cuando la conexión está establecida
@@ -154,9 +64,77 @@ class RouterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: AppRouter.generateRoute,
-      initialRoute: '/',
+    // Mostrar navegación normalmente. Si la DB aún no está lista, mostrar un pequeño banner.
+    final dbProv = Provider.of<DatabaseProvider>(context);
+    return Stack(
+      children: [
+        Navigator(
+          onGenerateRoute: AppRouter.generateRoute,
+          initialRoute: '/',
+        ),
+        if (!dbProv.isConnected)
+          Positioned(
+            left: 12,
+            right: 12,
+            top: 40,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: dbProv.errorMessage.isNotEmpty ? Colors.redAccent : Colors.orangeAccent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(dbProv.errorMessage.isNotEmpty ? Icons.error : Icons.info_outline, color: Colors.black),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        dbProv.errorMessage.isNotEmpty
+                            ? 'Error de conexión a DB'
+                            : 'Conectando a base de datos en segundo plano',
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    if (dbProv.errorMessage.isNotEmpty)
+                      TextButton(
+                        onPressed: () => dbProv.initializeDatabase(),
+                        child: const Text('Reintentar', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
+  }
+}
+
+// Simple NavigatorObserver para loggear cambios de ruta en debug
+class RouteLogger extends NavigatorObserver {
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    super.didPush(route, previousRoute);
+    try {
+      print('Route pushed: ${route.settings.name} <- from ${previousRoute?.settings.name}');
+    } catch (_) {}
+  }
+
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    super.didPop(route, previousRoute);
+    try {
+      print('Route popped: ${route.settings.name} -> back to ${previousRoute?.settings.name}');
+    } catch (_) {}
+  }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    try {
+      print('Route replaced: ${oldRoute?.settings.name} -> ${newRoute?.settings.name}');
+    } catch (_) {}
   }
 }

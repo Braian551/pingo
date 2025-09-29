@@ -133,12 +133,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         if (!mounted || _isDisposed) return;
         
         if (userExists) {
-          // Usuario existe - redirigir al login
-          _showSuccessDialog('Usuario verificado. Redirigiendo al login...');
-          await Future.delayed(const Duration(seconds: 2));
-          
+          // Usuario existe - mostrar SnackBar breve y redirigir al login
+          if (mounted && !_isDisposed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Usuario verificado'),
+                backgroundColor: Colors.green,
+                duration: Duration(milliseconds: 800),
+              ),
+            );
+            await Future.delayed(const Duration(milliseconds: 800));
+          }
+
           if (!mounted || _isDisposed) return;
-          
           Navigator.pushReplacementNamed(
             context,
             RouteNames.login,
@@ -148,12 +155,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             },
           );
         } else {
-          // Usuario no existe - redirigir al registro
-          _showSuccessDialog('Verificación exitosa. Creando tu cuenta...');
-          await Future.delayed(const Duration(seconds: 1));
-          
+          // Usuario no existe - mostrar SnackBar breve y redirigir al registro
+          if (mounted && !_isDisposed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Verificación exitosa'),
+                backgroundColor: Colors.green,
+                duration: Duration(milliseconds: 800),
+              ),
+            );
+            await Future.delayed(const Duration(milliseconds: 800));
+          }
+
           if (!mounted || _isDisposed) return;
-          
           Navigator.pushReplacementNamed(
             context,
             RouteNames.register,
@@ -199,38 +213,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         title: const Text(
           'Error',
           style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-            },
-            child: const Text(
-              'OK',
-              style: TextStyle(color: Color(0xFF39FF14)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSuccessDialog(String message) {
-    if (!mounted || _isDisposed) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'Éxito',
-          style: TextStyle(color: Color(0xFF39FF14)),
         ),
         content: Text(
           message,
