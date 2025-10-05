@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/routes/route_names.dart';
+import 'package:ping_go/src/global/services/auth/user_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,9 +35,14 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     // Navigate after a short delay so animation can finish
-    Timer(const Duration(milliseconds: 2200), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
+    Timer(const Duration(milliseconds: 2200), () async {
+      if (!mounted) return;
+      final session = await UserService.getSavedSession();
+      if (session != null) {
+        // If session exists, go directly to home
+        if (mounted) Navigator.of(context).pushReplacementNamed(RouteNames.home);
+      } else {
+        if (mounted) Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
       }
     });
   }

@@ -114,6 +114,12 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Permite establecer la dirección seleccionada manualmente (por ejemplo, edición)
+  void setSelectedAddress(String address) {
+    _selectedAddress = address;
+    notifyListeners();
+  }
+
   /// Geocodificar una dirección de texto y centrar el mapa en el primer resultado.
   /// Geocode an address and select the first result. Returns true if a result
   /// was found and selected, false otherwise.

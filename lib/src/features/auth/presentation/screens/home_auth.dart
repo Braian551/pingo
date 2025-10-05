@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
+import 'package:ping_go/src/features/profile/presentation/screens/profile_screen.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String? _userAddress;
   bool _loading = true;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -29,10 +31,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the body based on selected index
+    Widget bodyContent;
+    if (_loading) {
+      bodyContent = _buildLoading();
+    } else {
+      switch (_selectedIndex) {
+        case 0:
+          bodyContent = _buildContent();
+          break;
+        case 1:
+          bodyContent = const Center(child: Text('Pedidos', style: TextStyle(color: Colors.white)));
+          break;
+        case 2:
+          bodyContent = const Center(child: Text('Pagos', style: TextStyle(color: Colors.white)));
+          break;
+        case 3:
+          bodyContent = const ProfileTab();
+          break;
+        default:
+          bodyContent = _buildContent();
+      }
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: _buildAppBar(),
-      body: _loading ? _buildLoading() : _buildContent(),
+      body: bodyContent,
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
@@ -365,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
       currentIndex: 0,
       onTap: (index) {
-        // Navegación entre tabs
+        setState(() => _selectedIndex = index);
       },
     );
   }
