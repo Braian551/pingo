@@ -222,27 +222,31 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Dirección de recogida',
+                  'Ubicación seleccionada:',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // Show address inside the edit container and truncate if too long
-                Text(
-                  _userAddress ?? 'Seleccionar ubicación',
-                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                // Boxed, non-editable address field to match Step Address style
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _userAddress ?? 'Seleccionar ubicación',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.edit, color: Color(0xFF39FF14), size: 20),
             onPressed: () async {
