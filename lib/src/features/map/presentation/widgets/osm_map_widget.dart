@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,6 +10,8 @@ class OSMMapWidget extends StatefulWidget {
   final bool interactive;
   final Function(LatLng)? onLocationSelected;
   final Function(LatLng)? onMapMoved; // Notifica el centro actual del mapa
+  final VoidCallback? onMapMoveStart;
+  final VoidCallback? onMapMoveEnd;
   final bool showMarkers;
 
   const OSMMapWidget({
@@ -17,6 +20,8 @@ class OSMMapWidget extends StatefulWidget {
     this.interactive = true,
     this.onLocationSelected,
     this.onMapMoved,
+    this.onMapMoveStart,
+    this.onMapMoveEnd,
     this.showMarkers = true,
   });
 
@@ -27,6 +32,8 @@ class OSMMapWidget extends StatefulWidget {
 class _OSMMapWidgetState extends State<OSMMapWidget> {
   final MapController _mapController = MapController();
   LatLng? _currentCenter;
+  bool _isMoving = false;
+  Timer? _moveEndDebounce;
 
   @override
   void initState() {
@@ -68,9 +75,24 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
         onPositionChanged: (position, hasGesture) {
           if (hasGesture) {
             _currentCenter = position.center;
+
+            // Notify start of movement once
+            if (!_isMoving) {
+              _isMoving = true;
+              if (widget.onMapMoveStart != null) widget.onMapMoveStart!();
+            }
+
+            // Notify map moved
             if (widget.onMapMoved != null && position.center != null) {
               widget.onMapMoved!(position.center!);
             }
+
+            // Debounce to detect movement end
+            _moveEndDebounce?.cancel();
+            _moveEndDebounce = Timer(const Duration(milliseconds: 200), () {
+              _isMoving = false;
+              if (widget.onMapMoveEnd != null) widget.onMapMoveEnd!();
+            });
           }
         },
       ),

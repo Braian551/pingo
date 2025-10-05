@@ -24,18 +24,37 @@ class AddressStepWidget extends StatefulWidget {
   State<AddressStepWidget> createState() => _AddressStepWidgetState();
 }
 
-class _AddressStepWidgetState extends State<AddressStepWidget> {
+class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   LatLng? _mapCenterCache;
   Timer? _moveDebounce;
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearchFocused = false;
+  
+  // Animación solo para cuando el mapa se mueve
+  late AnimationController _animationController;
+  late Animation<double> _bounceAnimation;
 
   @override
   void initState() {
     super.initState();
     _searchController.text = widget.addressController.text;
     _searchFocusNode.addListener(_onSearchFocusChange);
+    
+    // Configurar controlador de animaciones solo para rebote
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    // Animación de rebote solo durante el movimiento
+    _bounceAnimation = Tween<double>(
+      begin: 0.0,
+      end: -6.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
   }
 
   void _onSearchFocusChange() {
@@ -49,6 +68,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
     _moveDebounce?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -82,6 +102,28 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   }
 
   bool _confirmed = false;
+  bool _isMapMoving = false;
+  Timer? _mapMoveTimer;
+
+  void _onMapMoveStart() {
+    setState(() {
+      _isMapMoving = true;
+    });
+    _mapMoveTimer?.cancel();
+    // Iniciar animación de rebote
+    _animationController.forward();
+  }
+
+  void _onMapMoveEnd() {
+    _mapMoveTimer?.cancel();
+    _mapMoveTimer = Timer(const Duration(milliseconds: 150), () {
+      setState(() {
+        _isMapMoving = false;
+      });
+      // Revertir animación de rebote
+      _animationController.reverse();
+    });
+  }
 
   void _showConfirmedSnack() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -181,6 +223,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                       _mapCenterCache = center;
                       _handleMapMovedDebounced(center);
                     },
+                    onMapMoveStart: _onMapMoveStart,
+                    onMapMoveEnd: _onMapMoveEnd,
                     showMarkers: false,
                   ),
                 ),
@@ -268,73 +312,81 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
             ),
           ),
 
-          // Marcador CORREGIDO - la punta de la raya es el punto de selección
+          // Marcador simple y limpio con animación solo al mover el mapa
           Center(
             child: IgnorePointer(
               ignoring: true,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Círculo decorativo en la parte superior
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+              child: AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(0, _bounceAnimation.value),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Círculo decorativo en la parte superior
+                        Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        
+                        // Línea vertical
+                        Container(
+                          height: 25,
+                          width: 2,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Punto de selección (la punta es el punto exacto)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  
-                  // Línea vertical - LA PUNTA INFIOR ES EL PUNTO DE SELECCIÓN
-                  Container(
-                    width: 2,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // Punto de selección en la punta de la raya
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),
@@ -544,7 +596,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                                 ),
                                 child: Icon(
                                   Icons.location_on,
-                                  color: Colors.redAccent,
+                                  color: const Color.fromARGB(255, 31, 221, 6),
                                   size: 18,
                                 ),
                               ),
