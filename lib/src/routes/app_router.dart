@@ -16,6 +16,9 @@ import 'package:ping_go/src/routes/animated_routes.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/':
+        // initial route used by Navigator(initialRoute: '/')
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.welcome:
@@ -61,8 +64,8 @@ class AppRouter {
           );
         }
       case RouteNames.home:
-  // Cuando el usuario se autentique debe ir a HomeAuth (pantalla principal auth)
-  return MaterialPageRoute(builder: (_) => const HomeAuth());
+        // Cuando el usuario se autentique debe ir a la pantalla principal (HomeScreen)
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       // Agregar más rutas aquí
       default:
         return MaterialPageRoute(

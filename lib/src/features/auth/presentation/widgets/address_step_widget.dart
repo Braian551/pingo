@@ -102,25 +102,18 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
   }
 
   bool _confirmed = false;
-  bool _isMapMoving = false;
   Timer? _mapMoveTimer;
 
   void _onMapMoveStart() {
-    setState(() {
-      _isMapMoving = true;
-    });
+    // Cancel any pending end-timer and start the bounce animation
     _mapMoveTimer?.cancel();
-    // Iniciar animación de rebote
     _animationController.forward();
   }
 
   void _onMapMoveEnd() {
     _mapMoveTimer?.cancel();
     _mapMoveTimer = Timer(const Duration(milliseconds: 150), () {
-      setState(() {
-        _isMapMoving = false;
-      });
-      // Revertir animación de rebote
+      // Revert the bounce animation after a short delay
       _animationController.reverse();
     });
   }
