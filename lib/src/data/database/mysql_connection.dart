@@ -1,4 +1,5 @@
 import 'package:mysql1/mysql1.dart';
+import '../../core/constants/app_constants.dart';
 
 class MySQLConnection {
   static final MySQLConnection _instance = MySQLConnection._internal();
@@ -16,11 +17,11 @@ class MySQLConnection {
   Future<void> connect() async {
     try {
       final settings = ConnectionSettings(
-        host: '10.0.2.2',
-        port: 3306,
-        user: 'root',
-        password: 'root',
-        db: 'pingo', // Nombre de tu base de datos
+        host: AppConstants.databaseHost,
+        port: int.tryParse(AppConstants.databasePort) ?? 3306,
+        user: AppConstants.databaseUser,
+        password: AppConstants.databasePassword,
+        db: AppConstants.databaseName, // Nombre de tu base de datos
         timeout: Duration(seconds: 10),
       );
       

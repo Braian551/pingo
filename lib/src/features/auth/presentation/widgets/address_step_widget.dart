@@ -28,27 +28,35 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   final TextEditingController _searchController = TextEditingController();
   LatLng? _mapCenterCache;
   Timer? _moveDebounce;
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _isSearchFocused = false;
 
   @override
   void initState() {
     super.initState();
     _searchController.text = widget.addressController.text;
-  // No automatic geocoding on manual edits: map pin movement will update the field.
+    _searchFocusNode.addListener(_onSearchFocusChange);
+  }
+
+  void _onSearchFocusChange() {
+    setState(() {
+      _isSearchFocused = _searchFocusNode.hasFocus;
+    });
   }
 
   @override
   void dispose() {
-  _moveDebounce?.cancel();
+    _moveDebounce?.cancel();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
-  // Manual edits to the address field do not trigger geocoding. The map/pin movement
-  // will update this field via the OSMMapWidget callbacks instead.
-
   void _onSearch(String q) async {
-    final prov = Provider.of<MapProvider>(context, listen: false);
-    prov.searchAddress(q);
+    if (q.length > 2) {
+      final prov = Provider.of<MapProvider>(context, listen: false);
+      prov.searchAddress(q);
+    }
   }
 
   void _onResultTap(NominatimResult result) {
@@ -58,6 +66,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
     // Actualizar el campo de dirección local
     final formatted = result.getFormattedAddress();
     widget.addressController.text = formatted;
+    _searchController.text = formatted;
 
     // Notificar al padre (no confirmar aún, solo preselección)
     widget.onLocationSelected({
@@ -67,15 +76,16 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
       'city': result.getCity(),
       'state': result.getState(),
     });
-  }
 
-  // removed unused _onMapTap - map taps are handled by OSMMapWidget.onLocationSelected
+    // Ocultar teclado y perder foco
+    _searchFocusNode.unfocus();
+  }
 
   bool _confirmed = false;
 
   void _showConfirmedSnack() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Row(
           children: [
             Icon(Icons.check_circle, color: Colors.white),
@@ -85,6 +95,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
         ),
         backgroundColor: Colors.green,
         duration: Duration(milliseconds: 900),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -96,7 +108,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
     final lon = center?.longitude ?? prov.selectedLocation?.longitude;
 
     if (lat == null || lon == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecciona una ubicación antes de confirmar')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Selecciona una ubicación antes de confirmar'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
       return;
     }
 
@@ -130,32 +149,36 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
       height: MediaQuery.of(context).size.height * 0.84,
       child: Stack(
         children: [
-          // Mapa a pantalla completa dentro del contenedor
-          // Mapa con bordes redondeados
+          // Mapa con bordes redondeados y efecto de profundidad mejorado
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white12),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 8, offset: const Offset(0,4))],
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                   child: OSMMapWidget(
                     initialLocation: prov.selectedLocation,
                     interactive: true,
                     onLocationSelected: (loc) async {
-                      // Actualizar caché del centro y realizar reverse
                       _mapCenterCache = loc;
                       await prov.selectLocation(loc);
-                      // rellenar input con la dirección obtenida
                       widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
+                      _searchController.text = widget.addressController.text;
                     },
                     onMapMoved: (center) {
                       _mapCenterCache = center;
-                      // Debounce reverse geocoding while the user moves the map
                       _handleMapMovedDebounced(center);
                     },
                     showMarkers: false,
@@ -165,73 +188,150 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
             ),
           ),
 
-          // Floating search at top
-          // Dark search bar
+          // Search bar moderna con efectos de glassmorphism
           Positioned(
-            top: 16,
-            left: 24,
-            right: 24,
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[850],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white12),
+            top: 20,
+            left: 20,
+            right: 20,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              decoration: BoxDecoration(
+                color: Colors.grey[850]!.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: _isSearchFocused 
+                    ? Color(0xFF39FF14).withOpacity(0.6)
+                    : Colors.white12,
+                  width: 1.5,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (v) => _onSearch(v),
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: 'Buscar dirección',
-                          hintStyle: TextStyle(color: Colors.white54),
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search, color: Colors.white54),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search_rounded,
+                        color: _isSearchFocused 
+                          ? Color(0xFF39FF14)
+                          : Colors.white54,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          onChanged: _onSearch,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Buscar dirección...',
+                            hintStyle: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 16,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.white70, size: 18),
-                        onPressed: () {
-                          _searchController.clear();
-                          Provider.of<MapProvider>(context, listen: false).clearSearch();
-                        },
-                      ),
-                    ),
-                  ],
+                      if (_searchController.text.isNotEmpty)
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.clear_rounded,
+                              color: Colors.white54,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              Provider.of<MapProvider>(context, listen: false).clearSearch();
+                              _searchFocusNode.unfocus();
+                            },
+                            splashRadius: 20,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
 
-          // Center pin (Uber style motorcycle)
+          // Marcador CORREGIDO - la punta de la raya es el punto de selección
           Center(
             child: IgnorePointer(
               ignoring: true,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.motorcycle, size: 64, color: Colors.redAccent, shadows: [const Shadow(color: Colors.black45, blurRadius: 8)]),
-                  const SizedBox(height: 6),
+                  // Círculo decorativo en la parte superior
                   Container(
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  
+                  // Línea vertical - LA PUNTA INFIOR ES EL PUNTO DE SELECCIÓN
+                  Container(
+                    width: 2,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Punto de selección en la punta de la raya
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -239,52 +339,92 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
             ),
           ),
 
-          // Floating bottom card (dark style) with address preview and confirm
+          // Tarjeta inferior moderna con efecto glass
           Positioned(
             left: 20,
             right: 20,
-            bottom: 24,
+            bottom: 20,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 260),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.easeOut,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white12),
-                boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 12, offset: const Offset(0, 6))],
+                color: Colors.grey[900]!.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white12,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Address text field (editable) - allows manual entry and geocoding
-                  TextField(
-                    controller: widget.addressController,
-                    readOnly: false,
-                    // Editable but DOES NOT trigger geocoding here. The top search bar is used for geocoding.
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.location_on, color: Colors.redAccent),
-                      hintText: 'Selecciona una ubicación',
-                      hintStyle: TextStyle(color: Colors.white54),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
+                  // Campo de dirección con icono
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850]!.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: TextField(
+                      controller: widget.addressController,
+                      readOnly: false,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.location_on,
+                          color: const Color.fromARGB(255, 91, 255, 82),
+                        ),
+                        hintText: 'Dirección seleccionada...',
+                        hintStyle: TextStyle(
+                          color: Colors.white54,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        filled: true,
+                        fillColor: Colors.transparent,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey[850],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
 
                   if (_confirmed)
-                    Row(
-                      children: const [
-                        Icon(Icons.check_circle, color: Colors.greenAccent),
-                        SizedBox(width: 8),
-                        Expanded(child: Text('Ha sido seleccionada la ubicación', style: TextStyle(color: Colors.white))),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.greenAccent),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Ubicación confirmada',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                   if (!_confirmed)
@@ -293,45 +433,61 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              // Confirm using the cached map center or provider selection
                               LatLng? center = _mapCenterCache ?? prov.selectedLocation;
-                              // If we have a center but no reverse address, try reverse now
                               if (center != null && prov.selectedAddress == null) {
                                 prov.selectLocation(center);
                                 widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
                               }
-                              // Fill address field and notify parent
                               if (prov.selectedAddress != null) {
                                 widget.addressController.text = prov.selectedAddress!;
                               }
                               _onConfirm(center);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF39FF14),
+                              backgroundColor: Color(0xFF39FF14),
                               foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                              shadowColor: Color(0xFF39FF14).withOpacity(0.3),
                             ),
-                            child: const Text('Confirmar ubicación'),
+                            child: Text(
+                              'Confirmar ubicación',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: Center(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                // Reset selection
-                                Provider.of<MapProvider>(context, listen: false).clearSelection();
-                                widget.addressController.clear();
-                              },
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                side: BorderSide(color: Colors.white12),
-                                padding: EdgeInsets.zero,
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800]!.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white12,
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              Provider.of<MapProvider>(context, listen: false).clearSelection();
+                              widget.addressController.clear();
+                              _searchController.clear();
+                            },
+                            icon: Icon(
+                              Icons.close_rounded,
+                              color: Colors.white70,
+                              size: 22,
+                            ),
+                            style: IconButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.close, color: Colors.white70),
                             ),
                           ),
                         ),
@@ -342,38 +498,76 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
             ),
           ),
 
-          // Search results dropdown (if any)
+          // Resultados de búsqueda con diseño glass
           if (prov.searchResults.isNotEmpty)
             Positioned(
-              top: 72,
-              left: 24,
-              right: 24,
+              top: 80,
+              left: 20,
+              right: 20,
               child: Material(
                 color: Colors.transparent,
-                elevation: 8,
-                borderRadius: BorderRadius.circular(10),
+                elevation: 0,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[850],
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white12),
+                    color: Colors.grey[850]!.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white12,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 240),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: prov.searchResults.length,
-                      itemBuilder: (context, i) {
-                        final r = prov.searchResults[i];
-                        return ListTile(
-                          leading: const Icon(Icons.location_on, color: Colors.white70),
-                          title: Text(r.getFormattedAddress(), style: const TextStyle(color: Colors.white)),
-                          onTap: () {
-                            _onResultTap(r);
-                            // After tap, hide results (provider already clears)
-                          },
-                        );
-                      },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 280),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: prov.searchResults.length,
+                        itemBuilder: (context, i) {
+                          final r = prov.searchResults[i];
+                          return Material(
+                            color: Colors.transparent,
+                            child: ListTile(
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[800]!.withOpacity(0.6),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: Colors.redAccent,
+                                  size: 18,
+                                ),
+                              ),
+                              title: Text(
+                                r.getFormattedAddress(),
+                                style: TextStyle(color: Colors.white),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: Colors.white54,
+                                size: 16,
+                              ),
+                              onTap: () => _onResultTap(r),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -386,15 +580,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
 
   void _handleMapMovedDebounced(LatLng? center) {
     if (center == null) return;
-    // Cancel previous
     _moveDebounce?.cancel();
     final prov = Provider.of<MapProvider>(context, listen: false);
-    _moveDebounce = Timer(const Duration(milliseconds: 700), () async {
+    _moveDebounce = Timer(const Duration(milliseconds: 800), () async {
       try {
         await prov.selectLocation(center);
-        // Update input with the reverse geocoded address
         setState(() {
           widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
+          _searchController.text = widget.addressController.text;
         });
       } catch (_) {
         // ignore errors silently for now
