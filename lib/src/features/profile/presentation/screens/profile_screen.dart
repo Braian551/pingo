@@ -21,6 +21,7 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   Map<String, dynamic>? _session;
   Map<String, dynamic>? _profileData;
+  Map<String, dynamic>? _location;
   bool _loading = true;
 
   @override
@@ -41,9 +42,34 @@ class _ProfileTabState extends State<ProfileTab> {
       final profile = await UserService.getProfile(userId: id, email: email);
       if (profile != null && profile['success'] == true) {
         setState(() {
-          _profileData = profile['user'] as Map<String, dynamic>?;
+            _profileData = profile['user'] as Map<String, dynamic>?;
+            _location = profile['location'] as Map<String, dynamic>?;
         });
       }
+    }
+
+    // If no saved session, maybe we were opened with route args (e.g. after register)
+    if (_session == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final args = ModalRoute.of(context)?.settings.arguments;
+        if (args is Map) {
+          final emailArg = args['email'] as String?;
+          final idArg = args['userId'] as int?;
+          if (emailArg != null || idArg != null) {
+            final profile = await UserService.getProfile(userId: idArg, email: emailArg);
+            if (profile != null && profile['success'] == true) {
+              if (mounted) {
+                setState(() {
+                  _profileData = profile['user'] as Map<String, dynamic>?;
+                  _location = profile['location'] as Map<String, dynamic>?;
+                });
+              }
+            }
+          }
+        }
+        if (mounted) setState(() => _loading = false);
+      });
+      return;
     }
 
     setState(() => _loading = false);
@@ -92,6 +118,16 @@ class _ProfileTabState extends State<ProfileTab> {
                                 email ?? 'No hay sesión',
                                 style: const TextStyle(color: Colors.white70),
                               ),
+                              const SizedBox(height: 6),
+                              // Mostrar dirección si está disponible (truncada en una sola línea)
+                              Text(
+                                _location != null && (_location!['direccion'] ?? '').toString().isNotEmpty
+                                    ? (_location!['direccion'] ?? '')
+                                    : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : ''),
+                                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ],
                           ),
                         ),
@@ -100,20 +136,21 @@ class _ProfileTabState extends State<ProfileTab> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final res = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
-                    );
-                    if (res != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
-                    }
-                  },
-                  icon: const Icon(Icons.location_on),
-                  label: const Text('Editar dirección'),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF39FF14), foregroundColor: Colors.black),
-                ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      // Abrir LocationPicker; al volver, recargar perfil para mostrar la dirección actualizada
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
+                      );
+                      setState(() => _loading = true);
+                      await _loadSession();
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
+                    },
+                    icon: const Icon(Icons.location_on),
+                    label: const Text('Editar dirección'),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF39FF14), foregroundColor: Colors.black),
+                  ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
                   onPressed: _logout,
@@ -130,6 +167,7 @@ class _ProfileTabState extends State<ProfileTab> {
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _session;
   Map<String, dynamic>? _profileData;
+  Map<String, dynamic>? _location;
   bool _loading = true;
 
   @override
@@ -151,11 +189,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (profile != null && profile['success'] == true) {
         setState(() {
           _profileData = profile['user'] as Map<String, dynamic>?;
+          _location = profile['location'] as Map<String, dynamic>?;
         });
       }
+      setState(() => _loading = false);
+      return;
     }
 
-    setState(() => _loading = false);
+    // Try to get profile using route args if no saved session
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map) {
+        final emailArg = args['email'] as String?;
+        final idArg = args['userId'] as int?;
+        if (emailArg != null || idArg != null) {
+          final profile = await UserService.getProfile(userId: idArg, email: emailArg);
+          if (profile != null && profile['success'] == true) {
+            if (mounted) {
+              setState(() {
+                _profileData = profile['user'] as Map<String, dynamic>?;
+                _location = profile['location'] as Map<String, dynamic>?;
+              });
+            }
+          }
+        }
+      }
+      if (mounted) setState(() => _loading = false);
+    });
   }
 
   void _logout() async {
@@ -208,6 +268,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   email ?? 'No hay sesión',
                                   style: const TextStyle(color: Colors.white70),
                                 ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _location != null && (_location!['direccion'] ?? '').toString().isNotEmpty
+                                      ? (_location!['direccion'] ?? '')
+                                      : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : ''),
+                                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ],
                             ),
                           ),
@@ -218,14 +287,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      // Abrir LocationPicker para editar dirección
-                      final res = await Navigator.push(
+                      // Abrir LocationPicker para editar dirección; al volver recargar perfil
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
                       );
-                      if (res != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
-                      }
+                      setState(() => _loading = true);
+                      await _loadSession();
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
                     },
                     icon: const Icon(Icons.location_on),
                     label: const Text('Editar dirección'),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
 import 'package:ping_go/src/features/profile/presentation/screens/profile_screen.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
+import 'package:ping_go/src/global/services/auth/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,12 +23,60 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadUserData() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    setState(() {
-      _userAddress = 'Av. Principal 123, Miraflores, Lima';
-      _loading = false;
+    // Try to load user's saved profile location from backend
+    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      final sess = await UserService.getSavedSession();
+      if (sess != null) {
+        final id = sess['id'] as int?;
+        final email = sess['email'] as String?;
+        final profile = await UserService.getProfile(userId: id, email: email);
+        if (profile != null && profile['success'] == true) {
+          final location = profile['location'];
+          if (location != null) {
+            final dir = location['direccion'] as String? ?? '';
+            setState(() {
+              _userAddress = dir.isNotEmpty ? dir : null;
+              _loading = false;
+            });
+            return;
+          }
+        }
+      }
+    } catch (_) {}
+    // If no saved session, try to read route args (e.g. after registration)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final args = ModalRoute.of(context)?.settings.arguments;
+        if (args is Map) {
+          final emailArg = args['email'] as String?;
+          final idArg = args['userId'] as int?;
+          if (emailArg != null || idArg != null) {
+            final profile = await UserService.getProfile(userId: idArg, email: emailArg);
+            if (profile != null && profile['success'] == true) {
+              final location = profile['location'];
+              if (location != null) {
+                final dir = location['direccion'] as String? ?? '';
+                if (mounted) {
+                  setState(() {
+                    _userAddress = dir.isNotEmpty ? dir : null;
+                    _loading = false;
+                  });
+                  return;
+                }
+              }
+            }
+          }
+        }
+      } catch (_) {}
+      if (mounted) setState(() {
+        _userAddress = null;
+        _loading = false;
+      });
     });
   }
+
+  // removed didChangeDependencies; route-arg handling moved into _loadUserData
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bodyContent = const Center(child: Text('Pagos', style: TextStyle(color: Colors.white)));
           break;
         case 3:
-          bodyContent = const ProfileTab();
+          bodyContent = ProfileTab();
           break;
         default:
           bodyContent = _buildContent();
@@ -140,13 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          _userAddress ?? 'Agrega una dirección para comenzar',
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 16,
-          ),
-        ),
+        // Remove duplicate address shown here; address will be shown inside the
+        // address card with proper truncation and the edit action.
         const SizedBox(height: 16),
         _buildAddressCard(),
       ],
@@ -186,25 +230,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
+                // Show address inside the edit container and truncate if too long
                 Text(
                   _userAddress ?? 'Seleccionar ubicación',
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.edit, color: Color(0xFF39FF14), size: 20),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              // Open LocationPicker, and refresh address when returning
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const LocationPickerScreen(),
                 ),
               );
+              setState(() => _loading = true);
+              await _loadUserData();
             },
           ),
         ],
@@ -388,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'Perfil',
         ),
       ],
-      currentIndex: 0,
+      currentIndex: _selectedIndex,
       onTap: (index) {
         setState(() => _selectedIndex = index);
       },

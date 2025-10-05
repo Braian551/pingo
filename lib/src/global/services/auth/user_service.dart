@@ -135,12 +135,36 @@ class UserService {
       final uri = Uri.parse('http://10.0.2.2/pingo/backend/auth/profile.php')
           .replace(queryParameters: userId != null ? {'userId': userId.toString()} : (email != null ? {'email': email} : null));
 
+      // Debug: print requested URI
+      try {
+        // ignore: avoid_print
+        print('Requesting profile URI: $uri');
+      } catch (_) {}
+
       final response = await http.get(uri, headers: {
         'Accept': 'application/json',
       });
 
+      // Debug: print response body
+      try {
+        // ignore: avoid_print
+        print('Profile response (${response.statusCode}): ${response.body}');
+      } catch (_) {}
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
+        // If backend wraps user/location under data, flatten it for callers
+        if (data.containsKey('data') && data['data'] is Map<String, dynamic>) {
+          final inner = data['data'] as Map<String, dynamic>;
+          final Map<String, dynamic> flattened = {
+            'success': data['success'],
+            'message': data['message'],
+            // prefer inner keys if present
+            'user': inner['user'],
+            'location': inner['location'],
+          };
+          return flattened;
+        }
         if (data['success'] == true) return data;
         return null;
       }
