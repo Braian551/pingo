@@ -113,4 +113,37 @@ class MapProvider with ChangeNotifier {
     _selectedState = null;
     notifyListeners();
   }
+
+  /// Geocodificar una dirección de texto y centrar el mapa en el primer resultado.
+  /// Geocode an address and select the first result. Returns true if a result
+  /// was found and selected, false otherwise.
+  Future<bool> geocodeAndSelect(String address) async {
+    final query = address.trim();
+    if (query.isEmpty) return false;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final results = await NominatimService.searchAddress(query);
+      if (results.isNotEmpty) {
+        // Seleccionar el primer resultado
+        selectSearchResult(results.first);
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        // No se encontraron resultados
+        _searchResults = [];
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _searchResults = [];
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

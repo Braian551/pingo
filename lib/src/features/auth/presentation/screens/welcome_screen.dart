@@ -1,6 +1,7 @@
 // lib/src/features/auth/presentation/screens/welcome_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/routes/route_names.dart';
+import 'package:ping_go/src/widgets/entrance_fader.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -18,63 +19,70 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               SizedBox(height: size.height * 0.12),
               
-              // Icono de auto moderno con efecto de profundidad
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      const Color(0xFF39FF14).withOpacity(0.15),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.1, 0.8],
-                  ),
-                ),
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+              // Icono de auto moderno con efecto de profundidad (entrance animation)
+              EntranceFader(
+                delay: const Duration(milliseconds: 80),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
                       colors: [
-                        Color(0xFF39FF14),
-                        Color(0xFF25C40A),
+                        const Color(0xFF39FF14).withOpacity(0.15),
+                        Colors.transparent,
                       ],
-                    ).createShader(bounds);
-                  },
-                  child: const Icon(
-                    Icons.sports_motorsports_outlined,
-                    size: 85,
-                    color: Colors.white,
+                      stops: const [0.1, 0.8],
+                    ),
+                  ),
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF39FF14),
+                          Color(0xFF25C40A),
+                        ],
+                      ).createShader(bounds);
+                    },
+                    child: const Icon(
+                      Icons.sports_motorsports_outlined,
+                      size: 85,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
               
               const SizedBox(height: 8),
-              
-              // Texto de bienvenida
-              const Text(
-                'Bienvenido a Ping-Go',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
+
+              EntranceFader(
+                delay: const Duration(milliseconds: 160),
+                child: const Text(
+                  'Bienvenido a Ping-Go',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
-              
+
               const SizedBox(height: 10),
-              
-              // Subtítulo
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  'Movilidad y entregas rápidas a tu alcance',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white70,
-                    height: 1.4,
+
+              EntranceFader(
+                delay: const Duration(milliseconds: 240),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    'Movilidad y entregas rápidas a tu alcance',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white70,
+                      height: 1.4,
+                    ),
                   ),
                 ),
               ),

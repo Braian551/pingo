@@ -4,12 +4,14 @@ import 'dart:async';
 class LocationSearchWidget extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onSearch;
+  final Function(String)? onSubmit;
   final String hintText;
 
   const LocationSearchWidget({
     super.key,
     required this.controller,
     required this.onSearch,
+    this.onSubmit,
     this.hintText = 'Buscar dirección...',
   });
 
@@ -43,20 +45,38 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
+      onSubmitted: widget.onSubmit,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: const TextStyle(color: Colors.white54),
         prefixIcon: const Icon(Icons.search, color: Color(0xFF39FF14)),
-        suffixIcon: widget.controller.text.isNotEmpty
-            ? IconButton(
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.controller.text.isNotEmpty)
+              IconButton(
                 icon: const Icon(Icons.clear, color: Colors.white54),
                 onPressed: () {
                   widget.controller.clear();
                   widget.onSearch('');
                 },
-              )
-            : null,
+              ),
+            IconButton(
+              icon: const Icon(Icons.search, color: Color(0xFF39FF14)),
+              onPressed: () {
+                final q = widget.controller.text.trim();
+                if (q.isNotEmpty) {
+                  if (widget.onSubmit != null) {
+                    widget.onSubmit!(q);
+                  } else {
+                    widget.onSearch(q);
+                  }
+                }
+              },
+            ),
+          ],
+        ),
         filled: true,
         fillColor: const Color(0xFF1A1A1A),
         border: OutlineInputBorder(

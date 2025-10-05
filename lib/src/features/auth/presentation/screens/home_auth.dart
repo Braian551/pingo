@@ -64,8 +64,11 @@ class _HomeAuthState extends State<HomeAuth> {
               }
 
               // If still no address found, expose the raw profile JSON in _debugProfile for troubleshooting
-              if (addr == null || addr.isEmpty) _debugProfile = prof;
-              else _address = addr;
+              if (addr == null || addr.isEmpty) {
+                _debugProfile = prof;
+              } else {
+                _address = addr;
+              }
             }
           } else {
             _debugProfile = prof;

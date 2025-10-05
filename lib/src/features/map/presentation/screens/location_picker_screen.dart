@@ -25,11 +25,14 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _editableAddressController = TextEditingController();
+  VoidCallback? _providerListener;
 
   @override
   void initState() {
     super.initState();
     _initializeLocation();
+  // Do not listen for edits here; editing the address should not trigger geocoding.
   }
 
   void _initializeLocation() {
@@ -42,6 +45,27 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     if (widget.initialAddress != null) {
       _searchController.text = widget.initialAddress!;
     }
+    // Initialize editable controller with any existing selectedAddress
+    if (mapProvider.selectedAddress != null) {
+      _editableAddressController.text = mapProvider.selectedAddress!;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ensure the editable controller stays in sync with provider.selectedAddress
+    final mapProvider = Provider.of<MapProvider>(context);
+    // Remove previous listener if set
+    if (_providerListener != null) {
+      // nothing to remove - provider doesn't have removeListener per-instance here
+    }
+    // We use a simple post-frame callback to set current value
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _editableAddressController.text = mapProvider.selectedAddress ?? _editableAddressController.text;
+      }
+    });
   }
 
   @override
@@ -75,6 +99,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             ),
         ],
       ),
+
       body: Column(
         children: [
           // Barra de búsqueda
@@ -84,6 +109,18 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               controller: _searchController,
               onSearch: (query) {
                 mapProvider.searchAddress(query);
+              },
+              onSubmit: (query) async {
+                // When user presses Enter or the search icon, try to geocode and select
+                final found = await mapProvider.geocodeAndSelect(query);
+                if (!found) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Dirección no encontrada'), duration: Duration(seconds: 2)),
+                  );
+                } else {
+                  // Sync search controller with the selected address
+                  _searchController.text = mapProvider.selectedAddress ?? _searchController.text;
+                }
               },
             ),
           ),
@@ -116,13 +153,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     ),
                   ),
                 
-                // Dirección seleccionada
+                // Dirección seleccionada (editable)
                 if (mapProvider.selectedAddress != null)
                   Positioned(
                     top: 16,
                     left: 16,
                     right: 16,
-                    child: _buildSelectedAddressCard(mapProvider),
+                    child: _buildEditableSelectedAddressCard(mapProvider),
                   ),
               ],
             ),
@@ -162,7 +199,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     );
   }
 
-  Widget _buildSelectedAddressCard(MapProvider mapProvider) {
+  
+
+  Widget _buildEditableSelectedAddressCard(MapProvider mapProvider) {
     return Card(
       color: Colors.black.withOpacity(0.8),
       child: Padding(
@@ -182,15 +221,29 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    mapProvider.selectedAddress!,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _editableAddressController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Editar dirección...',
+                            hintStyle: const TextStyle(color: Colors.white54),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            filled: true,
+                            fillColor: const Color(0xFF1A1A1A),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          // Editable but DOES NOT trigger geocoding here; map moves update the field
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -204,6 +257,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _editableAddressController.dispose();
     super.dispose();
   }
+
+  // Editing the selected-address field does not trigger geocoding.
 }

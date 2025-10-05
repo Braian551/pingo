@@ -33,14 +33,18 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   void initState() {
     super.initState();
     _searchController.text = widget.addressController.text;
+  // No automatic geocoding on manual edits: map pin movement will update the field.
   }
 
   @override
   void dispose() {
-    _moveDebounce?.cancel();
+  _moveDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
+
+  // Manual edits to the address field do not trigger geocoding. The map/pin movement
+  // will update this field via the OSMMapWidget callbacks instead.
 
   void _onSearch(String q) async {
     final prov = Provider.of<MapProvider>(context, listen: false);
@@ -254,10 +258,11 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Address text field (read-only, filled on confirm) - dark style
+                  // Address text field (editable) - allows manual entry and geocoding
                   TextField(
                     controller: widget.addressController,
-                    readOnly: true,
+                    readOnly: false,
+                    // Editable but DOES NOT trigger geocoding here. The top search bar is used for geocoding.
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.location_on, color: Colors.redAccent),

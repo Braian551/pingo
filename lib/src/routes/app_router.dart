@@ -9,37 +9,43 @@ import 'package:ping_go/src/features/auth/presentation/screens/email_verificatio
 // ride HomeScreen still available but the authenticated entrypoint should be HomeAuth
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:ping_go/src/features/auth/presentation/screens/splash_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
+import 'package:ping_go/src/routes/animated_routes.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case RouteNames.splash:
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.welcome:
-        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+        return FadeSlidePageRoute(page: const WelcomeScreen(), settings: settings);
       case RouteNames.login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return FadeSlidePageRoute(page: const LoginScreen(), settings: settings);
       case RouteNames.phoneAuth:
-        return MaterialPageRoute(builder: (_) => const PhoneAuthScreen());
+        return FadeSlidePageRoute(page: const PhoneAuthScreen(), settings: settings);
       case RouteNames.emailAuth:
-        return MaterialPageRoute(builder: (_) => const EmailAuthScreen());
+        return FadeSlidePageRoute(page: const EmailAuthScreen(), settings: settings);
       case RouteNames.emailVerification:
         {
           final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (_) => EmailVerificationScreen(
+          return FadeSlidePageRoute(
+            page: EmailVerificationScreen(
               email: args?['email'] ?? '',
               userName: args?['userName'] ?? '',
             ),
+            settings: settings,
           );
         }
       case RouteNames.register:
         {
           final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (_) => RegisterScreen(
+          return FadeSlidePageRoute(
+            page: RegisterScreen(
               email: args?['email'] ?? '',
               userName: args?['userName'] ?? '',
             ),
+            settings: settings,
           );
         }
       case RouteNames.locationPicker:
@@ -55,8 +61,8 @@ class AppRouter {
           );
         }
       case RouteNames.home:
-        // Cuando el usuario se autentique debe ir a HomeAuth (pantalla principal auth)
-        return MaterialPageRoute(builder: (_) => const HomeAuth());
+  // Cuando el usuario se autentique debe ir a HomeAuth (pantalla principal auth)
+  return MaterialPageRoute(builder: (_) => const HomeAuth());
       // Agregar más rutas aquí
       default:
         return MaterialPageRoute(

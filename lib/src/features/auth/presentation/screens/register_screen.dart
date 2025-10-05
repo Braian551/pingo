@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ping_go/src/features/map/providers/map_provider.dart';
+import 'package:ping_go/src/widgets/entrance_fader.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String email;
@@ -195,9 +196,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Form(
-                key: _formKey,
-                child: _buildStepContent(),
+              child: EntranceFader(
+                delay: const Duration(milliseconds: 120),
+                child: Form(
+                  key: _formKey,
+                  child: _buildStepContent(),
+                ),
               ),
             ),
           ),

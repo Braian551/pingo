@@ -4,6 +4,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:ping_go/src/global/services/email_service.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart'; // Importar UserService
 import 'package:ping_go/src/routes/route_names.dart';
+import 'package:ping_go/src/widgets/entrance_fader.dart';
 import 'dart:async';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -286,162 +287,165 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            
-            const Text(
-              'Verifica tu correo',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              'Hemos enviado un código de 6 dígitos a\n${widget.email}',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-            
-            const SizedBox(height: 40),
-            
-            if (_codeController != null) 
-              PinCodeTextField(
-                appContext: context,
-                length: 6,
-                controller: _codeController!,
-                keyboardType: TextInputType.number,
-                animationType: AnimationType.fade,
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(12),
-                  fieldHeight: 60,
-                  fieldWidth: 50,
-                  activeFillColor: const Color(0xFF1A1A1A),
-                  inactiveFillColor: const Color(0xFF1A1A1A),
-                  selectedFillColor: const Color(0xFF1A1A1A),
-                  activeColor: const Color(0xFF39FF14),
-                  inactiveColor: Colors.white30,
-                  selectedColor: const Color(0xFF39FF14),
-                ),
-                enableActiveFill: true,
-                textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
+        child: EntranceFader(
+          delay: const Duration(milliseconds: 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+
+              const Text(
+                'Verifica tu correo',
+                style: TextStyle(
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                onCompleted: (code) {
-                  if (mounted && !_isLoading && !_isDisposed && !_isVerifying) {
-                    _verifyCode();
-                  }
-                },
-                onChanged: (value) {},
               ),
-            
-            const SizedBox(height: 30),
-            
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: (_isLoading || _isResending || _isVerifying) ? null : _verifyCode,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF39FF14),
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
+
+              const SizedBox(height: 8),
+
+              Text(
+                'Hemos enviado un código de 6 dígitos a\n${widget.email}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              if (_codeController != null)
+                PinCodeTextField(
+                  appContext: context,
+                  length: 6,
+                  controller: _codeController!,
+                  keyboardType: TextInputType.number,
+                  animationType: AnimationType.fade,
+                  pinTheme: PinTheme(
+                    shape: PinCodeFieldShape.box,
                     borderRadius: BorderRadius.circular(12),
+                    fieldHeight: 60,
+                    fieldWidth: 50,
+                    activeFillColor: const Color(0xFF1A1A1A),
+                    inactiveFillColor: const Color(0xFF1A1A1A),
+                    selectedFillColor: const Color(0xFF1A1A1A),
+                    activeColor: const Color(0xFF39FF14),
+                    inactiveColor: Colors.white30,
+                    selectedColor: const Color(0xFF39FF14),
                   ),
-                  elevation: 0,
+                  enableActiveFill: true,
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onCompleted: (code) {
+                    if (mounted && !_isLoading && !_isDisposed && !_isVerifying) {
+                      _verifyCode();
+                    }
+                  },
+                  onChanged: (value) {},
                 ),
-                child: _isVerifying
-                    ? const CircularProgressIndicator(
-                        color: Colors.black,
-                        strokeWidth: 2,
-                      )
-                    : _isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.black,
-                            strokeWidth: 2,
-                          )
-                        : const Text(
-                            'Verificar',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            Center(
-              child: TextButton(
-                onPressed: (_resendCountdown > 0 || _isResending || _isVerifying) ? null : _resendCode,
-                child: _isResending
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF39FF14),
+
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: (_isLoading || _isResending || _isVerifying) ? null : _verifyCode,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF39FF14),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: _isVerifying
+                      ? const CircularProgressIndicator(
+                          color: Colors.black,
                           strokeWidth: 2,
+                        )
+                      : _isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.black,
+                              strokeWidth: 2,
+                            )
+                          : const Text(
+                              'Verificar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Center(
+                child: TextButton(
+                  onPressed: (_resendCountdown > 0 || _isResending || _isVerifying) ? null : _resendCode,
+                  child: _isResending
+                      ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF39FF14),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          _resendCountdown > 0
+                              ? 'Reenviar código en ${_resendCountdown}s'
+                              : 'Reenviar código',
+                          style: TextStyle(
+                            color: (_resendCountdown > 0 || _isVerifying)
+                                ? Colors.white54
+                                : const Color(0xFF39FF14),
+                            fontSize: 14,
+                          ),
                         ),
-                      )
-                    : Text(
-                        _resendCountdown > 0
-                            ? 'Reenviar código en ${_resendCountdown}s'
-                            : 'Reenviar código',
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              if (_verificationCode.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Para desarrollo:',
                         style: TextStyle(
-                          color: (_resendCountdown > 0 || _isVerifying) 
-                              ? Colors.white54 
-                              : const Color(0xFF39FF14),
-                          fontSize: 14,
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            if (_verificationCode.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Para desarrollo:',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                      const SizedBox(height: 8),
+                      Text(
+                        'Código: $_verificationCode',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Código: $_verificationCode',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

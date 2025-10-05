@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ping_go/src/routes/app_router.dart';
+import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/providers/database_provider.dart';
 import 'package:ping_go/src/features/map/providers/map_provider.dart';
 
@@ -49,9 +50,9 @@ class MyApp extends StatelessWidget {
       ),
   onGenerateRoute: AppRouter.generateRoute,
   navigatorObservers: [RouteLogger()],
-      initialRoute: '/',
-      // Mostrar la navegación inmediatamente; la conexión a la DB sucede en segundo plano.
-      home: const RouterScreen(),
+  initialRoute: RouteNames.splash,
+  // Mostrar la navegación inmediatamente; la conexión a la DB sucede en segundo plano.
+  home: const RouterScreen(),
     );
   }
 
@@ -70,7 +71,7 @@ class RouterScreen extends StatelessWidget {
       children: [
         Navigator(
           onGenerateRoute: AppRouter.generateRoute,
-          initialRoute: '/',
+          initialRoute: RouteNames.splash,
         ),
         if (!dbProv.isConnected)
           Positioned(
