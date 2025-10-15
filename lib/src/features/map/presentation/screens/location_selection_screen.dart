@@ -127,7 +127,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                         markerId: const MarkerId('selected_location'),
                         position: _selectedLocation!,
                         icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueGreen,
+                          BitmapDescriptor.hueYellow,
                         ),
                       ),
                     }
@@ -140,8 +140,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           // Loading indicator
           if (_isLoading)
             const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFF39FF14),
+              CircularProgressIndicator(
+                color: Color(0xFFFFFF00),
               ),
             ),
           
@@ -202,7 +202,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Color(0xFF39FF14),
+                                color: Color(0xFFFFFF00),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -222,8 +222,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                                 SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Color(0xFF39FF14),
+                                  CircularProgressIndicator(
+                                    color: Color(0xFFFFFF00),
                                     strokeWidth: 2,
                                   ),
                                 ),
@@ -258,7 +258,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                     child: ElevatedButton(
                       onPressed: _selectedLocation != null ? _confirmLocation : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF39FF14),
+                        backgroundColor: const Color(0xFFFFFF00),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

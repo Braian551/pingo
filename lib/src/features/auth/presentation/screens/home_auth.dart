@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 0,
       title: const Row(
         children: [
-          Icon(Icons.motorcycle, color: Color(0xFF39FF14)),
+          Icon(Icons.motorcycle, color: Color(0xFFFFFF00)),
           SizedBox(width: 8),
           Text(
             'PingGo',
@@ -137,9 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF39FF14)),
+              border: Border.all(color: const Color(0xFFFFFF00)),
             ),
-            child: const Icon(Icons.notifications_outlined, color: Color(0xFF39FF14), size: 20),
+            child: const Icon(Icons.notifications_outlined, color: Color(0xFFFFFF00), size: 20),
           ),
           onPressed: () {},
         ),
@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLoading() {
     return const Center(
       child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF39FF14)),
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
       ),
     );
   }
@@ -206,17 +206,17 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F0F),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF39FF14).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFFFFFF00).withOpacity(0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF39FF14).withOpacity(0.1),
+              color: const Color(0xFFFFFF00).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.location_on, color: Color(0xFF39FF14), size: 24),
+            child: const Icon(Icons.location_on, color: Color(0xFFFFFF00), size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -250,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.edit, color: Color(0xFF39FF14), size: 20),
+            icon: const Icon(Icons.edit, color: Color(0xFFFFFF00), size: 20),
             onPressed: () async {
               // Open LocationPicker, and refresh address when returning
               await Navigator.push(
@@ -421,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
       backgroundColor: const Color(0xFF0F0F0F),
-      selectedItemColor: const Color(0xFF39FF14),
+      selectedItemColor: const Color(0xFFFFFF00),
       unselectedItemColor: Colors.white54,
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
@@ -471,10 +471,10 @@ class _ServiceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F0F),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF39FF14).withOpacity(0.2)),
+        border: Border.all(color: const Color(0xFFFFFF00).withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF39FF14).withOpacity(0.1),
+            color: const Color(0xFFFFFF00).withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -493,10 +493,10 @@ class _ServiceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF39FF14).withOpacity(0.1),
+                    color: const Color(0xFFFFFF00).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: const Color(0xFF39FF14), size: 28),
+                  child: Icon(icon, color: const Color(0xFFFFFF00), size: 28),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -556,10 +556,10 @@ class _QuickActionCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF39FF14).withOpacity(0.1),
+                    color: const Color(0xFFFFFF00).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: const Color(0xFF39FF14), size: 20),
+                  child: Icon(icon, color: const Color(0xFFFFFF00), size: 20),
                 ),
                 const SizedBox(height: 8),
                 Text(

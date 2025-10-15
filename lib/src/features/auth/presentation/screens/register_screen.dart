@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('¡Registro exitoso! Redirigiendo...'),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.yellow,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -277,7 +277,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF39FF14),
+                    backgroundColor: const Color(0xFFFFFF00),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
@@ -434,7 +434,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Ubicación actual: ${pos.latitude.toStringAsFixed(6)}, ${pos.longitude.toStringAsFixed(6)}'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.yellow,
         duration: const Duration(seconds: 2),
       ));
     } catch (e) {
@@ -455,7 +455,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: InputDecoration(
             labelText: 'Nombre',
             labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.person, color: Color(0xFF39FF14)),
+            prefixIcon: const Icon(Icons.person, color: Color(0xFFFFFF00)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.white30),
@@ -466,7 +466,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF39FF14)),
+              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
             ),
           ),
           validator: (value) {
@@ -483,7 +483,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: InputDecoration(
             labelText: 'Apellido',
             labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF39FF14)),
+            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFFFFFF00)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.white30),
@@ -494,7 +494,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF39FF14)),
+              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
             ),
           ),
           validator: (value) {
@@ -520,7 +520,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: InputDecoration(
             labelText: 'Teléfono',
             labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.phone, color: Color(0xFF39FF14)),
+            prefixIcon: const Icon(Icons.phone, color: Color(0xFFFFFF00)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.white30),
@@ -531,7 +531,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF39FF14)),
+              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
             ),
           ),
           validator: (value) {
@@ -554,19 +554,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             margin: const EdgeInsets.only(top: 12),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.yellow.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.withOpacity(0.3)),
+              border: Border.all(color: Colors.yellow.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                const Icon(Icons.check_circle, color: Colors.yellow, size: 16),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Ubicación seleccionada: ${_selectedLat!.toStringAsFixed(6)}, ${_selectedLng!.toStringAsFixed(6)}',
                     style: const TextStyle(
-                      color: Colors.green,
+                      color: Colors.yellow,
                       fontSize: 12,
                     ),
                   ),
@@ -593,7 +593,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: InputDecoration(
             labelText: 'Contraseña',
             labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.lock, color: Color(0xFF39FF14)),
+            prefixIcon: const Icon(Icons.lock, color: Color(0xFFFFFF00)),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -615,7 +615,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF39FF14)),
+              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
             ),
           ),
           validator: (value) {
@@ -636,7 +636,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: InputDecoration(
             labelText: 'Confirmar contraseña',
             labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF39FF14)),
+            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFFFFF00)),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
@@ -658,7 +658,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF39FF14)),
+              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
             ),
           ),
           validator: (value) {

@@ -128,7 +128,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
             Expanded(child: Text('Ubicación seleccionada', style: TextStyle(color: Colors.white))),
           ],
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.yellow,
         duration: Duration(milliseconds: 900),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -238,7 +238,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _isSearchFocused 
-                    ? Color(0xFF39FF14).withOpacity(0.6)
+                    ? Color(0xFFFFFF00).withOpacity(0.6)
                     : Colors.white12,
                   width: 1.5,
                 ),
@@ -259,7 +259,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                       Icon(
                         Icons.search_rounded,
                         color: _isSearchFocused 
-                          ? Color(0xFF39FF14)
+                          ? Color(0xFFFFFF00)
                           : Colors.white54,
                         size: 22,
                       ),
@@ -426,7 +426,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.location_on,
-                          color: const Color.fromARGB(255, 91, 255, 82),
+                          color: const Color.fromARGB(255, 255, 255, 0),
                         ),
                         hintText: 'Dirección seleccionada...',
                         hintStyle: TextStyle(
@@ -451,13 +451,13 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.15),
+                      color: Colors.yellow.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                        border: Border.all(color: Colors.yellow.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.check_circle, color: Colors.greenAccent),
+                          Icon(Icons.check_circle, color: Colors.yellowAccent),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
@@ -489,14 +489,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                               _onConfirm(center);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF39FF14),
+                              backgroundColor: Color(0xFFFFFF00),
                               foregroundColor: Colors.black,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               elevation: 2,
-                              shadowColor: Color(0xFF39FF14).withOpacity(0.3),
+                              shadowColor: Color(0xFFFFFF00).withOpacity(0.3),
                             ),
                             child: Text(
                               'Confirmar ubicación',

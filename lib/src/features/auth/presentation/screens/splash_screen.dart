@@ -75,14 +75,14 @@ class _SplashScreenState extends State<SplashScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF39FF14).withOpacity(0.25),
+                        const Color(0xFFFFFF00).withOpacity(0.25),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.9],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF39FF14).withOpacity(0.12),
+                        color: const Color(0xFFFFFF00).withOpacity(0.12),
                         blurRadius: 30,
                         spreadRadius: 8,
                       ),
@@ -94,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
                         return const LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Color(0xFF39FF14), Color(0xFF25C40A)],
+                          colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
                         ).createShader(bounds);
                       },
                       child: const Icon(
@@ -123,7 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
                           fontWeight: FontWeight.w800,
                           foreground: Paint()
                             ..shader = const LinearGradient(
-                              colors: [Color(0xFF39FF14), Color(0xFF25C40A)],
+                              colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
                             ).createShader(Rect.fromLTWH(0, 0, 200, 0)),
                         ),
                       ),

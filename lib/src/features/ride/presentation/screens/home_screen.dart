@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1A1A1A),
-        selectedItemColor: const Color(0xFF39FF14),
+        selectedItemColor: const Color(0xFFFFFF00),
         unselectedItemColor: Colors.white70,
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -136,7 +136,7 @@ class TransportScreen extends StatelessWidget {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.location_on, color: Color(0xFF39FF14), size: 24),
+                      Icon(Icons.location_on, color: Color(0xFFFFFF00), size: 24),
                       SizedBox(width: 12),
                       Text(
                         'Ubicación actual',
@@ -166,7 +166,7 @@ class TransportScreen extends StatelessWidget {
                       icon: const Icon(Icons.refresh, size: 18),
                       label: const Text('Actualizar ubicación'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF39FF14),
+                        backgroundColor: const Color(0xFFFFFF00),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -248,13 +248,13 @@ class _ServiceCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF39FF14).withOpacity(0.3)),
+          border: Border.all(color: const Color(0xFFFFFF00).withOpacity(0.3)),
         ),
         child: Column(
           children: [
             Icon(
               icon,
-              color: const Color(0xFF39FF14),
+              color: const Color(0xFFFFFF00),
               size: 32,
             ),
             const SizedBox(height: 12),

@@ -50,7 +50,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: const TextStyle(color: Colors.white54),
-        prefixIcon: const Icon(Icons.search, color: Color(0xFF39FF14)),
+        prefixIcon: const Icon(Icons.search, color: Color(0xFFFFFF00)),
         suffixIcon: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -63,7 +63,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
                 },
               ),
             IconButton(
-              icon: const Icon(Icons.search, color: Color(0xFF39FF14)),
+              icon: const Icon(Icons.search, color: Color(0xFFFFFF00)),
               onPressed: () {
                 final q = widget.controller.text.trim();
                 if (q.isNotEmpty) {
@@ -85,7 +85,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF39FF14)),
+          borderSide: const BorderSide(color: Color(0xFFFFFF00)),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),

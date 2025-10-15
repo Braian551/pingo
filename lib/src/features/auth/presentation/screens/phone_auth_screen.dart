@@ -76,7 +76,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                       decoration: InputDecoration(
                         labelText: 'Número de teléfono',
                         labelStyle: const TextStyle(color: Colors.white70),
-                        prefixIcon: const Icon(Icons.phone, color: Color(0xFF39FF14)),
+                        prefixIcon: const Icon(Icons.phone, color: Color(0xFFFFFF00)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Colors.white30),
@@ -87,7 +87,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF39FF14)),
+                          borderSide: const BorderSide(color: Color(0xFFFFFF00)),
                         ),
                       ),
                       validator: (value) {
@@ -115,7 +115,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF39FF14),
+                          backgroundColor: const Color(0xFFFFFF00),
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -159,7 +159,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'OK',
-              style: TextStyle(color: Color(0xFF39FF14)),
+              style: TextStyle(color: Color(0xFFFFFF00)),
             ),
           ),
         ],

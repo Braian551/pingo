@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.yellow,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Row(
                           children: [
-                            const Icon(Icons.email, color: Color(0xFF39FF14)),
+                            const Icon(Icons.email, color: Color(0xFFFFFF00)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Contraseña',
                         labelStyle: const TextStyle(color: Colors.white70),
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF39FF14)),
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFFFFFF00)),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -187,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF39FF14)),
+                          borderSide: const BorderSide(color: Color(0xFFFFFF00)),
                         ),
                       ),
                       validator: (value) {
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           '¿Olvidaste tu contraseña?',
                           style: TextStyle(
-                            color: Color(0xFF39FF14),
+                            color: Color(0xFFFFFF00),
                             fontSize: 14,
                           ),
                         ),
@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF39FF14),
+                          backgroundColor: const Color(0xFFFFFF00),
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

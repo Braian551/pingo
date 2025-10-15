@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ping-Go',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.yellow,
         visualDensity: VisualDensity.standard,
         scaffoldBackgroundColor: Colors.black, // Fondo negro para toda la app
         appBarTheme: const AppBarTheme(

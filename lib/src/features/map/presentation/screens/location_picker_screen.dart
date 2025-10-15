@@ -217,7 +217,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
             ),
           ],
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.yellow,
         duration: const Duration(milliseconds: 1500),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -300,7 +300,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                   borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                     color: _isSearchFocused 
-                      ? Color(0xFF39FF14).withOpacity(0.6)
+                      ? Color(0xFFFFFF00).withOpacity(0.6)
                       : Colors.white12,
                     width: 1.5,
                   ),
@@ -321,7 +321,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                         Icon(
                           Icons.search_rounded,
                           color: _isSearchFocused 
-                            ? const Color(0xFF39FF14)
+                            ? const Color(0xFFFFFF00)
                             : Colors.white54,
                           size: 22,
                         ),
@@ -479,7 +479,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                         decoration: InputDecoration(
                           prefixIcon: Icon(
                             Icons.location_on,
-                            color: Color(0xFF39FF14),
+                            color: Color(0xFFFFFF00),
                           ),
                           hintText: 'Dirección seleccionada...',
                           hintStyle: TextStyle(color: Colors.white54),
@@ -503,13 +503,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.15),
+                          color: Colors.yellow.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green.withOpacity(0.3)),
+                          border: Border.all(color: Colors.yellow.withOpacity(0.3)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.check_circle, color: Colors.greenAccent),
+                            const Icon(Icons.check_circle, color: Colors.yellowAccent),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -532,14 +532,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                             child: ElevatedButton(
                               onPressed: _saveLocation,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF39FF14),
+                                backgroundColor: const Color(0xFFFFFF00),
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 2,
-                                shadowColor: Color(0xFF39FF14).withOpacity(0.3),
+                                shadowColor: Color(0xFFFFFF00).withOpacity(0.3),
                               ),
                               child: const Text(
                                 'Guardar ubicación',
@@ -631,7 +631,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                                   ),
                                   child: Icon(
                                     Icons.location_on,
-                                    color: const Color(0xFF39FF14),
+                                    color: const Color(0xFFFFFF00),
                                     size: 18,
                                   ),
                                 ),
@@ -665,7 +665,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
             if (mapProvider.isLoading)
               const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF39FF14)),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
                 ),
               ),
           ],

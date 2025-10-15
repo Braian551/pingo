@@ -139,7 +139,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Usuario verificado'),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.yellow,
                 duration: Duration(milliseconds: 800),
               ),
             );
@@ -161,7 +161,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Verificación exitosa'),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.yellow,
                 duration: Duration(milliseconds: 800),
               ),
             );
@@ -228,7 +228,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             },
             child: const Text(
               'OK',
-              style: TextStyle(color: Color(0xFF39FF14)),
+              style: TextStyle(color: Color(0xFFFFFF00)),
             ),
           ),
         ],
@@ -260,7 +260,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             },
             child: const Text(
               'OK',
-              style: TextStyle(color: Color(0xFF39FF14)),
+              style: TextStyle(color: Color(0xFFFFFF00)),
             ),
           ),
         ],
@@ -330,9 +330,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     activeFillColor: const Color(0xFF1A1A1A),
                     inactiveFillColor: const Color(0xFF1A1A1A),
                     selectedFillColor: const Color(0xFF1A1A1A),
-                    activeColor: const Color(0xFF39FF14),
+                    activeColor: const Color(0xFFFFFF00),
                     inactiveColor: Colors.white30,
-                    selectedColor: const Color(0xFF39FF14),
+                    selectedColor: const Color(0xFFFFFF00),
                   ),
                   enableActiveFill: true,
                   textStyle: const TextStyle(
@@ -356,7 +356,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 child: ElevatedButton(
                   onPressed: (_isLoading || _isResending || _isVerifying) ? null : _verifyCode,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF39FF14),
+                    backgroundColor: const Color(0xFFFFFF00),
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -394,7 +394,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
-                            color: Color(0xFF39FF14),
+                            color: Color(0xFFFFFF00),
                             strokeWidth: 2,
                           ),
                         )
@@ -405,7 +405,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           style: TextStyle(
                             color: (_resendCountdown > 0 || _isVerifying)
                                 ? Colors.white54
-                                : const Color(0xFF39FF14),
+                                : const Color(0xFFFFFF00),
                             fontSize: 14,
                           ),
                         ),

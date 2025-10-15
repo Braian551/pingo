@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF39FF14).withOpacity(0.15),
+                        const Color(0xFFFFFF00).withOpacity(0.15),
                         Colors.transparent,
                       ],
                       stops: const [0.1, 0.8],
@@ -40,8 +40,8 @@ class WelcomeScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF39FF14),
-                          Color(0xFF25C40A),
+                          Color(0xFFFFFF00),
+                          Color(0xFFFFFF00),
                         ],
                       ).createShader(bounds);
                     },
@@ -144,7 +144,7 @@ class WelcomeScreen extends StatelessWidget {
                         size: 24,
                       ),
                       text: 'Continuar con teléfono',
-                      backgroundColor: const Color(0xFF39FF14),
+                      backgroundColor: const Color(0xFFFFFF00),
                       textColor: Colors.black,
                       onPressed: () {
                         Navigator.pushNamed(context, RouteNames.phoneAuth);
@@ -157,13 +157,13 @@ class WelcomeScreen extends StatelessWidget {
                     _buildSocialButton(
                       icon: const Icon(
                         Icons.email_outlined,
-                        color: Color(0xFF39FF14),
+                        color: Color(0xFFFFFF00),
                         size: 24,
                       ),
                       text: 'Continuar con correo',
                       backgroundColor: Colors.transparent,
-                      textColor: const Color(0xFF39FF14),
-                      borderColor: const Color(0xFF39FF14).withOpacity(0.5),
+                      textColor: const Color(0xFFFFFF00),
+                      borderColor: const Color(0xFFFFFF00).withOpacity(0.5),
                       onPressed: () {
                         Navigator.pushNamed(context, RouteNames.emailAuth);
                       },
@@ -187,7 +187,7 @@ class WelcomeScreen extends StatelessWidget {
                             TextSpan(
                               text: 'Términos de Servicio',
                               style: TextStyle(
-                                color: const Color(0xFF39FF14).withOpacity(0.8),
+                                color: const Color(0xFFFFFF00).withOpacity(0.8),
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -195,7 +195,7 @@ class WelcomeScreen extends StatelessWidget {
                             TextSpan(
                               text: 'Política de Privacidad',
                               style: TextStyle(
-                                color: const Color(0xFF39FF14).withOpacity(0.8),
+                                color: const Color(0xFFFFFF00).withOpacity(0.8),
                                 decoration: TextDecoration.underline,
                               ),
                             ),

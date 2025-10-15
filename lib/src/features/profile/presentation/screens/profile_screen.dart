@@ -87,7 +87,7 @@ class _ProfileTabState extends State<ProfileTab> {
     final email = _session?['email'] as String?;
 
     return _loading
-        ? const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF39FF14))))
+        ? const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00))))
         : Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -102,7 +102,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         const CircleAvatar(
                           radius: 28,
                           backgroundColor: Color(0xFF1A1A1A),
-                          child: Icon(Icons.person, color: Color(0xFF39FF14), size: 32),
+                          child: Icon(Icons.person, color: Color(0xFFFFFF00), size: 32),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -149,7 +149,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     },
                     icon: const Icon(Icons.location_on),
                     label: const Text('Editar dirección'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF39FF14), foregroundColor: Colors.black),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFFF00), foregroundColor: Colors.black),
                   ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
@@ -237,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text('Perfil', style: TextStyle(color: Colors.white)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF39FF14))))
+          ? const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00))))
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -252,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const CircleAvatar(
                             radius: 28,
                             backgroundColor: Color(0xFF1A1A1A),
-                            child: Icon(Icons.person, color: Color(0xFF39FF14), size: 32),
+                            child: Icon(Icons.person, color: Color(0xFFFFFF00), size: 32),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -298,7 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     icon: const Icon(Icons.location_on),
                     label: const Text('Editar dirección'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF39FF14), foregroundColor: Colors.black),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFFF00), foregroundColor: Colors.black),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
