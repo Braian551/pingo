@@ -11,9 +11,8 @@ class FadeSlidePageRoute<T> extends PageRouteBuilder<T> {
     required this.page,
     this.duration = const Duration(milliseconds: 350),
     this.beginOffset = const Offset(0, 0.08), // slight upward motion
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           transitionDuration: duration,
           reverseTransitionDuration: const Duration(milliseconds: 280),
           pageBuilder: (context, animation, secondaryAnimation) => page,

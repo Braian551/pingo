@@ -69,10 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
       } catch (_) {}
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _userAddress = null;
         _loading = false;
       });
+      }
     });
   }
 

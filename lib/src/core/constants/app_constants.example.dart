@@ -19,7 +19,7 @@ class AppConstants {
   static const String databasePort = '3306';
   static const String databaseName = 'pingo';
   static const String databaseUser = 'root';
-  static const String databasePassword = 'root';
+  static const String databasePassword = '';
   
   // Configuración de la aplicación
   static const String appName = 'PingGo';
