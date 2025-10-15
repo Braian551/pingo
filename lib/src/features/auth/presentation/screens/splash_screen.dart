@@ -97,13 +97,10 @@ class _SplashScreenState extends State<SplashScreen>
                           colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
                         ).createShader(bounds);
                       },
-                      child: const Icon(
-                        Icons.sports_motorsports_outlined,
-                        size: 86,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
-                        ],
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 86,
+                        height: 86,
                       ),
                     ),
                   ),

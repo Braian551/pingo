@@ -45,10 +45,10 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ).createShader(bounds);
                     },
-                    child: const Icon(
-                      Icons.sports_motorsports_outlined,
-                      size: 85,
-                      color: Colors.white,
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 85,
+                      height: 85,
                     ),
                   ),
                 ),
