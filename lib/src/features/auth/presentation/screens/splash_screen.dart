@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 3000),
     );
 
     _scaleAnim = Tween<double>(begin: 0.7, end: 1.0)
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _navigateAfterDelay() async {
     // Wait for animation to complete
-    await Future.delayed(const Duration(milliseconds: 2500));
+    await Future.delayed(const Duration(milliseconds: 3500));
 
     if (mounted) {
       Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
