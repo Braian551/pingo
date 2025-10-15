@@ -2,9 +2,28 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
+import 'package:ping_go/src/global/services/auth/user_service.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkSession();
+  }
+
+  Future<void> _checkSession() async {
+    final session = await UserService.getSavedSession();
+    if (session != null && mounted) {
+      Navigator.of(context).pushReplacementNamed(RouteNames.home);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

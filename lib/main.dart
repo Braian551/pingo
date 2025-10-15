@@ -47,67 +47,9 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-  onGenerateRoute: AppRouter.generateRoute,
-  navigatorObservers: [RouteLogger()],
+      onGenerateRoute: AppRouter.generateRoute,
+      navigatorObservers: [RouteLogger()],
       initialRoute: '/',
-      // Mostrar la navegación inmediatamente; la conexión a la DB sucede en segundo plano.
-      home: const RouterScreen(),
-    );
-  }
-
-  // Note: Database connection UI is now shown as a small banner overlay in RouterScreen.
-}
-
-// Widget para manejar la navegación normal cuando la conexión está establecida
-class RouterScreen extends StatelessWidget {
-  const RouterScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Mostrar navegación normalmente. Si la DB aún no está lista, mostrar un pequeño banner.
-    final dbProv = Provider.of<DatabaseProvider>(context);
-    return Stack(
-      children: [
-        Navigator(
-          onGenerateRoute: AppRouter.generateRoute,
-          initialRoute: '/',
-        ),
-        if (!dbProv.isConnected)
-          Positioned(
-            left: 12,
-            right: 12,
-            top: 40,
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: dbProv.errorMessage.isNotEmpty ? Colors.redAccent : Colors.orangeAccent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(dbProv.errorMessage.isNotEmpty ? Icons.error : Icons.info_outline, color: Colors.black),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        dbProv.errorMessage.isNotEmpty
-                            ? 'Error de conexión a DB'
-                            : 'Conectando a base de datos en segundo plano',
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    if (dbProv.errorMessage.isNotEmpty)
-                      TextButton(
-                        onPressed: () => dbProv.initializeDatabase(),
-                        child: const Text('Reintentar', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
