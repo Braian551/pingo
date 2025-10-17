@@ -12,6 +12,7 @@ import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.da
 import 'package:ping_go/src/features/auth/presentation/screens/splash_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/routes/animated_routes.dart';
+import 'package:ping_go/src/widgets/auth_wrapper.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -21,6 +22,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+      case RouteNames.authWrapper:
+        return MaterialPageRoute(builder: (_) => const AuthWrapper());
       case RouteNames.welcome:
         return FadeSlidePageRoute(page: const WelcomeScreen(), settings: settings);
       case RouteNames.login:

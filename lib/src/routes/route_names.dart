@@ -1,5 +1,6 @@
 class RouteNames {
   static const String splash = '/splash';
+  static const String authWrapper = '/auth-wrapper';
   static const String welcome = '/welcome';
   static const String emailAuth = '/email-auth';
   static const String emailVerification = '/email-verification';
