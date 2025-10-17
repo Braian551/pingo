@@ -24,7 +24,16 @@ class AppRouter {
       case RouteNames.welcome:
         return FadeSlidePageRoute(page: const WelcomeScreen(), settings: settings);
       case RouteNames.login:
-        return FadeSlidePageRoute(page: const LoginScreen(), settings: settings);
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return FadeSlidePageRoute(
+            page: LoginScreen(
+              email: args?['email'],
+              prefilled: args?['prefilled'] ?? false,
+            ),
+            settings: settings,
+          );
+        }
       case RouteNames.phoneAuth:
         return FadeSlidePageRoute(page: const PhoneAuthScreen(), settings: settings);
       case RouteNames.emailAuth:

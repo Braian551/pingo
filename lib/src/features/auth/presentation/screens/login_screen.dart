@@ -46,14 +46,24 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = true);
 
       try {
-        String emailToUse = _emailController.text;
+        String emailToUse = _emailController.text.trim();
+
         if (emailToUse.isEmpty) {
           final sess = await UserService.getSavedSession();
-          if (sess != null && sess['email'] != null) emailToUse = sess['email'] as String;
+          if (sess != null && sess['email'] != null) {
+            emailToUse = sess['email'] as String;
+          } else {
+            _showError('No se pudo determinar el email. Por favor, intenta iniciar sesión nuevamente.');
+            return;
+          }
+        }
+
+        if (emailToUse.isEmpty) {
+          _showError('El email es requerido para iniciar sesión.');
+          return;
         }
 
         final resp = await UserService.login(email: emailToUse, password: _passwordController.text);
-        print('Login response: $resp');
 
         if (resp['success'] == true) {
           _showSuccess('¡Bienvenido de nuevo!');
@@ -66,10 +76,22 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, RouteNames.home, arguments: {'email': emailToUse});
           }
         } else {
-          _showError(resp['message'] ?? 'Credenciales inválidas');
+          final message = resp['message'] ?? 'Credenciales inválidas';
+
+          // Mostrar mensaje específico según el error del backend
+          if (message.contains('Email y password son requeridos')) {
+            _showError('Por favor, completa todos los campos.');
+          } else if (message.contains('Usuario no encontrado')) {
+            _showError('No se encontró una cuenta con este email. Verifica que el email sea correcto.');
+          } else if (message.contains('Contraseña incorrecta')) {
+            _showError('La contraseña es incorrecta. Inténtalo de nuevo.');
+          } else {
+            _showError(message);
+          }
         }
       } catch (e) {
-        _showError('Error al iniciar sesión: $e');
+        print('Error en login: $e');
+        _showError('Error al iniciar sesión. Verifica tu conexión a internet.');
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
