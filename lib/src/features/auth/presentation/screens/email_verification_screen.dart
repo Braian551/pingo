@@ -5,6 +5,8 @@ import 'package:ping_go/src/global/services/email_service.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart'; // Importar UserService
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
+import 'package:ping_go/src/widgets/dialogs/dialog_helper.dart';
+import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 import 'dart:async';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -136,14 +138,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         if (userExists) {
           // Usuario existe - mostrar SnackBar breve y redirigir al login
           if (mounted && !_isDisposed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Usuario verificado'),
-                backgroundColor: Colors.yellow,
-                duration: Duration(milliseconds: 800),
-              ),
+            CustomSnackbar.showSuccess(
+              context,
+              message: '¡Correo verificado! Ya tienes una cuenta',
+              duration: const Duration(milliseconds: 1200),
             );
-            await Future.delayed(const Duration(milliseconds: 800));
+            await Future.delayed(const Duration(milliseconds: 1200));
           }
 
           if (!mounted || _isDisposed) return;
@@ -158,14 +158,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         } else {
           // Usuario no existe - mostrar SnackBar breve y redirigir al registro
           if (mounted && !_isDisposed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Verificación exitosa'),
-                backgroundColor: Colors.yellow,
-                duration: Duration(milliseconds: 800),
-              ),
+            CustomSnackbar.showSuccess(
+              context,
+              message: '¡Código verificado! Completa tu registro',
+              duration: const Duration(milliseconds: 1200),
             );
-            await Future.delayed(const Duration(milliseconds: 800));
+            await Future.delayed(const Duration(milliseconds: 1200));
           }
 
           if (!mounted || _isDisposed) return;
@@ -181,9 +179,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       } catch (e) {
         if (!mounted || _isDisposed) return;
         
-        // Si hay error al verificar, continuar con registro por defecto
-        _showWarningDialog('Verificación completada. Continuando con registro...');
-        await Future.delayed(const Duration(seconds: 1));
+        // Si hay error al verificar, mostrar warning y continuar con registro
+        await DialogHelper.showWarning(
+          context,
+          title: 'Aviso',
+          message: 'No pudimos verificar tu estado de usuario. Continuaremos con el registro.',
+          primaryButtonText: 'Continuar',
+        );
         
         if (!mounted || _isDisposed) return;
         
@@ -200,71 +202,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         setState(() => _isVerifying = false);
       }
     } else {
-      _showErrorDialog('Código de verificación incorrecto');
+      // Código incorrecto
+      await DialogHelper.showError(
+        context,
+        title: 'Código Incorrecto',
+        message: 'El código de verificación que ingresaste no es válido. Por favor, verifica e intenta nuevamente.',
+        primaryButtonText: 'Reintentar',
+      );
     }
   }
 
   void _showErrorDialog(String message) {
     if (!mounted || _isDisposed) return;
     
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'Error',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-            },
-            child: const Text(
-              'OK',
-              style: TextStyle(color: Color(0xFFFFFF00)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showWarningDialog(String message) {
-    if (!mounted || _isDisposed) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'Advertencia',
-          style: TextStyle(color: Colors.orange),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-            },
-            child: const Text(
-              'OK',
-              style: TextStyle(color: Color(0xFFFFFF00)),
-            ),
-          ),
-        ],
-      ),
+    DialogHelper.showError(
+      context,
+      title: 'Error',
+      message: message,
+      primaryButtonText: 'Entendido',
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:ping_go/src/features/map/presentation/widgets/osm_map_widget.dart';
 import 'package:ping_go/src/features/map/providers/map_provider.dart';
 import 'package:ping_go/src/global/services/nominatim_service.dart';
+import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 
 /// Widget independiente para seleccionar dirección durante el registro.
 /// Expone callbacks para devolver la dirección seleccionada al padre.
@@ -119,20 +120,10 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
   }
 
   void _showConfirmedSnack() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text('Ubicación seleccionada', style: TextStyle(color: Colors.white))),
-          ],
-        ),
-        backgroundColor: Colors.yellow,
-        duration: Duration(milliseconds: 900),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+    CustomSnackbar.showSuccess(
+      context,
+      message: 'Ubicación seleccionada correctamente',
+      duration: const Duration(milliseconds: 900),
     );
   }
 
@@ -143,13 +134,9 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
     final lon = center?.longitude ?? prov.selectedLocation?.longitude;
 
     if (lat == null || lon == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Selecciona una ubicación antes de confirmar'),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+      CustomSnackbar.showWarning(
+        context,
+        message: 'Por favor, selecciona una ubicación antes de confirmar',
       );
       return;
     }

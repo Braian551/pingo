@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
+import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -145,7 +146,7 @@ class _ProfileTabState extends State<ProfileTab> {
                       );
                       setState(() => _loading = true);
                       await _loadSession();
-                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
+                      if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
                     },
                     icon: const Icon(Icons.location_on),
                     label: const Text('Editar dirección'),
@@ -294,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                       setState(() => _loading = true);
                       await _loadSession();
-                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dirección actualizada')));
+                      if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
                     },
                     icon: const Icon(Icons.location_on),
                     label: const Text('Editar dirección'),

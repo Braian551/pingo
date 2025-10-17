@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
+import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -76,22 +77,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
+    CustomSnackbar.showError(
+      context,
+      message: message,
+      duration: const Duration(seconds: 3),
     );
   }
 
   void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.yellow,
-        duration: const Duration(seconds: 2),
-      ),
+    CustomSnackbar.showSuccess(
+      context,
+      message: message,
+      duration: const Duration(seconds: 2),
     );
   }
 
