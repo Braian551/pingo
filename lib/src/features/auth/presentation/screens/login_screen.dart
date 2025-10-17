@@ -136,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
 
               const Text(
-                'Confirma tu contraseña',
+                'Ingresa tu contraseña',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
 
               const Text(
-                'Ingresa tu contraseña para continuar',
+                'Confirma tu identidad para continuar',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -160,23 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    if (_emailController.text.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.email, color: Color(0xFFFFFF00)),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _emailController.text,
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
