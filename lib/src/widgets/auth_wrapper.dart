@@ -10,11 +10,41 @@ class AuthWrapper extends StatefulWidget {
   State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AuthWrapperState extends State<AuthWrapper>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnim;
+  late final Animation<double> _fadeAnim;
+  late final Animation<double> _pulseAnim;
 
   @override
   void initState() {
     super.initState();
+
+    // Configurar animaciones
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
+
+    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+      ),
+    );
+
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    // Iniciar animación
+    _controller.repeat(reverse: true);
+
     _checkSession();
   }
 
@@ -46,54 +76,136 @@ class _AuthWrapperState extends State<AuthWrapper> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Mostrar pantalla de carga mientras se verifica la sesión
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Logo pequeño mientras se verifica
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    const Color(0xFFFFFF00).withOpacity(0.25),
-                    Colors.transparent,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _fadeAnim,
+              child: ScaleTransition(
+                scale: _scaleAnim,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo con efecto de pulso y glow
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Glow exterior pulsante
+                        ScaleTransition(
+                          scale: _pulseAnim,
+                          child: Container(
+                            width: size.width * 0.32,
+                            height: size.width * 0.32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFFFFFF00).withOpacity(0.3),
+                                  const Color(0xFFFFFF00).withOpacity(0.1),
+                                  Colors.transparent,
+                                ],
+                                stops: const [0.0, 0.5, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Círculo de fondo con sombra
+                        Container(
+                          width: size.width * 0.28,
+                          height: size.width * 0.28,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                const Color(0xFFFFFF00).withOpacity(0.15),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.85],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFFFF00).withOpacity(0.2),
+                                blurRadius: 40,
+                                spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFFFFFF00),
+                                    Color(0xFFFFDD00),
+                                  ],
+                                ).createShader(bounds);
+                              },
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: 80,
+                                height: 80,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Indicador de carga con diseño moderno
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Círculo exterior
+                          SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                const Color(0xFFFFFF00).withOpacity(0.3),
+                              ),
+                              value: null,
+                            ),
+                          ),
+                          // Círculo interior
+                          SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xFFFFFF00),
+                              ),
+                              value: null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                  stops: const [0.0, 0.9],
                 ),
               ),
-              child: Center(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 50,
-                  height: 50,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Verificando sesión...',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                color: Color(0xFFFFFF00),
-                strokeWidth: 2,
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
