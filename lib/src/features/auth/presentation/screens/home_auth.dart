@@ -117,11 +117,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.motorcycle, color: Color(0xFFFFFF00)),
-          SizedBox(width: 8),
-          Text(
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFFFFFF00).withOpacity(0.15),
+                  Colors.transparent,
+                ],
+                stops: const [0.1, 0.8],
+              ),
+            ),
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFFFFF00),
+                    Color(0xFFFFFF00),
+                  ],
+                ).createShader(bounds);
+              },
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 32,
+                height: 32,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Text(
             'PingGo',
             style: TextStyle(
               color: Colors.white,
