@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../core/config/env_config.dart';
 
+/// Servicio de geocoding GRATUITO usando Nominatim (OpenStreetMap)
+/// No requiere API key y es completamente gratuito
+/// Límite recomendado: 1 request por segundo
 class NominatimService {
   static const String _baseUrl = 'https://nominatim.openstreetmap.org';
   
@@ -14,7 +18,7 @@ class NominatimService {
           .get(
         uri,
         headers: {
-          'User-Agent': 'Ping-Go App (traconmaster@gmail.com)',
+          'User-Agent': '${EnvConfig.nominatimUserAgent} (${EnvConfig.nominatimEmail})',
           'Accept': 'application/json',
         },
       )
@@ -40,7 +44,7 @@ class NominatimService {
           .get(
         uri,
         headers: {
-          'User-Agent': 'Ping-Go App (traconmaster@gmail.com)',
+          'User-Agent': '${EnvConfig.nominatimUserAgent} (${EnvConfig.nominatimEmail})',
           'Accept': 'application/json',
         },
       )

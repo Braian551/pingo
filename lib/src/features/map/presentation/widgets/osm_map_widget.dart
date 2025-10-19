@@ -4,6 +4,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../../providers/map_provider.dart';
+import '../../../../core/config/env_config.dart';
+import '../../../../global/services/mapbox_service.dart';
+import '../../../../global/services/quota_monitor_service.dart';
 
 class OSMMapWidget extends StatefulWidget {
   final LatLng? initialLocation;
@@ -97,12 +100,68 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
         },
       ),
       children: [
-        // Capa de tiles de OpenStreetMap
+        // Capa de tiles de Mapbox (reemplaza OSM)
         TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          urlTemplate: MapboxService.getTileUrl(style: 'streets-v12'),
           userAgentPackageName: 'com.pingo.app',
-          subdomains: const ['a', 'b', 'c'],
+          additionalOptions: const {
+            'accessToken': EnvConfig.mapboxPublicToken,
+          },
+          tileProvider: NetworkTileProvider(),
+          // Callback para contar tiles cargados (monitoreo de cuotas)
+          tileBuilder: (context, widget, tile) {
+            // Incrementar contador cada 10 tiles para no saturar
+            if (tile.coordinates.z.hashCode % 10 == 0) {
+              QuotaMonitorService.incrementMapboxTiles(count: 1);
+            }
+            return widget;
+          },
         ),
+        
+        // Dibujar la ruta si existe
+        if (mapProvider.currentRoute != null && mapProvider.currentRoute!.geometry.isNotEmpty)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: mapProvider.currentRoute!.geometry,
+                strokeWidth: 5.0,
+                color: const Color(0xFF4A90E2),
+                borderStrokeWidth: 2.0,
+                borderColor: Colors.white,
+              ),
+            ],
+          ),
+
+        // Marcadores de waypoints de la ruta
+        if (mapProvider.routeWaypoints.isNotEmpty)
+          MarkerLayer(
+            markers: mapProvider.routeWaypoints.asMap().entries.map((entry) {
+              final index = entry.key;
+              final point = entry.value;
+              final isOrigin = index == 0;
+              final isDestination = index == mapProvider.routeWaypoints.length - 1;
+              
+              return Marker(
+                point: point,
+                width: 40.0,
+                height: 40.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isOrigin ? Colors.green : (isDestination ? Colors.red : Colors.orange),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      isOrigin ? Icons.play_arrow : (isDestination ? Icons.flag : Icons.circle),
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
         
         // Marcadores opcionales (puedes ocultarlos para mostrar sólo el pin centrado)
         if (widget.showMarkers) ...[
@@ -138,6 +197,34 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
               ],
             ),
         ],
+
+        // Marcadores de incidentes de tráfico
+        if (mapProvider.trafficIncidents.isNotEmpty)
+          MarkerLayer(
+            markers: mapProvider.trafficIncidents.map((incident) {
+              return Marker(
+                point: incident.location,
+                width: 30.0,
+                height: 30.0,
+                child: GestureDetector(
+                  onTap: () => _showIncidentInfo(context, incident),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _getIncidentColor(incident.severity),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: Center(
+                      child: Text(
+                        incident.icon,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }
@@ -152,8 +239,61 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
     }
   }
 
+  void _showIncidentInfo(BuildContext context, dynamic incident) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Text(incident.icon),
+            const SizedBox(width: 8),
+            const Expanded(child: Text('Incidente de Tráfico')),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              incident.description,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('Severidad: ${incident.severityText}'),
+            if (incident.from != null)
+              Text('Desde: ${incident.from}'),
+            if (incident.to != null)
+              Text('Hasta: ${incident.to}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getIncidentColor(int severity) {
+    switch (severity) {
+      case 0:
+      case 1:
+        return Colors.yellow.shade700;
+      case 2:
+        return Colors.orange.shade700;
+      case 3:
+      case 4:
+        return Colors.red.shade700;
+      default:
+        return Colors.grey.shade700;
+    }
+  }
+
   @override
   void dispose() {
+    _moveEndDebounce?.cancel();
     _mapController.dispose();
     super.dispose();
   }

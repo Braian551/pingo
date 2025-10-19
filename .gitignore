@@ -47,3 +47,14 @@ app.*.map.json
 
 # Ignore backend vendor directory
 pingo/backend/vendor/
+
+# ============================================
+# Security - API Keys and Environment Config
+# ============================================
+# IMPORTANTE: Protege tus API keys y tokens
+lib/src/core/config/env_config.dart
+**/env_config.dart
+
+# Backup files
+*.backup
+*.bak

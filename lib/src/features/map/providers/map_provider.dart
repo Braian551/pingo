@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../global/services/nominatim_service.dart';
+import '../../../global/services/mapbox_service.dart';
+import '../../../global/services/traffic_service.dart';
+import '../../../global/services/quota_monitor_service.dart';
 
 class MapProvider with ChangeNotifier {
   LatLng? _selectedLocation;
@@ -11,6 +14,13 @@ class MapProvider with ChangeNotifier {
   LatLng? _currentLocation;
   String? _selectedCity;
   String? _selectedState;
+  
+  // Nueva funcionalidad: Rutas y Tráfico
+  MapboxRoute? _currentRoute;
+  List<LatLng> _routeWaypoints = [];
+  TrafficFlow? _currentTraffic;
+  List<TrafficIncident> _trafficIncidents = [];
+  QuotaStatus? _quotaStatus;
 
   // Getters
   LatLng? get selectedLocation => _selectedLocation;
@@ -21,6 +31,13 @@ class MapProvider with ChangeNotifier {
   LatLng? get currentLocation => _currentLocation;
   String? get selectedCity => _selectedCity;
   String? get selectedState => _selectedState;
+  
+  // Nuevos getters
+  MapboxRoute? get currentRoute => _currentRoute;
+  List<LatLng> get routeWaypoints => _routeWaypoints;
+  TrafficFlow? get currentTraffic => _currentTraffic;
+  List<TrafficIncident> get trafficIncidents => _trafficIncidents;
+  QuotaStatus? get quotaStatus => _quotaStatus;
 
   /// Seleccionar ubicacin desde el mapa
   Future<void> selectLocation(LatLng location) async {
@@ -151,5 +168,104 @@ class MapProvider with ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  // ============================================
+  // NUEVAS FUNCIONALIDADES: RUTAS Y TRÁFICO
+  // ============================================
+
+  /// Calcular ruta entre origen y destino usando Mapbox
+  Future<bool> calculateRoute({
+    required LatLng origin,
+    required LatLng destination,
+    List<LatLng>? waypoints,
+    String profile = 'driving', // driving, walking, cycling
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final points = [origin];
+      if (waypoints != null) points.addAll(waypoints);
+      points.add(destination);
+
+      final route = await MapboxService.getRoute(
+        waypoints: points,
+        profile: profile,
+        alternatives: true,
+        steps: true,
+      );
+
+      if (route != null) {
+        _currentRoute = route;
+        _routeWaypoints = points;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      print('Error calculando ruta: $e');
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
+  /// Limpiar ruta actual
+  void clearRoute() {
+    _currentRoute = null;
+    _routeWaypoints = [];
+    notifyListeners();
+  }
+
+  /// Obtener información de tráfico en una ubicación
+  Future<void> fetchTrafficInfo(LatLng location) async {
+    try {
+      final traffic = await TrafficService.getTrafficFlow(location: location);
+      _currentTraffic = traffic;
+      notifyListeners();
+    } catch (e) {
+      print('Error obteniendo tráfico: $e');
+    }
+  }
+
+  /// Obtener incidentes de tráfico cercanos
+  Future<void> fetchTrafficIncidents(LatLng location, {double radiusKm = 5.0}) async {
+    try {
+      final incidents = await TrafficService.getTrafficIncidents(
+        location: location,
+        radiusKm: radiusKm,
+      );
+      _trafficIncidents = incidents;
+      notifyListeners();
+    } catch (e) {
+      print('Error obteniendo incidentes: $e');
+    }
+  }
+
+  /// Actualizar estado de cuotas
+  Future<void> updateQuotaStatus() async {
+    try {
+      final status = await QuotaMonitorService.getQuotaStatus();
+      _quotaStatus = status;
+      notifyListeners();
+    } catch (e) {
+      print('Error actualizando cuotas: $e');
+    }
+  }
+
+  /// Agregar waypoint a la ruta actual
+  void addWaypoint(LatLng waypoint) {
+    if (!_routeWaypoints.contains(waypoint)) {
+      _routeWaypoints.add(waypoint);
+      notifyListeners();
+    }
+  }
+
+  /// Remover waypoint de la ruta
+  void removeWaypoint(LatLng waypoint) {
+    _routeWaypoints.remove(waypoint);
+    notifyListeners();
   }
 }

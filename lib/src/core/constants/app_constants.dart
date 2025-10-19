@@ -1,39 +1,65 @@
 // lib/src/core/constants/app_constants.dart
 
 class AppConstants {
-  // Configuración de Google Maps
-  static const String googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY_HERE';
+  // ============================================
+  // CONFIGURACIÓN DE MAPAS (MAPBOX)
+  // ============================================
+  // La configuración de Mapbox ahora está en EnvConfig
+  // Ver: lib/src/core/config/env_config.dart
   
-  // Configuración del servicio de email (Backend PHP con Google SMTP)
-  // static const String emailApiUrl = 'https://tu-servidor.com/backend/email_service.php';
-  // static const String emailLocalUrl = 'http://localhost/backend/email_service.php';
+  // Ubicación por defecto (Bogotá, Colombia)
+  static const double defaultLatitude = 4.6097;
+  static const double defaultLongitude = -74.0817;
+  static const double defaultZoom = 15.0;
+  
+  // Estilos de mapa disponibles
+  static const String mapStyleStreets = 'streets-v12';
+  static const String mapStyleDark = 'dark-v11';
+  static const String mapStyleLight = 'light-v11';
+  static const String mapStyleOutdoors = 'outdoors-v12';
+  static const String mapStyleSatellite = 'satellite-streets-v12';
+  
+  // ============================================
+  // CONFIGURACIÓN DE EMAIL
+  // ============================================
   static const String emailApiUrl = 'http://10.0.2.2/pingo/backend/email_service.php';
+  static const bool useEmailMock = false;
   
-  // Configuración para desarrollo
-  static const bool useEmailMock = false; // Cambia a true para usar mock en desarrollo
-  
-  // Configuración de la base de datos
+  // ============================================
+  // CONFIGURACIÓN DE BASE DE DATOS
+  // ============================================
   static const String databaseHost = '10.0.2.2';
   static const String databasePort = '3306';
   static const String databaseName = 'pingo';
   static const String databaseUser = 'root';
   static const String databasePassword = 'root';
   
-  // Configuración de la aplicación
+  // ============================================
+  // CONFIGURACIÓN DE LA APLICACIÓN
+  // ============================================
   static const String appName = 'PingGo';
   static const String appVersion = '1.0.0';
-  
-  // URLs de la API
   static const String baseApiUrl = 'https://api.pingo.com';
   
-  // Configuración de mapas
-  static const double defaultLatitude = 4.6097; // Bogotá, Colombia
-  static const double defaultLongitude = -74.0817;
-  static const double defaultZoom = 15.0;
-  
-  // Configuración de validación
+  // ============================================
+  // CONFIGURACIÓN DE VALIDACIÓN
+  // ============================================
   static const int minPasswordLength = 6;
   static const int minPhoneLength = 10;
   static const int verificationCodeLength = 6;
   static const int resendCodeDelaySeconds = 60;
+  
+  // ============================================
+  // CONFIGURACIÓN DE RUTAS Y NAVEGACIÓN
+  // ============================================
+  static const String defaultRoutingProfile = 'driving'; // driving, walking, cycling
+  static const bool enableTrafficInfo = true;
+  static const bool enableRouteOptimization = true;
+  static const double trafficCheckRadiusKm = 5.0;
+  
+  // ============================================
+  // CONFIGURACIÓN DE NOTIFICACIONES
+  // ============================================
+  static const bool enableQuotaNotifications = true;
+  static const bool showQuotaInUI = true;
 }
