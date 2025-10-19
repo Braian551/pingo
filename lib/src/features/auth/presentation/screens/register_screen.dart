@@ -206,93 +206,162 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           
-          // Botones fijos en la parte inferior
+          // Botones fijos en la parte inferior con mejor diseño
           Container(
             padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              border: Border(
+                top: BorderSide(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Botón Atrás en la esquina inferior izquierda
+                // Botón Atrás mejorado
                 if (_currentStep > 0)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _currentStep--;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() {
+                            _currentStep--;
+                          });
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.arrow_back_rounded, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Atrás',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: const Text('Atrás'),
                   )
                 else
-                  const SizedBox(width: 80), // Espaciador para mantener la alineación
+                  const SizedBox(width: 0),
                 
-                // Botón Siguiente/Crear Cuenta en la esquina inferior derecha
-                ElevatedButton(
-                  onPressed: _isLoading ? null : () {
-                    // Ahora hay 4 pasos: 0 Personal, 1 Contacto, 2 Dirección, 3 Seguridad
-                    if (_currentStep < 3) {
-                      // Validar el paso actual antes de continuar
-            if (_currentStep == 0) {
-                        if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Por favor completa todos los campos'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                      } else if (_currentStep == 1) {
-                        if (_phoneController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Por favor ingresa tu teléfono'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                      } else if (_currentStep == 2) {
-                        if (_addressController.text.isEmpty || _selectedLat == null || _selectedLng == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Por favor selecciona tu dirección en el mapa'),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
-                          return;
-                        }
-                      }
-
-                      setState(() { _currentStep++; });
-                      if (_currentStep == 2) {
-                        _ensureLocationPermissionAndFetch();
-                      }
-                    } else {
-                      _register();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFFF00),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                  child: _currentStep < 3
-                      ? const Text('Siguiente')
-                      : _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.black,
-                                strokeWidth: 2,
+                // Botón Siguiente/Crear Cuenta mejorado
+                Expanded(
+                  flex: _currentStep > 0 ? 1 : 2,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : () {
+                      if (_currentStep < 3) {
+                        // Validación del paso actual
+                        if (_currentStep == 0) {
+                          if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Por favor completa todos los campos'),
+                                backgroundColor: Colors.red,
                               ),
-                            )
-                          : const Text('Crear Cuenta'),
+                            );
+                            return;
+                          }
+                        } else if (_currentStep == 1) {
+                          if (_phoneController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Por favor ingresa tu teléfono'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                        } else if (_currentStep == 2) {
+                          if (_addressController.text.isEmpty || _selectedLat == null || _selectedLng == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Por favor selecciona tu dirección en el mapa'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+                        }
+
+                        setState(() { _currentStep++; });
+                        if (_currentStep == 2) {
+                          _ensureLocationPermissionAndFetch();
+                        }
+                      } else {
+                        _register();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFFF00),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                      disabledBackgroundColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                      disabledForegroundColor: Colors.black.withOpacity(0.5),
+                    ),
+                    child: _currentStep < 3
+                        ? const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Siguiente',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded, size: 20),
+                            ],
+                          )
+                        : _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Crear Cuenta',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                  ),
                 ),
               ],
             ),
@@ -319,35 +388,94 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildStepperHeader() {
     final titles = ['Personal', 'Contacto', 'Dirección', 'Seguridad'];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
+          // Título del paso actual con animación
           Center(
-            child: Text(
-              titles[_currentStep],
-              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0.0, 0.2),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  ),
+                );
+              },
+              child: Text(
+                titles[_currentStep],
+                key: ValueKey<int>(_currentStep),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-          // Centered dots
+          const SizedBox(height: 16),
+          
+          // Indicador de progreso mejorado
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(titles.length, (i) {
               final isActive = i == _currentStep;
+              final isPassed = i < _currentStep;
+              
               return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                width: isActive ? 14 : 10,
-                height: isActive ? 14 : 10,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                width: isActive ? 32 : (isPassed ? 20 : 12),
+                height: isActive ? 8 : 8,
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.white24,
-                  shape: BoxShape.circle,
+                  color: isActive 
+                    ? const Color(0xFFFFFF00)
+                    : isPassed 
+                      ? const Color(0xFFFFFF00).withOpacity(0.5)
+                      : Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: isActive ? [
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.4),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ] : null,
                 ),
               );
             }),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Contador de pasos
+          Center(
+            child: Text(
+              '${_currentStep + 1} de ${titles.length}',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
@@ -448,27 +576,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildPersonalInfoStep() {
     return Column(
       children: [
-        const SizedBox(height: 20),
-        TextFormField(
+        const SizedBox(height: 24),
+        _buildModernTextField(
           controller: _nameController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Nombre',
-            labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.person, color: Color(0xFFFFFF00)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
-            ),
-          ),
+          label: 'Nombre',
+          icon: Icons.person_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor ingresa tu nombre';
@@ -477,26 +589,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 20),
-        TextFormField(
+        _buildModernTextField(
           controller: _lastNameController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Apellido',
-            labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFFFFFF00)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
-            ),
-          ),
+          label: 'Apellido',
+          icon: Icons.person_outline_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor ingresa tu apellido';
@@ -509,31 +605,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Widget _buildModernTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+        ),
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: Colors.white.withOpacity(0.6),
+            fontSize: 16,
+          ),
+          prefixIcon: Icon(
+            icon,
+            color: const Color(0xFFFFFF00),
+            size: 22,
+          ),
+          suffixIcon: suffixIcon,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 18,
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
   Widget _buildContactStep() {
     return Column(
       children: [
-        const SizedBox(height: 20),
-        TextFormField(
+        const SizedBox(height: 24),
+        _buildModernTextField(
           controller: _phoneController,
+          label: 'Teléfono',
+          icon: Icons.phone_rounded,
           keyboardType: TextInputType.phone,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Teléfono',
-            labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.phone, color: Color(0xFFFFFF00)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
-            ),
-          ),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor ingresa tu teléfono';
@@ -546,36 +676,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(height: 20),
         
-        const SizedBox(height: 8),
-        
-        // Información de coordenadas seleccionadas (solo para debug)
+        // Información de coordenadas seleccionadas
         if (_selectedLat != null && _selectedLng != null)
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
             margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.yellow.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.yellow.withOpacity(0.3)),
+              color: const Color(0xFFFFFF00).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFFFFFF00).withOpacity(0.3),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.yellow, size: 16),
-                const SizedBox(width: 8),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFF00),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: Colors.black,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Ubicación seleccionada: ${_selectedLat!.toStringAsFixed(6)}, ${_selectedLng!.toStringAsFixed(6)}',
-                    style: const TextStyle(
-                      color: Colors.yellow,
-                      fontSize: 12,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Ubicación guardada',
+                        style: TextStyle(
+                          color: Color(0xFFFFFF00),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_selectedLat!.toStringAsFixed(6)}, ${_selectedLng!.toStringAsFixed(6)}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        
-        const SizedBox(height: 8),
         
         const SizedBox(height: 40),
       ],
@@ -585,38 +740,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildSecurityStep() {
     return Column(
       children: [
-        const SizedBox(height: 20),
-        TextFormField(
+        const SizedBox(height: 24),
+        _buildModernTextField(
           controller: _passwordController,
+          label: 'Contraseña',
+          icon: Icons.lock_rounded,
           obscureText: _obscurePassword,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Contraseña',
-            labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.lock, color: Color(0xFFFFFF00)),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                color: Colors.white70,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+              color: Colors.white.withOpacity(0.6),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
-            ),
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -629,37 +768,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 20),
-        TextFormField(
+        _buildModernTextField(
           controller: _confirmPasswordController,
+          label: 'Confirmar contraseña',
+          icon: Icons.lock_outline_rounded,
           obscureText: _obscureConfirmPassword,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Confirmar contraseña',
-            labelStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFFFFF00)),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                color: Colors.white70,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscureConfirmPassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+              color: Colors.white.withOpacity(0.6),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white30),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFFF00)),
-            ),
+            onPressed: () {
+              setState(() {
+                _obscureConfirmPassword = !_obscureConfirmPassword;
+              });
+            },
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -672,32 +795,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         
-        // Información adicional para modo de pruebas
-        Container(
-          margin: const EdgeInsets.only(top: 20),
+        const SizedBox(height: 20),
+        
+        // Información adicional para modo de pruebas con mejor diseño
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.orange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.orange.withOpacity(0.3),
+            ),
           ),
-          child: const Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Modo Pruebas Activado',
-                style: TextStyle(
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.info_outline_rounded,
                   color: Colors.orange,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  size: 18,
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                'Errores técnicos menores serán ignorados para permitir el registro durante la fase de desarrollo.',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 12,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Modo Pruebas',
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Errores técnicos menores serán ignorados durante el desarrollo.',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

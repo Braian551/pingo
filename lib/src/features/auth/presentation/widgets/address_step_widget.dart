@@ -25,16 +25,21 @@ class AddressStepWidget extends StatefulWidget {
   State<AddressStepWidget> createState() => _AddressStepWidgetState();
 }
 
-class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTickerProviderStateMixin {
+class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   LatLng? _mapCenterCache;
   Timer? _moveDebounce;
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearchFocused = false;
   
-  // Animación solo para cuando el mapa se mueve
-  late AnimationController _animationController;
-  late Animation<double> _bounceAnimation;
+  // Controladores de animación mejorados
+  late AnimationController _pinAnimationController;
+  late AnimationController _pulseAnimationController;
+  
+  late Animation<double> _pinBounceAnimation;
+  late Animation<double> _pulseAnimation;
+  
+  bool _isMapMoving = false;
 
   @override
   void initState() {
@@ -42,19 +47,32 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
     _searchController.text = widget.addressController.text;
     _searchFocusNode.addListener(_onSearchFocusChange);
     
-    // Configurar controlador de animaciones solo para rebote
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    // Animación del pin al mover el mapa
+    _pinAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
     
-    // Animación de rebote solo durante el movimiento
-    _bounceAnimation = Tween<double>(
+    _pinBounceAnimation = Tween<double>(
       begin: 0.0,
-      end: -6.0,
+      end: -12.0,
     ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
+      parent: _pinAnimationController,
+      curve: Curves.easeOutBack,
+    ));
+    
+    // Animación de pulso para el pin
+    _pulseAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.3,
+    ).animate(CurvedAnimation(
+      parent: _pulseAnimationController,
+      curve: Curves.easeInOut,
     ));
   }
 
@@ -69,7 +87,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
     _moveDebounce?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
-    _animationController.dispose();
+    _pinAnimationController.dispose();
+    _pulseAnimationController.dispose();
     super.dispose();
   }
 
@@ -106,16 +125,20 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
   Timer? _mapMoveTimer;
 
   void _onMapMoveStart() {
-    // Cancel any pending end-timer and start the bounce animation
+    setState(() {
+      _isMapMoving = true;
+    });
     _mapMoveTimer?.cancel();
-    _animationController.forward();
+    _pinAnimationController.forward();
   }
 
   void _onMapMoveEnd() {
     _mapMoveTimer?.cancel();
-    _mapMoveTimer = Timer(const Duration(milliseconds: 150), () {
-      // Revert the bounce animation after a short delay
-      _animationController.reverse();
+    _mapMoveTimer = Timer(const Duration(milliseconds: 200), () {
+      setState(() {
+        _isMapMoving = false;
+      });
+      _pinAnimationController.reverse();
     });
   }
 
@@ -212,77 +235,104 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
             ),
           ),
 
-          // Search bar moderna con efectos de glassmorphism
+          // Barra de búsqueda moderna con efecto glass y animaciones suaves
           Positioned(
             top: 20,
             left: 20,
             right: 20,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
+              curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
-                color: Colors.grey[850]!.withOpacity(0.9),
+                color: Colors.black.withOpacity(0.75),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _isSearchFocused 
-                    ? Color(0xFFFFFF00).withOpacity(0.6)
-                    : Colors.white12,
-                  width: 1.5,
+                    ? const Color(0xFFFFFF00).withOpacity(0.8)
+                    : Colors.white.withOpacity(0.15),
+                  width: _isSearchFocused ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 20,
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: _isSearchFocused ? 24 : 16,
                     offset: const Offset(0, 8),
+                    spreadRadius: _isSearchFocused ? 2 : 0,
                   ),
+                  if (_isSearchFocused)
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 0),
+                      spreadRadius: 2,
+                    ),
                 ],
               ),
               child: Material(
                 color: Colors.transparent,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.search_rounded,
-                        color: _isSearchFocused 
-                          ? Color(0xFFFFFF00)
-                          : Colors.white54,
-                        size: 22,
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          Icons.search_rounded,
+                          color: _isSearchFocused 
+                            ? const Color(0xFFFFFF00)
+                            : Colors.white.withOpacity(0.6),
+                          size: 24,
+                        ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
                           focusNode: _searchFocusNode,
                           onChanged: _onSearch,
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Buscar dirección...',
                             hintStyle: TextStyle(
-                              color: Colors.white54,
+                              color: Colors.white.withOpacity(0.5),
                               fontSize: 16,
+                              fontWeight: FontWeight.w400,
                             ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                         ),
                       ),
                       if (_searchController.text.isNotEmpty)
-                        AnimatedContainer(
+                        AnimatedScale(
                           duration: const Duration(milliseconds: 200),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.clear_rounded,
-                              color: Colors.white54,
-                              size: 20,
+                          scale: 1.0,
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              shape: BoxShape.circle,
                             ),
-                            onPressed: () {
-                              _searchController.clear();
-                              Provider.of<MapProvider>(context, listen: false).clearSearch();
-                              _searchFocusNode.unfocus();
-                            },
-                            splashRadius: 20,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.close_rounded,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                Provider.of<MapProvider>(context, listen: false).clearSearch();
+                                _searchFocusNode.unfocus();
+                              },
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              splashRadius: 16,
+                            ),
                           ),
                         ),
                     ],
@@ -292,75 +342,122 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
             ),
           ),
 
-          // Marcador simple y limpio con animación solo al mover el mapa
+          // Pin de ubicación profesional estilo Uber con animaciones suaves
           Center(
             child: IgnorePointer(
               ignoring: true,
               child: AnimatedBuilder(
-                animation: _animationController,
+                animation: Listenable.merge([_pinAnimationController, _pulseAnimationController]),
                 builder: (context, child) {
                   return Transform.translate(
-                    offset: Offset(0, _bounceAnimation.value),
+                    offset: Offset(0, _pinBounceAnimation.value),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Círculo decorativo en la parte superior
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2,
+                        // Pin moderno inspirado en Uber
+                        Stack(
+                          alignment: Alignment.center,
+                          clipBehavior: Clip.none,
+                          children: [
+                            // Pulso animado de fondo (solo cuando no se mueve el mapa)
+                            if (!_isMapMoving)
+                              Transform.scale(
+                                scale: _pulseAnimation.value,
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFFF00).withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            
+                            // Pin principal
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                    spreadRadius: 1,
+                                  ),
+                                  BoxShadow(
+                                    color: const Color(0xFFFFFF00).withOpacity(0.2),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 2),
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFFF00),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFFFFF00).withOpacity(0.5),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
+                            
+                            // Indicador de punta (punto de referencia exacto)
+                            Positioned(
+                              bottom: -8,
+                              child: Container(
+                                width: 4,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.4),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        
-                        // Línea vertical
-                        Container(
-                          height: 25,
-                          width: 2,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(1),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                        
-                        // Punto de selección (la punta es el punto exacto)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1.5,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                          ],
+                        ),
+                        
+                        // Sombra debajo del pin
+                        const SizedBox(height: 4),
+                        Transform.scale(
+                          scale: _isMapMoving ? 0.8 : 1.0,
+                          child: Container(
+                            width: 24,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -371,87 +468,128 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
             ),
           ),
 
-          // Tarjeta inferior moderna con efecto glass
+          // Tarjeta inferior profesional con efecto glass
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 20,
+            left: 16,
+            right: 16,
+            bottom: 16,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[900]!.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(20),
+                color: Colors.black.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white12,
+                  color: _confirmed 
+                    ? const Color(0xFFFFFF00).withOpacity(0.4)
+                    : Colors.white.withOpacity(0.15),
+                  width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
                     spreadRadius: 2,
                   ),
+                  if (_confirmed)
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 0),
+                      spreadRadius: 2,
+                    ),
                 ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Campo de dirección con icono
-                  Container(
+                  // Campo de dirección mejorado
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(
-                      color: Colors.grey[850]!.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white12),
+                      color: Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.12),
+                      ),
                     ),
                     child: TextField(
                       controller: widget.addressController,
                       readOnly: false,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      minLines: 1,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.location_on,
-                          color: const Color.fromARGB(255, 255, 255, 0),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 12, right: 8),
+                          child: Icon(
+                            Icons.location_on_rounded,
+                            color: const Color(0xFFFFFF00),
+                            size: 22,
+                          ),
+                        ),
+                        prefixIconConstraints: const BoxConstraints(
+                          minWidth: 44,
+                          minHeight: 44,
                         ),
                         hintText: 'Dirección seleccionada...',
                         hintStyle: TextStyle(
-                          color: Colors.white54,
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 15,
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+                        border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 14,
+                          vertical: 16,
                         ),
-                        filled: true,
-                        fillColor: Colors.transparent,
+                        filled: false,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
+                  
+                  // Indicador de estado confirmado
                   if (_confirmed)
-                    Container(
-                      padding: const EdgeInsets.all(12),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      margin: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                      color: Colors.yellow.withOpacity(0.15),
+                        color: const Color(0xFFFFFF00).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.yellow.withOpacity(0.3)),
+                        border: Border.all(
+                          color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.check_circle, color: Colors.yellowAccent),
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFF00),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               'Ubicación confirmada',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
                               ),
                             ),
                           ),
@@ -459,142 +597,195 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with SingleTicker
                       ),
                     ),
 
+                  // Botones de acción
                   if (!_confirmed)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              LatLng? center = _mapCenterCache ?? prov.selectedLocation;
-                              if (center != null && prov.selectedAddress == null) {
-                                prov.selectLocation(center);
-                                widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
-                              }
-                              if (prov.selectedAddress != null) {
-                                widget.addressController.text = prov.selectedAddress!;
-                              }
-                              _onConfirm(center);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFFFF00),
-                              foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 2,
-                              shadowColor: Color(0xFFFFFF00).withOpacity(0.3),
-                            ),
-                            child: Text(
-                              'Confirmar ubicación',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          width: 52,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[800]!.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white12,
-                            ),
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              Provider.of<MapProvider>(context, listen: false).clearSelection();
-                              widget.addressController.clear();
-                              _searchController.clear();
-                            },
-                            icon: Icon(
-                              Icons.close_rounded,
-                              color: Colors.white70,
-                              size: 22,
-                            ),
-                            style: IconButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Row(
+                        children: [
+                          // Botón de confirmar (principal)
+                          Expanded(
+                            flex: 3,
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 200),
+                              scale: 1.0,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  LatLng? center = _mapCenterCache ?? prov.selectedLocation;
+                                  if (center != null && prov.selectedAddress == null) {
+                                    prov.selectLocation(center);
+                                    widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
+                                  }
+                                  if (prov.selectedAddress != null) {
+                                    widget.addressController.text = prov.selectedAddress!;
+                                  }
+                                  _onConfirm(center);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFFF00),
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(vertical: 18),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  elevation: 0,
+                                  shadowColor: const Color(0xFFFFFF00).withOpacity(0.4),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_rounded,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Confirmar',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          
+                          // Botón de limpiar
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.15),
+                              ),
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                Provider.of<MapProvider>(context, listen: false).clearSelection();
+                                widget.addressController.clear();
+                                _searchController.clear();
+                                setState(() {
+                                  _confirmed = false;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.refresh_rounded,
+                                color: Colors.white.withOpacity(0.8),
+                                size: 24,
+                              ),
+                              style: IconButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                 ],
               ),
             ),
           ),
 
-          // Resultados de búsqueda con diseño glass
-          if (prov.searchResults.isNotEmpty)
+          // Resultados de búsqueda con diseño profesional
+          if (prov.searchResults.isNotEmpty && _isSearchFocused)
             Positioned(
-              top: 80,
+              top: 84,
               left: 20,
               right: 20,
               child: Material(
                 color: Colors.transparent,
                 elevation: 0,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
                   decoration: BoxDecoration(
-                    color: Colors.grey[850]!.withOpacity(0.9),
+                    color: Colors.black.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Colors.white12,
+                      color: Colors.white.withOpacity(0.15),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        color: Colors.black.withOpacity(0.5),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 280),
-                      child: ListView.builder(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: ListView.separated(
                         shrinkWrap: true,
-                        padding: EdgeInsets.zero,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         itemCount: prov.searchResults.length,
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: Colors.white.withOpacity(0.08),
+                          indent: 60,
+                          endIndent: 20,
+                        ),
                         itemBuilder: (context, i) {
                           final r = prov.searchResults[i];
                           return Material(
                             color: Colors.transparent,
-                            child: ListTile(
-                              leading: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[800]!.withOpacity(0.6),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.location_on,
-                                  color: const Color.fromARGB(255, 31, 221, 6),
-                                  size: 18,
-                                ),
-                              ),
-                              title: Text(
-                                r.getFormattedAddress(),
-                                style: TextStyle(color: Colors.white),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                color: Colors.white54,
-                                size: 16,
-                              ),
+                            child: InkWell(
                               onTap: () => _onResultTap(r),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Icono de ubicación
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFF00).withOpacity(0.15),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.location_on_rounded,
+                                        color: Color(0xFFFFFF00),
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    
+                                    // Texto de la dirección
+                                    Expanded(
+                                      child: Text(
+                                        r.getFormattedAddress(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    
+                                    // Icono de flecha
+                                    Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      color: Colors.white.withOpacity(0.4),
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
