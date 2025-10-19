@@ -64,8 +64,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final email = sess['email'] as String?;
         final profile = await UserService.getProfile(userId: id, email: email);
         if (profile != null && profile['success'] == true) {
+          final user = profile['user'];
           final location = profile['location'];
-          final name = profile['nombre'] as String?;
+          final name = user != null ? user['nombre'] as String? : null;
           if (location != null) {
             final dir = location['direccion'] as String? ?? '';
             if (mounted) {
@@ -91,8 +92,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           if (emailArg != null || idArg != null) {
             final profile = await UserService.getProfile(userId: idArg, email: emailArg);
             if (profile != null && profile['success'] == true) {
+              final user = profile['user'];
               final location = profile['location'];
-              final name = profile['nombre'] as String?;
+              final name = user != null ? user['nombre'] as String? : null;
               if (location != null) {
                 final dir = location['direccion'] as String? ?? '';
                 if (mounted) {
@@ -101,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     _userName = name ?? 'Usuario';
                     _loading = false;
                   });
+                  if (idArg != null && emailArg != null) {
+                    await UserService.saveSession({'id': idArg, 'email': emailArg});
+                  }
                   _animationController.forward();
                   return;
                 }
@@ -571,7 +576,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        height: 140,
+        height: 170,
         decoration: BoxDecoration(
           color: const Color(0xFFFFFF00),
           borderRadius: BorderRadius.circular(20),
@@ -610,20 +615,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 2,
+                      ),
                     ),
                     child: const Text(
-                      'BIENVENIDO20',
+                      'BIENVENIDO',
                       style: TextStyle(
                         color: Color(0xFFFFFF00),
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ),

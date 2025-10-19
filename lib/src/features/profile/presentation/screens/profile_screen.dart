@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
@@ -83,83 +84,189 @@ class _ProfileTabState extends State<ProfileTab> {
     }
   }
 
+  Widget _buildProfileCard(String? email) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFF00),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _profileData != null ? '${_profileData!['nombre'] ?? ''} ${_profileData!['apellido'] ?? ''}' : (email ?? 'Usuario'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      email ?? 'No hay sesión',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _location != null && (_location!['direccion'] ?? '').toString().isNotEmpty
+                          ? (_location!['direccion'] ?? '')
+                          : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : 'Sin dirección'),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
+            );
+            setState(() => _loading = true);
+            await _loadSession();
+            if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFF00),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.black, size: 24),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Editar dirección',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: _logout,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.exit_to_app, color: Colors.white, size: 24),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Cerrar sesión',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final email = _session?['email'] as String?;
 
     return _loading
         ? const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00))))
-        : Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  color: Colors.black.withOpacity(0.8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Color(0xFF1A1A1A),
-                          child: Icon(Icons.person, color: Color(0xFFFFFF00), size: 32),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _profileData != null ? '${_profileData!['nombre'] ?? ''} ${_profileData!['apellido'] ?? ''}' : (email ?? 'Usuario'),
-                                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                email ?? 'No hay sesión',
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                              const SizedBox(height: 6),
-                              // Mostrar dirección si está disponible (truncada en una sola línea)
-                              Text(
-                                _location != null && (_location!['direccion'] ?? '').toString().isNotEmpty
-                                    ? (_location!['direccion'] ?? '')
-                                    : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : ''),
-                                style: const TextStyle(color: Colors.white70, fontSize: 12),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+        : SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Mi perfil',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      // Abrir LocationPicker; al volver, recargar perfil para mostrar la dirección actualizada
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
-                      );
-                      setState(() => _loading = true);
-                      await _loadSession();
-                      if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
-                    },
-                    icon: const Icon(Icons.location_on),
-                    label: const Text('Editar dirección'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFFF00), foregroundColor: Colors.black),
-                  ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: _logout,
-                  icon: const Icon(Icons.exit_to_app),
-                  label: const Text('Cerrar sesión'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
-                ),
-              ],
+                  const SizedBox(height: 24),
+                  _buildProfileCard(email),
+                  const SizedBox(height: 30),
+                  _buildActionButtons(),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           );
   }
