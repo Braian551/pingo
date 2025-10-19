@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Ping-Go',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.yellow,
         visualDensity: VisualDensity.standard,
