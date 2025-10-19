@@ -180,16 +180,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFFFF00).withOpacity(0.15),
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFFFFFF00).withOpacity(0.15),
+                  Colors.transparent,
+                ],
+                stops: const [0.1, 0.8],
+              ),
             ),
-            child: Image.asset(
-              'assets/images/logo.png',
-              width: 28,
-              height: 28,
-              color: const Color(0xFFFFFF00),
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFFFFF00),
+                    Color(0xFFFFFF00),
+                  ],
+                ).createShader(bounds);
+              },
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 36,
+                height: 36,
+              ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           const Text(
             'PingGo',
             style: TextStyle(
