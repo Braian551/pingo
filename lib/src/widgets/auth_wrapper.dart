@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:ping_go/src/routes/route_names.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
@@ -50,6 +51,18 @@ class _AuthWrapperState extends State<AuthWrapper>
 
   Future<void> _checkSession() async {
     try {
+      // Primero verificar si es la primera vez que abre la app
+      final prefs = await SharedPreferences.getInstance();
+      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+
+      if (!mounted) return;
+
+      // Si no ha completado el onboarding, mostrar pantalla introductoria
+      if (!onboardingCompleted) {
+        Navigator.of(context).pushReplacementNamed(RouteNames.onboarding);
+        return;
+      }
+
       // Verificar si hay una sesión guardada
       final session = await UserService.getSavedSession();
 
@@ -70,8 +83,6 @@ class _AuthWrapperState extends State<AuthWrapper>
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
       }
-    } finally {
-      // No necesitamos setState aquí ya que navegamos inmediatamente
     }
   }
 

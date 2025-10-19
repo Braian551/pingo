@@ -5,6 +5,7 @@ import 'package:ping_go/src/features/auth/presentation/screens/register_screen.d
 import 'package:ping_go/src/features/auth/presentation/screens/phone_auth_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/email_auth_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/email_verification_screen.dart';
+import 'package:ping_go/src/features/onboarding/presentation/screens/onboarding_screen.dart';
 // import 'package:ping_go/src/features/map/presentation/screens/location_selection_screen.dart'; // COMENTADO - YA NO SE USA
 // ride HomeScreen still available but the authenticated entrypoint should be HomeAuth
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
@@ -22,6 +23,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+      case RouteNames.onboarding:
+        return FadeSlidePageRoute(page: const OnboardingScreen(), settings: settings);
       case RouteNames.authWrapper:
         return MaterialPageRoute(builder: (_) => const AuthWrapper());
       case RouteNames.welcome:
