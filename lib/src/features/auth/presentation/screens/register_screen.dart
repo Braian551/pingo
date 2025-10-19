@@ -389,7 +389,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildStepperHeader() {
     final titles = ['Personal', 'Contacto', 'Dirección', 'Seguridad'];
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.black,
         border: Border(
@@ -411,7 +411,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   opacity: animation,
                   child: SlideTransition(
                     position: Tween<Offset>(
-                      begin: const Offset(0.0, 0.2),
+                      begin: const Offset(0.0, 0.15),
                       end: Offset.zero,
                     ).animate(animation),
                     child: child,
@@ -423,16 +423,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 key: ValueKey<int>(_currentStep),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.3,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           
-          // Indicador de progreso mejorado
+          // Indicador de progreso moderno y minimalista
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(titles.length, (i) {
@@ -440,42 +440,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
               final isPassed = i < _currentStep;
               
               return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                width: isActive ? 32 : (isPassed ? 20 : 12),
-                height: isActive ? 8 : 8,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 40 : 10,
+                height: 4,
                 decoration: BoxDecoration(
                   color: isActive 
                     ? const Color(0xFFFFFF00)
                     : isPassed 
-                      ? const Color(0xFFFFFF00).withOpacity(0.5)
-                      : Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(4),
+                      ? const Color(0xFFFFFF00).withOpacity(0.6)
+                      : Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(2),
                   boxShadow: isActive ? [
                     BoxShadow(
-                      color: const Color(0xFFFFFF00).withOpacity(0.4),
+                      color: const Color(0xFFFFFF00).withOpacity(0.3),
                       blurRadius: 8,
-                      spreadRadius: 1,
+                      spreadRadius: 0,
                     ),
                   ] : null,
                 ),
               );
             }),
-          ),
-          
-          const SizedBox(height: 8),
-          
-          // Contador de pasos
-          Center(
-            child: Text(
-              '${_currentStep + 1} de ${titles.length}',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
         ],
       ),
