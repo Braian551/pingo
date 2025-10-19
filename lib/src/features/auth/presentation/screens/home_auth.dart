@@ -12,14 +12,16 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? _userAddress;
   String? _userName;
   bool _loading = true;
   int _selectedIndex = 0;
   late AnimationController _animationController;
+  late AnimationController _navAnimationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _navScaleAnimation;
 
   @override
   void initState() {
@@ -34,6 +36,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 600),
     );
 
+    _navAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
@@ -42,6 +49,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       begin: const Offset(0, 0.1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+
+    _navScaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _navAnimationController, curve: Curves.easeOutBack),
+    );
   }
 
   Future<void> _loadUserData() async {
@@ -112,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _animationController.dispose();
+    _navAnimationController.dispose();
     super.dispose();
   }
 
@@ -157,14 +169,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.7),
-                  Colors.black.withOpacity(0.3),
-                ],
-              ),
+              color: const Color.fromARGB(255, 0, 0, 0),
             ),
           ),
         ),
@@ -175,24 +180,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  const Color(0xFFFFFF00).withOpacity(0.15),
-                  Colors.transparent,
-                ],
-              ),
+              color: const Color(0xFFFFFF00).withOpacity(0.15),
             ),
-            child: ShaderMask(
-              shaderCallback: (bounds) {
-                return const LinearGradient(
-                  colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
-                ).createShader(bounds);
-              },
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 28,
-                height: 28,
-              ),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 28,
+              height: 28,
+              color: const Color(0xFFFFFF00),
             ),
           ),
           const SizedBox(width: 8),
@@ -375,14 +369,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.1),
-                Colors.white.withOpacity(0.05),
-              ],
-            ),
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: Colors.white.withOpacity(0.1),
@@ -394,9 +381,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
-                  ),
+                  color: const Color(0xFFFFFF00),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -486,7 +471,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 icon: Icons.motorcycle,
                 title: 'Viaje',
                 subtitle: 'Rápido y seguro',
-                gradientColors: const [Color(0xFFFFFF00), Color(0xFFFFDD00)],
                 onTap: () {
                   Navigator.push(
                     context,
@@ -503,7 +487,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 icon: Icons.local_shipping_outlined,
                 title: 'Envío',
                 subtitle: 'Entrega express',
-                gradientColors: const [Color(0xFFFFDD00), Color(0xFFFFBB00)],
                 onTap: () {
                   Navigator.push(
                     context,
@@ -573,11 +556,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       child: Container(
         height: 140,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
-          ),
+          color: const Color(0xFFFFFF00),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
@@ -661,14 +640,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacity(0.05),
-                    Colors.white.withOpacity(0.02),
-                  ],
-                ),
+                color: const Color(0xFF1A1A1A).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.1),
@@ -724,12 +696,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFFFFF00).withOpacity(0.1),
-                  const Color(0xFFFFDD00).withOpacity(0.05),
-                ],
-              ),
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: const Color(0xFFFFFF00), size: 64),
@@ -763,14 +730,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                const Color(0xFF1A1A1A).withOpacity(0.9),
-                const Color(0xFF0F0F0F).withOpacity(0.95),
-              ],
-            ),
+            color: const Color(0xFF1A1A1A).withOpacity(0.95),
             border: Border(
               top: BorderSide(
                 color: Colors.white.withOpacity(0.1),
@@ -801,35 +761,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final isSelected = _selectedIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _selectedIndex = index),
-        child: Container(
+        onTap: () {
+          setState(() => _selectedIndex = index);
+          _navAnimationController.reset();
+          _navAnimationController.forward();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            gradient: isSelected
-                ? const LinearGradient(
-                    colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
-                  )
-                : null,
+            color: isSelected ? const Color(0xFFFFFF00) : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-                size: 26,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
+          child: ScaleTransition(
+            scale: isSelected ? _navScaleAnimation : const AlwaysStoppedAnimation(1.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
                   color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  size: 26,
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -842,14 +807,12 @@ class _ModernServiceCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final List<Color> gradientColors;
   final VoidCallback onTap;
 
   const _ModernServiceCard({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.gradientColors,
     required this.onTap,
   });
 
@@ -864,14 +827,7 @@ class _ModernServiceCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.1),
-                  Colors.white.withOpacity(0.05),
-                ],
-              ),
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: Colors.white.withOpacity(0.1),
@@ -884,11 +840,11 @@ class _ModernServiceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: gradientColors),
+                    color: const Color(0xFFFFFF00),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: gradientColors.first.withOpacity(0.3),
+                        color: const Color(0xFFFFFF00).withOpacity(0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -949,14 +905,7 @@ class _QuickActionItem extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacity(0.08),
-                    Colors.white.withOpacity(0.04),
-                  ],
-                ),
+                color: const Color(0xFF1A1A1A).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.1),
