@@ -103,19 +103,16 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
     final prov = Provider.of<MapProvider>(context, listen: false);
     prov.selectSearchResult(result);
 
-    // Actualizar el campo de dirección local
+    // Actualizar solo el campo de búsqueda visualmente
     final formatted = result.getFormattedAddress();
-    widget.addressController.text = formatted;
     _searchController.text = formatted;
 
-    // Notificar al padre (no confirmar aún, solo preselección)
-    widget.onLocationSelected({
-      'lat': result.lat,
-      'lon': result.lon,
-      'address': formatted,
-      'city': result.getCity(),
-      'state': result.getState(),
-    });
+    // Guardar temporalmente hasta confirmar
+    _tempLat = result.lat;
+    _tempLon = result.lon;
+    _tempAddress = formatted;
+    _tempCity = result.getCity();
+    _tempState = result.getState();
 
     // Ocultar teclado y perder foco
     _searchFocusNode.unfocus();
@@ -123,6 +120,13 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
 
   bool _confirmed = false;
   Timer? _mapMoveTimer;
+  
+  // Variables temporales para guardar la ubicación hasta que se confirme
+  double? _tempLat;
+  double? _tempLon;
+  String? _tempAddress;
+  String? _tempCity;
+  String? _tempState;
 
   void _onMapMoveStart() {
     setState(() {
@@ -153,8 +157,9 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
   void _onConfirm(LatLng? center) {
     final prov = Provider.of<MapProvider>(context, listen: false);
 
-    final lat = center?.latitude ?? prov.selectedLocation?.latitude;
-    final lon = center?.longitude ?? prov.selectedLocation?.longitude;
+    // Usar datos temporales si existen, sino usar el centro del mapa
+    final lat = _tempLat ?? center?.latitude ?? prov.selectedLocation?.latitude;
+    final lon = _tempLon ?? center?.longitude ?? prov.selectedLocation?.longitude;
 
     if (lat == null || lon == null) {
       CustomSnackbar.showWarning(
@@ -164,14 +169,21 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
       return;
     }
 
+    // Preparar los datos finales
+    final address = _tempAddress ?? prov.selectedAddress ?? _searchController.text;
+    final city = _tempCity ?? prov.selectedCity;
+    final state = _tempState ?? prov.selectedState;
+
     final data = {
       'lat': lat,
       'lon': lon,
-      'address': widget.addressController.text,
-      'city': prov.selectedCity,
-      'state': prov.selectedState,
+      'address': address,
+      'city': city,
+      'state': state,
     };
 
+    // SOLO AHORA notificar al padre con los datos confirmados
+    widget.addressController.text = address;
     widget.onLocationSelected(data);
 
     // Mostrar feedback visual y avanzar al siguiente paso si se provee callback
@@ -219,8 +231,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                     onLocationSelected: (loc) async {
                       _mapCenterCache = loc;
                       await prov.selectLocation(loc);
-                      widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
-                      _searchController.text = widget.addressController.text;
+                      // Solo actualizar el campo de búsqueda visualmente, NO el addressController del padre
+                      _searchController.text = prov.selectedAddress ?? _searchController.text;
+                      // Guardar temporalmente hasta confirmar
+                      _tempLat = loc.latitude;
+                      _tempLon = loc.longitude;
+                      _tempAddress = prov.selectedAddress;
+                      _tempCity = prov.selectedCity;
+                      _tempState = prov.selectedState;
                     },
                     onMapMoved: (center) {
                       _mapCenterCache = center;
@@ -612,13 +630,11 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                               child: ElevatedButton(
                                 onPressed: () {
                                   LatLng? center = _mapCenterCache ?? prov.selectedLocation;
+                                  // Si hay una ubicación en el centro pero no se ha seleccionado dirección, hacerlo
                                   if (center != null && prov.selectedAddress == null) {
                                     prov.selectLocation(center);
-                                    widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
                                   }
-                                  if (prov.selectedAddress != null) {
-                                    widget.addressController.text = prov.selectedAddress!;
-                                  }
+                                  // El _onConfirm se encargará de actualizar el addressController
                                   _onConfirm(center);
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -809,8 +825,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
       try {
         await prov.selectLocation(center);
         setState(() {
-          widget.addressController.text = prov.selectedAddress ?? widget.addressController.text;
-          _searchController.text = widget.addressController.text;
+          // Solo actualizar el campo de búsqueda visualmente, NO el addressController del padre
+          _searchController.text = prov.selectedAddress ?? _searchController.text;
+          // Guardar temporalmente hasta confirmar
+          _tempLat = center.latitude;
+          _tempLon = center.longitude;
+          _tempAddress = prov.selectedAddress;
+          _tempCity = prov.selectedCity;
+          _tempState = prov.selectedState;
         });
       } catch (_) {
         // ignore errors silently for now

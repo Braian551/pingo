@@ -63,18 +63,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      // Validar que se haya seleccionado una dirección
-      if (_addressController.text.isEmpty || _selectedLat == null || _selectedLng == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Por favor selecciona tu dirección en el mapa'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
+      // La dirección ahora es opcional - no se valida
+      
       setState(() => _isLoading = true);
       
       try {
@@ -290,17 +280,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             );
                             return;
                           }
-                        } else if (_currentStep == 2) {
-                          if (_addressController.text.isEmpty || _selectedLat == null || _selectedLng == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Por favor selecciona tu dirección en el mapa'),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                            return;
-                          }
                         }
+                        // El paso 2 (dirección) ahora es opcional - no se valida
 
                         setState(() { _currentStep++; });
                         if (_currentStep == 2) {
@@ -472,8 +453,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       children: [
         const SizedBox(height: 20),
+        // Mensaje informativo de que es opcional
+        Container(
+          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.blue.withOpacity(0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.blue,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Este paso es opcional. Puedes añadir tu dirección ahora o saltarlo.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         SizedBox(
-          height: 620,
+          height: 560,
           child: AddressStepWidget(
             addressController: _addressController,
             onLocationSelected: (data) {
