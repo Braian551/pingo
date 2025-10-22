@@ -11,6 +11,10 @@ import 'package:ping_go/src/features/onboarding/presentation/screens/onboarding_
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/splash_screen.dart';
+import 'package:ping_go/src/features/admin/presentation/screens/admin_home_screen.dart';
+import 'package:ping_go/src/features/admin/presentation/screens/users_management_screen.dart';
+import 'package:ping_go/src/features/admin/presentation/screens/statistics_screen.dart';
+import 'package:ping_go/src/features/admin/presentation/screens/audit_logs_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/routes/animated_routes.dart';
 import 'package:ping_go/src/widgets/auth_wrapper.dart';
@@ -81,6 +85,46 @@ class AppRouter {
       case RouteNames.home:
         // Cuando el usuario se autentique debe ir a la pantalla principal (HomeScreen)
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      
+      // Rutas de administrador
+      case RouteNames.adminHome:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => AdminHomeScreen(
+              adminUser: args?['admin_user'] ?? {},
+            ),
+          );
+        }
+      case RouteNames.adminUsers:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => UsersManagementScreen(
+              adminId: args?['admin_id'] ?? 0,
+              adminUser: args?['admin_user'] ?? {},
+            ),
+          );
+        }
+      case RouteNames.adminStatistics:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => StatisticsScreen(
+              adminId: args?['admin_id'] ?? 0,
+            ),
+          );
+        }
+      case RouteNames.adminAuditLogs:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => AuditLogsScreen(
+              adminId: args?['admin_id'] ?? 0,
+            ),
+          );
+        }
+      
       // Agregar más rutas aquí
       default:
         return MaterialPageRoute(

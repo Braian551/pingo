@@ -73,7 +73,24 @@ class _LoginScreenState extends State<LoginScreen> {
           } catch (_) {}
 
           if (mounted) {
-            Navigator.pushReplacementNamed(context, RouteNames.home, arguments: {'email': emailToUse});
+            final user = resp['data']?['user'];
+            final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
+            
+            // Redirigir según el tipo de usuario
+            if (tipoUsuario == 'administrador') {
+              Navigator.pushReplacementNamed(
+                context,
+                RouteNames.adminHome,
+                arguments: {'admin_user': user},
+              );
+            } else {
+              // Cliente o conductor van a home normal
+              Navigator.pushReplacementNamed(
+                context,
+                RouteNames.home,
+                arguments: {'email': emailToUse, 'user': user},
+              );
+            }
           }
         } else {
           final message = resp['message'] ?? 'Credenciales inválidas';
