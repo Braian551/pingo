@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
+        colors: [Color(0xFFFF9900), Color(0xFFFFFF00)],
       ),
     ),
     OnboardingPage(
@@ -34,7 +34,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFFFDD00), Color(0xFFFFBB00)],
+        colors: [Color(0xFFFF9900), Color(0xFFFFFF00)],
       ),
     ),
     OnboardingPage(
@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFFFBB00), Color(0xFFFF9900)],
+        colors: [Color(0xFFFF9900), Color(0xFFFFFF00)],
       ),
     ),
     OnboardingPage(
@@ -67,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
+        colors: [Color(0xFFFF9900), Color(0xFFFFFF00)],
       ),
     ),
   ];
@@ -273,7 +273,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          
+
           // Icon with gradient and glow effect
           Container(
             width: size.width * 0.5,
@@ -303,11 +303,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ],
                 ),
-                child: Icon(
-                  page.icon,
-                  size: 80,
-                  color: Colors.black,
-                ),
+                child: Icon(page.icon, size: 80, color: Colors.black),
               ),
             ),
           ),
