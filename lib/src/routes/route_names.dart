@@ -17,4 +17,11 @@ class RouteNames {
   static const String adminStatistics = '/admin/statistics';
   static const String adminAuditLogs = '/admin/audit-logs';
   static const String adminConfig = '/admin/config';
+  
+  // Rutas de conductor
+  static const String conductorHome = '/conductor/home';
+  static const String conductorTrips = '/conductor/trips';
+  static const String conductorEarnings = '/conductor/earnings';
+  static const String conductorProfile = '/conductor/profile';
+  static const String conductorVehicle = '/conductor/vehicle';
 }

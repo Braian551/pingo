@@ -83,8 +83,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 RouteNames.adminHome,
                 arguments: {'admin_user': user},
               );
+            } else if (tipoUsuario == 'conductor') {
+              Navigator.pushReplacementNamed(
+                context,
+                RouteNames.conductorHome,
+                arguments: {'conductor_user': user},
+              );
             } else {
-              // Cliente o conductor van a home normal
+              // Cliente
               Navigator.pushReplacementNamed(
                 context,
                 RouteNames.home,

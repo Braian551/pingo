@@ -145,6 +145,39 @@ LOCK TABLES `calificaciones` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `configuraciones_app`
+--
+
+DROP TABLE IF EXISTS `configuraciones_app`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `configuraciones_app` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `clave` varchar(100) NOT NULL COMMENT 'Nombre de la configuracion',
+  `valor` text COMMENT 'Valor de la configuracion',
+  `tipo` enum('string','number','boolean','json') DEFAULT 'string',
+  `categoria` varchar(50) DEFAULT NULL COMMENT 'Categoria de la config (pricing, system, etc)',
+  `descripcion` text COMMENT 'Descripcion de que hace esta config',
+  `es_publica` tinyint(1) DEFAULT '0' COMMENT '1 si puede verse en el frontend',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_clave` (`clave`),
+  KEY `idx_categoria` (`categoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraciones globales de la aplicacion';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configuraciones_app`
+--
+
+LOCK TABLES `configuraciones_app` WRITE;
+/*!40000 ALTER TABLE `configuraciones_app` DISABLE KEYS */;
+INSERT INTO `configuraciones_app` VALUES (1,'app_nombre','PinGo','string','sistema','Nombre de la aplicacion',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(2,'app_version','1.0.0','string','sistema','Version actual de la aplicacion',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(3,'mantenimiento_activo','false','boolean','sistema','Indica si la app esta en mantenimiento',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(4,'precio_base_km','2500','number','precios','Precio base por kilometro en COP',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(5,'precio_minimo_viaje','5000','number','precios','Precio minimo de un viaje en COP',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(6,'comision_plataforma','15','number','precios','Porcentaje de comision de la plataforma',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(7,'radio_busqueda_conductores','5000','number','sistema','Radio en metros para buscar conductores',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(8,'tiempo_expiracion_solicitud','300','number','sistema','Tiempo en segundos antes de expirar solicitud',0,'2025-10-22 14:35:57','2025-10-22 14:35:57');
+/*!40000 ALTER TABLE `configuraciones_app` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `detalles_conductor`
 --
 
@@ -253,6 +286,43 @@ LOCK TABLES `detalles_viaje` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `estadisticas_sistema`
+--
+
+DROP TABLE IF EXISTS `estadisticas_sistema`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `estadisticas_sistema` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `fecha` date NOT NULL,
+  `total_usuarios` int unsigned DEFAULT '0',
+  `total_clientes` int unsigned DEFAULT '0',
+  `total_conductores` int unsigned DEFAULT '0',
+  `total_administradores` int unsigned DEFAULT '0',
+  `usuarios_activos_dia` int unsigned DEFAULT '0',
+  `nuevos_registros_dia` int unsigned DEFAULT '0',
+  `total_solicitudes` int unsigned DEFAULT '0',
+  `solicitudes_completadas` int unsigned DEFAULT '0',
+  `solicitudes_canceladas` int unsigned DEFAULT '0',
+  `ingresos_totales` decimal(10,2) DEFAULT '0.00',
+  `ingresos_dia` decimal(10,2) DEFAULT '0.00',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_fecha` (`fecha`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Estadisticas diarias del sistema';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `estadisticas_sistema`
+--
+
+LOCK TABLES `estadisticas_sistema` WRITE;
+/*!40000 ALTER TABLE `estadisticas_sistema` DISABLE KEYS */;
+/*!40000 ALTER TABLE `estadisticas_sistema` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `historial_seguimiento`
 --
 
@@ -285,6 +355,43 @@ CREATE TABLE `historial_seguimiento` (
 LOCK TABLES `historial_seguimiento` WRITE;
 /*!40000 ALTER TABLE `historial_seguimiento` DISABLE KEYS */;
 /*!40000 ALTER TABLE `historial_seguimiento` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `logs_auditoria`
+--
+
+DROP TABLE IF EXISTS `logs_auditoria`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `logs_auditoria` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` bigint unsigned DEFAULT NULL,
+  `accion` varchar(100) NOT NULL COMMENT 'Tipo de accion realizada',
+  `entidad` varchar(100) DEFAULT NULL COMMENT 'Tabla o entidad afectada',
+  `entidad_id` bigint unsigned DEFAULT NULL COMMENT 'ID del registro afectado',
+  `descripcion` text COMMENT 'Descripcion detallada de la accion',
+  `ip_address` varchar(45) DEFAULT NULL COMMENT 'Direccion IP del usuario',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT 'Navegador/dispositivo usado',
+  `datos_anteriores` json DEFAULT NULL COMMENT 'Datos antes del cambio',
+  `datos_nuevos` json DEFAULT NULL COMMENT 'Datos despues del cambio',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_usuario_id` (`usuario_id`),
+  KEY `idx_accion` (`accion`),
+  KEY `idx_fecha` (`fecha_creacion`),
+  CONSTRAINT `fk_logs_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logs_auditoria`
+--
+
+LOCK TABLES `logs_auditoria` WRITE;
+/*!40000 ALTER TABLE `logs_auditoria` DISABLE KEYS */;
+INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21');
+/*!40000 ALTER TABLE `logs_auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -381,6 +488,47 @@ CREATE TABLE `reglas_precios` (
 LOCK TABLES `reglas_precios` WRITE;
 /*!40000 ALTER TABLE `reglas_precios` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reglas_precios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reportes_usuarios`
+--
+
+DROP TABLE IF EXISTS `reportes_usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reportes_usuarios` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_reportante_id` bigint unsigned NOT NULL,
+  `usuario_reportado_id` bigint unsigned NOT NULL,
+  `solicitud_id` bigint unsigned DEFAULT NULL,
+  `tipo_reporte` enum('conducta_inapropiada','fraude','seguridad','otro') NOT NULL,
+  `descripcion` text NOT NULL,
+  `estado` enum('pendiente','en_revision','resuelto','rechazado') DEFAULT 'pendiente',
+  `notas_admin` text,
+  `admin_revisor_id` bigint unsigned DEFAULT NULL,
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_resolucion` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_reportante` (`usuario_reportante_id`),
+  KEY `idx_reportado` (`usuario_reportado_id`),
+  KEY `idx_estado` (`estado`),
+  KEY `fk_reporte_solicitud` (`solicitud_id`),
+  KEY `fk_reporte_admin` (`admin_revisor_id`),
+  CONSTRAINT `fk_reporte_admin` FOREIGN KEY (`admin_revisor_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_reporte_reportado` FOREIGN KEY (`usuario_reportado_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_reporte_reportante` FOREIGN KEY (`usuario_reportante_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_reporte_solicitud` FOREIGN KEY (`solicitud_id`) REFERENCES `solicitudes_servicio` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Reportes de usuarios sobre comportamiento inadecuado';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reportes_usuarios`
+--
+
+LOCK TABLES `reportes_usuarios` WRITE;
+/*!40000 ALTER TABLE `reportes_usuarios` DISABLE KEYS */;
+/*!40000 ALTER TABLE `reportes_usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -573,7 +721,7 @@ CREATE TABLE `verification_codes` (
   PRIMARY KEY (`id`),
   KEY `idx_email` (`email`),
   KEY `idx_code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -582,7 +730,7 @@ CREATE TABLE `verification_codes` (
 
 LOCK TABLES `verification_codes` WRITE;
 /*!40000 ALTER TABLE `verification_codes` DISABLE KEYS */;
-INSERT INTO `verification_codes` VALUES (1,'braianoquen@gmail.com','184773','2025-09-22 00:02:19','2025-09-22 05:12:19',0),(2,'braianoquen@gmail.com','740721','2025-09-22 00:40:36','2025-09-22 05:50:36',0),(3,'braianoquen@gmail.com','470836','2025-09-22 03:16:18','2025-09-22 08:26:18',0),(4,'braianoquen@gmail.com','553736','2025-09-22 03:32:16','2025-09-22 08:42:16',0),(5,'braianoquen@gmail.com','558786','2025-09-22 03:42:09','2025-09-22 08:52:09',0),(6,'braianoquen@gmail.com','871431','2025-09-22 03:44:25','2025-09-22 08:54:25',0),(7,'braianoquen@gmail.com','109811','2025-09-22 03:48:08','2025-09-22 08:58:08',0),(8,'braianoquen@gmail.com','895561','2025-09-22 04:05:48','2025-09-22 09:15:48',0),(9,'traconmaster@gmail.com','517375','2025-09-22 04:09:27','2025-09-22 09:19:27',0),(10,'tracongames2@gmail.com','439802','2025-09-22 04:29:37','2025-09-22 09:39:37',0),(11,'tracongames3@gmail.com','928041','2025-09-22 04:40:27','2025-09-22 09:50:27',0),(12,'braianoquen@gmail.com','471108','2025-09-22 04:50:52','2025-09-22 10:00:52',0),(13,'braianoquen@gmail.com','289263','2025-09-22 04:59:38','2025-09-22 10:09:38',0),(14,'tracon2@gmail.com','972225','2025-09-22 23:15:48','2025-09-23 04:25:48',0),(15,'braianoquen@gmail.com','532386','2025-09-22 23:17:22','2025-09-23 04:27:22',0),(16,'gellen@gmail.com','836288','2025-09-29 16:33:39','2025-09-29 21:43:39',0),(17,'gellen2@gmail.com','618398','2025-09-29 16:42:48','2025-09-29 21:52:48',0),(18,'gellen4@gmail.com','503956','2025-09-29 16:59:45','2025-09-29 22:09:45',0),(19,'gellen4@gmail.com','215305','2025-09-29 17:06:30','2025-09-29 22:16:30',0),(20,'gellen2@gmail.com','309347','2025-09-29 17:12:20','2025-09-29 22:22:20',0),(21,'gellen2@gmail.com','430759','2025-09-29 17:16:52','2025-09-29 22:26:52',0),(22,'gellen2@gmail.com','571778','2025-09-29 17:24:00','2025-09-29 22:34:00',0),(23,'gellen2@gmail.com','641077','2025-09-29 17:30:09','2025-09-29 22:40:09',0),(24,'gellen2@gmail.com','129852','2025-09-29 17:36:07','2025-09-29 22:46:07',0),(25,'gellen2@gmail.com','644993','2025-09-29 17:43:12','2025-09-29 22:53:12',0),(26,'gellen2@gmail.com','931663','2025-09-29 17:47:56','2025-09-29 22:57:56',0),(27,'gellen2@gmail.com','661112','2025-09-29 17:50:41','2025-09-29 23:00:41',0),(28,'gellen2@gmail.com','580543','2025-09-29 17:51:12','2025-09-29 23:01:12',0),(29,'gellen2@gmail.com','105869','2025-09-29 17:55:34','2025-09-29 23:05:34',0),(30,'gellen34@gmail.com','345823','2025-09-29 18:02:16','2025-09-29 23:12:16',0),(31,'gellen2@gmail.com','749371','2025-09-29 18:06:18','2025-09-29 23:16:18',0),(32,'gellen2@gmail.com','108467','2025-09-29 18:11:22','2025-09-29 23:21:22',0),(33,'gellen2@gmail.com','828608','2025-09-29 18:17:44','2025-09-29 23:27:44',0),(34,'andres80@gmail.com','263140','2025-09-29 19:18:28','2025-09-30 00:28:28',0),(35,'braianoquen@gmail.com','891517','2025-09-29 19:26:17','2025-09-30 00:36:17',0),(36,'braianoquen@gmail.com','557643','2025-09-29 19:37:35','2025-09-30 00:47:35',0),(37,'braianoquen@gmail.com','898296','2025-09-29 19:44:37','2025-09-30 00:54:37',0),(38,'braianoquen@gmail.com','750790','2025-09-29 20:11:50','2025-09-30 01:21:50',0),(39,'braianoquendurango@gmail.com','636850','2025-09-29 20:13:08','2025-09-30 01:23:08',0),(40,'braianoquendurango@gmail.com','619818','2025-09-29 20:23:00','2025-09-30 01:33:00',0),(41,'braianoquendurango@gmail.com','906593','2025-09-29 20:29:27','2025-09-30 01:39:27',0),(42,'braianoquen@gmail.com','824558','2025-09-29 20:31:55','2025-09-30 01:41:55',0),(43,'braianoquen@gmail.com','819688','2025-09-29 20:36:15','2025-09-30 01:46:15',0),(44,'braianoquen@gmail.com','311995','2025-09-29 20:37:09','2025-09-30 01:47:09',0),(45,'braianoquen@gmail.com','187066','2025-09-29 20:37:48','2025-09-30 01:47:48',0),(46,'braianoquen@gmail.com','501886','2025-09-29 20:55:37','2025-09-30 02:05:37',0),(47,'braianoquen@gmail.com','274084','2025-09-29 21:02:39','2025-09-30 02:12:39',0),(48,'braianoquen@gmail.com','614962','2025-09-29 21:08:06','2025-09-30 02:18:06',0),(49,'braianoquen@gmail.com','377184','2025-09-29 21:10:58','2025-09-30 02:20:58',0),(50,'braianoquendurango@gmail.com','940771','2025-10-05 12:31:26','2025-10-05 17:41:26',0),(51,'braianoquendurango@gmail.com','156648','2025-10-05 12:33:09','2025-10-05 17:43:09',0),(52,'braianoquendurango@gmail.com','360795','2025-10-05 13:14:57','2025-10-05 18:24:57',0),(53,'braianoquendurango@gmail.com','270293','2025-10-05 13:18:24','2025-10-05 18:28:24',0),(54,'braianoquendurango@gmail.com','366137','2025-10-05 13:22:20','2025-10-05 18:32:20',0),(55,'braianoquendurango@gmail.com','219856','2025-10-05 13:22:53','2025-10-05 18:32:53',0),(56,'braianoquendurango@gmail.com','246651','2025-10-05 13:43:15','2025-10-05 18:53:15',0),(57,'braianoquendurango@gmail.com','170449','2025-10-05 13:48:15','2025-10-05 18:58:15',0),(58,'braianoquendurango@gmail.com','897340','2025-10-05 13:53:37','2025-10-05 19:03:37',0),(59,'braianoquendurango@gmail.com','816291','2025-10-05 13:57:58','2025-10-05 19:07:58',0),(60,'braianoquendurango@gmail.com','834542','2025-10-05 14:02:31','2025-10-05 19:12:31',0),(61,'braianoquendurango@gmail.com','220660','2025-10-05 14:07:14','2025-10-05 19:17:14',0),(62,'braianoquendurango@gmail.com','527698','2025-10-05 16:34:49','2025-10-05 21:44:49',0),(63,'braianoquendurango@gmail.com','947445','2025-10-05 16:46:56','2025-10-05 21:56:56',0),(64,'braianoquendurango@gmail.com','687214','2025-10-05 17:05:14','2025-10-05 22:15:14',0),(65,'braianoquendurango@gmail.com','586620','2025-10-05 17:35:18','2025-10-05 22:45:18',0),(66,'braianoquendurango@gmail.com','476004','2025-10-05 17:42:10','2025-10-05 22:52:10',0),(67,'braianoquen@gmail.com','822586','2025-10-05 18:51:09','2025-10-06 00:01:09',0),(68,'braianoquen@gmail.com','768999','2025-10-05 20:15:24','2025-10-06 01:25:24',0),(69,'braianoquen@gmail.com','635063','2025-10-05 20:16:32','2025-10-06 01:26:32',0),(70,'braianoquen@gmail.com','663502','2025-10-05 20:31:20','2025-10-06 01:41:20',0),(71,'braianoquen@gmail.com','656436','2025-10-05 20:55:10','2025-10-06 02:05:10',0),(72,'braianoquen@gmail.com','950733','2025-10-06 22:42:36','2025-10-07 03:52:36',0),(73,'braianoquen@gmail.com','972074','2025-10-06 22:44:02','2025-10-07 03:54:02',0),(74,'braian890@gmail.com','174360','2025-10-06 22:45:51','2025-10-07 03:55:51',0),(75,'braianoquen@gmail.com','701975','2025-10-06 22:49:07','2025-10-07 03:59:07',0),(76,'braianoquen79@gmail.com','185834','2025-10-06 23:07:49','2025-10-07 04:17:49',0),(77,'braianoquen80@gmail.com','367890','2025-10-17 03:02:29','2025-10-17 08:12:29',0),(78,'braianoquen@gmail.com','893059','2025-10-17 12:40:14','2025-10-17 17:50:14',0),(79,'braianoquen@gmail.com','894968','2025-10-17 12:55:02','2025-10-17 18:05:02',0),(80,'braianoquen@gmail.com','342619','2025-10-17 13:18:43','2025-10-17 18:28:43',0),(81,'braianoquen@gmail.com','575878','2025-10-19 14:35:11','2025-10-19 19:45:11',0),(82,'braaian80@gmail.com','109667','2025-10-19 16:11:09','2025-10-19 21:21:09',0),(83,'braianoquen13231@gmail.com','881509','2025-10-19 16:30:14','2025-10-19 21:40:14',0),(84,'braianoquen323@gmail.com','700367','2025-10-19 16:37:32','2025-10-19 21:47:32',0),(85,'braianoquen324@gmail.com','648366','2025-10-20 22:33:07','2025-10-21 03:43:07',0),(86,'braianoquen2@gmail.com','245192','2025-10-22 14:05:51','2025-10-22 19:15:51',0),(87,'braianoquendurango@gmail.com','948056','2025-10-22 14:07:51','2025-10-22 19:17:51',0),(88,'braianoquen2@gmail.com','607965','2025-10-22 14:10:18','2025-10-22 19:20:18',0);
+INSERT INTO `verification_codes` VALUES (1,'braianoquen@gmail.com','184773','2025-09-22 00:02:19','2025-09-22 05:12:19',0),(2,'braianoquen@gmail.com','740721','2025-09-22 00:40:36','2025-09-22 05:50:36',0),(3,'braianoquen@gmail.com','470836','2025-09-22 03:16:18','2025-09-22 08:26:18',0),(4,'braianoquen@gmail.com','553736','2025-09-22 03:32:16','2025-09-22 08:42:16',0),(5,'braianoquen@gmail.com','558786','2025-09-22 03:42:09','2025-09-22 08:52:09',0),(6,'braianoquen@gmail.com','871431','2025-09-22 03:44:25','2025-09-22 08:54:25',0),(7,'braianoquen@gmail.com','109811','2025-09-22 03:48:08','2025-09-22 08:58:08',0),(8,'braianoquen@gmail.com','895561','2025-09-22 04:05:48','2025-09-22 09:15:48',0),(9,'traconmaster@gmail.com','517375','2025-09-22 04:09:27','2025-09-22 09:19:27',0),(10,'tracongames2@gmail.com','439802','2025-09-22 04:29:37','2025-09-22 09:39:37',0),(11,'tracongames3@gmail.com','928041','2025-09-22 04:40:27','2025-09-22 09:50:27',0),(12,'braianoquen@gmail.com','471108','2025-09-22 04:50:52','2025-09-22 10:00:52',0),(13,'braianoquen@gmail.com','289263','2025-09-22 04:59:38','2025-09-22 10:09:38',0),(14,'tracon2@gmail.com','972225','2025-09-22 23:15:48','2025-09-23 04:25:48',0),(15,'braianoquen@gmail.com','532386','2025-09-22 23:17:22','2025-09-23 04:27:22',0),(16,'gellen@gmail.com','836288','2025-09-29 16:33:39','2025-09-29 21:43:39',0),(17,'gellen2@gmail.com','618398','2025-09-29 16:42:48','2025-09-29 21:52:48',0),(18,'gellen4@gmail.com','503956','2025-09-29 16:59:45','2025-09-29 22:09:45',0),(19,'gellen4@gmail.com','215305','2025-09-29 17:06:30','2025-09-29 22:16:30',0),(20,'gellen2@gmail.com','309347','2025-09-29 17:12:20','2025-09-29 22:22:20',0),(21,'gellen2@gmail.com','430759','2025-09-29 17:16:52','2025-09-29 22:26:52',0),(22,'gellen2@gmail.com','571778','2025-09-29 17:24:00','2025-09-29 22:34:00',0),(23,'gellen2@gmail.com','641077','2025-09-29 17:30:09','2025-09-29 22:40:09',0),(24,'gellen2@gmail.com','129852','2025-09-29 17:36:07','2025-09-29 22:46:07',0),(25,'gellen2@gmail.com','644993','2025-09-29 17:43:12','2025-09-29 22:53:12',0),(26,'gellen2@gmail.com','931663','2025-09-29 17:47:56','2025-09-29 22:57:56',0),(27,'gellen2@gmail.com','661112','2025-09-29 17:50:41','2025-09-29 23:00:41',0),(28,'gellen2@gmail.com','580543','2025-09-29 17:51:12','2025-09-29 23:01:12',0),(29,'gellen2@gmail.com','105869','2025-09-29 17:55:34','2025-09-29 23:05:34',0),(30,'gellen34@gmail.com','345823','2025-09-29 18:02:16','2025-09-29 23:12:16',0),(31,'gellen2@gmail.com','749371','2025-09-29 18:06:18','2025-09-29 23:16:18',0),(32,'gellen2@gmail.com','108467','2025-09-29 18:11:22','2025-09-29 23:21:22',0),(33,'gellen2@gmail.com','828608','2025-09-29 18:17:44','2025-09-29 23:27:44',0),(34,'andres80@gmail.com','263140','2025-09-29 19:18:28','2025-09-30 00:28:28',0),(35,'braianoquen@gmail.com','891517','2025-09-29 19:26:17','2025-09-30 00:36:17',0),(36,'braianoquen@gmail.com','557643','2025-09-29 19:37:35','2025-09-30 00:47:35',0),(37,'braianoquen@gmail.com','898296','2025-09-29 19:44:37','2025-09-30 00:54:37',0),(38,'braianoquen@gmail.com','750790','2025-09-29 20:11:50','2025-09-30 01:21:50',0),(39,'braianoquendurango@gmail.com','636850','2025-09-29 20:13:08','2025-09-30 01:23:08',0),(40,'braianoquendurango@gmail.com','619818','2025-09-29 20:23:00','2025-09-30 01:33:00',0),(41,'braianoquendurango@gmail.com','906593','2025-09-29 20:29:27','2025-09-30 01:39:27',0),(42,'braianoquen@gmail.com','824558','2025-09-29 20:31:55','2025-09-30 01:41:55',0),(43,'braianoquen@gmail.com','819688','2025-09-29 20:36:15','2025-09-30 01:46:15',0),(44,'braianoquen@gmail.com','311995','2025-09-29 20:37:09','2025-09-30 01:47:09',0),(45,'braianoquen@gmail.com','187066','2025-09-29 20:37:48','2025-09-30 01:47:48',0),(46,'braianoquen@gmail.com','501886','2025-09-29 20:55:37','2025-09-30 02:05:37',0),(47,'braianoquen@gmail.com','274084','2025-09-29 21:02:39','2025-09-30 02:12:39',0),(48,'braianoquen@gmail.com','614962','2025-09-29 21:08:06','2025-09-30 02:18:06',0),(49,'braianoquen@gmail.com','377184','2025-09-29 21:10:58','2025-09-30 02:20:58',0),(50,'braianoquendurango@gmail.com','940771','2025-10-05 12:31:26','2025-10-05 17:41:26',0),(51,'braianoquendurango@gmail.com','156648','2025-10-05 12:33:09','2025-10-05 17:43:09',0),(52,'braianoquendurango@gmail.com','360795','2025-10-05 13:14:57','2025-10-05 18:24:57',0),(53,'braianoquendurango@gmail.com','270293','2025-10-05 13:18:24','2025-10-05 18:28:24',0),(54,'braianoquendurango@gmail.com','366137','2025-10-05 13:22:20','2025-10-05 18:32:20',0),(55,'braianoquendurango@gmail.com','219856','2025-10-05 13:22:53','2025-10-05 18:32:53',0),(56,'braianoquendurango@gmail.com','246651','2025-10-05 13:43:15','2025-10-05 18:53:15',0),(57,'braianoquendurango@gmail.com','170449','2025-10-05 13:48:15','2025-10-05 18:58:15',0),(58,'braianoquendurango@gmail.com','897340','2025-10-05 13:53:37','2025-10-05 19:03:37',0),(59,'braianoquendurango@gmail.com','816291','2025-10-05 13:57:58','2025-10-05 19:07:58',0),(60,'braianoquendurango@gmail.com','834542','2025-10-05 14:02:31','2025-10-05 19:12:31',0),(61,'braianoquendurango@gmail.com','220660','2025-10-05 14:07:14','2025-10-05 19:17:14',0),(62,'braianoquendurango@gmail.com','527698','2025-10-05 16:34:49','2025-10-05 21:44:49',0),(63,'braianoquendurango@gmail.com','947445','2025-10-05 16:46:56','2025-10-05 21:56:56',0),(64,'braianoquendurango@gmail.com','687214','2025-10-05 17:05:14','2025-10-05 22:15:14',0),(65,'braianoquendurango@gmail.com','586620','2025-10-05 17:35:18','2025-10-05 22:45:18',0),(66,'braianoquendurango@gmail.com','476004','2025-10-05 17:42:10','2025-10-05 22:52:10',0),(67,'braianoquen@gmail.com','822586','2025-10-05 18:51:09','2025-10-06 00:01:09',0),(68,'braianoquen@gmail.com','768999','2025-10-05 20:15:24','2025-10-06 01:25:24',0),(69,'braianoquen@gmail.com','635063','2025-10-05 20:16:32','2025-10-06 01:26:32',0),(70,'braianoquen@gmail.com','663502','2025-10-05 20:31:20','2025-10-06 01:41:20',0),(71,'braianoquen@gmail.com','656436','2025-10-05 20:55:10','2025-10-06 02:05:10',0),(72,'braianoquen@gmail.com','950733','2025-10-06 22:42:36','2025-10-07 03:52:36',0),(73,'braianoquen@gmail.com','972074','2025-10-06 22:44:02','2025-10-07 03:54:02',0),(74,'braian890@gmail.com','174360','2025-10-06 22:45:51','2025-10-07 03:55:51',0),(75,'braianoquen@gmail.com','701975','2025-10-06 22:49:07','2025-10-07 03:59:07',0),(76,'braianoquen79@gmail.com','185834','2025-10-06 23:07:49','2025-10-07 04:17:49',0),(77,'braianoquen80@gmail.com','367890','2025-10-17 03:02:29','2025-10-17 08:12:29',0),(78,'braianoquen@gmail.com','893059','2025-10-17 12:40:14','2025-10-17 17:50:14',0),(79,'braianoquen@gmail.com','894968','2025-10-17 12:55:02','2025-10-17 18:05:02',0),(80,'braianoquen@gmail.com','342619','2025-10-17 13:18:43','2025-10-17 18:28:43',0),(81,'braianoquen@gmail.com','575878','2025-10-19 14:35:11','2025-10-19 19:45:11',0),(82,'braaian80@gmail.com','109667','2025-10-19 16:11:09','2025-10-19 21:21:09',0),(83,'braianoquen13231@gmail.com','881509','2025-10-19 16:30:14','2025-10-19 21:40:14',0),(84,'braianoquen323@gmail.com','700367','2025-10-19 16:37:32','2025-10-19 21:47:32',0),(85,'braianoquen324@gmail.com','648366','2025-10-20 22:33:07','2025-10-21 03:43:07',0),(86,'braianoquen2@gmail.com','245192','2025-10-22 14:05:51','2025-10-22 19:15:51',0),(87,'braianoquendurango@gmail.com','948056','2025-10-22 14:07:51','2025-10-22 19:17:51',0),(88,'braianoquen2@gmail.com','607965','2025-10-22 14:10:18','2025-10-22 19:20:18',0),(89,'braianoquen@gmail.com','108760','2025-10-22 14:37:06','2025-10-22 19:47:06',0);
 /*!40000 ALTER TABLE `verification_codes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -603,4 +751,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-22  9:17:58
+-- Dump completed on 2025-10-23  7:31:07

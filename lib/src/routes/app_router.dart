@@ -15,6 +15,7 @@ import 'package:ping_go/src/features/admin/presentation/screens/admin_home_scree
 import 'package:ping_go/src/features/admin/presentation/screens/users_management_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/statistics_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/audit_logs_screen.dart';
+import 'package:ping_go/src/features/conductor/presentation/screens/conductor_home_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/routes/animated_routes.dart';
 import 'package:ping_go/src/widgets/auth_wrapper.dart';
@@ -121,6 +122,17 @@ class AppRouter {
           return MaterialPageRoute(
             builder: (_) => AuditLogsScreen(
               adminId: args?['admin_id'] ?? 0,
+            ),
+          );
+        }
+      
+      // Rutas de conductor
+      case RouteNames.conductorHome:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => ConductorHomeScreen(
+              conductorUser: args?['conductor_user'] ?? {},
             ),
           );
         }
