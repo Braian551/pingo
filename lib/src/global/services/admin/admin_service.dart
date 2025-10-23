@@ -9,23 +9,55 @@ class AdminService {
     required int adminId,
   }) async {
     try {
+      print('AdminService: Obteniendo estadísticas para admin_id: $adminId');
+      
+      final uri = Uri.parse('$_baseUrl/dashboard_stats.php').replace(
+        queryParameters: {'admin_id': adminId.toString()},
+      );
+      
+      print('AdminService: URL completa: $uri');
+      
       final response = await http.get(
-        Uri.parse('$_baseUrl/dashboard_stats.php?admin_id=$adminId'),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Tiempo de espera agotado');
+        },
       );
+
+      print('AdminService: Status Code: ${response.statusCode}');
+      print('AdminService: Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data;
+      } else if (response.statusCode == 403) {
+        return {
+          'success': false,
+          'message': 'Acceso denegado. Solo administradores pueden acceder.'
+        };
+      } else if (response.statusCode == 400) {
+        return {
+          'success': false,
+          'message': 'Solicitud inválida'
+        };
       }
 
-      return {'success': false, 'message': 'Error al obtener estadísticas'};
+      return {
+        'success': false,
+        'message': 'Error del servidor: ${response.statusCode}'
+      };
     } catch (e) {
-      print('Error en getDashboardStats: $e');
-      return {'success': false, 'message': e.toString()};
+      print('AdminService Error en getDashboardStats: $e');
+      return {
+        'success': false,
+        'message': 'Error de conexión: ${e.toString()}'
+      };
     }
   }
 

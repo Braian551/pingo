@@ -4,22 +4,32 @@
  * Retorna estadísticas generales del sistema para el panel de administrador
  */
 
-require_once '../config/config.php';
+// Configuración de errores y CORS
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
+require_once '../config/config.php';
+
 try {
     // Verificar que sea un administrador
     $input = $_SERVER['REQUEST_METHOD'] === 'GET' ? $_GET : getJsonInput();
     
+    // Log para debug
+    error_log("Dashboard Stats - Input recibido: " . json_encode($input));
+    
     if (empty($input['admin_id'])) {
+        http_response_code(400);
         sendJsonResponse(false, 'ID de administrador requerido');
     }
 
@@ -27,13 +37,18 @@ try {
     $db = $database->getConnection();
 
     // Verificar que el usuario sea administrador
-    $checkAdmin = "SELECT tipo_usuario FROM usuarios WHERE id = ? AND tipo_usuario = 'administrador'";
+    $checkAdmin = "SELECT id, tipo_usuario, nombre FROM usuarios WHERE id = ? AND tipo_usuario = 'administrador'";
     $stmtCheck = $db->prepare($checkAdmin);
     $stmtCheck->execute([$input['admin_id']]);
     
-    if (!$stmtCheck->fetch()) {
+    $adminData = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$adminData) {
+        http_response_code(403);
         sendJsonResponse(false, 'Acceso denegado. Solo administradores pueden acceder.');
     }
+    
+    error_log("Dashboard Stats - Admin verificado: " . $adminData['nombre']);
 
     // === ESTADÍSTICAS GENERALES ===
     
@@ -49,6 +64,8 @@ try {
     
     $stmtUsers = $db->query($queryUsers);
     $userStats = $stmtUsers->fetch(PDO::FETCH_ASSOC);
+    
+    error_log("Dashboard Stats - User Stats: " . json_encode($userStats));
 
     // Estadísticas de solicitudes
     $querySolicitudes = "SELECT 
@@ -131,11 +148,15 @@ try {
         'registros_ultimos_7_dias' => $registrosGrafica,
         'fecha_actualizacion' => date('Y-m-d H:i:s')
     ];
+    
+    error_log("Dashboard Stats - Datos completos: " . json_encode($dashboardData));
 
+    http_response_code(200);
     sendJsonResponse(true, 'Estadísticas obtenidas exitosamente', $dashboardData);
 
 } catch (Exception $e) {
     error_log("Error en dashboard_stats: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
     sendJsonResponse(false, 'Error al obtener estadísticas: ' . $e->getMessage());
 }

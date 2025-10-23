@@ -164,7 +164,7 @@ CREATE TABLE `configuraciones_app` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_clave` (`clave`),
   KEY `idx_categoria` (`categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraciones globales de la aplicacion';
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraciones globales de la aplicacion';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -173,7 +173,7 @@ CREATE TABLE `configuraciones_app` (
 
 LOCK TABLES `configuraciones_app` WRITE;
 /*!40000 ALTER TABLE `configuraciones_app` DISABLE KEYS */;
-INSERT INTO `configuraciones_app` VALUES (1,'app_nombre','PinGo','string','sistema','Nombre de la aplicacion',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(2,'app_version','1.0.0','string','sistema','Version actual de la aplicacion',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(3,'mantenimiento_activo','false','boolean','sistema','Indica si la app esta en mantenimiento',1,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(4,'precio_base_km','2500','number','precios','Precio base por kilometro en COP',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(5,'precio_minimo_viaje','5000','number','precios','Precio minimo de un viaje en COP',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(6,'comision_plataforma','15','number','precios','Porcentaje de comision de la plataforma',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(7,'radio_busqueda_conductores','5000','number','sistema','Radio en metros para buscar conductores',0,'2025-10-22 14:35:57','2025-10-22 14:35:57'),(8,'tiempo_expiracion_solicitud','300','number','sistema','Tiempo en segundos antes de expirar solicitud',0,'2025-10-22 14:35:57','2025-10-22 14:35:57');
+INSERT INTO `configuraciones_app` VALUES (1,'app_nombre','PinGo','string','sistema','Nombre de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(2,'app_version','1.0.0','string','sistema','Version actual de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(3,'mantenimiento_activo','false','boolean','sistema','Indica si la app esta en mantenimiento',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(4,'precio_base_km','2500','number','precios','Precio base por kilometro en COP',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(5,'precio_minimo_viaje','5000','number','precios','Precio minimo de un viaje en COP',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(6,'comision_plataforma','15','number','precios','Porcentaje de comision de la plataforma',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(7,'radio_busqueda_conductores','5000','number','sistema','Radio en metros para buscar conductores',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(8,'tiempo_expiracion_solicitud','300','number','sistema','Tiempo en segundos antes de expirar solicitud',0,'2025-10-22 14:35:57','2025-10-23 13:54:19');
 /*!40000 ALTER TABLE `configuraciones_app` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,14 +187,14 @@ DROP TABLE IF EXISTS `detalles_conductor`;
 CREATE TABLE `detalles_conductor` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` bigint unsigned NOT NULL,
-  `numero_licencia` varchar(50) NOT NULL,
-  `vencimiento_licencia` date NOT NULL,
-  `tipo_vehiculo` enum('motocicleta','carro','furgoneta','camion') NOT NULL,
-  `marca_vehiculo` varchar(50) DEFAULT NULL,
-  `modelo_vehiculo` varchar(50) DEFAULT NULL,
-  `ano_vehiculo` int DEFAULT NULL,
-  `color_vehiculo` varchar(30) DEFAULT NULL,
-  `placa_vehiculo` varchar(20) NOT NULL,
+  `licencia_conduccion` varchar(50) NOT NULL,
+  `licencia_vencimiento` date NOT NULL,
+  `vehiculo_tipo` enum('motocicleta','carro','furgoneta','camion') NOT NULL,
+  `vehiculo_marca` varchar(50) DEFAULT NULL,
+  `vehiculo_modelo` varchar(50) DEFAULT NULL,
+  `vehiculo_anio` int DEFAULT NULL,
+  `vehiculo_color` varchar(30) DEFAULT NULL,
+  `vehiculo_placa` varchar(20) NOT NULL,
   `aseguradora` varchar(100) DEFAULT NULL,
   `numero_poliza_seguro` varchar(100) DEFAULT NULL,
   `vencimiento_seguro` date DEFAULT NULL,
@@ -204,10 +204,21 @@ CREATE TABLE `detalles_conductor` (
   `total_calificaciones` int DEFAULT '0',
   `creado_en` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `actualizado_en` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `disponible` tinyint(1) DEFAULT '0' COMMENT '1 si el conductor esta disponible para recibir solicitudes',
+  `latitud_actual` decimal(10,8) DEFAULT NULL COMMENT 'Latitud actual del conductor',
+  `longitud_actual` decimal(11,8) DEFAULT NULL COMMENT 'Longitud actual del conductor',
+  `ultima_actualizacion` timestamp NULL DEFAULT NULL COMMENT 'Ultima vez que se actualizo la ubicacion',
+  `total_viajes` int unsigned DEFAULT '0' COMMENT 'Total de viajes completados',
+  `estado_verificacion` enum('pendiente','en_revision','aprobado','rechazado') DEFAULT 'pendiente' COMMENT 'Estado de verificacion de documentos',
+  `fecha_ultima_verificacion` timestamp NULL DEFAULT NULL COMMENT 'Fecha de la ultima verificacion',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `numero_licencia` (`numero_licencia`),
-  UNIQUE KEY `placa_vehiculo` (`placa_vehiculo`),
   UNIQUE KEY `idx_detalles_conductor_usuario` (`usuario_id`),
+  KEY `idx_disponible` (`disponible`),
+  KEY `idx_ubicacion` (`latitud_actual`,`longitud_actual`),
+  KEY `idx_licencia` (`licencia_conduccion`),
+  KEY `idx_placa` (`vehiculo_placa`),
+  KEY `idx_estado_verificacion` (`estado_verificacion`),
   CONSTRAINT `detalles_conductor_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -554,6 +565,7 @@ CREATE TABLE `solicitudes_servicio` (
   `distancia_estimada` decimal(8,2) NOT NULL,
   `tiempo_estimado` int NOT NULL,
   `estado` enum('pendiente','aceptada','conductor_asignado','recogido','en_transito','entregado','completada','cancelada') DEFAULT 'pendiente',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `solicitado_en` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `aceptado_en` timestamp NULL DEFAULT NULL,
   `recogido_en` timestamp NULL DEFAULT NULL,
@@ -603,6 +615,7 @@ CREATE TABLE `transacciones` (
   `monto_total` decimal(10,2) NOT NULL,
   `metodo_pago` enum('efectivo','tarjeta_credito','tarjeta_debito','billetera_digital') NOT NULL,
   `estado_pago` enum('pendiente','procesando','completado','fallido','reembolsado') DEFAULT 'pendiente',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_transaccion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `completado_en` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -677,12 +690,12 @@ CREATE TABLE `usuarios` (
   `telefono` varchar(20) NOT NULL,
   `hash_contrasena` varchar(255) NOT NULL,
   `tipo_usuario` enum('cliente','conductor','administrador') DEFAULT 'cliente',
-  `url_imagen_perfil` varchar(500) DEFAULT NULL,
+  `foto_perfil` varchar(500) DEFAULT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
-  `verificado` tinyint(1) DEFAULT '0',
-  `activo` tinyint(1) DEFAULT '1',
-  `creado_en` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `actualizado_en` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `es_verificado` tinyint(1) DEFAULT '0',
+  `es_activo` tinyint(1) DEFAULT '1',
+  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ultimo_acceso_en` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`),
@@ -702,6 +715,42 @@ LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES (1,'user_68daf618780e50.65802566','braian','oquendo','braianoquen@gmail.com','3013636902','$2y$10$H2Un4DmxCsM6XOGA1fiX8.5VB42Z9v8uwqERrGBms83dk2CQVQKnO','administrador',NULL,NULL,0,1,'2025-09-29 21:11:52','2025-10-22 14:16:12',NULL),(2,'user_68e44706c14db4.53994811','braian890','oquendo','braian890@gmail.com','32323232','$2y$10$NB9S4hWQLrK7HhTjc9yneu9RTb6otip3dtZ1muEgukWWLKcSpxRF6','cliente',NULL,NULL,0,1,'2025-10-06 22:47:34',NULL,NULL),(3,'user_68e44d12079086.97442308','braianoquen79','oquendo','braianoquen79@gmail.com','34343434','$2y$10$6LhMx5vHi.3LrrM/EjFjw.ZztZWhhGQgqf1sD76h2RtJ4B7nN/sjC','cliente',NULL,NULL,0,1,'2025-10-06 23:13:22',NULL,NULL),(4,'user_68f5142e614579.71603626','braianoquen323','oquendo','braianoquen323@gmail.com','213131313131','$2y$10$qSZ1igIQd1BQJmq.MRMwM.2EUfUYhvXhsf4g0h7GJJDJ8uaR66/qy','cliente',NULL,NULL,0,1,'2025-10-19 16:39:10',NULL,NULL),(5,'user_68f6b9b1f1cb28.57297864','braianoquen324','oquendo','braianoquen324@gmail.com','4274672','$2y$10$Oji7gxZcVki50Pyk5aReKexUhCGPbXLGNe.rsnlzAaZvI.Bo.UexS','cliente',NULL,NULL,0,1,'2025-10-20 22:37:37',NULL,NULL),(6,'user_68f8e56f0736b2.62296910','braianoquendurango','oquendo','braianoquendurango@gmail.com','323121','$2y$10$DDOIUEJ8jv1ILAu7PKj3LutCGRru.7sVUs2himDiKZ4yqY.VtvRb6','cliente',NULL,NULL,0,1,'2025-10-22 14:08:47',NULL,NULL),(7,'user_68f8e5efd5f888.59258279','braianoquen2','oqeundo','braianoquen2@gmail.com','3242442','$2y$10$DUUZdDrKiyespZGSJfk9JeGYuvOkAjrlMemg9BA/BZfyXlamgobjW','conductor',NULL,NULL,0,1,'2025-10-22 14:10:55','2025-10-22 14:15:38',NULL);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuarios_backup_20251023`
+--
+
+DROP TABLE IF EXISTS `usuarios_backup_20251023`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuarios_backup_20251023` (
+  `id` bigint unsigned NOT NULL DEFAULT '0',
+  `uuid` varchar(255) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `apellido` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `hash_contrasena` varchar(255) NOT NULL,
+  `tipo_usuario` enum('cliente','conductor','administrador') DEFAULT 'cliente',
+  `url_imagen_perfil` varchar(500) DEFAULT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `verificado` tinyint(1) DEFAULT '0',
+  `activo` tinyint(1) DEFAULT '1',
+  `creado_en` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `actualizado_en` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `ultimo_acceso_en` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios_backup_20251023`
+--
+
+LOCK TABLES `usuarios_backup_20251023` WRITE;
+/*!40000 ALTER TABLE `usuarios_backup_20251023` DISABLE KEYS */;
+INSERT INTO `usuarios_backup_20251023` VALUES (1,'user_68daf618780e50.65802566','braian','oquendo','braianoquen@gmail.com','3013636902','$2y$10$H2Un4DmxCsM6XOGA1fiX8.5VB42Z9v8uwqERrGBms83dk2CQVQKnO','administrador',NULL,NULL,0,1,'2025-09-29 21:11:52','2025-10-22 14:16:12',NULL),(2,'user_68e44706c14db4.53994811','braian890','oquendo','braian890@gmail.com','32323232','$2y$10$NB9S4hWQLrK7HhTjc9yneu9RTb6otip3dtZ1muEgukWWLKcSpxRF6','cliente',NULL,NULL,0,1,'2025-10-06 22:47:34',NULL,NULL),(3,'user_68e44d12079086.97442308','braianoquen79','oquendo','braianoquen79@gmail.com','34343434','$2y$10$6LhMx5vHi.3LrrM/EjFjw.ZztZWhhGQgqf1sD76h2RtJ4B7nN/sjC','cliente',NULL,NULL,0,1,'2025-10-06 23:13:22',NULL,NULL),(4,'user_68f5142e614579.71603626','braianoquen323','oquendo','braianoquen323@gmail.com','213131313131','$2y$10$qSZ1igIQd1BQJmq.MRMwM.2EUfUYhvXhsf4g0h7GJJDJ8uaR66/qy','cliente',NULL,NULL,0,1,'2025-10-19 16:39:10',NULL,NULL),(5,'user_68f6b9b1f1cb28.57297864','braianoquen324','oquendo','braianoquen324@gmail.com','4274672','$2y$10$Oji7gxZcVki50Pyk5aReKexUhCGPbXLGNe.rsnlzAaZvI.Bo.UexS','cliente',NULL,NULL,0,1,'2025-10-20 22:37:37',NULL,NULL),(6,'user_68f8e56f0736b2.62296910','braianoquendurango','oquendo','braianoquendurango@gmail.com','323121','$2y$10$DDOIUEJ8jv1ILAu7PKj3LutCGRru.7sVUs2himDiKZ4yqY.VtvRb6','cliente',NULL,NULL,0,1,'2025-10-22 14:08:47',NULL,NULL),(7,'user_68f8e5efd5f888.59258279','braianoquen2','oqeundo','braianoquen2@gmail.com','3242442','$2y$10$DUUZdDrKiyespZGSJfk9JeGYuvOkAjrlMemg9BA/BZfyXlamgobjW','conductor',NULL,NULL,0,1,'2025-10-22 14:10:55','2025-10-22 14:15:38',NULL);
+/*!40000 ALTER TABLE `usuarios_backup_20251023` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -751,4 +800,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-23  7:31:07
+-- Dump completed on 2025-10-23  9:00:59
