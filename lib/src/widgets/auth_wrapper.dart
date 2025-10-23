@@ -69,40 +69,67 @@ class _AuthWrapperState extends State<AuthWrapper>
       if (!mounted) return;
 
       if (session != null && session['email'] != null) {
-        // Usuario tiene sesión activa, obtener perfil para verificar tipo de usuario
-        final profile = await UserService.getProfile(
-          userId: session['id'] as int?,
-          email: session['email'] as String?,
-        );
+        // Verificar si tenemos el tipo de usuario guardado
+        final tipoUsuarioGuardado = session['tipo_usuario'];
 
-        if (!mounted) return;
-
-        if (profile != null && profile['success'] == true) {
-          final user = profile['user'];
-          final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
-
-          // Redirigir según el tipo de usuario
-          if (tipoUsuario == 'administrador') {
+        if (tipoUsuarioGuardado != null) {
+          // Usar el tipo guardado directamente para navegación más rápida
+          if (tipoUsuarioGuardado == 'administrador') {
             Navigator.of(context).pushReplacementNamed(
               RouteNames.adminHome,
-              arguments: {'admin_user': user},
+              arguments: {'admin_user': session},
             );
-          } else if (tipoUsuario == 'conductor') {
+          } else if (tipoUsuarioGuardado == 'conductor') {
             Navigator.of(context).pushReplacementNamed(
               RouteNames.conductorHome,
-              arguments: {'conductor_user': user},
+              arguments: {'conductor_user': session},
             );
           } else {
             // Cliente
             Navigator.of(context).pushReplacementNamed(
               RouteNames.home,
-              arguments: {'email': session['email'], 'user': user},
+              arguments: {'email': session['email'], 'user': session},
             );
           }
         } else {
-          // Si no se pudo obtener el perfil, limpiar sesión y mostrar welcome
-          await UserService.clearSession();
-          Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
+          // No hay tipo guardado, obtener perfil completo
+          final profile = await UserService.getProfile(
+            userId: session['id'] as int?,
+            email: session['email'] as String?,
+          );
+
+          if (!mounted) return;
+
+          if (profile != null && profile['success'] == true) {
+            final user = profile['user'];
+            final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
+
+            // Actualizar la sesión con el tipo obtenido
+            await UserService.saveSession(user);
+
+            // Redirigir según el tipo de usuario
+            if (tipoUsuario == 'administrador') {
+              Navigator.of(context).pushReplacementNamed(
+                RouteNames.adminHome,
+                arguments: {'admin_user': user},
+              );
+            } else if (tipoUsuario == 'conductor') {
+              Navigator.of(context).pushReplacementNamed(
+                RouteNames.conductorHome,
+                arguments: {'conductor_user': user},
+              );
+            } else {
+              // Cliente
+              Navigator.of(context).pushReplacementNamed(
+                RouteNames.home,
+                arguments: {'email': session['email'], 'user': user},
+              );
+            }
+          } else {
+            // Si no se pudo obtener el perfil, limpiar sesión y mostrar welcome
+            await UserService.clearSession();
+            Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
+          }
         }
       } else {
         // No hay sesión, mostrar welcome

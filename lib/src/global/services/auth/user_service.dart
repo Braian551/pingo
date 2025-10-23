@@ -222,6 +222,7 @@ class UserService {
   // Session helpers using SharedPreferences
   static const String _kUserEmail = 'pingo_user_email';
   static const String _kUserId = 'pingo_user_id';
+  static const String _kUserType = 'pingo_user_type';
 
   static Future<void> saveSession(Map<String, dynamic>? user) async {
     if (user == null) return;
@@ -232,16 +233,21 @@ class UserService {
     if (user.containsKey('id') && user['id'] != null) {
       await prefs.setInt(_kUserId, int.tryParse(user['id'].toString()) ?? 0);
     }
+    if (user.containsKey('tipo_usuario') && user['tipo_usuario'] != null) {
+      await prefs.setString(_kUserType, user['tipo_usuario'].toString());
+    }
   }
 
   static Future<Map<String, dynamic>?> getSavedSession() async {
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString(_kUserEmail);
     final id = prefs.getInt(_kUserId);
+    final tipoUsuario = prefs.getString(_kUserType);
     if (email == null && id == null) return null;
     return {
       if (id != null) 'id': id,
       if (email != null) 'email': email,
+      if (tipoUsuario != null) 'tipo_usuario': tipoUsuario,
     };
   }
 
@@ -249,6 +255,7 @@ class UserService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_kUserEmail);
     await prefs.remove(_kUserId);
+    await prefs.remove(_kUserType);
   }
 
   static Future<Map<String, dynamic>> login({
