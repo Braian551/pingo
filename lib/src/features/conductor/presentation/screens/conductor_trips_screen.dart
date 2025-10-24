@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/conductor_provider.dart';
+import '../../providers/conductor_trips_provider.dart';
+import '../../services/conductor_trips_service.dart';
+import 'package:intl/intl.dart';
 
 class ConductorTripsScreen extends StatefulWidget {
   final int conductorId;
@@ -15,30 +17,20 @@ class ConductorTripsScreen extends StatefulWidget {
   State<ConductorTripsScreen> createState() => _ConductorTripsScreenState();
 }
 
-class _ConductorTripsScreenState extends State<ConductorTripsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  String _filterStatus = 'todos'; // todos, completados, cancelados
+class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
+  late ConductorTripsProvider _provider;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _provider = Provider.of<ConductorTripsProvider>(context, listen: false);
       _loadTrips();
     });
   }
 
   Future<void> _loadTrips() async {
-    final provider = Provider.of<ConductorProvider>(context, listen: false);
-    // In real app, load trip history from API
-    await provider.loadViajesActivos(widget.conductorId);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    await _provider.loadTrips(widget.conductorId);
   }
 
   @override
@@ -52,13 +44,56 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
           children: [
             _buildFilters(),
             Expanded(
-              child: Consumer<ConductorProvider>(
+              child: Consumer<ConductorTripsProvider>(
                 builder: (context, provider, child) {
+                  if (provider.isLoading && provider.trips.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFFFF00),
+                      ),
+                    );
+                  }
+
+                  if (provider.errorMessage != null && provider.trips.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            provider.errorMessage!,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: _loadTrips,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFFF00),
+                            ),
+                            child: const Text(
+                              'Reintentar',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return RefreshIndicator(
                     onRefresh: _loadTrips,
                     color: const Color(0xFFFFFF00),
                     backgroundColor: const Color(0xFF1A1A1A),
-                    child: _buildTripsList(),
+                    child: _buildTripsList(provider.trips),
                   );
                 },
               ),
@@ -107,27 +142,31 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
   }
 
   Widget _buildFilters() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildFilterChip('Todos', 'todos', Icons.list_rounded),
-            const SizedBox(width: 12),
-            _buildFilterChip('Completados', 'completados', Icons.check_circle_rounded),
-            const SizedBox(width: 12),
-            _buildFilterChip('Cancelados', 'cancelados', Icons.cancel_rounded),
-          ],
-        ),
-      ),
+    return Consumer<ConductorTripsProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip('Todos', 'todos', Icons.list_rounded, provider),
+                const SizedBox(width: 12),
+                _buildFilterChip('Completados', 'completados', Icons.check_circle_rounded, provider),
+                const SizedBox(width: 12),
+                _buildFilterChip('Cancelados', 'cancelados', Icons.cancel_rounded, provider),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildFilterChip(String label, String value, IconData icon) {
-    final isSelected = _filterStatus == value;
+  Widget _buildFilterChip(String label, String value, IconData icon, ConductorTripsProvider provider) {
+    final isSelected = provider.filterStatus == value;
     return GestureDetector(
-      onTap: () => setState(() => _filterStatus = value),
+      onTap: () => provider.setFilter(value),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
@@ -165,10 +204,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
     );
   }
 
-  Widget _buildTripsList() {
-    // Mock data - in real app this would come from provider
-    final trips = _getMockTrips();
-
+  Widget _buildTripsList(List<TripModel> trips) {
     if (trips.isEmpty) {
       return Center(
         child: Column(
@@ -200,17 +236,17 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
     );
   }
 
-  Widget _buildTripCard(Map<String, dynamic> trip) {
-    final status = trip['status'] ?? 'completado';
+  Widget _buildTripCard(TripModel trip) {
+    final status = trip.estado;
     Color statusColor;
     IconData statusIcon;
     
     switch (status) {
-      case 'completado':
+      case 'completada':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle_rounded;
         break;
-      case 'cancelado':
+      case 'cancelada':
         statusColor = Colors.red;
         statusIcon = Icons.cancel_rounded;
         break;
@@ -218,6 +254,11 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
         statusColor = Colors.orange;
         statusIcon = Icons.access_time_rounded;
     }
+
+    final dateFormat = DateFormat('dd MMM yyyy, hh:mm a', 'es');
+    final dateStr = trip.fechaCompletado != null
+        ? dateFormat.format(trip.fechaCompletado!)
+        : dateFormat.format(trip.fechaSolicitud);
 
     return GestureDetector(
       onTap: () => _showTripDetails(trip),
@@ -271,7 +312,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
                             ),
                           ),
                           Text(
-                            trip['date'] ?? 'Hoy',
+                            dateStr,
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 13,
@@ -304,30 +345,31 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  trip['customerName'] ?? 'Cliente',
+                                  trip.clienteNombreCompleto,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.star_rounded,
-                                      color: Color(0xFFFFFF00),
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      trip['customerRating']?.toString() ?? '5.0',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14,
+                                if (trip.calificacion != null)
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        color: Color(0xFFFFFF00),
+                                        size: 16,
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        trip.calificacionDouble.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
@@ -337,28 +379,30 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
                       // Route
                       _buildRouteInfo(
                         Icons.location_on_rounded,
-                        trip['pickup'] ?? 'Punto de recogida',
+                        trip.origen ?? 'Punto de recogida',
                         true,
                       ),
                       _buildRouteLine(),
                       _buildRouteInfo(
                         Icons.flag_rounded,
-                        trip['destination'] ?? 'Destino',
+                        trip.destino ?? 'Destino',
                         false,
                       ),
                       const SizedBox(height: 16),
                       // Stats
                       Row(
                         children: [
-                          _buildStatBadge(
-                            Icons.route_rounded,
-                            '${trip['distance'] ?? '5.2'} km',
-                          ),
+                          if (trip.distanciaKm != null)
+                            _buildStatBadge(
+                              Icons.route_rounded,
+                              '${trip.distanciaKm!.toStringAsFixed(1)} km',
+                            ),
                           const SizedBox(width: 12),
-                          _buildStatBadge(
-                            Icons.access_time_rounded,
-                            '${trip['duration'] ?? '15'} min',
-                          ),
+                          if (trip.duracionEstimada != null)
+                            _buildStatBadge(
+                              Icons.access_time_rounded,
+                              '${trip.duracionEstimada} min',
+                            ),
                         ],
                       ),
                     ],
@@ -387,7 +431,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
                         ),
                       ),
                       Text(
-                        '+\$${trip['earnings'] ?? '12,500'}',
+                        '+\$${(trip.precioFinal ?? trip.precioEstimado ?? 0).toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Colors.green,
                           fontSize: 20,
@@ -478,7 +522,12 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
     );
   }
 
-  void _showTripDetails(Map<String, dynamic> trip) {
+  void _showTripDetails(TripModel trip) {
+    final dateFormat = DateFormat('dd MMM yyyy, hh:mm a', 'es');
+    final fullDate = trip.fechaCompletado != null
+        ? dateFormat.format(trip.fechaCompletado!)
+        : dateFormat.format(trip.fechaSolicitud);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -526,27 +575,29 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
                       const SizedBox(height: 24),
                       _buildDetailItem(
                         'Cliente',
-                        trip['customerName'] ?? 'N/A',
+                        trip.clienteNombreCompleto,
                         Icons.person_rounded,
                       ),
                       _buildDetailItem(
                         'Fecha',
-                        trip['fullDate'] ?? '24 Oct 2025, 10:30 AM',
+                        fullDate,
                         Icons.calendar_today_rounded,
                       ),
-                      _buildDetailItem(
-                        'Distancia',
-                        '${trip['distance'] ?? '5.2'} km',
-                        Icons.route_rounded,
-                      ),
-                      _buildDetailItem(
-                        'Duración',
-                        '${trip['duration'] ?? '15'} minutos',
-                        Icons.access_time_rounded,
-                      ),
+                      if (trip.distanciaKm != null)
+                        _buildDetailItem(
+                          'Distancia',
+                          '${trip.distanciaKm!.toStringAsFixed(1)} km',
+                          Icons.route_rounded,
+                        ),
+                      if (trip.duracionEstimada != null)
+                        _buildDetailItem(
+                          'Duración',
+                          '${trip.duracionEstimada} minutos',
+                          Icons.access_time_rounded,
+                        ),
                       _buildDetailItem(
                         'Ganancia',
-                        '\$${trip['earnings'] ?? '12,500'}',
+                        '\$${(trip.precioFinal ?? trip.precioEstimado ?? 0).toStringAsFixed(0)}',
                         Icons.attach_money,
                       ),
                       const SizedBox(height: 24),
@@ -628,66 +679,5 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen>
         ],
       ),
     );
-  }
-
-  List<Map<String, dynamic>> _getMockTrips() {
-    final allTrips = [
-      {
-        'status': 'completado',
-        'date': 'Hoy, 10:30 AM',
-        'fullDate': '24 Oct 2025, 10:30 AM',
-        'customerName': 'Juan Pérez',
-        'customerRating': 4.8,
-        'pickup': 'Calle 123, Centro',
-        'destination': 'Av. Principal 456',
-        'distance': 5.2,
-        'duration': 15,
-        'earnings': 12500,
-      },
-      {
-        'status': 'completado',
-        'date': 'Hoy, 9:15 AM',
-        'fullDate': '24 Oct 2025, 9:15 AM',
-        'customerName': 'María García',
-        'customerRating': 5.0,
-        'pickup': 'Centro Comercial Norte',
-        'destination': 'Residencial Los Pinos',
-        'distance': 8.3,
-        'duration': 22,
-        'earnings': 18300,
-      },
-      {
-        'status': 'cancelado',
-        'date': 'Ayer, 3:45 PM',
-        'fullDate': '23 Oct 2025, 3:45 PM',
-        'customerName': 'Carlos Rodríguez',
-        'customerRating': 4.5,
-        'pickup': 'Terminal de Buses',
-        'destination': 'Aeropuerto Internacional',
-        'distance': 15.0,
-        'duration': 35,
-        'earnings': 0,
-      },
-      {
-        'status': 'completado',
-        'date': 'Ayer, 11:20 AM',
-        'fullDate': '23 Oct 2025, 11:20 AM',
-        'customerName': 'Ana López',
-        'customerRating': 4.9,
-        'pickup': 'Hospital Central',
-        'destination': 'Universidad Nacional',
-        'distance': 6.7,
-        'duration': 18,
-        'earnings': 14200,
-      },
-    ];
-
-    if (_filterStatus == 'todos') {
-      return allTrips;
-    } else if (_filterStatus == 'completados') {
-      return allTrips.where((t) => t['status'] == 'completado').toList();
-    } else {
-      return allTrips.where((t) => t['status'] == 'cancelado').toList();
-    }
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/conductor_provider.dart';
+import '../../providers/conductor_earnings_provider.dart';
 
 class ConductorEarningsScreen extends StatefulWidget {
   final int conductorId;
@@ -15,29 +15,20 @@ class ConductorEarningsScreen extends StatefulWidget {
   State<ConductorEarningsScreen> createState() => _ConductorEarningsScreenState();
 }
 
-class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _selectedPeriod = 0; // 0: Hoy, 1: Semana, 2: Mes
+class _ConductorEarningsScreenState extends State<ConductorEarningsScreen> {
+  late ConductorEarningsProvider _provider;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _provider = Provider.of<ConductorEarningsProvider>(context, listen: false);
       _loadEarnings();
     });
   }
 
   Future<void> _loadEarnings() async {
-    final provider = Provider.of<ConductorProvider>(context, listen: false);
-    await provider.loadEstadisticas(widget.conductorId);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    await _provider.loadEarnings(widget.conductorId);
   }
 
   @override
@@ -51,8 +42,51 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
           children: [
             _buildPeriodSelector(),
             Expanded(
-              child: Consumer<ConductorProvider>(
+              child: Consumer<ConductorEarningsProvider>(
                 builder: (context, provider, child) {
+                  if (provider.isLoading && provider.earnings == null) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFFFF00),
+                      ),
+                    );
+                  }
+
+                  if (provider.errorMessage != null && provider.earnings == null) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            provider.errorMessage!,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: _loadEarnings,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFFF00),
+                            ),
+                            child: const Text(
+                              'Reintentar',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return RefreshIndicator(
                     onRefresh: _loadEarnings,
                     color: const Color(0xFFFFFF00),
@@ -68,8 +102,6 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
                           _buildStatsGrid(provider),
                           const SizedBox(height: 24),
                           _buildEarningsBreakdown(provider),
-                          const SizedBox(height: 24),
-                          _buildRecentTransactions(),
                           const SizedBox(height: 24),
                           _buildWithdrawButton(),
                         ],
@@ -123,35 +155,36 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
   }
 
   Widget _buildPeriodSelector() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A).withOpacity(0.8),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          _buildPeriodButton('Hoy', 0),
-          _buildPeriodButton('Semana', 1),
-          _buildPeriodButton('Mes', 2),
-        ],
-      ),
+    return Consumer<ConductorEarningsProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              _buildPeriodButton('Hoy', EarningsPeriod.today, provider),
+              _buildPeriodButton('Semana', EarningsPeriod.week, provider),
+              _buildPeriodButton('Mes', EarningsPeriod.month, provider),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildPeriodButton(String label, int index) {
-    final isSelected = _selectedPeriod == index;
+  Widget _buildPeriodButton(String label, EarningsPeriod period, ConductorEarningsProvider provider) {
+    final isSelected = provider.selectedPeriod == period;
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          setState(() => _selectedPeriod = index);
-          _loadEarnings();
-        },
+        onTap: () => provider.setPeriod(period, widget.conductorId),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
@@ -172,13 +205,9 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
     );
   }
 
-  Widget _buildTotalEarningsCard(ConductorProvider provider) {
-    final stats = provider.estadisticas;
-    final earnings = _selectedPeriod == 0
-        ? stats['ganancias_hoy'] ?? 0
-        : _selectedPeriod == 1
-            ? stats['ganancias_semana'] ?? 0
-            : stats['ganancias_mes'] ?? 0;
+  Widget _buildTotalEarningsCard(ConductorEarningsProvider provider) {
+    final earnings = provider.earnings;
+    final total = earnings?.total ?? 0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -187,14 +216,7 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
         child: Container(
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.green.withOpacity(0.3),
-                Colors.green.withOpacity(0.1),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: Colors.green.withOpacity(0.2),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: Colors.green.withOpacity(0.3),
@@ -267,7 +289,7 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                '\$${earnings.toStringAsFixed(0)}',
+                '\$${total.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 48,
@@ -277,9 +299,9 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
               ),
               const SizedBox(height: 12),
               Text(
-                _selectedPeriod == 0
+                provider.selectedPeriod == EarningsPeriod.today
                     ? 'Hoy'
-                    : _selectedPeriod == 1
+                    : provider.selectedPeriod == EarningsPeriod.week
                         ? 'Esta semana'
                         : 'Este mes',
                 style: const TextStyle(
@@ -294,37 +316,29 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
     );
   }
 
-  Widget _buildStatsGrid(ConductorProvider provider) {
-    final stats = provider.estadisticas;
+  Widget _buildStatsGrid(ConductorEarningsProvider provider) {
+    final earnings = provider.earnings;
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
             icon: Icons.route_rounded,
             label: 'Viajes',
-            value: '${stats['viajes_${_getPeriodKey()}'] ?? 0}',
+            value: '${earnings?.totalViajes ?? 0}',
             color: const Color(0xFFFFFF00),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            icon: Icons.access_time_rounded,
-            label: 'Horas',
-            value: '${stats['horas_${_getPeriodKey()}'] ?? 0}h',
+            icon: Icons.attach_money,
+            label: 'Promedio',
+            value: '\$${(earnings?.promedioPorViaje ?? 0).toStringAsFixed(0)}',
             color: Colors.blue,
           ),
         ),
       ],
     );
-  }
-
-  String _getPeriodKey() {
-    return _selectedPeriod == 0
-        ? 'hoy'
-        : _selectedPeriod == 1
-            ? 'semana'
-            : 'mes';
   }
 
   Widget _buildStatCard({
@@ -374,7 +388,15 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
     );
   }
 
-  Widget _buildEarningsBreakdown(ConductorProvider provider) {
+  Widget _buildEarningsBreakdown(ConductorEarningsProvider provider) {
+    final earnings = provider.earnings;
+    final total = earnings?.total ?? 0;
+    
+    // Calcular porcentajes aproximados
+    final viajesAmount = total * 0.85;
+    final propinasAmount = total * 0.10;
+    final bonusAmount = total * 0.05;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -389,19 +411,19 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
         const SizedBox(height: 16),
         _buildBreakdownItem(
           'Viajes completados',
-          75000,
+          viajesAmount,
           85,
         ),
         const SizedBox(height: 12),
         _buildBreakdownItem(
           'Propinas',
-          8500,
+          propinasAmount,
           10,
         ),
         const SizedBox(height: 12),
         _buildBreakdownItem(
           'Bonificaciones',
-          4500,
+          bonusAmount,
           5,
         ),
       ],
@@ -456,142 +478,6 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen>
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentTransactions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Transacciones Recientes',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Navigate to all transactions
-              },
-              child: const Text(
-                'Ver todas',
-                style: TextStyle(
-                  color: Color(0xFFFFFF00),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildTransactionItem(
-          'Viaje completado',
-          '+\$12,500',
-          'Hace 2 horas',
-          Icons.check_circle_rounded,
-          Colors.green,
-        ),
-        const SizedBox(height: 12),
-        _buildTransactionItem(
-          'Viaje completado',
-          '+\$8,300',
-          'Hace 5 horas',
-          Icons.check_circle_rounded,
-          Colors.green,
-        ),
-        const SizedBox(height: 12),
-        _buildTransactionItem(
-          'Propina recibida',
-          '+\$2,000',
-          'Hace 1 día',
-          Icons.star_rounded,
-          const Color(0xFFFFFF00),
-        ),
-        const SizedBox(height: 12),
-        _buildTransactionItem(
-          'Bonificación',
-          '+\$5,000',
-          'Hace 2 días',
-          Icons.card_giftcard_rounded,
-          Colors.purple,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTransactionItem(
-    String title,
-    String amount,
-    String time,
-    IconData icon,
-    Color color,
-  ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      time,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                amount,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

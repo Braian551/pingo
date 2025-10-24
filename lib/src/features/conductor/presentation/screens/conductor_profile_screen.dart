@@ -145,14 +145,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFFFFFF00).withOpacity(0.2),
-                const Color(0xFFFFFF00).withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: const Color(0xFFFFFF00).withOpacity(0.15),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: const Color(0xFFFFFF00).withOpacity(0.3),

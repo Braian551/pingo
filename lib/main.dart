@@ -5,6 +5,8 @@ import 'package:ping_go/src/providers/database_provider.dart';
 import 'package:ping_go/src/features/map/providers/map_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_profile_provider.dart';
+import 'package:ping_go/src/features/conductor/providers/conductor_trips_provider.dart';
+import 'package:ping_go/src/features/conductor/providers/conductor_earnings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MapProvider()),
         ChangeNotifierProvider(create: (_) => ConductorProvider()),
         ChangeNotifierProvider(create: (_) => ConductorProfileProvider()),
+        ChangeNotifierProvider(create: (_) => ConductorTripsProvider()),
+        ChangeNotifierProvider(create: (_) => ConductorEarningsProvider()),
       ],
       child: const MyApp(),
     ),

@@ -161,18 +161,35 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       context,
                       listen: false,
                     );
-                    await profileProvider.loadProfile(_conductorId!);
+                    
+                    // Load profile if not loaded
+                    if (profileProvider.profile == null) {
+                      await profileProvider.loadProfile(_conductorId!);
+                    }
                     
                     final profile = profileProvider.profile;
-                    if (profile == null || !profile.canBeAvailable) {
+                    
+                    // Check if can be available
+                    if (profile == null) {
+                      // Show error if profile couldn't be loaded
+                      ErrorNotification.show(
+                        context,
+                        message: 'No se pudo verificar tu perfil. Intenta nuevamente.',
+                      );
+                      return;
+                    }
+                    
+                    if (!profile.canBeAvailable) {
                       // Show profile incomplete alert
                       final shouldComplete = await ProfileIncompleteAlert.show(
                         context,
-                        missingItems: profile?.pendingTasks ?? [
-                          'Registrar licencia de conducción',
-                          'Registrar vehículo',
-                          'Completar documentos',
-                        ],
+                        missingItems: profile.pendingTasks.isEmpty 
+                          ? [
+                              'Registrar licencia de conducción',
+                              'Registrar vehículo',
+                              'Completar documentos',
+                            ]
+                          : profile.pendingTasks,
                         dismissible: true,
                       );
                       
@@ -190,6 +207,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     }
                   }
                   
+                  // Toggle availability
                   await provider.toggleDisponibilidad(
                     conductorId: _conductorId!,
                   );
