@@ -1,4 +1,7 @@
 /// Modelo para información del vehículo
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class VehicleModel {
   final String? marca;
   final String? modelo;
@@ -178,16 +181,16 @@ class VehicleModel {
 
 /// Tipo de vehículo
 enum VehicleType {
-  motocicleta('motocicleta', 'Motocicleta', '🏍️'),
-  carro('carro', 'Carro', '🚗'),
-  furgoneta('furgoneta', 'Furgoneta', '🚐'),
-  camion('camion', 'Camión', '🚚');
+  motocicleta('motocicleta', 'Motocicleta', FontAwesomeIcons.motorcycle),
+  carro('carro', 'Carro', FontAwesomeIcons.car),
+  furgoneta('furgoneta', 'Furgoneta', FontAwesomeIcons.vanShuttle),
+  camion('camion', 'Camión', FontAwesomeIcons.truck);
 
   final String value;
   final String label;
-  final String emoji;
+  final IconData icon;
 
-  const VehicleType(this.value, this.label, this.emoji);
+  const VehicleType(this.value, this.label, this.icon);
 
   static VehicleType fromString(String value) {
     return VehicleType.values.firstWhere(

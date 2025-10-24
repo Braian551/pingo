@@ -499,7 +499,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       isComplete: hasVehicle,
       details: hasVehicle
           ? [
-              '${vehicle.tipo.emoji} ${vehicle.tipo.label}',
+              vehicle.tipo.label,
               '${vehicle.marca} ${vehicle.modelo}',
               'Placa: ${vehicle.placa}',
               'Color: ${vehicle.color}',

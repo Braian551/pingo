@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../models/vehicle_model.dart';
 import '../../providers/conductor_profile_provider.dart';
 
@@ -458,9 +459,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            type.emoji,
-                            style: const TextStyle(fontSize: 20),
+                          Icon(
+                            type.icon,
+                            size: 20,
+                            color: isSelected ? Colors.black : Colors.white,
                           ),
                           const SizedBox(width: 8),
                           Text(

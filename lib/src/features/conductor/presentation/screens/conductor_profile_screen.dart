@@ -404,7 +404,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
           ? Column(
               children: [
                 _buildDetailRow('Placa', vehicle.placa.toUpperCase()),
-                _buildDetailRow('Tipo', '${vehicle.tipo.emoji} ${vehicle.tipo.label}'),
+                _buildDetailRow('Tipo', vehicle.tipo.label),
                 _buildDetailRow('Marca', vehicle.marca ?? 'N/A'),
                 _buildDetailRow('Modelo', vehicle.modelo ?? 'N/A'),
                 _buildDetailRow('Año', vehicle.anio?.toString() ?? 'N/A'),

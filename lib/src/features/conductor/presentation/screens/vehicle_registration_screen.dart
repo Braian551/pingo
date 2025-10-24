@@ -522,9 +522,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          type.emoji,
-                          style: const TextStyle(fontSize: 20),
+                        Icon(
+                          type.icon,
+                          size: 20,
+                          color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
                         ),
                         const SizedBox(width: 8),
                         Text(
