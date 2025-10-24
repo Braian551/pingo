@@ -119,7 +119,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         children: [
           _buildStepCircle(0, 'Licencia'),
           _buildStepLine(0),
-          _buildStepCircle(1, 'VehÃ­culo'),
+          _buildStepCircle(1, 'Vehí­culo'),
           _buildStepLine(1),
           _buildStepCircle(2, 'Documentos'),
         ],
