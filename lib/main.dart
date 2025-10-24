@@ -7,9 +7,11 @@ import 'package:ping_go/src/features/conductor/providers/conductor_provider.dart
 import 'package:ping_go/src/features/conductor/providers/conductor_profile_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_trips_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_earnings_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es_ES', null);
 
   runApp(
     MultiProvider(

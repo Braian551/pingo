@@ -38,23 +38,71 @@ class TripModel {
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
-    return TripModel(
-      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
-      tipoServicio: json['tipo_servicio']?.toString() ?? 'viaje',
-      estado: json['estado']?.toString() ?? 'completado',
-      precioEstimado: double.tryParse(json['precio_estimado']?.toString() ?? '0'),
-      precioFinal: double.tryParse(json['precio_final']?.toString() ?? '0'),
-      distanciaKm: double.tryParse(json['distancia_km']?.toString() ?? '0'),
-      duracionEstimada: int.tryParse(json['duracion_estimada']?.toString() ?? '0'),
-      fechaSolicitud: DateTime.tryParse(json['fecha_solicitud']?.toString() ?? '') ?? DateTime.now(),
-      fechaCompletado: DateTime.tryParse(json['fecha_completado']?.toString() ?? ''),
-      origen: json['origen']?.toString(),
-      destino: json['destino']?.toString(),
-      clienteNombre: json['cliente_nombre']?.toString() ?? '',
-      clienteApellido: json['cliente_apellido']?.toString() ?? '',
-      calificacion: int.tryParse(json['calificacion']?.toString() ?? '0'),
-      comentario: json['comentario']?.toString(),
-    );
+    try {
+      // Helper para parsear fechas de manera segura
+      DateTime? parseDate(dynamic value) {
+        if (value == null || value.toString().isEmpty) return null;
+        try {
+          return DateTime.parse(value.toString());
+        } catch (e) {
+          print('Error parsing date: $value - $e');
+          return null;
+        }
+      }
+
+      // Helper para parsear doubles de manera segura
+      double? parseDouble(dynamic value) {
+        if (value == null) return null;
+        if (value is double) return value;
+        if (value is int) return value.toDouble();
+        if (value is String && value.isEmpty) return null;
+        try {
+          return double.parse(value.toString());
+        } catch (e) {
+          print('Error parsing double: $value - $e');
+          return null;
+        }
+      }
+
+      // Helper para parsear ints de manera segura
+      int? parseInt(dynamic value) {
+        if (value == null) return null;
+        if (value is int) return value;
+        if (value is String && value.isEmpty) return null;
+        try {
+          return int.parse(value.toString());
+        } catch (e) {
+          print('Error parsing int: $value - $e');
+          return null;
+        }
+      }
+
+      final id = parseInt(json['id']) ?? 0;
+      final fechaSolicitud = parseDate(json['fecha_solicitud']) ?? DateTime.now();
+      
+      return TripModel(
+        id: id,
+        tipoServicio: json['tipo_servicio']?.toString() ?? 'viaje',
+        estado: json['estado']?.toString() ?? 'completado',
+        precioEstimado: parseDouble(json['precio_estimado']),
+        precioFinal: parseDouble(json['precio_final']),
+        distanciaKm: parseDouble(json['distancia_km']),
+        duracionEstimada: parseInt(json['duracion_estimada']),
+        fechaSolicitud: fechaSolicitud,
+        fechaCompletado: parseDate(json['fecha_completado']),
+        origen: json['origen']?.toString(),
+        destino: json['destino']?.toString(),
+        clienteNombre: json['cliente_nombre']?.toString() ?? '',
+        clienteApellido: json['cliente_apellido']?.toString() ?? '',
+        calificacion: parseInt(json['calificacion']),
+        comentario: json['comentario']?.toString(),
+      );
+    } catch (e, stackTrace) {
+      print('Error in TripModel.fromJson: $e');
+      print('JSON: $json');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   String get clienteNombreCompleto => '$clienteNombre $clienteApellido';
@@ -110,26 +158,71 @@ class ConductorTripsService {
           'Accept': 'application/json',
         },
       ).timeout(
-        const Duration(seconds: 15),
+        const Duration(seconds: 10),
         onTimeout: () {
-          throw Exception('Tiempo de espera agotado');
+          print('Request timeout after 10 seconds');
+          throw Exception('Tiempo de espera agotado. Por favor, intenta de nuevo.');
         },
       );
 
       print('Trips response status: ${response.statusCode}');
-      print('Trips response body: ${response.body}');
-
+      
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        print('Trips response body length: ${response.body.length}');
+        
+        final Map<String, dynamic> data;
+        try {
+          data = json.decode(response.body) as Map<String, dynamic>;
+          print('JSON decoded successfully. Success: ${data['success']}');
+        } catch (e) {
+          print('Error decoding JSON: $e');
+          print('Response body: ${response.body}');
+          return {
+            'success': false,
+            'viajes': <TripModel>[],
+            'message': 'Error al procesar la respuesta del servidor',
+          };
+        }
         
         if (data['success'] == true) {
-          final viajesList = (data['viajes'] as List?)
-              ?.map((item) => TripModel.fromJson(item))
-              .toList() ?? [];
+          print('Processing viajes list...');
+          final viajesData = data['viajes'];
+          
+          if (viajesData == null) {
+            print('Warning: viajes is null');
+            return {
+              'success': true,
+              'viajes': <TripModel>[],
+              'pagination': PaginationModel(page: 1, limit: 20, total: 0, totalPages: 0),
+              'message': data['message'] ?? 'No hay viajes disponibles',
+            };
+          }
 
-          final pagination = data['pagination'] != null
-              ? PaginationModel.fromJson(data['pagination'])
-              : PaginationModel(page: 1, limit: 20, total: 0, totalPages: 0);
+          final List<TripModel> viajesList = [];
+          try {
+            for (var item in (viajesData as List)) {
+              try {
+                final trip = TripModel.fromJson(item as Map<String, dynamic>);
+                viajesList.add(trip);
+              } catch (e) {
+                print('Error parsing trip item: $e');
+                print('Item: $item');
+              }
+            }
+            print('Parsed ${viajesList.length} trips successfully');
+          } catch (e) {
+            print('Error processing viajes list: $e');
+          }
+
+          PaginationModel pagination;
+          try {
+            pagination = data['pagination'] != null
+                ? PaginationModel.fromJson(data['pagination'] as Map<String, dynamic>)
+                : PaginationModel(page: 1, limit: 20, total: 0, totalPages: 0);
+          } catch (e) {
+            print('Error parsing pagination: $e');
+            pagination = PaginationModel(page: 1, limit: 20, total: 0, totalPages: 0);
+          }
 
           return {
             'success': true,

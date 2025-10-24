@@ -27,9 +27,10 @@ try {
 
     // Contar total de viajes
     $query_count = "SELECT COUNT(*) as total
-                    FROM solicitudes_servicio
-                    WHERE conductor_id = :conductor_id
-                    AND estado = 'completada'";
+                    FROM solicitudes_servicio s
+                    INNER JOIN asignaciones_conductor ac ON s.id = ac.solicitud_id
+                    WHERE ac.conductor_id = :conductor_id
+                    AND s.estado IN ('completada', 'entregado')";
     
     $stmt_count = $db->prepare($query_count);
     $stmt_count->bindParam(':conductor_id', $conductor_id, PDO::PARAM_INT);
@@ -41,47 +42,68 @@ try {
                 s.id,
                 s.tipo_servicio,
                 s.estado,
-                s.precio_estimado,
-                s.precio_final,
-                s.distancia_km,
-                s.duracion_estimada,
-                s.fecha_solicitud,
-                s.fecha_completado,
-                uo.direccion as origen,
-                ud.direccion as destino,
+                s.distancia_estimada as distancia_km,
+                s.tiempo_estimado as duracion_estimada,
+                s.solicitado_en as fecha_solicitud,
+                s.completado_en as fecha_completado,
+                s.direccion_recogida as origen,
+                s.direccion_destino as destino,
                 u.nombre as cliente_nombre,
                 u.apellido as cliente_apellido,
                 c.calificacion,
-                c.comentario
+                c.comentarios as comentario,
+                0 as precio_estimado,
+                0 as precio_final
               FROM solicitudes_servicio s
-              INNER JOIN usuarios u ON s.usuario_id = u.id
-              LEFT JOIN ubicaciones_usuario uo ON s.ubicacion_origen_id = uo.id
-              LEFT JOIN ubicaciones_usuario ud ON s.ubicacion_destino_id = ud.id
-              LEFT JOIN calificaciones c ON s.id = c.solicitud_id
-              WHERE s.conductor_id = :conductor_id
-              AND s.estado = 'completada'
-              ORDER BY s.fecha_completado DESC
+              INNER JOIN asignaciones_conductor ac ON s.id = ac.solicitud_id
+              INNER JOIN usuarios u ON s.cliente_id = u.id
+              LEFT JOIN calificaciones c ON s.id = c.solicitud_id AND c.usuario_calificado_id = :conductor_id2
+              WHERE ac.conductor_id = :conductor_id
+              AND s.estado IN ('completada', 'entregado')
+              ORDER BY s.completado_en DESC
               LIMIT :limit OFFSET :offset";
     
     $stmt = $db->prepare($query);
     $stmt->bindParam(':conductor_id', $conductor_id, PDO::PARAM_INT);
+    $stmt->bindParam(':conductor_id2', $conductor_id, PDO::PARAM_INT);
     $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
 
     $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Asegurar que los valores numéricos sean del tipo correcto
+    $viajes = array_map(function($viaje) {
+        return [
+            'id' => (int)$viaje['id'],
+            'tipo_servicio' => $viaje['tipo_servicio'],
+            'estado' => $viaje['estado'],
+            'distancia_km' => $viaje['distancia_km'] ? (float)$viaje['distancia_km'] : null,
+            'duracion_estimada' => $viaje['duracion_estimada'] ? (int)$viaje['duracion_estimada'] : null,
+            'fecha_solicitud' => $viaje['fecha_solicitud'],
+            'fecha_completado' => $viaje['fecha_completado'],
+            'origen' => $viaje['origen'],
+            'destino' => $viaje['destino'],
+            'cliente_nombre' => $viaje['cliente_nombre'],
+            'cliente_apellido' => $viaje['cliente_apellido'],
+            'calificacion' => $viaje['calificacion'] ? (int)$viaje['calificacion'] : null,
+            'comentario' => $viaje['comentario'],
+            'precio_estimado' => (float)$viaje['precio_estimado'],
+            'precio_final' => (float)$viaje['precio_final']
+        ];
+    }, $viajes);
 
     echo json_encode([
         'success' => true,
         'viajes' => $viajes,
         'pagination' => [
-            'page' => $page,
-            'limit' => $limit,
-            'total' => intval($total),
-            'total_pages' => ceil($total / $limit)
+            'page' => (int)$page,
+            'limit' => (int)$limit,
+            'total' => (int)$total,
+            'total_pages' => (int)ceil($total / $limit)
         ],
         'message' => 'Historial obtenido exitosamente'
-    ]);
+    ], JSON_NUMERIC_CHECK);
 
 } catch (Exception $e) {
     http_response_code(500);

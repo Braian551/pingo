@@ -19,18 +19,49 @@ class ConductorTripsScreen extends StatefulWidget {
 
 class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
   late ConductorTripsProvider _provider;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    print('ConductorTripsScreen: initState called');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      print('ConductorTripsScreen: didChangeDependencies - initializing');
+      _isInitialized = true;
       _provider = Provider.of<ConductorTripsProvider>(context, listen: false);
-      _loadTrips();
-    });
+      // Usar Future.microtask para evitar problemas de sincronización
+      Future.microtask(() => _loadTrips());
+    }
   }
 
   Future<void> _loadTrips() async {
-    await _provider.loadTrips(widget.conductorId);
+    print('ConductorTripsScreen: _loadTrips called for conductor ${widget.conductorId}');
+    try {
+      await _provider.loadTrips(widget.conductorId);
+      print('ConductorTripsScreen: loadTrips completed');
+    } catch (e, stackTrace) {
+      print('ConductorTripsScreen: Error loading trips: $e');
+      print('Stack trace: $stackTrace');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar viajes: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    print('ConductorTripsScreen: dispose called');
+    super.dispose();
   }
 
   @override

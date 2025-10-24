@@ -189,6 +189,8 @@ CREATE TABLE `detalles_conductor` (
   `usuario_id` bigint unsigned NOT NULL,
   `licencia_conduccion` varchar(50) NOT NULL,
   `licencia_vencimiento` date NOT NULL,
+  `licencia_expedicion` date DEFAULT NULL,
+  `licencia_categoria` varchar(10) DEFAULT 'C1',
   `vehiculo_tipo` enum('motocicleta','carro','furgoneta','camion') NOT NULL,
   `vehiculo_marca` varchar(50) DEFAULT NULL,
   `vehiculo_modelo` varchar(50) DEFAULT NULL,
@@ -198,6 +200,11 @@ CREATE TABLE `detalles_conductor` (
   `aseguradora` varchar(100) DEFAULT NULL,
   `numero_poliza_seguro` varchar(100) DEFAULT NULL,
   `vencimiento_seguro` date DEFAULT NULL,
+  `soat_numero` varchar(50) DEFAULT NULL,
+  `soat_vencimiento` date DEFAULT NULL,
+  `tecnomecanica_numero` varchar(50) DEFAULT NULL,
+  `tecnomecanica_vencimiento` date DEFAULT NULL,
+  `tarjeta_propiedad_numero` varchar(50) DEFAULT NULL,
   `aprobado` tinyint(1) DEFAULT '0',
   `estado_aprobacion` enum('pendiente','aprobado','rechazado') DEFAULT 'pendiente',
   `calificacion_promedio` decimal(3,2) DEFAULT '0.00',
@@ -219,6 +226,9 @@ CREATE TABLE `detalles_conductor` (
   KEY `idx_licencia` (`licencia_conduccion`),
   KEY `idx_placa` (`vehiculo_placa`),
   KEY `idx_estado_verificacion` (`estado_verificacion`),
+  KEY `idx_licencia_vencimiento` (`licencia_vencimiento`),
+  KEY `idx_soat_vencimiento` (`soat_vencimiento`),
+  KEY `idx_tecnomecanica_vencimiento` (`tecnomecanica_vencimiento`),
   CONSTRAINT `detalles_conductor_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -229,7 +239,7 @@ CREATE TABLE `detalles_conductor` (
 
 LOCK TABLES `detalles_conductor` WRITE;
 /*!40000 ALTER TABLE `detalles_conductor` DISABLE KEYS */;
-INSERT INTO `detalles_conductor` VALUES (1,7,'TEMP123456','2026-12-31','motocicleta','Honda','CB300R',2023,'Rojo','ABC123',NULL,NULL,NULL,0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-24 13:09:05',0,NULL,NULL,NULL,0,'pendiente',NULL,'2025-10-24 11:53:16');
+INSERT INTO `detalles_conductor` VALUES (1,7,'4343434','2036-10-24','2025-10-09','A1','motocicleta','toyota','corolla',2024,'rojo','232323',NULL,NULL,NULL,'344243434','2025-10-24','23232323','2027-10-24','334332323',0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-24 20:02:23',0,NULL,NULL,NULL,0,'pendiente',NULL,'2025-10-24 11:53:16');
 /*!40000 ALTER TABLE `detalles_conductor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -801,4 +811,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-24  8:24:44
+-- Dump completed on 2025-10-24 16:21:02

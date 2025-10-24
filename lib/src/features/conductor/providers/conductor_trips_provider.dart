@@ -17,33 +17,45 @@ class ConductorTripsProvider with ChangeNotifier {
 
   /// Cargar historial de viajes
   Future<void> loadTrips(int conductorId, {int page = 1}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
     try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      print('ConductorTripsProvider: Loading trips for conductor $conductorId, page $page');
+
       final response = await ConductorTripsService.getTripsHistory(
         conductorId: conductorId,
         page: page,
       );
 
+      print('ConductorTripsProvider: Response received - success: ${response['success']}');
+
       if (response['success'] == true) {
-        _trips = response['viajes'] ?? [];
+        final viajes = response['viajes'];
+        print('ConductorTripsProvider: Processing ${viajes?.length ?? 0} trips');
+        
+        _trips = List<TripModel>.from(viajes ?? []);
         _pagination = response['pagination'];
         _applyFilter();
         _errorMessage = null;
+        
+        print('ConductorTripsProvider: Trips loaded successfully. Total: ${_trips.length}, Filtered: ${_filteredTrips.length}');
       } else {
         _errorMessage = response['message'] ?? 'Error al cargar viajes';
         _trips = [];
         _filteredTrips = [];
+        print('ConductorTripsProvider: Error loading trips - $_errorMessage');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Error de conexión: $e';
       _trips = [];
       _filteredTrips = [];
-      print('Error en loadTrips: $e');
+      print('ConductorTripsProvider: Exception in loadTrips: $e');
+      print('Stack trace: $stackTrace');
     } finally {
       _isLoading = false;
+      print('ConductorTripsProvider: Loading finished, notifying listeners');
       notifyListeners();
     }
   }
