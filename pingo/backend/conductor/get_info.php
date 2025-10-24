@@ -102,7 +102,7 @@ try {
     $query_ubicacion = "SELECT 
                          direccion,
                          ciudad,
-                         estado,
+                         departamento,
                          pais,
                          latitud,
                          longitud

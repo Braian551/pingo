@@ -61,17 +61,8 @@ try {
         
         $stmt->execute();
     } else {
-        // Crear nuevo registro
-        $query = "INSERT INTO detalles_conductor 
-                  (usuario_id, disponible, latitud_actual, longitud_actual, fecha_creacion)
-                  VALUES (:conductor_id, :disponible, :latitud, :longitud, NOW())";
-        
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':conductor_id', $conductor_id, PDO::PARAM_INT);
-        $stmt->bindParam(':disponible', $disponible, PDO::PARAM_INT);
-        $stmt->bindParam(':latitud', $latitud);
-        $stmt->bindParam(':longitud', $longitud);
-        $stmt->execute();
+        // No existe registro en detalles_conductor - el conductor debe completar su perfil primero
+        throw new Exception('El conductor debe completar su perfil antes de poder cambiar su disponibilidad. Registre su licencia, vehículo y documentos requeridos.');
     }
 
     echo json_encode([

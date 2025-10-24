@@ -2,8 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/conductor_provider.dart';
+import '../../providers/conductor_profile_provider.dart';
 import '../widgets/conductor_stats_card.dart';
 import '../widgets/viaje_activo_card.dart';
+import '../widgets/conductor_alerts.dart';
+import 'conductor_profile_screen.dart';
+import 'conductor_earnings_screen.dart';
+import 'conductor_trips_screen.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -148,19 +153,53 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 inactiveThumbColor: Colors.grey,
                 inactiveTrackColor: Colors.grey.withOpacity(0.3),
                 onChanged: (value) async {
-                  if (_conductorId != null) {
-                    await provider.toggleDisponibilidad(
-                      conductorId: _conductorId!,
+                  if (_conductorId == null) return;
+
+                  // Check if profile is complete before allowing availability
+                  if (value) {
+                    final profileProvider = Provider.of<ConductorProfileProvider>(
+                      context,
+                      listen: false,
                     );
+                    await profileProvider.loadProfile(_conductorId!);
                     
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          value ? 'Ahora estás disponible' : 'Ahora estás no disponible',
-                        ),
-                        backgroundColor: value ? Colors.green : Colors.orange,
-                        duration: const Duration(seconds: 2),
-                      ),
+                    final profile = profileProvider.profile;
+                    if (profile == null || !profile.canBeAvailable) {
+                      // Show profile incomplete alert
+                      final shouldComplete = await ProfileIncompleteAlert.show(
+                        context,
+                        missingItems: profile?.pendingTasks ?? [
+                          'Registrar licencia de conducción',
+                          'Registrar vehículo',
+                          'Completar documentos',
+                        ],
+                        dismissible: true,
+                      );
+                      
+                      if (shouldComplete == true && mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ConductorProfileScreen(
+                              conductorId: _conductorId!,
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                  }
+                  
+                  await provider.toggleDisponibilidad(
+                    conductorId: _conductorId!,
+                  );
+                  
+                  if (mounted) {
+                    SuccessNotification.show(
+                      context,
+                      message: value
+                          ? '¡Ahora estás disponible para recibir viajes!'
+                          : 'Has dejado de estar disponible',
                     );
                   }
                 },
@@ -185,11 +224,11 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case 0:
         return _buildHomeTab();
       case 1:
-        return _buildTripsTab();
+        return ConductorTripsScreen(conductorId: _conductorId ?? 0);
       case 2:
-        return _buildEarningsTab();
+        return ConductorEarningsScreen(conductorId: _conductorId ?? 0);
       case 3:
-        return _buildProfileTab();
+        return ConductorProfileScreen(conductorId: _conductorId ?? 0);
       default:
         return _buildHomeTab();
     }
@@ -470,33 +509,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildTripsTab() {
-    return const Center(
-      child: Text(
-        'Historial de viajes',
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
-    );
-  }
-
-  Widget _buildEarningsTab() {
-    return const Center(
-      child: Text(
-        'Ganancias',
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
-    );
-  }
-
-  Widget _buildProfileTab() {
-    return const Center(
-      child: Text(
-        'Perfil',
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
     );
   }
 

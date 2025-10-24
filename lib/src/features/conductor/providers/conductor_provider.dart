@@ -120,6 +120,13 @@ class ConductorProvider with ChangeNotifier {
       return false;
     } catch (e) {
       print('Error cambiando disponibilidad: $e');
+      // Si el error indica que el perfil no está completo, mantener el estado anterior
+      if (e.toString().contains('completar su perfil') || e.toString().contains('perfil')) {
+        _errorMessage = 'Debes completar tu perfil de conductor antes de poder activar la disponibilidad. Incluye tu licencia, vehículo y documentos requeridos.';
+      } else {
+        _errorMessage = 'Error al cambiar disponibilidad: $e';
+      }
+      notifyListeners();
       return false;
     }
   }

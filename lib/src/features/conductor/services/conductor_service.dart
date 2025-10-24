@@ -120,12 +120,18 @@ class ConductorService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return data['success'] == true;
+        if (data['success'] == true) {
+          return true;
+        } else {
+          // Lanzar excepción con el mensaje del servidor
+          throw Exception(data['message'] ?? 'Error desconocido del servidor');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
       }
-      return false;
     } catch (e) {
       print('Error actualizando disponibilidad: $e');
-      return false;
+      rethrow; // Re-lanzar la excepción para que el provider la maneje
     }
   }
 
