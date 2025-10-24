@@ -588,12 +588,18 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
               border: InputBorder.none,
               prefixIcon: Icon(Icons.category_rounded, color: Color(0xFFFFFF00)),
             ),
+            isExpanded: true,
             items: LicenseCategory.values
                 .where((cat) => cat != LicenseCategory.ninguna)
                 .map((category) {
               return DropdownMenuItem(
                 value: category,
-                child: Text('${category.label} - ${category.description}'),
+                child: Text(
+                  '${category.label} - ${category.description}',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(fontSize: 14),
+                ),
               );
             }).toList(),
             onChanged: (value) {
