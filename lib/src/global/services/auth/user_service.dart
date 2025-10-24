@@ -274,9 +274,11 @@ class UserService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+        print('UserService.login: response data = $data');
         // If login success and backend returned user, save session locally
         try {
           if (data['success'] == true && data['data']?['user'] != null) {
+            print('UserService.login: user data = ${data['data']['user']}');
             await saveSession(Map<String, dynamic>.from(data['data']['user']));
           }
         } catch (_) {

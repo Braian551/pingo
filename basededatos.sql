@@ -164,7 +164,7 @@ CREATE TABLE `configuraciones_app` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_clave` (`clave`),
   KEY `idx_categoria` (`categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraciones globales de la aplicacion';
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraciones globales de la aplicacion';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -173,7 +173,7 @@ CREATE TABLE `configuraciones_app` (
 
 LOCK TABLES `configuraciones_app` WRITE;
 /*!40000 ALTER TABLE `configuraciones_app` DISABLE KEYS */;
-INSERT INTO `configuraciones_app` VALUES (1,'app_nombre','PinGo','string','sistema','Nombre de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(2,'app_version','1.0.0','string','sistema','Version actual de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(3,'mantenimiento_activo','false','boolean','sistema','Indica si la app esta en mantenimiento',1,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(4,'precio_base_km','2500','number','precios','Precio base por kilometro en COP',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(5,'precio_minimo_viaje','5000','number','precios','Precio minimo de un viaje en COP',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(6,'comision_plataforma','15','number','precios','Porcentaje de comision de la plataforma',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(7,'radio_busqueda_conductores','5000','number','sistema','Radio en metros para buscar conductores',0,'2025-10-22 14:35:57','2025-10-23 13:54:19'),(8,'tiempo_expiracion_solicitud','300','number','sistema','Tiempo en segundos antes de expirar solicitud',0,'2025-10-22 14:35:57','2025-10-23 13:54:19');
+INSERT INTO `configuraciones_app` VALUES (1,'app_nombre','PinGo','string','sistema','Nombre de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(2,'app_version','1.0.0','string','sistema','Version actual de la aplicacion',1,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(3,'mantenimiento_activo','false','boolean','sistema','Indica si la app esta en mantenimiento',1,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(4,'precio_base_km','2500','number','precios','Precio base por kilometro en COP',0,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(5,'precio_minimo_viaje','5000','number','precios','Precio minimo de un viaje en COP',0,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(6,'comision_plataforma','15','number','precios','Porcentaje de comision de la plataforma',0,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(7,'radio_busqueda_conductores','5000','number','sistema','Radio en metros para buscar conductores',0,'2025-10-22 14:35:57','2025-10-23 14:06:24'),(8,'tiempo_expiracion_solicitud','300','number','sistema','Tiempo en segundos antes de expirar solicitud',0,'2025-10-22 14:35:57','2025-10-23 14:06:24');
 /*!40000 ALTER TABLE `configuraciones_app` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -800,4 +800,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-23  9:00:59
+-- Dump completed on 2025-10-24  5:12:29

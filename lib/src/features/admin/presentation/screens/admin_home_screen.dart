@@ -9,7 +9,7 @@ import 'package:shimmer/shimmer.dart';
 class AdminHomeScreen extends StatefulWidget {
   final Map<String, dynamic> adminUser;
 
-  const AdminHomeScreen({
+  AdminHomeScreen({
     super.key,
     required this.adminUser,
   });
@@ -143,13 +143,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final adminName = widget.adminUser['nombre'] ?? 'Admin';
+    // Usar datos del admin del widget o del dashboard como fallback
+    final adminData = _dashboardData?['admin'] ?? widget.adminUser;
+    final adminName = (adminData['nombre'] ?? widget.adminUser['nombre'] ?? 'Braian').toString();
 
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(adminName),
-      body: _isLoading ? _buildShimmerLoading() : _buildContent(),
+      body: _isLoading ? _buildShimmerLoading() : _buildContent(adminName),
     );
   }
 
@@ -303,7 +305,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(String adminName) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SlideTransition(
@@ -320,7 +322,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  _buildWelcomeSection(),
+                  _buildWelcomeSection(adminName),
                   const SizedBox(height: 30),
                   _buildStatsGrid(),
                   const SizedBox(height: 30),
@@ -337,7 +339,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildWelcomeSection() {
+  Widget _buildWelcomeSection(String adminName) {
+    // Determine greeting based on time of day
     final hour = DateTime.now().hour;
     String greeting = 'Buenos días';
     IconData greetingIcon = Icons.wb_sunny_rounded;
@@ -397,7 +400,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      widget.adminUser['nombre'] ?? 'Administrador',
+                      adminName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,

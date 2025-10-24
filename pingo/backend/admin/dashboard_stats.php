@@ -48,7 +48,7 @@ try {
         sendJsonResponse(false, 'Acceso denegado. Solo administradores pueden acceder.');
     }
     
-    error_log("Dashboard Stats - Admin verificado: " . $adminData['nombre']);
+    error_log("Dashboard Stats - Admin verificado: " . json_encode($adminData));
 
     // === ESTADÍSTICAS GENERALES ===
     
@@ -140,6 +140,7 @@ try {
 
     // Consolidar respuesta
     $dashboardData = [
+        'admin' => $adminData,  // Agregar datos del admin
         'usuarios' => $userStats,
         'solicitudes' => $solicitudStats,
         'ingresos' => $ingresosStats,

@@ -27,18 +27,30 @@ try {
         $input = getJsonInput();
     }
 
+    // Log para debug
+    error_log("user_management.php - Método: $method");
+    error_log("user_management.php - Input: " . json_encode($input));
+
     // Verificar autenticación de administrador
     if (empty($input['admin_id'])) {
+        error_log("user_management.php - Error: admin_id vacío");
         sendJsonResponse(false, 'ID de administrador requerido');
+        exit();
     }
 
     $checkAdmin = "SELECT tipo_usuario FROM usuarios WHERE id = ? AND tipo_usuario = 'administrador'";
     $stmtCheck = $db->prepare($checkAdmin);
     $stmtCheck->execute([$input['admin_id']]);
     
-    if (!$stmtCheck->fetch()) {
-        sendJsonResponse(false, 'Acceso denegado');
+    $adminUser = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$adminUser) {
+        error_log("user_management.php - Error: Usuario no es administrador");
+        sendJsonResponse(false, 'Acceso denegado. Usuario no es administrador.');
+        exit();
     }
+
+    error_log("user_management.php - Admin verificado, ejecutando método: $method");
 
     switch ($method) {
         case 'GET':
@@ -59,79 +71,103 @@ try {
         
         default:
             sendJsonResponse(false, 'Método no permitido');
+            exit();
     }
 
 } catch (Exception $e) {
     error_log("Error en user_management: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
-    sendJsonResponse(false, 'Error: ' . $e->getMessage());
+    sendJsonResponse(false, 'Error del servidor: ' . $e->getMessage());
+    exit();
 }
 
 function handleGetUsers($db, $input) {
-    $page = isset($input['page']) ? (int)$input['page'] : 1;
-    $perPage = isset($input['per_page']) ? (int)$input['per_page'] : 20;
-    $offset = ($page - 1) * $perPage;
-    
-    $search = isset($input['search']) ? '%' . $input['search'] . '%' : null;
-    $tipoUsuario = isset($input['tipo_usuario']) ? $input['tipo_usuario'] : null;
-    $esActivo = isset($input['es_activo']) ? (int)$input['es_activo'] : null;
+    try {
+        error_log("handleGetUsers - Iniciando...");
+        
+        $page = isset($input['page']) ? (int)$input['page'] : 1;
+        $perPage = isset($input['per_page']) ? (int)$input['per_page'] : 20;
+        $offset = ($page - 1) * $perPage;
+        
+        $search = isset($input['search']) ? '%' . $input['search'] . '%' : null;
+        $tipoUsuario = isset($input['tipo_usuario']) ? $input['tipo_usuario'] : null;
+        $esActivo = isset($input['es_activo']) ? (int)$input['es_activo'] : null;
 
-    // Construir query con filtros
-    $whereConditions = [];
-    $params = [];
+        error_log("handleGetUsers - Filtros: search=$search, tipo=$tipoUsuario, activo=$esActivo");
 
-    if ($search) {
-        $whereConditions[] = "(nombre LIKE ? OR apellido LIKE ? OR email LIKE ? OR telefono LIKE ?)";
-        $params[] = $search;
-        $params[] = $search;
-        $params[] = $search;
-        $params[] = $search;
+        // Construir query con filtros
+        $whereConditions = [];
+        $params = [];
+
+        if ($search) {
+            $whereConditions[] = "(nombre LIKE ? OR apellido LIKE ? OR email LIKE ? OR telefono LIKE ?)";
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+        }
+
+        if ($tipoUsuario) {
+            $whereConditions[] = "tipo_usuario = ?";
+            $params[] = $tipoUsuario;
+        }
+
+        if ($esActivo !== null) {
+            $whereConditions[] = "es_activo = ?";
+            $params[] = $esActivo;
+        }
+
+        $whereClause = empty($whereConditions) ? '' : 'WHERE ' . implode(' AND ', $whereConditions);
+
+        // Contar total
+        $countQuery = "SELECT COUNT(*) as total FROM usuarios $whereClause";
+        error_log("handleGetUsers - Query count: $countQuery");
+        error_log("handleGetUsers - Params count: " . json_encode($params));
+        
+        $stmtCount = $db->prepare($countQuery);
+        $stmtCount->execute($params);
+        $total = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
+        
+        error_log("handleGetUsers - Total usuarios: $total");
+
+        // Obtener usuarios
+        $query = "SELECT 
+            id, uuid, nombre, apellido, email, telefono, 
+            tipo_usuario, foto_perfil, es_verificado, es_activo, 
+            fecha_registro, fecha_actualizacion
+        FROM usuarios 
+        $whereClause
+        ORDER BY fecha_registro DESC
+        LIMIT ? OFFSET ?";
+        
+        $params[] = $perPage;
+        $params[] = $offset;
+        
+        error_log("handleGetUsers - Query: $query");
+        error_log("handleGetUsers - Params: " . json_encode($params));
+        
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("handleGetUsers - Usuarios obtenidos: " . count($usuarios));
+
+        sendJsonResponse(true, 'Usuarios obtenidos exitosamente', [
+            'usuarios' => $usuarios,
+            'pagination' => [
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_pages' => ceil($total / $perPage)
+            ]
+        ]);
+        
+    } catch (Exception $e) {
+        error_log("handleGetUsers - Error: " . $e->getMessage());
+        error_log("handleGetUsers - Stack: " . $e->getTraceAsString());
+        sendJsonResponse(false, 'Error al obtener usuarios: ' . $e->getMessage());
     }
-
-    if ($tipoUsuario) {
-        $whereConditions[] = "tipo_usuario = ?";
-        $params[] = $tipoUsuario;
-    }
-
-    if ($esActivo !== null) {
-        $whereConditions[] = "es_activo = ?";
-        $params[] = $esActivo;
-    }
-
-    $whereClause = empty($whereConditions) ? '' : 'WHERE ' . implode(' AND ', $whereConditions);
-
-    // Contar total
-    $countQuery = "SELECT COUNT(*) as total FROM usuarios $whereClause";
-    $stmtCount = $db->prepare($countQuery);
-    $stmtCount->execute($params);
-    $total = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
-
-    // Obtener usuarios
-    $query = "SELECT 
-        id, uuid, nombre, apellido, email, telefono, 
-        tipo_usuario, foto_perfil, es_verificado, es_activo, 
-        fecha_registro, fecha_actualizacion
-    FROM usuarios 
-    $whereClause
-    ORDER BY fecha_registro DESC
-    LIMIT ? OFFSET ?";
-    
-    $params[] = $perPage;
-    $params[] = $offset;
-    
-    $stmt = $db->prepare($query);
-    $stmt->execute($params);
-    $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    sendJsonResponse(true, 'Usuarios obtenidos', [
-        'usuarios' => $usuarios,
-        'pagination' => [
-            'total' => $total,
-            'page' => $page,
-            'per_page' => $perPage,
-            'total_pages' => ceil($total / $perPage)
-        ]
-    ]);
 }
 
 function handleUpdateUser($db, $input) {
