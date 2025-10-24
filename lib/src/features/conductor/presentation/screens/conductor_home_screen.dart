@@ -9,7 +9,7 @@ import '../widgets/conductor_alerts.dart';
 import 'conductor_profile_screen.dart';
 import 'conductor_earnings_screen.dart';
 import 'conductor_trips_screen.dart';
-import 'edit_profile_screen.dart';
+import 'vehicle_registration_screen.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -98,7 +98,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditProfileScreen(
+                    builder: (context) => VehicleRegistrationScreen(
                       conductorId: _conductorId!,
                     ),
                   ),
@@ -242,7 +242,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditProfileScreen(
+                            builder: (context) => VehicleRegistrationScreen(
                               conductorId: _conductorId!,
                             ),
                           ),

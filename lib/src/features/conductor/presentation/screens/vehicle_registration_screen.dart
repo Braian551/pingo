@@ -102,7 +102,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         onPressed: () => Navigator.pop(context),
       ),
       title: const Text(
-        'Registrar VehÃ­culo',
+        'Registrar Vehículo',
         style: TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -134,28 +134,32 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     return Expanded(
       child: Column(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               color: isCompleted
-                  ? Colors.green
+                  ? const Color(0xFFFFFF00)
                   : isActive
-                      ? const Color(0xFFFFFF00)
-                      : Colors.white.withOpacity(0.2),
+                      ? const Color(0xFFFFFF00).withOpacity(0.2)
+                      : Colors.white.withOpacity(0.1),
               shape: BoxShape.circle,
               border: Border.all(
-                color: isActive ? const Color(0xFFFFFF00) : Colors.transparent,
+                color: isActive || isCompleted 
+                    ? const Color(0xFFFFFF00) 
+                    : Colors.white.withOpacity(0.2),
                 width: 2,
               ),
             ),
             child: Center(
               child: isCompleted
-                  ? const Icon(Icons.check, color: Colors.white, size: 20)
+                  ? const Icon(Icons.check, color: Colors.black, size: 20)
                   : Text(
                       '${step + 1}',
                       style: TextStyle(
-                        color: isActive ? Colors.black : Colors.white,
+                        color: isActive ? const Color(0xFFFFFF00) : Colors.white54,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -178,12 +182,14 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Widget _buildStepLine(int step) {
     return Expanded(
       flex: 1,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
         height: 2,
         margin: const EdgeInsets.only(bottom: 30),
         color: step < _currentStep
-            ? Colors.green
-            : Colors.white.withOpacity(0.2),
+            ? const Color(0xFFFFFF00)
+            : Colors.white.withOpacity(0.1),
       ),
     );
   }
@@ -207,18 +213,18 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       children: [
         const SizedBox(height: 20),
         _buildSectionHeader(
-          'Licencia de ConducciÃ³n',
+          'Licencia de Conducción',
           Icons.badge_rounded,
         ),
         const SizedBox(height: 24),
         _buildTextField(
           controller: _licenseNumberController,
-          label: 'NÃºmero de Licencia',
+          label: 'Número de Licencia',
           hint: 'Ej: 12345678',
           icon: Icons.numbers_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el nÃºmero de licencia';
+              return 'Por favor ingresa el número de licencia';
             }
             return null;
           },
@@ -227,7 +233,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         _buildCategorySelector(),
         const SizedBox(height: 16),
         _buildDateField(
-          label: 'Fecha de ExpediciÃ³n',
+          label: 'Fecha de Expedición',
           selectedDate: _licenseExpedicion,
           onTap: () => _selectDate(context, isExpedicion: true),
         ),
@@ -247,7 +253,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       children: [
         const SizedBox(height: 20),
         _buildSectionHeader(
-          'InformaciÃ³n del VehÃ­culo',
+          'Información del Vehículo',
           Icons.directions_car_rounded,
         ),
         const SizedBox(height: 24),
@@ -306,7 +312,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
             Expanded(
               child: _buildTextField(
                 controller: _anioController,
-                label: 'AÃ±o',
+                label: 'Año',
                 hint: '2020',
                 icon: Icons.calendar_today_rounded,
                 keyboardType: TextInputType.number,
@@ -316,7 +322,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                   }
                   final year = int.tryParse(value);
                   if (year == null || year < 1900 || year > DateTime.now().year + 1) {
-                    return 'AÃ±o invÃ¡lido';
+                    return 'Año inválido';
                   }
                   return null;
                 },
@@ -349,18 +355,18 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       children: [
         const SizedBox(height: 20),
         _buildSectionHeader(
-          'Documentos del VehÃ­culo',
+          'Documentos del Vehículo',
           Icons.description_rounded,
         ),
         const SizedBox(height: 24),
         _buildTextField(
           controller: _soatNumberController,
-          label: 'NÃºmero SOAT',
-          hint: 'NÃºmero de pÃ³liza SOAT',
+          label: 'Número SOAT',
+          hint: 'Número de póliza SOAT',
           icon: Icons.shield_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el nÃºmero SOAT';
+              return 'Por favor ingresa el número SOAT';
             }
             return null;
           },
@@ -374,19 +380,19 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         const SizedBox(height: 20),
         _buildTextField(
           controller: _tecnomecanicaNumberController,
-          label: 'NÃºmero TecnomecÃ¡nica',
-          hint: 'NÃºmero de certificado',
+          label: 'Número Tecnomecánica',
+          hint: 'Número de certificado',
           icon: Icons.build_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el nÃºmero de tecnomecÃ¡nica';
+              return 'Por favor ingresa el número de tecnomecánica';
             }
             return null;
           },
         ),
         const SizedBox(height: 16),
         _buildDateField(
-          label: 'Vencimiento TecnomecÃ¡nica',
+          label: 'Vencimiento Tecnomecánica',
           selectedDate: _tecnomecanicaVencimiento,
           onTap: () => _selectTecnomecanicaDate(context),
         ),
@@ -394,11 +400,11 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         _buildTextField(
           controller: _tarjetaPropiedadController,
           label: 'Tarjeta de Propiedad',
-          hint: 'NÃºmero de tarjeta',
+          hint: 'Número de tarjeta',
           icon: Icons.credit_card_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el nÃºmero de tarjeta de propiedad';
+              return 'Por favor ingresa el número de tarjeta de propiedad';
             }
             return null;
           },
@@ -442,30 +448,35 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.6),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1.5,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
           ),
-        ),
-        child: TextFormField(
-          controller: controller,
-          style: const TextStyle(color: Colors.white),
-          keyboardType: keyboardType,
-          textCapitalization: textCapitalization,
-          decoration: InputDecoration(
-            labelText: label,
-            hintText: hint,
-            labelStyle: const TextStyle(color: Colors.white70),
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-            prefixIcon: Icon(icon, color: const Color(0xFFFFFF00)),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.all(20),
+          child: TextFormField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white),
+            keyboardType: keyboardType,
+            textCapitalization: textCapitalization,
+            decoration: InputDecoration(
+              labelText: label,
+              hintText: hint,
+              labelStyle: const TextStyle(color: Colors.white70),
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+              prefixIcon: Icon(icon, color: const Color(0xFFFFFF00)),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(20),
+              errorStyle: const TextStyle(color: Colors.redAccent),
+            ),
+            validator: validator,
           ),
-          validator: validator,
         ),
       ),
     );
@@ -474,74 +485,79 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Widget _buildVehicleTypeSelector() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.6),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1.5,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Tipo de VehÃ­culo',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: VehicleType.values.map((type) {
-                final isSelected = _selectedType == type;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedType = type),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFFFFF00).withOpacity(0.2)
-                          : Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tipo de Vehículo',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: VehicleType.values.map((type) {
+                  final isSelected = _selectedType == type;
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedType = type),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFFFF00)
-                            : Colors.white.withOpacity(0.1),
-                        width: 2,
+                            ? const Color(0xFFFFFF00).withOpacity(0.2)
+                            : Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFFFFF00)
+                              : Colors.white.withOpacity(0.1),
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            type.icon,
+                            size: 20,
+                            color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            type.label,
+                            style: TextStyle(
+                              color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          type.icon,
-                          size: 20,
-                          color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          type.label,
-                          style: TextStyle(
-                            color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -550,39 +566,42 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Widget _buildCategorySelector() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.6),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1.5,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
           ),
-        ),
-        child: DropdownButtonFormField<LicenseCategory>(
-          value: _selectedCategory,
-          dropdownColor: const Color(0xFF1A1A1A),
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'CategorÃ­a de Licencia',
-            labelStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
-            prefixIcon: Icon(Icons.category_rounded, color: Color(0xFFFFFF00)),
+          child: DropdownButtonFormField<LicenseCategory>(
+            value: _selectedCategory,
+            dropdownColor: const Color(0xFF1A1A1A),
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              labelText: 'Categoría de Licencia',
+              labelStyle: TextStyle(color: Colors.white70),
+              border: InputBorder.none,
+              prefixIcon: Icon(Icons.category_rounded, color: Color(0xFFFFFF00)),
+            ),
+            items: LicenseCategory.values
+                .where((cat) => cat != LicenseCategory.ninguna)
+                .map((category) {
+              return DropdownMenuItem(
+                value: category,
+                child: Text('${category.label} - ${category.description}'),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => _selectedCategory = value);
+              }
+            },
           ),
-          items: LicenseCategory.values
-              .where((cat) => cat != LicenseCategory.ninguna)
-              .map((category) {
-            return DropdownMenuItem(
-              value: category,
-              child: Text('${category.label} - ${category.description}'),
-            );
-          }).toList(),
-          onChanged: (value) {
-            if (value != null) {
-              setState(() => _selectedCategory = value);
-            }
-          },
         ),
       ),
     );
@@ -597,50 +616,54 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       onTap: onTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 1.5,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.calendar_today_rounded, color: Color(0xFFFFFF00)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today_rounded, color: Color(0xFFFFFF00)),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      selectedDate != null
-                          ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
-                          : 'Seleccionar fecha',
-                      style: TextStyle(
-                        color: selectedDate != null ? Colors.white : Colors.white54,
-                        fontSize: 16,
+                      const SizedBox(height: 4),
+                      Text(
+                        selectedDate != null
+                            ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
+                            : 'Seleccionar fecha',
+                        style: TextStyle(
+                          color: selectedDate != null ? Colors.white : Colors.white54,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: Colors.white.withOpacity(0.3),
-                size: 16,
-              ),
-            ],
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white.withOpacity(0.3),
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -648,73 +671,81 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   }
 
   Widget _buildNavigationButtons(ConductorProfileProvider provider) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border(
-          top: BorderSide(
-            color: Colors.white.withOpacity(0.1),
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          if (_currentStep > 0)
-            Expanded(
-              child: TextButton(
-                onPressed: () => setState(() => _currentStep--),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.white.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'AtrÃ¡s',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withOpacity(0.1),
               ),
             ),
-          if (_currentStep > 0) const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: ElevatedButton(
-              onPressed: provider.isLoading ? null : () => _handleNext(provider),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(0xFFFFFF00),
-                disabledBackgroundColor: Colors.grey,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: provider.isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Row(
+              children: [
+                if (_currentStep > 0)
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => setState(() => _currentStep--),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    )
-                  : Text(
-                      _currentStep < 2 ? 'Siguiente' : 'Guardar',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      child: const Text(
+                        'Atrás',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
+                  ),
+                if (_currentStep > 0) const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: provider.isLoading ? null : () => _handleNext(provider),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: const Color(0xFFFFFF00),
+                      disabledBackgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: provider.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          )
+                        : Text(
+                            _currentStep < 2 ? 'Siguiente' : 'Guardar',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -885,7 +916,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       if (vehicleSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('InformaciÃ³n guardada exitosamente'),
+            content: Text('Información guardada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
@@ -893,7 +924,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(provider.errorMessage ?? 'Error al guardar vehÃ­culo'),
+            content: Text(provider.errorMessage ?? 'Error al guardar vehículo'),
             backgroundColor: Colors.red,
           ),
         );
