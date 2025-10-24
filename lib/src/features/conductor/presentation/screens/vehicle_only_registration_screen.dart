@@ -1,33 +1,27 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/vehicle_model.dart';
-import '../../models/driver_license_model.dart';
 import '../../providers/conductor_profile_provider.dart';
+import 'license_registration_screen.dart';
 
-class VehicleRegistrationScreen extends StatefulWidget {
+class VehicleOnlyRegistrationScreen extends StatefulWidget {
   final int conductorId;
   final VehicleModel? existingVehicle;
 
-  const VehicleRegistrationScreen({
+  const VehicleOnlyRegistrationScreen({
     super.key,
     required this.conductorId,
     this.existingVehicle,
   });
 
   @override
-  State<VehicleRegistrationScreen> createState() => _VehicleRegistrationScreenState();
+  State<VehicleOnlyRegistrationScreen> createState() => _VehicleOnlyRegistrationScreenState();
 }
 
-class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
+class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationScreen> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
-
-  // License data
-  final _licenseNumberController = TextEditingController();
-  DateTime? _licenseExpedicion;
-  DateTime? _licenseVencimiento;
-  LicenseCategory _selectedCategory = LicenseCategory.c1;
 
   // Vehicle data
   final _placaController = TextEditingController();
@@ -69,7 +63,6 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
 
   @override
   void dispose() {
-    _licenseNumberController.dispose();
     _placaController.dispose();
     _marcaController.dispose();
     _modeloController.dispose();
@@ -83,10 +76,11 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.existingVehicle != null;
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(isEditing),
       body: Consumer<ConductorProfileProvider>(
         builder: (context, provider, child) {
           return SafeArea(
@@ -111,7 +105,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(bool isEditing) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -126,9 +120,9 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: const Text(
-        'Registrar Vehículo',
-        style: TextStyle(
+      title: Text(
+        isEditing ? 'Editar Vehículo' : 'Registrar Vehículo',
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -142,11 +136,9 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          _buildStepCircle(0, 'Licencia'),
+          _buildStepCircle(0, 'Vehículo'),
           _buildStepLine(0),
-          _buildStepCircle(1, 'Vehí­culo'),
-          _buildStepLine(1),
-          _buildStepCircle(2, 'Documentos'),
+          _buildStepCircle(1, 'Documentos'),
         ],
       ),
     );
@@ -222,54 +214,12 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Widget _buildCurrentStep() {
     switch (_currentStep) {
       case 0:
-        return _buildLicenseStep();
-      case 1:
         return _buildVehicleStep();
-      case 2:
+      case 1:
         return _buildDocumentsStep();
       default:
         return Container();
     }
-  }
-
-  Widget _buildLicenseStep() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 20),
-        _buildSectionHeader(
-          'Licencia de Conducción',
-          Icons.badge_rounded,
-        ),
-        const SizedBox(height: 24),
-        _buildTextField(
-          controller: _licenseNumberController,
-          label: 'Número de Licencia',
-          hint: 'Ej: 12345678',
-          icon: Icons.numbers_rounded,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el número de licencia';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        _buildCategorySelector(),
-        const SizedBox(height: 16),
-        _buildDateField(
-          label: 'Fecha de Expedición',
-          selectedDate: _licenseExpedicion,
-          onTap: () => _selectDate(context, isExpedicion: true),
-        ),
-        const SizedBox(height: 16),
-        _buildDateField(
-          label: 'Fecha de Vencimiento',
-          selectedDate: _licenseVencimiento,
-          onTap: () => _selectDate(context, isExpedicion: false),
-        ),
-      ],
-    );
   }
 
   Widget _buildVehicleStep() {
@@ -588,56 +538,6 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     );
   }
 
-  Widget _buildCategorySelector() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 1.5,
-            ),
-          ),
-          child: DropdownButtonFormField<LicenseCategory>(
-            value: _selectedCategory,
-            dropdownColor: const Color(0xFF1A1A1A),
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Categoría de Licencia',
-              labelStyle: TextStyle(color: Colors.white70),
-              border: InputBorder.none,
-              prefixIcon: Icon(Icons.category_rounded, color: Color(0xFFFFFF00)),
-            ),
-            isExpanded: true,
-            items: LicenseCategory.values
-                .where((cat) => cat != LicenseCategory.ninguna)
-                .map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Text(
-                  '${category.label} - ${category.description}',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _selectedCategory = value);
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildDateField({
     required String label,
     required DateTime? selectedDate,
@@ -764,7 +664,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                             ),
                           )
                         : Text(
-                            _currentStep < 2 ? 'Siguiente' : 'Guardar',
+                            _currentStep < 1 ? 'Siguiente' : 'Guardar',
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 16,
@@ -781,42 +681,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, {required bool isExpedicion}) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: isExpedicion ? DateTime(1950) : DateTime.now(),
-      lastDate: isExpedicion ? DateTime.now() : DateTime(2050),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFFFFF00),
-              onPrimary: Colors.black,
-              surface: Color(0xFF1A1A1A),
-              onSurface: Colors.white,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isExpedicion) {
-          _licenseExpedicion = picked;
-        } else {
-          _licenseVencimiento = picked;
-        }
-      });
-    }
-  }
-
   Future<void> _selectSOATDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _soatVencimiento ?? DateTime.now().add(const Duration(days: 365)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
       builder: (context, child) {
@@ -842,7 +710,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Future<void> _selectTecnomecanicaDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _tecnomecanicaVencimiento ?? DateTime.now().add(const Duration(days: 365)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
       builder: (context, child) {
@@ -866,12 +734,12 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   }
 
   Future<void> _handleNext(ConductorProfileProvider provider) async {
-    if (_currentStep < 2) {
+    if (_currentStep < 1) {
       if (_validateCurrentStep()) {
         setState(() => _currentStep++);
       }
     } else {
-      // Save all data
+      // Save all vehicle data
       await _saveData(provider);
     }
   }
@@ -879,12 +747,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   bool _validateCurrentStep() {
     switch (_currentStep) {
       case 0:
-        return _licenseNumberController.text.isNotEmpty &&
-            _licenseExpedicion != null &&
-            _licenseVencimiento != null;
-      case 1:
         return _formKey.currentState?.validate() ?? false;
-      case 2:
+      case 1:
         return _soatNumberController.text.isNotEmpty &&
             _soatVencimiento != null &&
             _tecnomecanicaNumberController.text.isNotEmpty &&
@@ -898,32 +762,26 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   Future<void> _saveData(ConductorProfileProvider provider) async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Save license
-    final license = DriverLicenseModel(
-      numero: _licenseNumberController.text,
-      fechaExpedicion: _licenseExpedicion!,
-      fechaVencimiento: _licenseVencimiento!,
-      categoria: _selectedCategory,
-    );
-
-    final licenseSuccess = await provider.updateLicense(
-      conductorId: widget.conductorId,
-      license: license,
-    );
-
-    if (!licenseSuccess) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(provider.errorMessage ?? 'Error al guardar licencia'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (_soatVencimiento == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor selecciona la fecha de vencimiento del SOAT'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
-    // Save vehicle
+    if (_tecnomecanicaVencimiento == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor selecciona la fecha de vencimiento de la tecnomecánica'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final vehicle = VehicleModel(
       placa: _placaController.text,
       tipo: _selectedType,
@@ -946,11 +804,91 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     if (mounted) {
       if (vehicleSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Información guardada exitosamente'),
+          SnackBar(
+            content: Text(
+              widget.existingVehicle != null 
+                  ? 'Vehículo actualizado exitosamente' 
+                  : 'Vehículo guardado exitosamente',
+            ),
             backgroundColor: Colors.green,
           ),
         );
+        
+        // Si es registro nuevo (no edición), verificar si falta la licencia
+        final isEditing = widget.existingVehicle != null;
+        if (!isEditing && provider.profile != null) {
+          final hasLicense = provider.profile!.licencia != null && 
+                             provider.profile!.licencia!.isComplete;
+          
+          if (!hasLicense) {
+            // Mostrar diálogo para ir a registrar licencia
+            final goToLicense = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                backgroundColor: const Color(0xFF1A1A1A),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: const Row(
+                  children: [
+                    Icon(Icons.badge_rounded, color: Color(0xFFFFFF00)),
+                    SizedBox(width: 12),
+                    Text(
+                      'Registrar Licencia',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                content: const Text(
+                  '¡Vehículo guardado! ¿Deseas continuar registrando tu licencia de conducción ahora?',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text(
+                      'Después',
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFFF00),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Continuar',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            if (goToLicense == true && mounted) {
+              // Ir a la pantalla de registro de licencia
+              final licenseResult = await Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LicenseRegistrationScreen(
+                    conductorId: widget.conductorId,
+                  ),
+                ),
+              );
+              // Si guardó la licencia, retornar true
+              if (licenseResult == true) {
+                return;
+              }
+            }
+          }
+        }
+        
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -963,4 +901,3 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     }
   }
 }
-

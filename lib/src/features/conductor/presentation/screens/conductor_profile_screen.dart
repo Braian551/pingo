@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/conductor_profile_provider.dart';
 import '../../models/conductor_profile_model.dart';
-import 'vehicle_registration_screen.dart';
+import 'license_registration_screen.dart';
+import 'vehicle_only_registration_screen.dart';
 import 'verification_status_screen.dart';
 
 class ConductorProfileScreen extends StatefulWidget {
@@ -319,8 +320,9 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         final result = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => VehicleRegistrationScreen(
+            builder: (context) => LicenseRegistrationScreen(
               conductorId: widget.conductorId,
+              existingLicense: license,
             ),
           ),
         );
@@ -390,8 +392,9 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         final result = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => VehicleRegistrationScreen(
+            builder: (context) => VehicleOnlyRegistrationScreen(
               conductorId: widget.conductorId,
+              existingVehicle: vehicle,
             ),
           ),
         );
