@@ -68,8 +68,7 @@ class DriverLicenseModel {
   bool get isComplete {
     return numero.isNotEmpty &&
         categoria != LicenseCategory.ninguna &&
-        foto != null &&
-        foto!.isNotEmpty;
+        fechaVencimiento.isAfter(DateTime.now());
   }
 
   DriverLicenseModel copyWith({

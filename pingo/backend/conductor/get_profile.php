@@ -36,7 +36,9 @@ try {
                 u.telefono,
                 u.foto_perfil,
                 dc.licencia_conduccion,
+                dc.licencia_expedicion,
                 dc.licencia_vencimiento,
+                dc.licencia_categoria,
                 dc.vehiculo_tipo,
                 dc.vehiculo_marca,
                 dc.vehiculo_modelo,
@@ -46,6 +48,11 @@ try {
                 dc.aseguradora,
                 dc.numero_poliza_seguro,
                 dc.vencimiento_seguro,
+                dc.soat_numero,
+                dc.soat_vencimiento,
+                dc.tecnomecanica_numero,
+                dc.tecnomecanica_vencimiento,
+                dc.tarjeta_propiedad_numero,
                 dc.calificacion_promedio,
                 dc.total_viajes,
                 dc.disponible,
@@ -94,62 +101,79 @@ try {
     // Build license info if exists
     if (!empty($conductor['licencia_conduccion'])) {
         $profile['licencia'] = [
-            'numero_licencia' => $conductor['licencia_conduccion'],
-            'fecha_emision' => null, // Not in current DB structure
-            'fecha_vencimiento' => $conductor['licencia_vencimiento'],
-            'categoria' => null, // Not in current DB structure
+            'licencia_conduccion' => $conductor['licencia_conduccion'],
+            'licencia_expedicion' => $conductor['licencia_expedicion'],
+            'licencia_vencimiento' => $conductor['licencia_vencimiento'],
+            'licencia_categoria' => $conductor['licencia_categoria'] ?? 'C1',
             'estado' => 'activa',
-            'foto_frontal' => null, // Not in current DB structure
-            'foto_trasera' => null // Not in current DB structure
+            'licencia_foto' => null, // Not in current DB structure
+            'licencia_foto_reverso' => null // Not in current DB structure
         ];
-    } else {
-        $profile['pending_tasks'][] = 'Registrar licencia de conducción';
-        $profile['documentos_pendientes'][] = 'licencia_conduccion';
     }
 
     // Build vehicle info if exists
     if (!empty($conductor['vehiculo_placa'])) {
         $profile['vehiculo'] = [
-            'placa' => $conductor['vehiculo_placa'],
-            'tipo' => $conductor['vehiculo_tipo'],
-            'marca' => $conductor['vehiculo_marca'],
-            'modelo' => $conductor['vehiculo_modelo'],
-            'anio' => (int)$conductor['vehiculo_anio'],
-            'color' => $conductor['vehiculo_color'],
+            'vehiculo_placa' => $conductor['vehiculo_placa'],
+            'vehiculo_tipo' => $conductor['vehiculo_tipo'],
+            'vehiculo_marca' => $conductor['vehiculo_marca'],
+            'vehiculo_modelo' => $conductor['vehiculo_modelo'],
+            'vehiculo_anio' => (int)$conductor['vehiculo_anio'],
+            'vehiculo_color' => $conductor['vehiculo_color'],
             'aseguradora' => $conductor['aseguradora'],
-            'numero_poliza' => $conductor['numero_poliza_seguro'],
+            'numero_poliza_seguro' => $conductor['numero_poliza_seguro'],
             'vencimiento_seguro' => $conductor['vencimiento_seguro'],
-            'foto_frontal' => null, // Not in current DB structure
-            'foto_lateral' => null, // Not in current DB structure
-            'tarjeta_propiedad' => null // Not in current DB structure
+            'soat_numero' => $conductor['soat_numero'],
+            'soat_vencimiento' => $conductor['soat_vencimiento'],
+            'tecnomecanica_numero' => $conductor['tecnomecanica_numero'],
+            'tecnomecanica_vencimiento' => $conductor['tecnomecanica_vencimiento'],
+            'tarjeta_propiedad_numero' => $conductor['tarjeta_propiedad_numero'],
+            'foto_vehiculo' => null, // Not in current DB structure
+            'foto_tarjeta_propiedad' => null, // Not in current DB structure
+            'foto_soat' => null, // Not in current DB structure
+            'foto_tecnomecanica' => null // Not in current DB structure
         ];
+    }
+
+    // Calculate completion percentage
+    $total_items = 2; // license and vehicle (with documents)
+    $completed_items = 0;
+    
+    // Check license completion
+    $license_complete = !empty($conductor['licencia_conduccion']) && 
+                       !empty($conductor['licencia_vencimiento']) &&
+                       !empty($conductor['licencia_categoria']);
+    
+    if ($license_complete) {
+        $completed_items++;
+    } else {
+        $profile['pending_tasks'][] = 'Completar información de licencia';
+        $profile['documentos_pendientes'][] = 'licencia';
+    }
+    
+    // Check vehicle completion
+    $vehicle_complete = !empty($conductor['vehiculo_placa']) && 
+                       !empty($conductor['vehiculo_marca']) &&
+                       !empty($conductor['vehiculo_modelo']) &&
+                       !empty($conductor['vehiculo_anio']) &&
+                       !empty($conductor['soat_numero']) &&
+                       !empty($conductor['soat_vencimiento']) &&
+                       !empty($conductor['tecnomecanica_numero']) &&
+                       !empty($conductor['tecnomecanica_vencimiento']) &&
+                       !empty($conductor['tarjeta_propiedad_numero']);
+    
+    if ($vehicle_complete) {
+        $completed_items++;
+    } else if (!empty($conductor['vehiculo_placa'])) {
+        $profile['pending_tasks'][] = 'Completar documentos del vehículo';
+        $profile['documentos_pendientes'][] = 'documentos_vehiculo';
     } else {
         $profile['pending_tasks'][] = 'Registrar vehículo';
         $profile['documentos_pendientes'][] = 'vehiculo';
     }
-
-    // Add other missing items
-    if (empty($conductor['foto_perfil'])) {
-        $profile['pending_tasks'][] = 'Subir foto de perfil';
-        $profile['documentos_pendientes'][] = 'foto_perfil';
-    }
-
-    if (empty($conductor['aseguradora']) || empty($conductor['numero_poliza_seguro'])) {
-        $profile['pending_tasks'][] = 'Registrar información del seguro';
-        $profile['documentos_pendientes'][] = 'seguro';
-    }
-
-    // Calculate completion percentage
-    $total_items = 4; // license, vehicle, photo, insurance
-    $completed_items = 0;
     
-    if (!empty($conductor['licencia_conduccion'])) $completed_items++;
-    if (!empty($conductor['vehiculo_placa'])) $completed_items++;
-    if (!empty($conductor['foto_perfil'])) $completed_items++;
-    if (!empty($conductor['aseguradora'])) $completed_items++;
-    
-    $profile['completion_percentage'] = round($completed_items / $total_items, 2);
-    $profile['is_profile_complete'] = count($profile['pending_tasks']) === 0;
+    $profile['completion_percentage'] = $total_items > 0 ? round($completed_items / $total_items, 2) : 0;
+    $profile['is_profile_complete'] = $license_complete && $vehicle_complete;
 
     echo json_encode([
         'success' => true,
