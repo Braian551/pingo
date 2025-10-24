@@ -1,20 +1,61 @@
 ﻿import 'package:flutter/material.dart';
+import '../../models/conductor_profile_model.dart';
+
+/// Tipo de acción requerida para completar el perfil
+enum ProfileAction {
+  registerLicense,
+  registerVehicle,
+  submitVerification,
+  completeProfile,
+}
+
+/// Helper function to determine the action type based on profile
+ProfileAction getProfileActionType(ConductorProfileModel? profile) {
+  if (profile == null) {
+    return ProfileAction.completeProfile;
+  }
+
+  // Si no tiene licencia o está incompleta
+  if (profile.licencia == null || !profile.licencia!.isComplete) {
+    return ProfileAction.registerLicense;
+  }
+
+  // Si no tiene vehículo o está incompleto
+  if (profile.vehiculo == null || !profile.vehiculo!.isBasicComplete) {
+    return ProfileAction.registerVehicle;
+  }
+
+  // Si el perfil está completo pero no se ha enviado para verificación
+  if (profile.isProfileComplete && 
+      profile.estadoVerificacion == VerificationStatus.pendiente) {
+    return ProfileAction.submitVerification;
+  }
+
+  // Caso por defecto
+  return ProfileAction.completeProfile;
+}
 
 /// Alert shown when driver profile is incomplete
 class ProfileIncompleteAlert extends StatelessWidget {
   final VoidCallback onComplete;
   final VoidCallback? onDismiss;
   final List<String> missingItems;
+  final ProfileAction actionType;
 
   const ProfileIncompleteAlert({
     super.key,
     required this.onComplete,
     this.onDismiss,
     this.missingItems = const [],
+    this.actionType = ProfileAction.completeProfile,
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonText = _getButtonText();
+    final title = _getTitle();
+    final message = _getMessage();
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -51,9 +92,9 @@ class ProfileIncompleteAlert extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Perfil Incompleto',
-                  style: TextStyle(
+                Text(
+                  title,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -61,9 +102,9 @@ class ProfileIncompleteAlert extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Para activar tu disponibilidad y recibir viajes, debes completar tu perfil de conductor.',
-                  style: TextStyle(
+                Text(
+                  message,
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 16,
                   ),
@@ -151,9 +192,9 @@ class ProfileIncompleteAlert extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Completar Ahora',
-                          style: TextStyle(
+                        child: Text(
+                          buttonText,
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -170,10 +211,50 @@ class ProfileIncompleteAlert extends StatelessWidget {
     );
   }
 
+  String _getButtonText() {
+    switch (actionType) {
+      case ProfileAction.registerLicense:
+        return 'Registrar Licencia';
+      case ProfileAction.registerVehicle:
+        return 'Registrar Vehículo';
+      case ProfileAction.submitVerification:
+        return 'Ver Mi Perfil';
+      case ProfileAction.completeProfile:
+        return 'Completar Ahora';
+    }
+  }
+
+  String _getTitle() {
+    switch (actionType) {
+      case ProfileAction.registerLicense:
+        return 'Falta tu Licencia';
+      case ProfileAction.registerVehicle:
+        return 'Falta tu Vehículo';
+      case ProfileAction.submitVerification:
+        return 'Perfil Listo';
+      case ProfileAction.completeProfile:
+        return 'Perfil Incompleto';
+    }
+  }
+
+  String _getMessage() {
+    switch (actionType) {
+      case ProfileAction.registerLicense:
+        return 'Necesitas registrar tu licencia de conducción para poder activar tu disponibilidad.';
+      case ProfileAction.registerVehicle:
+        return 'Necesitas registrar tu vehículo para poder activar tu disponibilidad.';
+      case ProfileAction.submitVerification:
+        return 'Tu perfil está completo. Envíalo para verificación y podrás empezar a recibir viajes.';
+      case ProfileAction.completeProfile:
+        return 'Para activar tu disponibilidad y recibir viajes, debes completar tu perfil de conductor.';
+    }
+  }
+
   static Future<bool?> show(
     BuildContext context, {
     List<String> missingItems = const [],
     bool dismissible = true,
+    ProfileAction actionType = ProfileAction.completeProfile,
   }) {
     return showDialog<bool>(
       context: context,
@@ -181,6 +262,7 @@ class ProfileIncompleteAlert extends StatelessWidget {
       barrierColor: Colors.black.withOpacity(0.85),
       builder: (context) => ProfileIncompleteAlert(
         missingItems: missingItems,
+        actionType: actionType,
         onComplete: () => Navigator.of(context).pop(true),
         onDismiss: dismissible ? () => Navigator.of(context).pop(false) : null,
       ),

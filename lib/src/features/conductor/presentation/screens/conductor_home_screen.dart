@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/conductor_provider.dart';
 import '../../providers/conductor_profile_provider.dart';
+import '../../models/conductor_profile_model.dart';
 import '../widgets/conductor_stats_card.dart';
 import '../widgets/viaje_activo_card.dart';
 import '../widgets/conductor_alerts.dart';
 import 'conductor_profile_screen.dart';
 import 'conductor_earnings_screen.dart';
 import 'conductor_trips_screen.dart';
-import 'vehicle_registration_screen.dart';
+import 'license_registration_screen.dart';
+import 'vehicle_only_registration_screen.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -83,6 +85,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         _hasShownProfileAlert = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
+            final actionType = getProfileActionType(profile);
             ProfileIncompleteAlert.show(
               context,
               missingItems: profile.pendingTasks.isEmpty 
@@ -93,21 +96,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   ]
                 : profile.pendingTasks,
               dismissible: true,
+              actionType: actionType,
             ).then((shouldComplete) {
               if (shouldComplete == true && mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => VehicleRegistrationScreen(
-                      conductorId: _conductorId!,
-                    ),
-                  ),
-                ).then((result) {
-                  if (result == true) {
-                    // Reload profile after editing
-                    profileProvider.loadProfile(_conductorId!);
-                  }
-                });
+                _handleProfileAction(actionType, profile);
               }
             });
           }
@@ -121,6 +113,68 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  void _handleProfileAction(ProfileAction actionType, ConductorProfileModel profile) {
+    switch (actionType) {
+      case ProfileAction.registerLicense:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LicenseRegistrationScreen(
+              conductorId: _conductorId!,
+              existingLicense: profile.licencia,
+            ),
+          ),
+        ).then((result) {
+          if (result == true) {
+            final profileProvider = Provider.of<ConductorProfileProvider>(
+              context,
+              listen: false,
+            );
+            profileProvider.loadProfile(_conductorId!);
+          }
+        });
+        break;
+
+      case ProfileAction.registerVehicle:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VehicleOnlyRegistrationScreen(
+              conductorId: _conductorId!,
+              existingVehicle: profile.vehiculo,
+            ),
+          ),
+        ).then((result) {
+          if (result == true) {
+            final profileProvider = Provider.of<ConductorProfileProvider>(
+              context,
+              listen: false,
+            );
+            profileProvider.loadProfile(_conductorId!);
+          }
+        });
+        break;
+
+      case ProfileAction.submitVerification:
+      case ProfileAction.completeProfile:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConductorProfileScreen(
+              conductorId: _conductorId!,
+            ),
+          ),
+        ).then((result) {
+          final profileProvider = Provider.of<ConductorProfileProvider>(
+            context,
+            listen: false,
+          );
+          profileProvider.loadProfile(_conductorId!);
+        });
+        break;
     }
   }
 
@@ -226,6 +280,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     
                     if (!profile.canBeAvailable) {
                       // Show profile incomplete alert
+                      final actionType = getProfileActionType(profile);
                       final shouldComplete = await ProfileIncompleteAlert.show(
                         context,
                         missingItems: profile.pendingTasks.isEmpty 
@@ -236,26 +291,11 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                             ]
                           : profile.pendingTasks,
                         dismissible: true,
+                        actionType: actionType,
                       );
                       
                       if (shouldComplete == true && mounted) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VehicleRegistrationScreen(
-                              conductorId: _conductorId!,
-                            ),
-                          ),
-                        ).then((result) {
-                          if (result == true) {
-                            // Reload profile after editing
-                            final profileProvider = Provider.of<ConductorProfileProvider>(
-                              context,
-                              listen: false,
-                            );
-                            profileProvider.loadProfile(_conductorId!);
-                          }
-                        });
+                        _handleProfileAction(actionType, profile);
                       }
                       return;
                     }
