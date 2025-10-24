@@ -31,6 +31,30 @@ class ConductorProfileService {
     }
   }
 
+  /// Actualizar perfil completo
+  static Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> data) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/update_profile.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      print('Update profile response (${response.statusCode}): ${response.body}');
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+      return {'success': false, 'message': 'Error del servidor'};
+    } catch (e) {
+      print('Error actualizando perfil: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   /// Registrar o actualizar licencia de conducción
   static Future<Map<String, dynamic>> updateLicense({
     required int conductorId,

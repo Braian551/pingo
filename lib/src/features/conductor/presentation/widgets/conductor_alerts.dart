@@ -1,5 +1,4 @@
-﻿import 'dart:ui';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 /// Alert shown when driver profile is incomplete
 class ProfileIncompleteAlert extends StatelessWidget {
@@ -18,11 +17,9 @@ class ProfileIncompleteAlert extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
+      child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: const Color(0xFFFFFF00).withOpacity(0.5),
@@ -170,7 +167,6 @@ class ProfileIncompleteAlert extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -215,11 +211,9 @@ class DocumentExpiryAlert extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
+      child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isExpired
@@ -341,7 +335,6 @@ class DocumentExpiryAlert extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -531,11 +524,9 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
       backgroundColor: Colors.transparent,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
+        child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              color: const Color(0xFF1A1A1A),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: const Color(0xFFFFFF00).withOpacity(0.5),
@@ -700,7 +691,6 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
             ),
           ),
         ),
-      ),
     );
   }
 

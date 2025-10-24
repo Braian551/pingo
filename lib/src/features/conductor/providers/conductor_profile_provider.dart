@@ -155,6 +155,34 @@ class ConductorProfileProvider with ChangeNotifier {
     }
   }
 
+  /// Actualizar perfil completo con datos JSON
+  Future<bool> updateProfile(Map<String, dynamic> data) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await ConductorProfileService.updateProfile(data);
+
+      if (response['success'] == true) {
+        _errorMessage = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response['message'] ?? 'Error al actualizar perfil';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Error al actualizar perfil: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Enviar perfil para verificación
   Future<bool> submitForVerification(int conductorId) async {
     _isLoading = true;

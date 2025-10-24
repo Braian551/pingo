@@ -9,6 +9,7 @@ import '../widgets/conductor_alerts.dart';
 import 'conductor_profile_screen.dart';
 import 'conductor_earnings_screen.dart';
 import 'conductor_trips_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -78,7 +79,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
-      if (profile != null && !profile.canBeAvailable && !_hasShownProfileAlert) {
+      if (profile != null && !profile.isProfileComplete && !_hasShownProfileAlert) {
         _hasShownProfileAlert = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -92,7 +93,23 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   ]
                 : profile.pendingTasks,
               dismissible: true,
-            );
+            ).then((shouldComplete) {
+              if (shouldComplete == true && mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfileScreen(
+                      conductorId: _conductorId!,
+                    ),
+                  ),
+                ).then((result) {
+                  if (result == true) {
+                    // Reload profile after editing
+                    profileProvider.loadProfile(_conductorId!);
+                  }
+                });
+              }
+            });
           }
         });
       }
@@ -225,11 +242,20 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ConductorProfileScreen(
+                            builder: (context) => EditProfileScreen(
                               conductorId: _conductorId!,
                             ),
                           ),
-                        );
+                        ).then((result) {
+                          if (result == true) {
+                            // Reload profile after editing
+                            final profileProvider = Provider.of<ConductorProfileProvider>(
+                              context,
+                              listen: false,
+                            );
+                            profileProvider.loadProfile(_conductorId!);
+                          }
+                        });
                       }
                       return;
                     }
