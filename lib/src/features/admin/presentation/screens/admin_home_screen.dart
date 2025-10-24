@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/admin/admin_service.dart';
+import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:shimmer/shimmer.dart';
@@ -237,7 +238,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
           ),
           child: IconButton(
             icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 22),
-            onPressed: () {
+            onPressed: () async {
+              // Limpiar la sesión antes de navegar
+              await UserService.clearSession();
+              
+              if (!mounted) return;
+              
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 RouteNames.welcome,

@@ -25,25 +25,52 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadConductorData();
+    // Defer the loading to after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadConductorData();
+    });
   }
 
   Future<void> _loadConductorData() async {
+    if (!mounted) return;
+    
     setState(() => _isLoading = true);
 
     try {
+      // Extract conductor ID with better error handling
       _conductorId = int.tryParse(widget.conductorUser['id']?.toString() ?? '0');
+      
+      print('Loading conductor data for ID: $_conductorId');
+      print('Conductor user data: ${widget.conductorUser}');
 
-      if (_conductorId != null && _conductorId! > 0) {
-        final provider = Provider.of<ConductorProvider>(context, listen: false);
-        await provider.loadConductorInfo(_conductorId!);
-        await provider.loadEstadisticas(_conductorId!);
-        await provider.loadViajesActivos(_conductorId!);
+      if (_conductorId == null || _conductorId! <= 0) {
+        print('Error: Invalid conductor ID: $_conductorId');
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        return;
       }
-    } catch (e) {
+
+      if (!mounted) return;
+      
+      final provider = Provider.of<ConductorProvider>(context, listen: false);
+      
+      // Load data sequentially with error handling for each call
+      await provider.loadConductorInfo(_conductorId!);
+      if (!mounted) return;
+      
+      await provider.loadEstadisticas(_conductorId!);
+      if (!mounted) return;
+      
+      await provider.loadViajesActivos(_conductorId!);
+      
+    } catch (e, stackTrace) {
       print('Error cargando datos del conductor: $e');
+      print('Stack trace: $stackTrace');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

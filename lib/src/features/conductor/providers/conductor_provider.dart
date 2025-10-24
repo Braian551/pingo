@@ -24,20 +24,29 @@ class ConductorProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      print('ConductorProvider: Loading info for conductor $conductorId');
       final response = await ConductorService.getConductorInfo(conductorId);
+      print('ConductorProvider: Response received: $response');
+      
       if (response != null && response['success'] == true) {
         final conductorData = response['conductor'];
         if (conductorData != null) {
           _conductor = ConductorModel.fromJson(conductorData);
           _disponible = _conductor?.disponible ?? false;
           _errorMessage = null;
+          print('ConductorProvider: Conductor info loaded successfully');
+        } else {
+          _errorMessage = 'Datos del conductor no encontrados';
+          print('ConductorProvider: conductorData is null');
         }
       } else {
         _errorMessage = 'No se pudo cargar la información del conductor';
+        print('ConductorProvider: Response unsuccessful or null');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Error al cargar información: $e';
       print('Error en loadConductorInfo: $e');
+      print('Stack trace: $stackTrace');
     } finally {
       _isLoading = false;
       notifyListeners();

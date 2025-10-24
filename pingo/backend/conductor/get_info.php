@@ -35,8 +35,8 @@ try {
                 u.email,
                 u.telefono,
                 u.foto_perfil,
-                u.activo,
-                u.fecha_creacion
+                u.es_activo,
+                u.fecha_registro
               FROM usuarios u
               WHERE u.id = :conductor_id AND u.tipo_usuario = 'conductor'";
     
