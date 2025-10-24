@@ -26,6 +26,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   int _selectedIndex = 0;
   bool _isLoading = true;
   int? _conductorId;
+  bool _hasShownProfileAlert = false;
 
   @override
   void initState() {
@@ -68,6 +69,33 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       if (!mounted) return;
       
       await provider.loadViajesActivos(_conductorId!);
+      if (!mounted) return;
+      
+      // Load conductor profile
+      final profileProvider = Provider.of<ConductorProfileProvider>(context, listen: false);
+      await profileProvider.loadProfile(_conductorId!);
+      if (!mounted) return;
+      
+      // Check if profile is incomplete and show alert if not shown before
+      final profile = profileProvider.profile;
+      if (profile != null && !profile.canBeAvailable && !_hasShownProfileAlert) {
+        _hasShownProfileAlert = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ProfileIncompleteAlert.show(
+              context,
+              missingItems: profile.pendingTasks.isEmpty 
+                ? [
+                    'Registrar licencia de conducción',
+                    'Registrar vehículo',
+                    'Completar documentos',
+                  ]
+                : profile.pendingTasks,
+              dismissible: true,
+            );
+          }
+        });
+      }
       
     } catch (e, stackTrace) {
       print('Error cargando datos del conductor: $e');
