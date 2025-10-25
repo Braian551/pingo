@@ -5,14 +5,14 @@ import 'package:ping_go/src/features/profile/presentation/screens/profile_screen
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:shimmer/shimmer.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeUserScreen extends StatefulWidget {
+  const HomeUserScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeUserScreen> createState() => _HomeUserScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStateMixin {
   String? _userAddress;
   String? _userName;
   bool _loading = true;
