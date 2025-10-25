@@ -66,6 +66,19 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 },
               ),
               _ManagementItem(
+                title: 'Documentos de Conductores',
+                subtitle: 'Revisar y verificar documentos de conductores',
+                icon: Icons.description_rounded,
+                accentColor: const Color(0xFFFFFF00),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    RouteNames.adminConductorDocs,
+                    arguments: {'admin_id': adminId, 'admin_user': widget.adminUser},
+                  );
+                },
+              ),
+              _ManagementItem(
                 title: 'Conductores',
                 subtitle: 'Administrar conductores y sus vehículos',
                 icon: Icons.drive_eta_rounded,

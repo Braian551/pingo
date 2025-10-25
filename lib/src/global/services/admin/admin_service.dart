@@ -353,4 +353,133 @@ class AdminService {
       return {'success': false, 'message': e.toString()};
     }
   }
+
+  /// Obtiene documentos de conductores con todos los campos
+  static Future<Map<String, dynamic>> getConductoresDocumentos({
+    required int adminId,
+    int? conductorId,
+    String? estadoVerificacion,
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    try {
+      final queryParams = {
+        'admin_id': adminId.toString(),
+        'page': page.toString(),
+        'per_page': perPage.toString(),
+      };
+
+      if (conductorId != null) queryParams['conductor_id'] = conductorId.toString();
+      if (estadoVerificacion != null) queryParams['estado_verificacion'] = estadoVerificacion;
+
+      final uri = Uri.parse('$_baseUrl/get_conductores_documentos.php')
+          .replace(queryParameters: queryParams);
+
+      print('AdminService.getConductoresDocumentos - URL: $uri');
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar con el servidor');
+        },
+      );
+
+      print('AdminService.getConductoresDocumentos - Status: ${response.statusCode}');
+      print('AdminService.getConductoresDocumentos - Body preview: ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}...');
+
+      if (response.statusCode == 200) {
+        try {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          return data;
+        } catch (e) {
+          print('AdminService.getConductoresDocumentos - JSON Parse Error: $e');
+          print('AdminService.getConductoresDocumentos - Full Response Body: ${response.body}');
+          return {
+            'success': false,
+            'message': 'Error al procesar la respuesta del servidor'
+          };
+        }
+      } else if (response.statusCode == 403) {
+        return {
+          'success': false,
+          'message': 'Acceso denegado. Solo administradores pueden ver documentos.'
+        };
+      }
+
+      return {'success': false, 'message': 'Error al obtener documentos'};
+    } catch (e) {
+      print('Error en getConductoresDocumentos: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  /// Aprobar documentos de conductor
+  static Future<Map<String, dynamic>> aprobarConductor({
+    required int adminId,
+    required int conductorId,
+    String? notas,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/aprobar_conductor.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'admin_id': adminId,
+          'conductor_id': conductorId,
+          'notas': notas,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      }
+
+      return {'success': false, 'message': 'Error al aprobar conductor'};
+    } catch (e) {
+      print('Error en aprobarConductor: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  /// Rechazar documentos de conductor
+  static Future<Map<String, dynamic>> rechazarConductor({
+    required int adminId,
+    required int conductorId,
+    required String motivo,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/rechazar_conductor.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'admin_id': adminId,
+          'conductor_id': conductorId,
+          'motivo': motivo,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      }
+
+      return {'success': false, 'message': 'Error al rechazar conductor'};
+    } catch (e) {
+      print('Error en rechazarConductor: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
 }
