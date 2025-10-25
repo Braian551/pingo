@@ -30,7 +30,7 @@ class DriverLicenseModel {
       categoria: LicenseCategory.fromString(
         json['licencia_categoria']?.toString() ?? 'C1',
       ),
-      foto: json['licencia_foto']?.toString(),
+      foto: json['licencia_foto_url']?.toString(),
       fotoReverso: json['licencia_foto_reverso']?.toString(),
       isVerified: json['licencia_verificada'] == 1 || json['licencia_verificada'] == true,
     );

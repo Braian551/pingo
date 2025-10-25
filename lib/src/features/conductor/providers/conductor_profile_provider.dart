@@ -4,6 +4,7 @@ import '../models/conductor_profile_model.dart';
 import '../models/driver_license_model.dart';
 import '../models/vehicle_model.dart';
 import '../services/conductor_profile_service.dart';
+import '../services/document_upload_service.dart';
 
 class ConductorProfileProvider with ChangeNotifier {
   ConductorProfileModel? _profile;
@@ -245,6 +246,93 @@ class ConductorProfileProvider with ChangeNotifier {
       }
     } catch (e) {
       print('Error refrescando estado de verificación: $e');
+    }
+  }
+
+  /// Subir múltiples documentos del vehículo
+  Future<Map<String, String?>> uploadVehicleDocuments({
+    required int conductorId,
+    String? soatFotoPath,
+    String? tecnomecanicaFotoPath,
+    String? tarjetaPropiedadFotoPath,
+  }) async {
+    final results = <String, String?>{};
+    _errorMessage = null;
+
+    try {
+      final documents = <String, String>{};
+      
+      if (soatFotoPath != null) {
+        documents['soat'] = soatFotoPath;
+      }
+      if (tecnomecanicaFotoPath != null) {
+        documents['tecnomecanica'] = tecnomecanicaFotoPath;
+      }
+      if (tarjetaPropiedadFotoPath != null) {
+        documents['tarjeta_propiedad'] = tarjetaPropiedadFotoPath;
+      }
+
+      if (documents.isEmpty) {
+        return results;
+      }
+
+      _isLoading = true;
+      notifyListeners();
+
+      results.addAll(
+        await DocumentUploadService.uploadMultipleDocuments(
+          conductorId: conductorId,
+          documents: documents,
+        ),
+      );
+
+      _isLoading = false;
+      notifyListeners();
+
+      // Recargar perfil si algún upload fue exitoso
+      final hasSuccessfulUpload = results.values.any((url) => url != null);
+      if (hasSuccessfulUpload) {
+        await loadProfile(conductorId);
+      }
+
+      return results;
+    } catch (e) {
+      _errorMessage = 'Error al subir documentos: $e';
+      _isLoading = false;
+      notifyListeners();
+      return results;
+    }
+  }
+
+  /// Subir foto de licencia
+  Future<String?> uploadLicensePhoto({
+    required int conductorId,
+    required String licenciaFotoPath,
+  }) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final url = await DocumentUploadService.uploadDocument(
+        conductorId: conductorId,
+        tipoDocumento: 'licencia',
+        imagePath: licenciaFotoPath,
+      );
+
+      _isLoading = false;
+      notifyListeners();
+
+      // Recargar perfil si el upload fue exitoso
+      if (url != null) {
+        await loadProfile(conductorId);
+      }
+
+      return url;
+    } catch (e) {
+      _errorMessage = 'Error al subir foto de licencia: $e';
+      _isLoading = false;
+      notifyListeners();
+      return null;
     }
   }
 

@@ -66,9 +66,9 @@ class VehicleModel {
           : null,
       tarjetaPropiedadNumero: json['tarjeta_propiedad_numero']?.toString(),
       fotoVehiculo: json['foto_vehiculo']?.toString(),
-      fotoTarjetaPropiedad: json['foto_tarjeta_propiedad']?.toString(),
-      fotoSoat: json['foto_soat']?.toString(),
-      fotoTecnomecanica: json['foto_tecnomecanica']?.toString(),
+      fotoTarjetaPropiedad: json['tarjeta_propiedad_foto_url']?.toString(),
+      fotoSoat: json['soat_foto_url']?.toString(),
+      fotoTecnomecanica: json['tecnomecanica_foto_url']?.toString(),
     );
   }
 

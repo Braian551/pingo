@@ -195,6 +195,7 @@ CREATE TABLE `detalles_conductor` (
   `licencia_vencimiento` date NOT NULL,
   `licencia_expedicion` date DEFAULT NULL,
   `licencia_categoria` varchar(10) DEFAULT 'C1',
+  `licencia_foto_url` varchar(500) DEFAULT NULL COMMENT 'Ruta de la foto de la licencia',
   `vehiculo_tipo` enum('motocicleta','carro','furgoneta','camion') NOT NULL,
   `vehiculo_marca` varchar(50) DEFAULT NULL,
   `vehiculo_modelo` varchar(50) DEFAULT NULL,
@@ -204,11 +205,15 @@ CREATE TABLE `detalles_conductor` (
   `aseguradora` varchar(100) DEFAULT NULL,
   `numero_poliza_seguro` varchar(100) DEFAULT NULL,
   `vencimiento_seguro` date DEFAULT NULL,
+  `seguro_foto_url` varchar(500) DEFAULT NULL COMMENT 'Ruta de la foto del seguro',
   `soat_numero` varchar(50) DEFAULT NULL,
   `soat_vencimiento` date DEFAULT NULL,
+  `soat_foto_url` varchar(500) DEFAULT NULL COMMENT 'Ruta de la foto del SOAT',
   `tecnomecanica_numero` varchar(50) DEFAULT NULL,
   `tecnomecanica_vencimiento` date DEFAULT NULL,
+  `tecnomecanica_foto_url` varchar(500) DEFAULT NULL COMMENT 'Ruta de la foto de la tecnomecánica',
   `tarjeta_propiedad_numero` varchar(50) DEFAULT NULL,
+  `tarjeta_propiedad_foto_url` varchar(500) DEFAULT NULL COMMENT 'Ruta de la foto de la tarjeta de propiedad',
   `aprobado` tinyint(1) DEFAULT '0',
   `estado_aprobacion` enum('pendiente','aprobado','rechazado') DEFAULT 'pendiente',
   `calificacion_promedio` decimal(3,2) DEFAULT '0.00',
@@ -243,7 +248,7 @@ CREATE TABLE `detalles_conductor` (
 
 LOCK TABLES `detalles_conductor` WRITE;
 /*!40000 ALTER TABLE `detalles_conductor` DISABLE KEYS */;
-INSERT INTO `detalles_conductor` VALUES (1,7,'4343434','2036-10-24','2025-10-09','A1','motocicleta','toyota','corolla',2024,'rojo','232323',NULL,NULL,NULL,'344243434','2025-10-24','23232323','2027-10-24','334332323',0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-24 20:02:23',0,NULL,NULL,NULL,0,'pendiente',NULL,'2025-10-24 11:53:16');
+INSERT INTO `detalles_conductor` VALUES (1,7,'','2025-10-25',NULL,'C1',NULL,'motocicleta','','',NULL,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-25 19:28:58',0,NULL,NULL,NULL,0,'pendiente','2025-10-25 15:41:26','2025-10-24 11:53:16');
 /*!40000 ALTER TABLE `detalles_conductor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -309,6 +314,38 @@ CREATE TABLE `detalles_viaje` (
 LOCK TABLES `detalles_viaje` WRITE;
 /*!40000 ALTER TABLE `detalles_viaje` DISABLE KEYS */;
 /*!40000 ALTER TABLE `detalles_viaje` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `documentos_conductor_historial`
+--
+
+DROP TABLE IF EXISTS `documentos_conductor_historial`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documentos_conductor_historial` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `conductor_id` bigint unsigned NOT NULL,
+  `tipo_documento` enum('licencia','soat','tecnomecanica','tarjeta_propiedad','seguro') NOT NULL,
+  `url_documento` varchar(500) NOT NULL,
+  `fecha_carga` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `activo` tinyint(1) DEFAULT '1' COMMENT '1 si es el documento actual, 0 si fue reemplazado',
+  `reemplazado_en` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_conductor_tipo` (`conductor_id`,`tipo_documento`),
+  KEY `idx_fecha_carga` (`fecha_carga`),
+  KEY `idx_activo` (`activo`),
+  CONSTRAINT `fk_doc_historial_conductor` FOREIGN KEY (`conductor_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de documentos subidos por conductores';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documentos_conductor_historial`
+--
+
+LOCK TABLES `documentos_conductor_historial` WRITE;
+/*!40000 ALTER TABLE `documentos_conductor_historial` DISABLE KEYS */;
+/*!40000 ALTER TABLE `documentos_conductor_historial` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -407,7 +444,7 @@ CREATE TABLE `logs_auditoria` (
   KEY `idx_accion` (`accion`),
   KEY `idx_fecha` (`fecha_creacion`),
   CONSTRAINT `fk_logs_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -416,7 +453,7 @@ CREATE TABLE `logs_auditoria` (
 
 LOCK TABLES `logs_auditoria` WRITE;
 /*!40000 ALTER TABLE `logs_auditoria` DISABLE KEYS */;
-INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27');
+INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27'),(3,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-25 15:41:26'),(4,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 16:08:02'),(5,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 18:47:52');
 /*!40000 ALTER TABLE `logs_auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -816,4 +853,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-25  9:10:53
+-- Dump completed on 2025-10-25 14:31:30
