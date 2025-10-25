@@ -6,13 +6,16 @@ import '../../models/conductor_profile_model.dart';
 import 'license_registration_screen.dart';
 import 'vehicle_only_registration_screen.dart';
 import 'verification_status_screen.dart';
+import 'package:ping_go/src/global/services/auth/user_service.dart';
 
 class ConductorProfileScreen extends StatefulWidget {
   final int conductorId;
+  final bool showBackButton;
 
   const ConductorProfileScreen({
     super.key,
     required this.conductorId,
+    this.showBackButton = true,
   });
 
   @override
@@ -97,8 +100,12 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                   const SizedBox(height: 24),
                   _buildPendingTasks(profile),
                   const SizedBox(height: 24),
-                  if (profile.isProfileComplete && !profile.aprobado)
-                    _buildSubmitButton(provider),
+                  if (profile.isProfileComplete && !profile.aprobado && profile.estadoVerificacion != VerificationStatus.enRevision)
+                    _buildSubmitButton(provider, profile),
+                  const SizedBox(height: 24),
+                  if (profile.estadoVerificacion == VerificationStatus.enRevision)
+                    _buildInReviewMessage(),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -122,10 +129,13 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
           ),
         ),
       ),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: widget.showBackButton
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            )
+          : null,
+      automaticallyImplyLeading: widget.showBackButton,
       title: const Text(
         'Mi Perfil',
         style: TextStyle(
@@ -134,6 +144,70 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.logout_rounded, color: Colors.white),
+          onPressed: () => _showLogoutDialog(),
+        ),
+      ],
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            '¿Cerrar sesión?',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            '¿Estás seguro de que deseas cerrar sesión?',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white54),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await UserService.clearSession();
+                if (mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/welcome',
+                    (route) => false,
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFFF00),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Cerrar sesión',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -192,7 +266,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               const SizedBox(height: 12),
               Text(
                 profile.isProfileComplete
-                    ? '¡Perfil completo! 🎉'
+                    ? '¡Perfil completo!'
                     : 'Completa tu perfil para recibir viajes',
                 style: TextStyle(
                   color: profile.isProfileComplete
@@ -600,7 +674,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
     );
   }
 
-  Widget _buildSubmitButton(ConductorProfileProvider provider) {
+  Widget _buildSubmitButton(ConductorProfileProvider provider, ConductorProfileModel profile) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -615,11 +689,14 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                          '¡Perfil enviado para verificación!',
+                          '¡Perfil enviado para verificación exitosamente!',
                         ),
                         backgroundColor: Colors.green,
+                        duration: Duration(seconds: 3),
                       ),
                     );
+                    // Recargar perfil para actualizar estado
+                    await provider.loadProfile(widget.conductorId);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -657,6 +734,91 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildInReviewMessage() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.blue.withOpacity(0.3),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.hourglass_empty_rounded,
+                  color: Colors.blue,
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Verificación en Revisión',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Tu perfil ha sido enviado y está siendo revisado por nuestro equipo. Te notificaremos cuando el proceso haya finalizado.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: Color(0xFFFFFF00),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Tiempo estimado: 24-48 horas',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

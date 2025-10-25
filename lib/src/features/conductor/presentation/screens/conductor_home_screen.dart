@@ -81,29 +81,35 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
-      if (profile != null && !profile.isProfileComplete && !_hasShownProfileAlert) {
-        _hasShownProfileAlert = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            final actionType = getProfileActionType(profile);
-            ProfileIncompleteAlert.show(
-              context,
-              missingItems: profile.pendingTasks.isEmpty 
-                ? [
-                    'Registrar licencia de conducción',
-                    'Registrar vehículo',
-                    'Completar documentos',
-                  ]
-                : profile.pendingTasks,
-              dismissible: true,
-              actionType: actionType,
-            ).then((shouldComplete) {
-              if (shouldComplete == true && mounted) {
-                _handleProfileAction(actionType, profile);
-              }
-            });
-          }
-        });
+      if (profile != null && !_hasShownProfileAlert) {
+        final actionType = getProfileActionType(profile);
+        
+        // Only show alert if there are pending actions (not in review or complete)
+        if (actionType == ProfileAction.registerLicense || 
+            actionType == ProfileAction.registerVehicle || 
+            actionType == ProfileAction.submitVerification) {
+          _hasShownProfileAlert = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ProfileIncompleteAlert.show(
+                context,
+                missingItems: profile.pendingTasks.isEmpty 
+                  ? [
+                      'Registrar licencia de conducción',
+                      'Registrar vehículo',
+                      'Completar documentos',
+                    ]
+                  : profile.pendingTasks,
+                dismissible: true,
+                actionType: actionType,
+              ).then((shouldComplete) {
+                if (shouldComplete == true && mounted) {
+                  _handleProfileAction(actionType, profile);
+                }
+              });
+            }
+          });
+        }
       }
       
     } catch (e, stackTrace) {
@@ -160,6 +166,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
 
       case ProfileAction.submitVerification:
       case ProfileAction.completeProfile:
+      case ProfileAction.inReview:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -279,8 +286,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     }
                     
                     if (!profile.canBeAvailable) {
-                      // Show profile incomplete alert
+                      // Show appropriate alert based on profile status
                       final actionType = getProfileActionType(profile);
+                      
+                      // Always show alert, but content depends on status
                       final shouldComplete = await ProfileIncompleteAlert.show(
                         context,
                         missingItems: profile.pendingTasks.isEmpty 
@@ -340,7 +349,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case 2:
         return ConductorEarningsScreen(conductorId: _conductorId ?? 0);
       case 3:
-        return ConductorProfileScreen(conductorId: _conductorId ?? 0);
+        return ConductorProfileScreen(
+          conductorId: _conductorId ?? 0,
+          showBackButton: false,
+        );
       default:
         return _buildHomeTab();
     }
