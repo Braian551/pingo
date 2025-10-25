@@ -130,6 +130,32 @@ class UserService {
     }
   }
 
+  static Future<Map<String, dynamic>?> getAdminProfile({int? adminId, String? email}) async {
+    try {
+      final uri = Uri.parse('http://10.0.2.2/pingo/backend/admin/dashboard_stats.php')
+          .replace(queryParameters: adminId != null ? {'admin_id': adminId.toString()} : null);
+
+      final response = await http.get(uri, headers: {
+        'Accept': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['success'] == true && data['data']?['admin'] != null) {
+          return {
+            'success': true,
+            'admin': data['data']['admin'],
+          };
+        }
+        return null;
+      }
+      return null;
+    } catch (e) {
+      print('Error obteniendo perfil de admin: $e');
+      return null;
+    }
+  }
+
   static Future<Map<String, dynamic>?> getProfile({int? userId, String? email}) async {
     try {
       final uri = Uri.parse('http://10.0.2.2/pingo/backend/auth/profile.php')
@@ -223,6 +249,8 @@ class UserService {
   static const String _kUserEmail = 'pingo_user_email';
   static const String _kUserId = 'pingo_user_id';
   static const String _kUserType = 'pingo_user_type';
+  static const String _kUserName = 'pingo_user_name';
+  static const String _kUserPhone = 'pingo_user_phone';
 
   static Future<void> saveSession(Map<String, dynamic>? user) async {
     if (user == null) return;
@@ -236,6 +264,14 @@ class UserService {
     if (user.containsKey('tipo_usuario') && user['tipo_usuario'] != null) {
       await prefs.setString(_kUserType, user['tipo_usuario'].toString());
     }
+    // Guardar nombre si está disponible (especialmente para administradores)
+    if (user.containsKey('nombre') && user['nombre'] != null) {
+      await prefs.setString(_kUserName, user['nombre'].toString());
+    }
+    // Guardar teléfono si está disponible
+    if (user.containsKey('telefono') && user['telefono'] != null) {
+      await prefs.setString(_kUserPhone, user['telefono'].toString());
+    }
   }
 
   static Future<Map<String, dynamic>?> getSavedSession() async {
@@ -243,11 +279,15 @@ class UserService {
     final email = prefs.getString(_kUserEmail);
     final id = prefs.getInt(_kUserId);
     final tipoUsuario = prefs.getString(_kUserType);
+    final nombre = prefs.getString(_kUserName);
+    final telefono = prefs.getString(_kUserPhone);
     if (email == null && id == null) return null;
     return {
       if (id != null) 'id': id,
       if (email != null) 'email': email,
       if (tipoUsuario != null) 'tipo_usuario': tipoUsuario,
+      if (nombre != null) 'nombre': nombre,
+      if (telefono != null) 'telefono': telefono,
     };
   }
 
@@ -256,6 +296,8 @@ class UserService {
     await prefs.remove(_kUserEmail);
     await prefs.remove(_kUserId);
     await prefs.remove(_kUserType);
+    await prefs.remove(_kUserName);
+    await prefs.remove(_kUserPhone);
   }
 
   static Future<Map<String, dynamic>> login({
@@ -275,11 +317,16 @@ class UserService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
         print('UserService.login: response data = $data');
-        // If login success and backend returned user, save session locally
+        // If login success and backend returned user or admin, save session locally
         try {
-          if (data['success'] == true && data['data']?['user'] != null) {
-            print('UserService.login: user data = ${data['data']['user']}');
-            await saveSession(Map<String, dynamic>.from(data['data']['user']));
+          if (data['success'] == true) {
+            if (data['data']?['admin'] != null) {
+              print('UserService.login: admin data = ${data['data']['admin']}');
+              await saveSession(Map<String, dynamic>.from(data['data']['admin']));
+            } else if (data['data']?['user'] != null) {
+              print('UserService.login: user data = ${data['data']['user']}');
+              await saveSession(Map<String, dynamic>.from(data['data']['user']));
+            }
           }
         } catch (_) {
           // ignore save session errors

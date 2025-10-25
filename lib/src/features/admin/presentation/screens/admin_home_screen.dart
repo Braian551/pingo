@@ -42,7 +42,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final adminName = (widget.adminUser['nombre'] ?? 'Braian').toString();
+    final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
 
     return Scaffold(
       backgroundColor: Colors.black,

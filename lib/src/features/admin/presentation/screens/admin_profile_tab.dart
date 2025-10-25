@@ -23,9 +23,9 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context);
     
-    final adminName = widget.adminUser['nombre'] ?? 'Administrador';
+    final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
     final adminEmail = widget.adminUser['correo_electronico'] ?? widget.adminUser['email'] ?? 'admin@pinggo.com';
-    final adminPhone = widget.adminUser['telefono'] ?? 'No especificado';
+    final adminPhone = widget.adminUser['telefono'] ?? widget.adminUser['phone'] ?? 'No especificado';
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

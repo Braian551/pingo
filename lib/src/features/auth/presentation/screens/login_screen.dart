@@ -69,19 +69,29 @@ class _LoginScreenState extends State<LoginScreen> {
           _showSuccess('¡Bienvenido de nuevo!');
           await Future.delayed(const Duration(milliseconds: 500));
           try {
-            await UserService.saveSession(resp['data']?['user'] ?? {'email': emailToUse});
+            // Determinar qué datos guardar en la sesión según el tipo de usuario
+            final user = resp['data']?['user'];
+            final admin = resp['data']?['admin'];
+            final tipoUsuario = user?['tipo_usuario'] ?? admin?['tipo_usuario'] ?? 'cliente';
+            
+            if (tipoUsuario == 'administrador') {
+              await UserService.saveSession(admin ?? {'email': emailToUse});
+            } else {
+              await UserService.saveSession(user ?? {'email': emailToUse});
+            }
           } catch (_) {}
 
           if (mounted) {
             final user = resp['data']?['user'];
-            final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
+            final admin = resp['data']?['admin'];
+            final tipoUsuario = user?['tipo_usuario'] ?? admin?['tipo_usuario'] ?? 'cliente';
             
             // Redirigir según el tipo de usuario
             if (tipoUsuario == 'administrador') {
               Navigator.pushReplacementNamed(
                 context,
                 RouteNames.adminHome,
-                arguments: {'admin_user': user},
+                arguments: {'admin_user': admin},
               );
             } else if (tipoUsuario == 'conductor') {
               Navigator.pushReplacementNamed(

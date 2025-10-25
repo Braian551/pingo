@@ -103,7 +103,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
   Widget build(BuildContext context) {
     super.build(context);
     
-    final adminName = (widget.adminUser['nombre'] ?? 'Braian').toString();
+    final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
 
     if (_isLoading) {
       return _buildShimmerLoading();

@@ -37,7 +37,7 @@ try {
     $db = $database->getConnection();
 
     // Verificar que el usuario sea administrador
-    $checkAdmin = "SELECT id, tipo_usuario, nombre FROM usuarios WHERE id = ? AND tipo_usuario = 'administrador'";
+    $checkAdmin = "SELECT id, tipo_usuario, nombre, email, telefono FROM usuarios WHERE id = ? AND tipo_usuario = 'administrador'";
     $stmtCheck = $db->prepare($checkAdmin);
     $stmtCheck->execute([$input['admin_id']]);
     

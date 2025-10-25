@@ -75,10 +75,35 @@ class _AuthWrapperState extends State<AuthWrapper>
         if (tipoUsuarioGuardado != null) {
           // Usar el tipo guardado directamente para navegación más rápida
           if (tipoUsuarioGuardado == 'administrador') {
-            Navigator.of(context).pushReplacementNamed(
-              RouteNames.adminHome,
-              arguments: {'admin_user': session},
-            );
+            // Para administradores, verificar si tenemos información completa
+            if (session.containsKey('nombre') && session['nombre'] != null) {
+              // Ya tenemos la información completa
+              Navigator.of(context).pushReplacementNamed(
+                RouteNames.adminHome,
+                arguments: {'admin_user': session},
+              );
+            } else {
+              // Necesitamos obtener el perfil completo del admin
+              final adminProfile = await UserService.getAdminProfile(
+                adminId: session['id'] as int?,
+                email: session['email'] as String?,
+              );
+
+              if (!mounted) return;
+
+              if (adminProfile != null && adminProfile['success'] == true) {
+                Navigator.of(context).pushReplacementNamed(
+                  RouteNames.adminHome,
+                  arguments: {'admin_user': adminProfile['admin']},
+                );
+              } else {
+                // Si no se pudo obtener el perfil de admin, usar datos básicos
+                Navigator.of(context).pushReplacementNamed(
+                  RouteNames.adminHome,
+                  arguments: {'admin_user': session},
+                );
+              }
+            }
           } else if (tipoUsuarioGuardado == 'conductor') {
             Navigator.of(context).pushReplacementNamed(
               RouteNames.conductorHome,
@@ -109,10 +134,26 @@ class _AuthWrapperState extends State<AuthWrapper>
 
             // Redirigir según el tipo de usuario
             if (tipoUsuario == 'administrador') {
-              Navigator.of(context).pushReplacementNamed(
-                RouteNames.adminHome,
-                arguments: {'admin_user': user},
+              // Para administradores, necesitamos obtener el perfil completo desde dashboard_stats
+              final adminProfile = await UserService.getAdminProfile(
+                adminId: session['id'] as int?,
+                email: session['email'] as String?,
               );
+
+              if (!mounted) return;
+
+              if (adminProfile != null && adminProfile['success'] == true) {
+                Navigator.of(context).pushReplacementNamed(
+                  RouteNames.adminHome,
+                  arguments: {'admin_user': adminProfile['admin']},
+                );
+              } else {
+                // Si no se pudo obtener el perfil de admin, usar datos básicos
+                Navigator.of(context).pushReplacementNamed(
+                  RouteNames.adminHome,
+                  arguments: {'admin_user': session},
+                );
+              }
             } else if (tipoUsuario == 'conductor') {
               Navigator.of(context).pushReplacementNamed(
                 RouteNames.conductorHome,
