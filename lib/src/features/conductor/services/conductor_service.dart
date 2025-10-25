@@ -1,8 +1,15 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../../core/config/app_config.dart';
 
+/// Servicio para operaciones de conductor
+/// 
+/// NOTA: Este servicio es redundante con ConductorRemoteDataSource.
+/// Se mantiene por compatibilidad, pero debería migrarse a usar
+/// el patrón de Clean Architecture (Repository -> DataSource)
 class ConductorService {
-  static const String baseUrl = 'http://10.0.2.2/pingo/backend/conductor';
+  /// URL base del microservicio de conductores
+  static String get baseUrl => AppConfig.conductorServiceUrl;
 
   /// Obtener información completa del conductor
   static Future<Map<String, dynamic>?> getConductorInfo(int conductorId) async {

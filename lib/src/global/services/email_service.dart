@@ -2,13 +2,17 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import '../../core/constants/app_constants.dart';
+import '../../core/config/app_config.dart';
 
+/// Servicio para envío de correos electrónicos
+/// 
+/// NOTA: email_service.php ahora está en el microservicio de auth
+/// URL: AppConfig.authServiceUrl/email_service.php
 class EmailService {
-  // Usar URL de producción o local según configuración
+  /// URL del servicio de email
+  /// Archivo movido a auth/ microservicio
   static String get _apiUrl {
-    // En desarrollo puedes usar localhost, en producción usa tu servidor
-    return AppConstants.emailApiUrl;
+    return '${AppConfig.authServiceUrl}/email_service.php';
   }
 
   /// Genera un código de verificación de 6 dígitos
@@ -76,9 +80,9 @@ class EmailService {
     required String email,
     required String code,
     required String userName,
-    bool? useMock, // Si es null, usa la configuración de AppConstants
+    bool? useMock, // Si es null, usa mock en desarrollo
   }) async {
-    final shouldUseMock = useMock ?? AppConstants.useEmailMock;
+    final shouldUseMock = useMock ?? (AppConfig.environment == Environment.development);
     
     if (shouldUseMock) {
       return await sendVerificationCodeMock(

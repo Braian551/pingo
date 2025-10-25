@@ -22,7 +22,10 @@ class AppConstants {
   // ============================================
   // CONFIGURACIÓN DE EMAIL
   // ============================================
-  static const String emailApiUrl = 'http://10.0.2.2/pingo/backend/email_service.php';
+  // NOTA: email_service.php YA FUE MOVIDO a auth/ microservicio
+  // Usar: AppConfig.authServiceUrl + '/email_service.php'
+  @Deprecated('Usar AppConfig.authServiceUrl + \'/email_service.php\' en su lugar')
+  static const String emailApiUrl = 'http://10.0.2.2/pingo/backend/auth/email_service.php';
   static const bool useEmailMock = false;
   
   // ============================================

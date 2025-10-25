@@ -2,22 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ping_go/src/routes/app_router.dart';
 import 'package:ping_go/src/providers/database_provider.dart';
-import 'package:ping_go/src/features/map/providers/map_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_profile_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_trips_provider.dart';
 import 'package:ping_go/src/features/conductor/providers/conductor_earnings_provider.dart';
+import 'package:ping_go/src/core/di/service_locator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
 
+  // Inicializar Service Locator (Inyección de Dependencias)
+  // Esto configura todos los datasources, repositories y use cases
+  final serviceLocator = ServiceLocator();
+  await serviceLocator.init();
+
   runApp(
     MultiProvider(
       providers: [
+        // Database Provider (legacy)
         ChangeNotifierProvider(create: (_) => DatabaseProvider()),
-        ChangeNotifierProvider(create: (_) => MapProvider()),
+        
+        // ========== MICROSERVICES ARCHITECTURE (Clean Architecture) ==========
+        
+        // User Microservice Provider
+        ChangeNotifierProvider(
+          create: (_) => serviceLocator.createUserProvider(),
+        ),
+        
+        // Conductor Microservice Provider
+        ChangeNotifierProvider(
+          create: (_) => serviceLocator.createConductorProfileProvider(),
+        ),
+
+        // Trip Microservice Provider
+        ChangeNotifierProvider(
+          create: (_) => serviceLocator.createTripProvider(),
+        ),
+
+        // Map Microservice Provider
+        ChangeNotifierProvider(
+          create: (_) => serviceLocator.createMapProvider(),
+        ),
+
+        // Admin Microservice Provider
+        ChangeNotifierProvider(
+          create: (_) => serviceLocator.createAdminProvider(),
+        ),
+
+        // ========== LEGACY PROVIDERS (por deprecar gradualmente) ==========
+        
+        // Conductor Providers (legacy - funcionalidad migrada a Conductor Microservice)
         ChangeNotifierProvider(create: (_) => ConductorProvider()),
         ChangeNotifierProvider(create: (_) => ConductorProfileProvider()),
         ChangeNotifierProvider(create: (_) => ConductorTripsProvider()),

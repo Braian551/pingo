@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../core/config/app_config.dart';
 
 /// Modelo para las ganancias
 class EarningsModel {
@@ -49,8 +50,12 @@ class EarningsDayModel {
 }
 
 /// Servicio para gestionar las ganancias del conductor
+/// 
+/// NOTA: Redundante con ConductorRemoteDataSource.
+/// Se mantiene por compatibilidad.
 class ConductorEarningsService {
-  static const String _baseUrl = 'http://10.0.2.2/pingo/backend';
+  /// URL base del microservicio de conductores
+  static String get _baseUrl => AppConfig.baseUrl;
 
   /// Obtener ganancias del conductor
   static Future<Map<String, dynamic>> getEarnings({

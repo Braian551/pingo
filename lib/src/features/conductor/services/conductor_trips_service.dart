@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../core/config/app_config.dart';
 
 /// Modelo para un viaje individual
 class TripModel {
@@ -135,8 +136,12 @@ class PaginationModel {
 }
 
 /// Servicio para gestionar el historial de viajes del conductor
+/// 
+/// NOTA: Redundante con ConductorRemoteDataSource.
+/// Se mantiene por compatibilidad.
 class ConductorTripsService {
-  static const String _baseUrl = 'http://10.0.2.2/pingo/backend';
+  /// URL base del microservicio
+  static String get _baseUrl => AppConfig.baseUrl;
 
   /// Obtener historial de viajes
   static Future<Map<String, dynamic>> getTripsHistory({

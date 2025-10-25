@@ -4,9 +4,15 @@ import 'package:http/http.dart' as http;
 import '../models/conductor_profile_model.dart';
 import '../models/driver_license_model.dart';
 import '../models/vehicle_model.dart';
+import '../../../core/config/app_config.dart';
 
+/// Servicio para gestión de perfil de conductor
+/// 
+/// NOTA: Este servicio es redundante con ConductorRemoteDataSource.
+/// Se mantiene por compatibilidad con código legacy.
 class ConductorProfileService {
-  static const String baseUrl = 'http://10.0.2.2/pingo/backend/conductor';
+  /// URL base del microservicio de conductores
+  static String get baseUrl => AppConfig.conductorServiceUrl;
 
   /// Obtener perfil completo del conductor
   static Future<ConductorProfileModel?> getProfile(int conductorId) async {
