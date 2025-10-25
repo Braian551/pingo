@@ -1,11 +1,10 @@
 import 'dart:ui';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../models/vehicle_model.dart';
 import '../../providers/conductor_profile_provider.dart';
 import 'license_registration_screen.dart';
+import '../widgets/document_upload_widget.dart';
 
 class VehicleOnlyRegistrationScreen extends StatefulWidget {
   final int conductorId;
@@ -24,7 +23,6 @@ class VehicleOnlyRegistrationScreen extends StatefulWidget {
 class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationScreen> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
-  final ImagePicker _picker = ImagePicker();
 
   // Vehicle data
   final _placaController = TextEditingController();
@@ -345,6 +343,8 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           Icons.description_rounded,
         ),
         const SizedBox(height: 24),
+        
+        // SOAT
         _buildTextField(
           controller: _soatNumberController,
           label: 'Número SOAT',
@@ -364,12 +364,36 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           onTap: () => _selectSOATDate(context),
         ),
         const SizedBox(height: 16),
-        _buildPhotoUpload(
-          label: 'Foto del SOAT',
-          photoPath: _soatFotoPath,
-          onTap: () => _pickImage('soat'),
+        DocumentUploadWidget(
+          label: 'Documento SOAT',
+          subtitle: 'Foto o PDF del SOAT',
+          filePath: _soatFotoPath,
+          icon: Icons.shield_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _soatFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _soatFotoPath = null;
+            });
+          },
         ),
-        const SizedBox(height: 20),
+        
+        const SizedBox(height: 24),
+        const Divider(color: Colors.white24, thickness: 1),
+        const SizedBox(height: 24),
+        
+        // Tecnomecánica
         _buildTextField(
           controller: _tecnomecanicaNumberController,
           label: 'Número Tecnomecánica',
@@ -389,12 +413,36 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           onTap: () => _selectTecnomecanicaDate(context),
         ),
         const SizedBox(height: 16),
-        _buildPhotoUpload(
-          label: 'Foto de la Tecnomecánica',
-          photoPath: _tecnomecanicaFotoPath,
-          onTap: () => _pickImage('tecnomecanica'),
+        DocumentUploadWidget(
+          label: 'Certificado Tecnomecánica',
+          subtitle: 'Foto o PDF del certificado',
+          filePath: _tecnomecanicaFotoPath,
+          icon: Icons.build_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _tecnomecanicaFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _tecnomecanicaFotoPath = null;
+            });
+          },
         ),
-        const SizedBox(height: 20),
+        
+        const SizedBox(height: 24),
+        const Divider(color: Colors.white24, thickness: 1),
+        const SizedBox(height: 24),
+        
+        // Tarjeta de propiedad
         _buildTextField(
           controller: _tarjetaPropiedadController,
           label: 'Tarjeta de Propiedad',
@@ -408,10 +456,29 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           },
         ),
         const SizedBox(height: 16),
-        _buildPhotoUpload(
-          label: 'Foto de la Tarjeta de Propiedad',
-          photoPath: _tarjetaPropiedadFotoPath,
-          onTap: () => _pickImage('tarjeta_propiedad'),
+        DocumentUploadWidget(
+          label: 'Tarjeta de Propiedad',
+          subtitle: 'Foto o PDF de la tarjeta',
+          filePath: _tarjetaPropiedadFotoPath,
+          icon: Icons.credit_card_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _tarjetaPropiedadFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _tarjetaPropiedadFotoPath = null;
+            });
+          },
         ),
       ],
     );
@@ -712,217 +779,6 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         ),
       ),
     );
-  }
-
-  /// Widget para seleccionar/mostrar foto
-  Widget _buildPhotoUpload({
-    required String label,
-    required String? photoPath,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: photoPath != null 
-                    ? const Color(0xFFFFFF00).withOpacity(0.3)
-                    : Colors.white.withOpacity(0.1),
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: photoPath != null
-                        ? const Color(0xFFFFFF00).withOpacity(0.15)
-                        : Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: photoPath != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            File(photoPath),
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Icon(
-                          Icons.add_a_photo_rounded,
-                          color: Colors.white.withOpacity(0.4),
-                          size: 28,
-                        ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        photoPath != null ? 'Foto seleccionada' : 'Toca para seleccionar',
-                        style: TextStyle(
-                          color: photoPath != null 
-                              ? const Color(0xFFFFFF00)
-                              : Colors.white54,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  photoPath != null ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
-                  color: photoPath != null
-                      ? const Color(0xFFFFFF00)
-                      : Colors.white.withOpacity(0.3),
-                  size: 24,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Seleccionar imagen de la galería o cámara
-  Future<void> _pickImage(String documentType) async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Seleccionar foto',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFF00).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.camera_alt_rounded, color: Color(0xFFFFFF00)),
-                  ),
-                  title: const Text(
-                    'Tomar foto',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    'Usar cámara',
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
-                  ),
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFF00).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFFFFFF00)),
-                  ),
-                  title: const Text(
-                    'Seleccionar de galería',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    'Elegir foto existente',
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
-                  ),
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    if (source != null) {
-      try {
-        final XFile? image = await _picker.pickImage(
-          source: source,
-          maxWidth: 1920,
-          maxHeight: 1920,
-          imageQuality: 85,
-        );
-
-        if (image != null) {
-          setState(() {
-            switch (documentType) {
-              case 'soat':
-                _soatFotoPath = image.path;
-                break;
-              case 'tecnomecanica':
-                _tecnomecanicaFotoPath = image.path;
-                break;
-              case 'tarjeta_propiedad':
-                _tarjetaPropiedadFotoPath = image.path;
-                break;
-            }
-          });
-        }
-      } catch (e) {
-        print('Error al seleccionar imagen: $e');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error al seleccionar imagen'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
   }
 
   Future<void> _selectSOATDate(BuildContext context) async {

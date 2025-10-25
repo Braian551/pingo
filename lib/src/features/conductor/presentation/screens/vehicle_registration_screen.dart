@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/vehicle_model.dart';
 import '../../models/driver_license_model.dart';
 import '../../providers/conductor_profile_provider.dart';
+import '../widgets/document_upload_widget.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
   final int conductorId;
@@ -40,9 +41,12 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   // Document data
   final _soatNumberController = TextEditingController();
   DateTime? _soatVencimiento;
+  String? _soatFotoPath;
   final _tecnomecanicaNumberController = TextEditingController();
   DateTime? _tecnomecanicaVencimiento;
+  String? _tecnomecanicaFotoPath;
   final _tarjetaPropiedadController = TextEditingController();
+  String? _tarjetaPropiedadFotoPath;
 
   @override
   void initState() {
@@ -384,6 +388,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
           Icons.description_rounded,
         ),
         const SizedBox(height: 24),
+        
+        // SOAT
         _buildTextField(
           controller: _soatNumberController,
           label: 'Número SOAT',
@@ -402,7 +408,37 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
           selectedDate: _soatVencimiento,
           onTap: () => _selectSOATDate(context),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+        DocumentUploadWidget(
+          label: 'Documento SOAT',
+          subtitle: 'Foto o PDF del SOAT',
+          filePath: _soatFotoPath,
+          icon: Icons.shield_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _soatFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _soatFotoPath = null;
+            });
+          },
+        ),
+        
+        const SizedBox(height: 24),
+        const Divider(color: Colors.white24, thickness: 1),
+        const SizedBox(height: 24),
+        
+        // Tecnomecánica
         _buildTextField(
           controller: _tecnomecanicaNumberController,
           label: 'Número Tecnomecánica',
@@ -421,7 +457,37 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
           selectedDate: _tecnomecanicaVencimiento,
           onTap: () => _selectTecnomecanicaDate(context),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+        DocumentUploadWidget(
+          label: 'Certificado Tecnomecánica',
+          subtitle: 'Foto o PDF del certificado',
+          filePath: _tecnomecanicaFotoPath,
+          icon: Icons.build_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _tecnomecanicaFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _tecnomecanicaFotoPath = null;
+            });
+          },
+        ),
+        
+        const SizedBox(height: 24),
+        const Divider(color: Colors.white24, thickness: 1),
+        const SizedBox(height: 24),
+        
+        // Tarjeta de propiedad
         _buildTextField(
           controller: _tarjetaPropiedadController,
           label: 'Tarjeta de Propiedad',
@@ -432,6 +498,31 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
               return 'Por favor ingresa el número de tarjeta de propiedad';
             }
             return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        DocumentUploadWidget(
+          label: 'Tarjeta de Propiedad',
+          subtitle: 'Foto o PDF de la tarjeta',
+          filePath: _tarjetaPropiedadFotoPath,
+          icon: Icons.credit_card_rounded,
+          acceptedType: DocumentType.any,
+          isRequired: false,
+          onTap: () async {
+            final path = await DocumentPickerHelper.pickDocument(
+              context: context,
+              documentType: DocumentType.any,
+            );
+            if (path != null) {
+              setState(() {
+                _tarjetaPropiedadFotoPath = path;
+              });
+            }
+          },
+          onRemove: () {
+            setState(() {
+              _tarjetaPropiedadFotoPath = null;
+            });
           },
         ),
       ],
