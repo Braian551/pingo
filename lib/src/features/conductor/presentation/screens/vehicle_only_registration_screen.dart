@@ -168,8 +168,8 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
               color: isCompleted
                   ? const Color(0xFFFFFF00)
                   : isActive
-                      ? const Color(0xFFFFFF00).withOpacity(0.2)
-                      : Colors.white.withOpacity(0.1),
+                      ? const Color(0xFFFFFF00).withOpacity(0.15)
+                      : Colors.white.withOpacity(0.05),
               shape: BoxShape.circle,
               border: Border.all(
                 color: isActive || isCompleted 
@@ -251,6 +251,9 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor ingresa la placa';
+            }
+            if (value.length < 6) {
+              return 'La placa debe tener al menos 6 caracteres';
             }
             return null;
           },
@@ -420,18 +423,20 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFF00).withOpacity(0.2),
+            color: const Color(0xFFFFFF00).withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFFFFFF00), size: 24),
         ),
         const SizedBox(width: 16),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -506,6 +511,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 12),
@@ -525,14 +531,14 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFFFF00).withOpacity(0.2)
+                            ? const Color(0xFFFFFF00).withOpacity(0.15)
                             : Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFFFFFF00)
+                              ? const Color(0xFFFFFF00).withOpacity(0.5)
                               : Colors.white.withOpacity(0.1),
-                          width: 2,
+                          width: 1.5,
                         ),
                       ),
                       child: Row(
@@ -541,14 +547,15 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                           Icon(
                             type.icon,
                             size: 20,
-                            color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
+                            color: isSelected ? const Color(0xFFFFFF00) : Colors.white70,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             type.label,
                             style: TextStyle(
-                              color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected ? const Color(0xFFFFFF00) : Colors.white70,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -726,7 +733,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: photoPath != null 
-                    ? const Color(0xFFFFFF00).withOpacity(0.5)
+                    ? const Color(0xFFFFFF00).withOpacity(0.3)
                     : Colors.white.withOpacity(0.1),
                 width: 1.5,
               ),
@@ -738,7 +745,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                   height: 60,
                   decoration: BoxDecoration(
                     color: photoPath != null
-                        ? const Color(0xFFFFFF00).withOpacity(0.2)
+                        ? const Color(0xFFFFFF00).withOpacity(0.15)
                         : Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -752,7 +759,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                         )
                       : Icon(
                           Icons.add_a_photo_rounded,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withOpacity(0.4),
                           size: 28,
                         ),
                 ),
@@ -846,8 +853,13 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                     'Tomar foto',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                   ),
+                  subtitle: Text(
+                    'Usar cámara',
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                  ),
                   onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
+                const SizedBox(height: 8),
                 ListTile(
                   leading: Container(
                     padding: const EdgeInsets.all(12),
@@ -860,6 +872,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                   title: const Text(
                     'Seleccionar de galería',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'Elegir foto existente',
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
                   ),
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
@@ -1075,50 +1091,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
             // Mostrar diálogo para ir a registrar licencia
             final goToLicense = await showDialog<bool>(
               context: context,
-              builder: (context) => AlertDialog(
-                backgroundColor: const Color(0xFF1A1A1A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                title: const Row(
-                  children: [
-                    Icon(Icons.badge_rounded, color: Color(0xFFFFFF00)),
-                    SizedBox(width: 12),
-                    Text(
-                      'Registrar Licencia',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                content: const Text(
-                  '¡Vehículo guardado! ¿Deseas continuar registrando tu licencia de conducción ahora?',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text(
-                      'Después',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFFF00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+              builder: (context) => _buildNavigationDialog(
+                icon: Icons.badge_rounded,
+                title: 'Registrar Licencia',
+                message: '¡Vehículo guardado! ¿Deseas continuar registrando tu licencia de conducción ahora?',
               ),
             );
 
@@ -1150,5 +1126,113 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         );
       }
     }
+  }
+
+  Widget _buildNavigationDialog({
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFF00).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: const Color(0xFFFFFF00),
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Después',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFFFFF00),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Continuar',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

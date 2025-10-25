@@ -1,6 +1,8 @@
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/driver_license_model.dart';
 import '../../providers/conductor_profile_provider.dart';
 import 'vehicle_only_registration_screen.dart';
@@ -22,9 +24,11 @@ class LicenseRegistrationScreen extends StatefulWidget {
 class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _licenseNumberController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   DateTime? _licenseExpedicion;
   DateTime? _licenseVencimiento;
   LicenseCategory _selectedCategory = LicenseCategory.c1;
+  String? _licenceFotoPath;
 
   @override
   void initState() {
@@ -118,10 +122,10 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFF00).withOpacity(0.15),
+            color: const Color(0xFFFFFF00).withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFFFFF00).withOpacity(0.3),
+              color: const Color(0xFFFFFF00).withOpacity(0.2),
               width: 1.5,
             ),
           ),
@@ -130,7 +134,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFF00).withOpacity(0.2),
+                  color: const Color(0xFFFFFF00).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -145,7 +149,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isEditing ? 'Actualizar Informaci�n' : 'Licencia de Conducci�n',
+                      isEditing ? 'Actualizar Información' : 'Licencia de Conducción',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -176,12 +180,12 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       children: [
         _buildTextField(
           controller: _licenseNumberController,
-          label: 'N�mero de Licencia',
+          label: 'Número de Licencia',
           hint: 'Ej: 12345678',
           icon: Icons.numbers_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el n�mero de licencia';
+              return 'Por favor ingresa el número de licencia';
             }
             return null;
           },
@@ -190,7 +194,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         _buildCategorySelector(),
         const SizedBox(height: 16),
         _buildDateField(
-          label: 'Fecha de Expedici�n',
+          label: 'Fecha de Expedición',
           selectedDate: _licenseExpedicion,
           onTap: () => _selectDate(context, isExpedicion: true),
         ),
@@ -200,29 +204,42 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
           selectedDate: _licenseVencimiento,
           onTap: () => _selectDate(context, isExpedicion: false),
         ),
+        const SizedBox(height: 16),
+        _buildPhotoUpload(
+          label: 'Foto de la Licencia',
+          photoPath: _licenceFotoPath,
+          onTap: () => _pickImage(),
+        ),
         if (_licenseVencimiento != null && _licenseVencimiento!.isBefore(DateTime.now()))
           Container(
             margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.2),
+              color: Colors.red.withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.red.withOpacity(0.5),
+                color: Colors.red.withOpacity(0.3),
                 width: 1.5,
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.warning_rounded, color: Colors.red, size: 24),
-                SizedBox(width: 12),
-                Expanded(
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.warning_rounded, color: Colors.red, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
                   child: Text(
-                    'Tu licencia est� vencida. Debes renovarla para poder recibir viajes.',
+                    'Tu licencia está vencida. Debes renovarla para poder recibir viajes.',
                     style: TextStyle(
                       color: Colors.red,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -420,6 +437,198 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
     );
   }
 
+  /// Widget para seleccionar/mostrar foto de licencia
+  Widget _buildPhotoUpload({
+    required String label,
+    required String? photoPath,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: photoPath != null 
+                    ? const Color(0xFFFFFF00).withOpacity(0.3)
+                    : Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: photoPath != null
+                        ? const Color(0xFFFFFF00).withOpacity(0.15)
+                        : Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: photoPath != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            File(photoPath),
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Icon(
+                          Icons.add_a_photo_rounded,
+                          color: Colors.white.withOpacity(0.4),
+                          size: 28,
+                        ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        photoPath != null ? 'Foto seleccionada' : 'Toca para seleccionar',
+                        style: TextStyle(
+                          color: photoPath != null 
+                              ? const Color(0xFFFFFF00)
+                              : Colors.white54,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  photoPath != null ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
+                  color: photoPath != null
+                      ? const Color(0xFFFFFF00)
+                      : Colors.white.withOpacity(0.3),
+                  size: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Seleccionar imagen de la galería o cámara
+  Future<void> _pickImage() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Seleccionar foto',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFF00).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: Color(0xFFFFFF00)),
+                  ),
+                  title: const Text(
+                    'Tomar foto',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFF00).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFFFFFF00)),
+                  ),
+                  title: const Text(
+                    'Seleccionar de galería',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (source != null) {
+      try {
+        final XFile? image = await _picker.pickImage(
+          source: source,
+          maxWidth: 1920,
+          maxHeight: 1920,
+          imageQuality: 85,
+        );
+
+        if (image != null) {
+          setState(() {
+            _licenceFotoPath = image.path;
+          });
+        }
+      } catch (e) {
+        print('Error al seleccionar imagen: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error al seleccionar imagen'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   Future<void> _selectDate(BuildContext context, {required bool isExpedicion}) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -460,7 +669,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
     if (_licenseExpedicion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor selecciona la fecha de expedici�n'),
+          content: Text('Por favor selecciona la fecha de expedición'),
           backgroundColor: Colors.red,
         ),
       );
@@ -475,6 +684,23 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         ),
       );
       return;
+    }
+
+    // Primero subir la foto si existe
+    if (_licenceFotoPath != null) {
+      final uploadResult = await provider.uploadLicensePhoto(
+        conductorId: widget.conductorId,
+        licenciaFotoPath: _licenceFotoPath!,
+      );
+
+      if (uploadResult == null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Advertencia: No se pudo subir la foto de la licencia'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     }
 
     final license = DriverLicenseModel(
@@ -509,50 +735,10 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
             // Mostrar diálogo para ir a registrar vehículo
             final goToVehicle = await showDialog<bool>(
               context: context,
-              builder: (context) => AlertDialog(
-                backgroundColor: const Color(0xFF1A1A1A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                title: const Row(
-                  children: [
-                    Icon(Icons.directions_car_rounded, color: Color(0xFFFFFF00)),
-                    SizedBox(width: 12),
-                    Text(
-                      'Registrar Vehículo',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                content: const Text(
-                  '¡Licencia guardada! ¿Deseas continuar registrando tu vehículo ahora?',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text(
-                      'Después',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFFF00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+              builder: (context) => _buildNavigationDialog(
+                icon: Icons.directions_car_rounded,
+                title: 'Registrar Vehículo',
+                message: '¡Licencia guardada! ¿Deseas continuar registrando tu vehículo ahora?',
               ),
             );
 
@@ -586,5 +772,113 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         );
       }
     }
+  }
+
+  Widget _buildNavigationDialog({
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFF00).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: const Color(0xFFFFFF00),
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Después',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFFFFF00),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Continuar',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
