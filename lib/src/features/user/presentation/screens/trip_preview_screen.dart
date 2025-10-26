@@ -3,7 +3,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:async';
 import '../../../../global/services/mapbox_service.dart';
+import '../../services/trip_request_service.dart';
 import 'select_destination_screen.dart';
+import 'searching_driver_screen.dart';
 
 /// Modelo para cotización del viaje
 class TripQuote {
@@ -670,7 +672,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                 height: 80,
                 alignment: Alignment.centerLeft,
                 child: Transform.translate(
-                  offset: const Offset(50, 0),
+                  offset: const Offset(65, -10),
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: const Duration(milliseconds: 500),
@@ -1675,45 +1677,97 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
     );
   }
 
-  void _confirmTrip() {
-    // TODO: Implementar lógica de confirmación
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Solicitando viaje de ${_quote!.formattedTotal}...'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    
-    // Por ahora solo mostrar un diálogo
+  void _confirmTrip() async {
+    if (_quote == null || _route == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: No se pudo calcular el viaje'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Mostrar diálogo de carga
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('¡Viaje solicitado!'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Vehículo: ${_getVehicleName(widget.vehicleType)}'),
-            Text('Distancia: ${_quote!.formattedDistance}'),
-            Text('Tiempo estimado: ${_quote!.formattedDuration}'),
-            Text('Costo total: ${_quote!.formattedTotal}'),
-            const SizedBox(height: 16),
-            const Text(
-              'Buscando conductor disponible...',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Cerrar diálogo
-              Navigator.pop(context); // Volver a pantalla anterior
-            },
-            child: const Text('Aceptar'),
-          ),
-        ],
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFFFFD700)),
       ),
     );
+
+    try {
+      // Crear solicitud de viaje (usuario_id temporal = 1, ajustar cuando tengas auth)
+      final response = await TripRequestService.createTripRequest(
+        userId: 1, // TODO: Obtener del sistema de autenticación
+        latitudOrigen: widget.origin.latitude,
+        longitudOrigen: widget.origin.longitude,
+        direccionOrigen: widget.origin.address,
+        latitudDestino: widget.destination.latitude,
+        longitudDestino: widget.destination.longitude,
+        direccionDestino: widget.destination.address,
+        tipoServicio: 'viaje',
+        tipoVehiculo: widget.vehicleType,
+        distanciaKm: _quote!.distanceKm,
+        duracionMinutos: _quote!.durationMinutes,
+        precioEstimado: _quote!.totalPrice,
+      );
+
+      // Cerrar diálogo de carga
+      if (mounted) Navigator.of(context).pop();
+
+      if (response['success'] == true) {
+        final solicitudId = response['solicitud_id'];
+        final conductoresEncontrados = response['conductores_encontrados'] ?? 0;
+
+        // Navegar a la pantalla de búsqueda de conductor
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => SearchingDriverScreen(
+                solicitudId: solicitudId,
+                latitudOrigen: widget.origin.latitude,
+                longitudOrigen: widget.origin.longitude,
+                direccionOrigen: widget.origin.address,
+                latitudDestino: widget.destination.latitude,
+                longitudDestino: widget.destination.longitude,
+                direccionDestino: widget.destination.address,
+                tipoVehiculo: widget.vehicleType,
+              ),
+            ),
+          );
+        }
+
+        // Mostrar mensaje informativo
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                conductoresEncontrados > 0
+                    ? 'Buscando entre $conductoresEncontrados ${conductoresEncontrados == 1 ? "conductor disponible" : "conductores disponibles"}'
+                    : 'Buscando conductores disponibles...',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Cerrar diálogo de carga si está abierto
+      if (mounted) Navigator.of(context).pop();
+
+      // Mostrar error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al solicitar viaje: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
   }
 }

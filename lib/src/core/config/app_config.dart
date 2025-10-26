@@ -28,7 +28,7 @@ class AppConfig {
   static String get baseUrl {
     switch (environment) {
       case Environment.development:
-        return 'http://10.0.2.2/pingo/backend'; // Android Emulator
+        return 'http://localhost/pingo/backend'; // Laragon local
       case Environment.staging:
         return 'https://staging-api.pingo.com';
       case Environment.production:
