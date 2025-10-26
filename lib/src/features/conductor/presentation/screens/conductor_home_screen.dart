@@ -15,6 +15,7 @@ import 'conductor_earnings_screen.dart';
 import 'conductor_trips_screen.dart';
 import 'license_registration_screen.dart';
 import 'vehicle_only_registration_screen.dart';
+import 'conductor_searching_passengers_screen.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -336,20 +337,38 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       }
                       return;
                     }
-                  }
-                  
-                  // Toggle availability
-                  await provider.toggleDisponibilidad(
-                    conductorId: _conductorId!,
-                  );
-                  
-                  if (mounted) {
-                    SuccessNotification.show(
+                    
+                    // Perfil completo - navegar a pantalla de búsqueda
+                    final nombre = provider.conductor?.nombre ?? widget.conductorUser['nombre'] ?? 'Conductor';
+                    final tipoVehiculo = profile.vehiculo?.tipo.value ?? 'moto';
+                    
+                    final result = await Navigator.push(
                       context,
-                      message: value
-                          ? '¡Ahora estás disponible para recibir viajes!'
-                          : 'Has dejado de estar disponible',
+                      MaterialPageRoute(
+                        builder: (context) => ConductorSearchingPassengersScreen(
+                          conductorId: _conductorId!,
+                          conductorNombre: nombre,
+                          tipoVehiculo: tipoVehiculo,
+                        ),
+                      ),
                     );
+                    
+                    // Si el conductor aceptó un viaje, recargar datos
+                    if (result == true && mounted) {
+                      await provider.loadViajesActivos(_conductorId!);
+                    }
+                  } else {
+                    // Toggle availability off
+                    await provider.toggleDisponibilidad(
+                      conductorId: _conductorId!,
+                    );
+                    
+                    if (mounted) {
+                      SuccessNotification.show(
+                        context,
+                        message: 'Has dejado de estar disponible',
+                      );
+                    }
                   }
                 },
               ),

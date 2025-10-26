@@ -27,34 +27,46 @@ try {
     $database = new Database();
     $db = $database->getConnection();
     
+    // Mapear tipo de vehículo de la app a la BD
+    $vehiculoTipoMap = [
+        'moto' => 'motocicleta',
+        'carro' => 'carro',
+        'moto_carga' => 'motocicleta',
+        'carro_carga' => 'furgoneta'
+    ];
+    $vehiculoTipoBD = $vehiculoTipoMap[$tipoVehiculo] ?? 'motocicleta';
+    
     // Buscar conductores cercanos disponibles usando la fórmula de Haversine
     $stmt = $db->prepare("
         SELECT 
             u.id,
             u.nombre,
+            u.apellido,
             u.telefono,
-            u.latitud_actual,
-            u.longitud_actual,
-            dc.tipo_vehiculo,
-            dc.marca_vehiculo,
-            dc.modelo_vehiculo,
-            dc.placa_vehiculo,
-            dc.color_vehiculo,
+            u.foto_perfil,
+            dc.vehiculo_tipo,
+            dc.vehiculo_marca,
+            dc.vehiculo_modelo,
+            dc.vehiculo_placa,
+            dc.vehiculo_color,
             dc.calificacion_promedio,
             dc.total_viajes,
+            dc.latitud_actual,
+            dc.longitud_actual,
             (6371 * acos(
-                cos(radians(?)) * cos(radians(u.latitud_actual)) *
-                cos(radians(u.longitud_actual) - radians(?)) +
-                sin(radians(?)) * sin(radians(u.latitud_actual))
+                cos(radians(?)) * cos(radians(dc.latitud_actual)) *
+                cos(radians(dc.longitud_actual) - radians(?)) +
+                sin(radians(?)) * sin(radians(dc.latitud_actual))
             )) AS distancia_km
         FROM usuarios u
         INNER JOIN detalles_conductor dc ON u.id = dc.usuario_id
         WHERE u.tipo_usuario = 'conductor'
-        AND u.disponibilidad = 1
+        AND u.es_activo = 1
+        AND dc.disponible = 1
         AND dc.estado_verificacion = 'aprobado'
-        AND dc.tipo_vehiculo = ?
-        AND u.latitud_actual IS NOT NULL
-        AND u.longitud_actual IS NOT NULL
+        AND dc.vehiculo_tipo = ?
+        AND dc.latitud_actual IS NOT NULL
+        AND dc.longitud_actual IS NOT NULL
         HAVING distancia_km <= ?
         ORDER BY distancia_km ASC
         LIMIT 20
@@ -64,7 +76,7 @@ try {
         $latitud,
         $longitud,
         $latitud,
-        $tipoVehiculo,
+        $vehiculoTipoBD,
         $radioKm
     ]);
     

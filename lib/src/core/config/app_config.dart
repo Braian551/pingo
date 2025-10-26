@@ -28,7 +28,9 @@ class AppConfig {
   static String get baseUrl {
     switch (environment) {
       case Environment.development:
-        return 'http://localhost/pingo/backend'; // Laragon local
+        // Para emulador Android usa 10.0.2.2 en lugar de localhost
+        // Para dispositivo físico usa la IP de tu máquina (ej: 192.168.1.X)
+        return 'http://10.0.2.2/pingo/backend'; // Laragon local desde emulador
       case Environment.staging:
         return 'https://staging-api.pingo.com';
       case Environment.production:

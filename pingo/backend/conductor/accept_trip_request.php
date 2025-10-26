@@ -47,7 +47,7 @@ try {
         
         // Verificar que el conductor esté disponible
         $stmt = $db->prepare("
-            SELECT u.id, u.disponibilidad, dc.tipo_vehiculo
+            SELECT u.id, dc.disponible, dc.vehiculo_tipo
             FROM usuarios u
             INNER JOIN detalles_conductor dc ON u.id = dc.usuario_id
             WHERE u.id = ? 
@@ -61,11 +61,11 @@ try {
             throw new Exception('Conductor no encontrado o no verificado');
         }
         
-        if (!$conductor['disponibilidad']) {
+        if (!$conductor['disponible']) {
             throw new Exception('Conductor no disponible');
         }
         
-        if ($conductor['tipo_vehiculo'] !== $solicitud['tipo_vehiculo']) {
+        if ($conductor['vehiculo_tipo'] !== $solicitud['tipo_vehiculo']) {
             throw new Exception('Tipo de vehículo no coincide');
         }
         
@@ -91,9 +91,9 @@ try {
         
         // Actualizar disponibilidad del conductor
         $stmt = $db->prepare("
-            UPDATE usuarios 
-            SET disponibilidad = 0 
-            WHERE id = ?
+            UPDATE detalles_conductor 
+            SET disponible = 0 
+            WHERE usuario_id = ?
         ");
         $stmt->execute([$conductorId]);
         

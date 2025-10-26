@@ -21,36 +21,60 @@ class TripRequestService {
     required double precioEstimado,
   }) async {
     try {
+      final url = '$baseUrl/user/create_trip_request.php';
+      print('📍 Enviando solicitud a: $url');
+      
+      final requestBody = {
+        'usuario_id': userId,
+        'latitud_origen': latitudOrigen,
+        'longitud_origen': longitudOrigen,
+        'direccion_origen': direccionOrigen,
+        'latitud_destino': latitudDestino,
+        'longitud_destino': longitudDestino,
+        'direccion_destino': direccionDestino,
+        'tipo_servicio': tipoServicio,
+        'tipo_vehiculo': tipoVehiculo,
+        'distancia_km': distanciaKm,
+        'duracion_minutos': duracionMinutos,
+        'precio_estimado': precioEstimado,
+      };
+      
+      print('📦 Datos enviados: $requestBody');
+      
       final response = await http.post(
-        Uri.parse('$baseUrl/user/create_trip_request.php'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'usuario_id': userId,
-          'latitud_origen': latitudOrigen,
-          'longitud_origen': longitudOrigen,
-          'direccion_origen': direccionOrigen,
-          'latitud_destino': latitudDestino,
-          'longitud_destino': longitudDestino,
-          'direccion_destino': direccionDestino,
-          'tipo_servicio': tipoServicio,
-          'tipo_vehiculo': tipoVehiculo,
-          'distancia_km': distanciaKm,
-          'duracion_minutos': duracionMinutos,
-          'precio_estimado': precioEstimado,
-        }),
+        body: jsonEncode(requestBody),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Tiempo de espera agotado. Verifica tu conexión.');
+        },
       );
+
+      print('📥 Respuesta recibida - Status: ${response.statusCode}');
+      print('📄 Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
+          print('✅ Solicitud creada exitosamente');
           return data;
         } else {
-          throw Exception(data['message'] ?? 'Error al crear solicitud');
+          final errorMsg = data['message'] ?? 'Error al crear solicitud';
+          print('❌ Error del servidor: $errorMsg');
+          throw Exception(errorMsg);
         }
       } else {
-        throw Exception('Error del servidor: ${response.statusCode}');
+        final errorMsg = 'Error del servidor: ${response.statusCode} - ${response.body}';
+        print('❌ $errorMsg');
+        throw Exception(errorMsg);
       }
     } catch (e) {
+      print('❌ Error en createTripRequest: $e');
+      if (e.toString().contains('SocketException') || e.toString().contains('Connection')) {
+        throw Exception('No se pudo conectar al servidor. Verifica tu conexión.');
+      }
       throw Exception('Error al crear solicitud de viaje: $e');
     }
   }

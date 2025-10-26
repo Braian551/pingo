@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:async';
 import '../../../../global/services/mapbox_service.dart';
+import '../../../../global/services/auth/user_service.dart';
 import '../../services/trip_request_service.dart';
 import 'select_destination_screen.dart';
 import 'searching_driver_screen.dart';
@@ -1698,9 +1699,20 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
     );
 
     try {
-      // Crear solicitud de viaje (usuario_id temporal = 1, ajustar cuando tengas auth)
+      // Obtener usuario de la sesión
+      final session = await UserService.getSavedSession();
+      if (session == null) {
+        throw Exception('No hay sesión activa. Por favor inicia sesión.');
+      }
+      
+      final userId = session['id'] as int?;
+      if (userId == null) {
+        throw Exception('Usuario no válido. Por favor inicia sesión nuevamente.');
+      }
+      
+      // Crear solicitud de viaje
       final response = await TripRequestService.createTripRequest(
-        userId: 1, // TODO: Obtener del sistema de autenticación
+        userId: userId,
         latitudOrigen: widget.origin.latitude,
         longitudOrigen: widget.origin.longitude,
         direccionOrigen: widget.origin.address,
@@ -1720,13 +1732,16 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
       if (response['success'] == true) {
         final solicitudId = response['solicitud_id'];
         final conductoresEncontrados = response['conductores_encontrados'] ?? 0;
+        
+        // Convertir solicitudId a int (viene como String del backend)
+        final solicitudIdInt = solicitudId is int ? solicitudId : int.parse(solicitudId.toString());
 
         // Navegar a la pantalla de búsqueda de conductor
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => SearchingDriverScreen(
-                solicitudId: solicitudId,
+                solicitudId: solicitudIdInt,
                 latitudOrigen: widget.origin.latitude,
                 longitudOrigen: widget.origin.longitude,
                 direccionOrigen: widget.origin.address,
