@@ -266,33 +266,56 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                 final isSelected = _filtroEstado == entry.key;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(
-                      entry.value,
-                      style: TextStyle(
-                        color: isSelected ? Colors.black : Colors.white,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    selected: isSelected,
-                    onSelected: (selected) {
+                  child: GestureDetector(
+                    onTap: () {
                       setState(() => _filtroEstado = entry.key);
                       _loadDocumentos();
                     },
-                    backgroundColor: Colors.transparent,
-                    selectedColor: const Color(0xFFFFFF00),
-                    checkmarkColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: isSelected ? const Color(0xFFFFFF00) : Colors.white.withOpacity(0.3),
-                        width: 1.5,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFFFFFF00)
+                            : Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFFFFF00)
+                              : Colors.white.withOpacity(0.7),
+                          width: 1.5,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            entry.value,
+                            style: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          if (isSelected) ...[
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.black,
+                              size: 16,
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    labelPadding: EdgeInsets.zero,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 );
               },
@@ -1022,11 +1045,18 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
 
   /// Muestra el historial de documentos de un conductor
   Future<void> _showDocumentHistory(int conductorId) async {
+    // Mostrar loading
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
+      builder: (context) => PopScope(
+        canPop: false,
+        child: Container(
+          color: Colors.black.withOpacity(0.5),
+          child: const Center(
+            child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
+          ),
+        ),
       ),
     );
 
@@ -1036,12 +1066,25 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         conductorId: conductorId,
       );
 
-      Navigator.pop(context); // Cerrar loading
+      // Cerrar loading primero
+      if (mounted) Navigator.pop(context);
+
+      // Esperar un poco para que el diálogo se cierre completamente
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (!mounted) return;
 
       if (response['success'] == true && response['data'] != null) {
         final List<Map<String, dynamic>> historial = 
             List<Map<String, dynamic>>.from(response['data']['historial'] ?? []);
 
+        // Si no hay historial, mostrar alerta
+        if (historial.isEmpty) {
+          _showNoHistoryAlert();
+          return;
+        }
+
+        // Mostrar el historial
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -1052,9 +1095,143 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         _showError(response['message'] ?? 'Error al cargar historial');
       }
     } catch (e) {
-      Navigator.pop(context); // Cerrar loading
-      _showError('Error al cargar historial: $e');
+      // Cerrar loading si hay error
+      if (mounted) Navigator.pop(context);
+      
+      // Esperar un poco antes de mostrar el error
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      if (mounted) {
+        _showError('Error al cargar historial: $e');
+      }
     }
+  }
+
+  /// Muestra una alerta cuando no hay historial de documentos
+  void _showNoHistoryAlert() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.7),
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFF00).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.info_outline_rounded, 
+                color: Color(0xFFFFFF00), 
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Sin Historial', 
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.folder_open_rounded,
+                    size: 64,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Este conductor aún no tiene historial de documentos registrado.',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 15,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFF00).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.lightbulb_outline_rounded,
+                          color: Color(0xFFFFFF00),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'El historial se genera cuando el conductor sube o actualiza sus documentos.',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFFF00),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Entendido',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      ),
+    );
   }
 
   /// Widget para mostrar el historial de documentos
@@ -1077,16 +1254,39 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     padding: const EdgeInsets.all(24),
                     child: Row(
                       children: [
-                        const Icon(Icons.history_rounded, color: Color(0xFFFFFF00), size: 28),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFF00).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.history_rounded, 
+                            color: Color(0xFFFFFF00), 
+                            size: 28,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            'Historial de Documentos',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Historial de Documentos',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${historial.length} ${historial.length == 1 ? 'registro' : 'registros'}',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.6),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         IconButton(
@@ -1097,36 +1297,15 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     ),
                   ),
                   Expanded(
-                    child: historial.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.folder_open_rounded,
-                                  size: 64,
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No hay historial de documentos',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.6),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                            controller: scrollController,
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                            itemCount: historial.length,
-                            itemBuilder: (context, index) {
-                              final doc = historial[index];
-                              return _buildHistorialItem(doc);
-                            },
-                          ),
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                      itemCount: historial.length,
+                      itemBuilder: (context, index) {
+                        final doc = historial[index];
+                        return _buildHistorialItem(doc, index);
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -1138,7 +1317,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   }
 
   /// Widget para un item del historial
-  Widget _buildHistorialItem(Map<String, dynamic> doc) {
+  Widget _buildHistorialItem(Map<String, dynamic> doc, int index) {
     final estado = doc['estado'] ?? 'pendiente';
     final Color estadoColor = estado == 'aprobado' 
         ? const Color(0xFF11998e) 
@@ -1155,131 +1334,301 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     };
 
     final String nombreDoc = tiposDocumento[doc['tipo_documento']] ?? doc['tipo_documento'];
+    final bool hasMotivo = doc['motivo_rechazo'] != null && doc['motivo_rechazo'].toString().isNotEmpty;
+    final bool hasArchivo = doc['ruta_archivo'] != null && doc['ruta_archivo'].toString().isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: estadoColor.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: estadoColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.description_rounded,
-                  color: estadoColor,
-                  size: 20,
-                ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: estadoColor.withOpacity(0.3),
+                width: 1.5,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      nombreDoc,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Cabecera
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: estadoColor.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatDate(doc['fecha_subida']),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: estadoColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: estadoColor.withOpacity(0.5)),
-                ),
-                child: Text(
-                  estado.toUpperCase(),
-                  style: TextStyle(
-                    color: estadoColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
-            ],
-          ),
-          if (doc['motivo_rechazo'] != null && doc['motivo_rechazo'].toString().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFf5576c).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.info_outline_rounded,
-                      color: Color(0xFFf5576c),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        doc['motivo_rechazo'],
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 13,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: estadoColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          _getDocumentIcon(doc['tipo_documento']),
+                          color: estadoColor,
+                          size: 24,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          if (doc['ruta_archivo'] != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context); // Cerrar el historial
-                  _viewDocument(context, doc['ruta_archivo'], nombreDoc);
-                },
-                icon: const Icon(Icons.visibility_rounded, size: 18),
-                label: const Text('Ver Documento'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: estadoColor.withOpacity(0.2),
-                  foregroundColor: estadoColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              nombreDoc,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 14,
+                                  color: Colors.white.withOpacity(0.6),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _formatDate(doc['fecha_subida']),
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.6),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: estadoColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: estadoColor.withOpacity(0.5), width: 1.5),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getEstadoIcon(estado),
+                              color: estadoColor,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _getEstadoLabel(estado),
+                              style: TextStyle(
+                                color: estadoColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                
+                // Contenido
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Información adicional del documento
+                      if (doc['numero_documento'] != null && doc['numero_documento'].toString().isNotEmpty)
+                        _buildHistorialInfoRow(
+                          Icons.numbers_rounded,
+                          'Número',
+                          doc['numero_documento'],
+                        ),
+                      
+                      if (doc['fecha_vencimiento'] != null)
+                        _buildHistorialInfoRow(
+                          Icons.event_rounded,
+                          'Vencimiento',
+                          _formatDate(doc['fecha_vencimiento']),
+                        ),
+                      
+                      // Motivo de rechazo (si existe)
+                      if (hasMotivo) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFf5576c).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFFf5576c).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.info_outline_rounded,
+                                color: Color(0xFFf5576c),
+                                size: 18,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Motivo de rechazo:',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      doc['motivo_rechazo'],
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.95),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      
+                      // Botón para ver documento
+                      if (hasArchivo) ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context); // Cerrar el historial
+                              _viewDocument(context, doc['ruta_archivo'], nombreDoc);
+                            },
+                            icon: const Icon(Icons.visibility_rounded, size: 20),
+                            label: const Text('Ver Documento'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: estadoColor.withOpacity(0.2),
+                              foregroundColor: estadoColor,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(color: estadoColor.withOpacity(0.5), width: 1.5),
+                              ),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Helper para construir una fila de información en el historial
+  Widget _buildHistorialInfoRow(IconData icon, String label, dynamic value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.white.withOpacity(0.5)),
+          const SizedBox(width: 8),
+          Text(
+            '$label: ',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value?.toString() ?? 'N/A',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  /// Helper para obtener el icono según el tipo de documento
+  IconData _getDocumentIcon(String? tipo) {
+    switch (tipo) {
+      case 'licencia':
+        return Icons.badge_rounded;
+      case 'soat':
+        return Icons.health_and_safety_rounded;
+      case 'tecnomecanica':
+        return Icons.build_rounded;
+      case 'tarjeta_propiedad':
+        return Icons.credit_card_rounded;
+      case 'seguro':
+        return Icons.shield_rounded;
+      default:
+        return Icons.description_rounded;
+    }
+  }
+
+  /// Helper para obtener el icono según el estado
+  IconData _getEstadoIcon(String estado) {
+    switch (estado) {
+      case 'aprobado':
+        return Icons.check_circle_rounded;
+      case 'rechazado':
+        return Icons.cancel_rounded;
+      case 'en_revision':
+        return Icons.pending_rounded;
+      case 'pendiente':
+      default:
+        return Icons.schedule_rounded;
+    }
+  }
+
+  /// Helper para obtener el label del estado
+  String _getEstadoLabel(String estado) {
+    switch (estado) {
+      case 'aprobado':
+        return 'Aprobado';
+      case 'rechazado':
+        return 'Rechazado';
+      case 'en_revision':
+        return 'En Revisión';
+      case 'pendiente':
+      default:
+        return 'Pendiente';
+    }
   }
 
   /// Muestra un documento en pantalla completa

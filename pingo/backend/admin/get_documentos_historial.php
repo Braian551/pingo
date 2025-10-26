@@ -62,40 +62,78 @@ try {
         exit;
     }
 
+    // Verificar que el conductor existe
+    $stmt = $conn->prepare("SELECT id FROM usuarios WHERE id = ? AND tipo_usuario = 'conductor'");
+    $stmt->bind_param("i", $conductor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        http_response_code(404);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Conductor no encontrado'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     // Obtener historial de documentos
     $sql = "SELECT 
-                dch.*,
+                dch.id,
+                dch.conductor_id,
+                dch.tipo_documento,
+                dch.url_documento as ruta_archivo,
+                dch.fecha_carga as fecha_subida,
+                dch.activo,
+                dch.reemplazado_en,
                 u.nombre,
                 u.apellido,
                 u.email
             FROM documentos_conductor_historial dch
             INNER JOIN usuarios u ON dch.conductor_id = u.id
             WHERE dch.conductor_id = ?
-            ORDER BY dch.fecha_subida DESC";
+            ORDER BY dch.fecha_carga DESC";
 
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception('Error al preparar consulta: ' . $conn->error);
+    }
+    
     $stmt->bind_param("i", $conductor_id);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception('Error al ejecutar consulta: ' . $stmt->error);
+    }
+    
     $result = $stmt->get_result();
 
     $historial = [];
     while ($row = $result->fetch_assoc()) {
+        // Determinar el estado basado en el campo 'activo'
+        $estado = intval($row['activo']) === 1 ? 'aprobado' : 'reemplazado';
+        
         $historial[] = [
-            'id' => $row['id'],
-            'conductor_id' => $row['conductor_id'],
+            'id' => intval($row['id']),
+            'conductor_id' => intval($row['conductor_id']),
             'conductor_nombre' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
-            'conductor_email' => $row['email'],
-            'tipo_documento' => $row['tipo_documento'],
-            'ruta_archivo' => $row['ruta_archivo'],
-            'fecha_subida' => $row['fecha_subida'],
-            'estado' => $row['estado'],
-            'motivo_rechazo' => $row['motivo_rechazo'],
+            'conductor_email' => $row['email'] ?? '',
+            'tipo_documento' => $row['tipo_documento'] ?? '',
+            'ruta_archivo' => $row['ruta_archivo'] ?? '',
+            'fecha_subida' => $row['fecha_subida'] ?? '',
+            'estado' => $estado,
+            'activo' => intval($row['activo']),
+            'reemplazado_en' => $row['reemplazado_en'] ?? null,
+            'motivo_rechazo' => null, // Esta tabla no tiene motivo de rechazo
+            'numero_documento' => null,
+            'fecha_vencimiento' => null,
         ];
     }
 
+    http_response_code(200);
     echo json_encode([
         'success' => true,
-        'message' => 'Historial de documentos obtenido exitosamente',
+        'message' => count($historial) > 0 
+            ? 'Historial de documentos obtenido exitosamente' 
+            : 'No hay historial de documentos para este conductor',
         'data' => [
             'historial' => $historial,
             'total' => count($historial),
