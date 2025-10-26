@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ping_go/src/features/user/presentation/screens/home_user.dart';
 import 'package:ping_go/src/features/user/presentation/screens/confirm_trip_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/request_trip_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/vehicle_selection_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/user_profile_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/payment_methods_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/trip_history_screen.dart';
@@ -97,11 +96,6 @@ class AppRouter {
       // Rutas de usuario
       case RouteNames.requestTrip:
         return MaterialPageRoute(builder: (_) => const RequestTripScreen());
-      case '/vehicle_selection':
-        return MaterialPageRoute(
-          builder: (_) => const VehicleSelectionScreen(),
-          settings: settings,
-        );
       case RouteNames.confirmTrip:
         return MaterialPageRoute(
           builder: (_) => const ConfirmTripScreen(),

@@ -78,6 +78,9 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
   late AnimationController _pulseAnimationController;
   late Animation<double> _pulseAnimation;
   
+  final DraggableScrollableController _draggableController = DraggableScrollableController();
+  bool _isPanelExpanded = false;
+  
   bool _showDetails = false;
   List<LatLng> _animatedRoutePoints = [];
   double _currentRouteProgress = 0.0;
@@ -87,16 +90,28 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
     super.initState();
     _setupAnimations();
     _loadRouteAndQuote();
+    _draggableController.addListener(_onPanelDrag);
   }
 
   @override
   void dispose() {
+    _draggableController.removeListener(_onPanelDrag);
+    _draggableController.dispose();
     _slideAnimationController.dispose();
     _routeAnimationController.dispose();
     _topPanelAnimationController.dispose();
     _markerAnimationController.dispose();
     _pulseAnimationController.dispose();
     super.dispose();
+  }
+
+  void _onPanelDrag() {
+    final size = _draggableController.size;
+    if (size > 0.6 && !_isPanelExpanded) {
+      setState(() => _isPanelExpanded = true);
+    } else if (size <= 0.6 && _isPanelExpanded) {
+      setState(() => _isPanelExpanded = false);
+    }
   }
 
   void _setupAnimations() {
@@ -648,14 +663,14 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
         if (_markerScaleAnimation.value > 0.5)
           MarkerLayer(
             markers: [
-              // Cuadro de información del origen
+              // Cuadro de información del origen (posicionado al lado derecho del marcador)
               Marker(
                 point: widget.origin.toLatLng(),
-                width: 200,
+                width: 220,
                 height: 80,
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.centerLeft,
                 child: Transform.translate(
-                  offset: const Offset(0, -50),
+                  offset: const Offset(50, 0),
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: const Duration(milliseconds: 500),
@@ -664,7 +679,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                       return Transform.scale(
                         scale: value,
                         child: Opacity(
-                          opacity: value,
+                          opacity: value.clamp(0.0, 1.0),
                           child: child,
                         ),
                       );
@@ -735,14 +750,14 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                 ),
               ),
               
-              // Cuadro de información del destino
+              // Cuadro de información del destino (posicionado abajo)
               Marker(
                 point: widget.destination.toLatLng(),
                 width: 200,
                 height: 80,
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.topCenter,
                 child: Transform.translate(
-                  offset: const Offset(0, -80),
+                  offset: const Offset(0, 80),
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: const Duration(milliseconds: 600),
@@ -751,7 +766,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                       return Transform.scale(
                         scale: value,
                         child: Opacity(
-                          opacity: value,
+                          opacity: value.clamp(0.0, 1.0),
                           child: child,
                         ),
                       );
@@ -1053,80 +1068,110 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
     required String text,
     required bool isOrigin,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Icono compacto
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Icon(
-              icon,
-              size: iconSize,
-              color: color,
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => Navigator.pop(context),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Icono compacto
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: iconSize,
+                    color: color,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // Texto compacto
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.9),
+                    height: 1.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              // Icono de editar
+              Icon(
+                Icons.edit_outlined,
+                size: 16,
+                color: color.withOpacity(0.6),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 10),
-        // Texto compacto
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.9),
-              height: 1.3,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildBottomPanel() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A), // Fondo oscuro como en la imagen
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 30,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+    return DraggableScrollableSheet(
+      controller: _draggableController,
+      initialChildSize: 0.42,
+      minChildSize: 0.42,
+      maxChildSize: 0.75,
+      snap: true,
+      snapSizes: const [0.42, 0.75],
+      builder: (BuildContext context, ScrollController scrollController) {
+        return SlideTransition(
+          position: _slideAnimation,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 30,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: ListView(
+              controller: scrollController,
+              padding: EdgeInsets.zero,
               children: [
+                // Drag handle - línea blanca
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                
                 // Título de sección
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Selecciona tu vehículo',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+                  child: Text(
+                    'Selecciona tu vehículo',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -1140,7 +1185,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                     curve: Curves.easeOutCubic,
                     builder: (context, value, child) {
                       return Opacity(
-                        opacity: value,
+                        opacity: value.clamp(0.0, 1.0),
                         child: Transform.translate(
                           offset: Offset(0, 20 * (1 - value)),
                           child: child,
@@ -1225,10 +1270,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                   ),
                 ),
                 
-                // Botón de efectivo (opcional)
+                // Botón de efectivo (opcional) - más compacto
                 if (_quote!.surchargePercentage > 0)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: InkWell(
                       onTap: () {
                         setState(() {
@@ -1237,7 +1282,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: const Color(0xFF2A2A2A),
                           borderRadius: BorderRadius.circular(12),
@@ -1288,12 +1333,59 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                   child: _showDetails ? _buildPriceBreakdown() : const SizedBox.shrink(),
                 ),
                 
-                // Botón de solicitar viaje (más cerca del contenido)
+                // Mensaje cuando está expandido
+                if (_isPanelExpanded) ...[
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.yellow.shade700.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.yellow.shade700,
+                            size: 40,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Pronto habrá más servicios',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Estamos trabajando para ofrecerte más opciones de vehículos y servicios',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[400],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                
+                // Botón de solicitar viaje - más arriba y visible
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                   child: SizedBox(
                     width: double.infinity,
-                    height: 54,
+                    height: 52,
                     child: ElevatedButton(
                       onPressed: _confirmTrip,
                       style: ElevatedButton.styleFrom(
@@ -1314,11 +1406,13 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                     ),
                   ),
                 ),
+                
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
   
@@ -1360,7 +1454,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
       curve: Curves.easeOut,
       builder: (context, value, child) {
         return Opacity(
-          opacity: value,
+          opacity: value.clamp(0.0, 1.0),
           child: Transform.scale(
             scale: 0.95 + (0.05 * value),
             child: child,
