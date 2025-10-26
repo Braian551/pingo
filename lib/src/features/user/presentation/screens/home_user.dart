@@ -1,7 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
-import 'package:ping_go/src/features/profile/presentation/screens/profile_screen.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -13,7 +11,6 @@ class HomeUserScreen extends StatefulWidget {
 }
 
 class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStateMixin {
-  String? _userAddress;
   String? _userName;
   bool _loading = true;
   int _selectedIndex = 0;
@@ -65,19 +62,14 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         final profile = await UserService.getProfile(userId: id, email: email);
         if (profile != null && profile['success'] == true) {
           final user = profile['user'];
-          final location = profile['location'];
           final name = user != null ? user['nombre'] as String? : null;
-          if (location != null) {
-            final dir = location['direccion'] as String? ?? '';
-            if (mounted) {
-              setState(() {
-                _userAddress = dir.isNotEmpty ? dir : null;
-                _userName = name ?? 'Usuario';
-                _loading = false;
-              });
-              _animationController.forward();
-              return;
-            }
+          if (mounted) {
+            setState(() {
+              _userName = name ?? 'Usuario';
+              _loading = false;
+            });
+            _animationController.forward();
+            return;
           }
         }
       }
@@ -93,22 +85,17 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             final profile = await UserService.getProfile(userId: idArg, email: emailArg);
             if (profile != null && profile['success'] == true) {
               final user = profile['user'];
-              final location = profile['location'];
               final name = user != null ? user['nombre'] as String? : null;
-              if (location != null) {
-                final dir = location['direccion'] as String? ?? '';
-                if (mounted) {
-                  setState(() {
-                    _userAddress = dir.isNotEmpty ? dir : null;
-                    _userName = name ?? 'Usuario';
-                    _loading = false;
-                  });
-                  if (idArg != null && emailArg != null) {
-                    await UserService.saveSession({'id': idArg, 'email': emailArg});
-                  }
-                  _animationController.forward();
-                  return;
+              if (mounted) {
+                setState(() {
+                  _userName = name ?? 'Usuario';
+                  _loading = false;
+                });
+                if (idArg != null && emailArg != null) {
+                  await UserService.saveSession({'id': idArg, 'email': emailArg});
                 }
+                _animationController.forward();
+                return;
               }
             }
           }
@@ -116,7 +103,6 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       } catch (_) {}
       if (mounted) {
         setState(() {
-          _userAddress = null;
           _userName = 'Usuario';
           _loading = false;
         });
@@ -134,33 +120,11 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    Widget bodyContent;
-    if (_loading) {
-      bodyContent = _buildShimmerLoading();
-    } else {
-      switch (_selectedIndex) {
-        case 0:
-          bodyContent = _buildContent();
-          break;
-        case 1:
-          bodyContent = _buildComingSoon('Pedidos', Icons.receipt_long);
-          break;
-        case 2:
-          bodyContent = _buildComingSoon('Pagos', Icons.credit_card);
-          break;
-        case 3:
-          bodyContent = ProfileTab();
-          break;
-        default:
-          bodyContent = _buildContent();
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(),
-      body: bodyContent,
+      body: _loading ? _buildShimmerLoading() : _buildBody(),
       bottomNavigationBar: _buildModernBottomNav(),
     );
   }
@@ -316,6 +280,465 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
     );
   }
 
+  Widget _buildBody() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildContent();
+      case 1:
+        return _buildTripHistoryTab();
+      case 2:
+        return _buildPaymentsTab();
+      case 3:
+        return _buildProfileTab();
+      default:
+        return _buildContent();
+    }
+  }
+
+  Widget _buildTripHistoryTab() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Historial de viajes',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.receipt_long,
+                          color: Colors.white.withOpacity(0.3),
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Sin viajes registrados',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tus viajes aparecerán aquí',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentsTab() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Métodos de pago',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.credit_card,
+                          color: Colors.white.withOpacity(0.3),
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No hay métodos de pago',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Agrega un método de pago para continuar',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/payment_methods');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFFF00),
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Agregar método de pago',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileTab() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _buildProfileHeader(),
+                  const SizedBox(height: 24),
+                  _buildProfileStats(),
+                  const SizedBox(height: 24),
+                  _buildProfileMenu(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFFFFF00).withOpacity(0.3),
+                          const Color(0xFFFFFF00).withOpacity(0.1),
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _userName != null && _userName!.isNotEmpty ? _userName![0].toUpperCase() : 'U',
+                        style: const TextStyle(
+                          color: Color(0xFFFFFF00),
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFFF00),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.edit, color: Colors.black, size: 16),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _userName ?? 'Usuario',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileStats() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildStatCard(
+            icon: Icons.route,
+            title: 'Viajes',
+            value: '0',
+            color: const Color(0xFFFFFF00),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildStatCard(
+            icon: Icons.star,
+            title: 'Calificación',
+            value: '5.0',
+            color: Colors.amber,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileMenu() {
+    return Column(
+      children: [
+        _buildProfileMenuItem(
+          icon: Icons.settings,
+          title: 'Configuración',
+          onTap: () => Navigator.pushNamed(context, '/settings'),
+        ),
+        const SizedBox(height: 12),
+        _buildProfileMenuItem(
+          icon: Icons.help_outline,
+          title: 'Ayuda y soporte',
+          onTap: () => Navigator.pushNamed(context, '/help'),
+        ),
+        const SizedBox(height: 12),
+        _buildProfileMenuItem(
+          icon: Icons.logout,
+          title: 'Cerrar sesión',
+          isLogout: true,
+          onTap: () async {
+            await UserService.clearSession();
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, '/');
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isLogout = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isLogout 
+                  ? Colors.red.withOpacity(0.1) 
+                  : const Color(0xFF1A1A1A).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isLogout 
+                    ? Colors.red.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isLogout
+                        ? Colors.red.withOpacity(0.2)
+                        : const Color(0xFFFFFF00).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon, 
+                    color: isLogout ? Colors.red : const Color(0xFFFFFF00), 
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: isLogout ? Colors.red : Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios, 
+                  color: isLogout 
+                      ? Colors.red.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.3), 
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent() {
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -384,88 +807,59 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
   }
 
   Widget _buildLocationCard() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 1.5,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/request_trip');
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFF00),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFFFFF00).withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.location_on, color: Colors.black, size: 28),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tu ubicación',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFF00),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
+                    ],
+                  ),
+                  child: const Icon(Icons.search, color: Colors.black, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    '¿A dónde vas?',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _userAddress ?? 'Agregar ubicación',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white.withOpacity(0.3),
+                  size: 18,
                 ),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.edit_outlined, color: Color(0xFFFFFF00), size: 20),
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LocationPickerScreen(),
-                      ),
-                    );
-                    setState(() => _loading = true);
-                    await _loadUserData();
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -494,12 +888,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 title: 'Viaje',
                 subtitle: 'Rápido y seguro',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LocationPickerScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/request_trip');
                 },
               ),
             ),
@@ -510,12 +899,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 title: 'Envío',
                 subtitle: 'Entrega express',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LocationPickerScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/request_trip');
                 },
               ),
             ),
@@ -548,22 +932,30 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               _QuickActionItem(
                 icon: Icons.history,
                 label: 'Historial',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/trip_history');
+                },
               ),
               _QuickActionItem(
                 icon: Icons.star_outline,
                 label: 'Favoritos',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/favorite_places');
+                },
               ),
               _QuickActionItem(
                 icon: Icons.percent,
                 label: 'Promociones',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/promotions');
+                },
               ),
               _QuickActionItem(
                 icon: Icons.help_outline,
                 label: 'Ayuda',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/help');
+                },
               ),
             ],
           ),
@@ -711,41 +1103,6 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildComingSoon(String title, IconData icon) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: const Color(0xFFFFFF00), size: 64),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Próximamente disponible',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
     );
   }
 

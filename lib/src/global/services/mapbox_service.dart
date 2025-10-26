@@ -153,6 +153,92 @@ class MapboxService {
   }
 
   // ============================================
+  // GEOCODING API (Búsqueda de lugares)
+  // ============================================
+  
+  /// Buscar lugares por texto
+  /// [query] - Texto de búsqueda (dirección, nombre de lugar, etc.)
+  /// [proximity] - Coordenadas para priorizar resultados cercanos
+  /// [limit] - Número máximo de resultados (1-10)
+  /// [types] - Tipos de resultados: address, poi, place, etc.
+  static Future<List<MapboxPlace>> searchPlaces({
+    required String query,
+    LatLng? proximity,
+    int limit = 5,
+    List<String>? types,
+  }) async {
+    try {
+      if (query.trim().isEmpty) return [];
+
+      final queryParams = <String, String>{
+        'access_token': EnvConfig.mapboxPublicToken,
+        'limit': limit.toString(),
+        'language': 'es',
+      };
+
+      if (proximity != null) {
+        queryParams['proximity'] = '${proximity.longitude},${proximity.latitude}';
+      }
+
+      if (types != null && types.isNotEmpty) {
+        queryParams['types'] = types.join(',');
+      }
+
+      final encodedQuery = Uri.encodeComponent(query);
+      final url = Uri.parse(
+        '$_baseUrl/geocoding/v5/mapbox.places/$encodedQuery.json'
+      ).replace(queryParameters: queryParams);
+
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['features'] != null) {
+          final features = data['features'] as List;
+          return features.map((f) => MapboxPlace.fromJson(f)).toList();
+        }
+      } else {
+        print('Error en Mapbox Geocoding: ${response.statusCode} - ${response.body}');
+      }
+      
+      return [];
+    } catch (e) {
+      print('Error buscando lugares: $e');
+      return [];
+    }
+  }
+
+  /// Geocodificación inversa: obtener dirección desde coordenadas
+  static Future<MapboxPlace?> reverseGeocode({
+    required LatLng position,
+  }) async {
+    try {
+      final url = Uri.parse(
+        '$_baseUrl/geocoding/v5/mapbox.places/${position.longitude},${position.latitude}.json'
+        '?access_token=${EnvConfig.mapboxPublicToken}'
+        '&language=es'
+        '&types=address,poi,place'
+      );
+
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['features'] != null && (data['features'] as List).isNotEmpty) {
+          return MapboxPlace.fromJson(data['features'][0]);
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      print('Error en geocodificación inversa: $e');
+      return null;
+    }
+  }
+
+  // ============================================
   // TILES API
   // ============================================
   
@@ -346,4 +432,58 @@ class MapMarker {
     this.label = 'a',
     this.color = 'ff0000',
   });
+}
+
+/// Lugar encontrado por Geocoding API
+class MapboxPlace {
+  final String id;
+  final String placeName; // Nombre completo del lugar
+  final String text; // Nombre corto
+  final LatLng coordinates;
+  final String? address;
+  final String? placeType; // poi, address, place, etc.
+  final Map<String, dynamic>? context; // Información de contexto (ciudad, país, etc.)
+
+  MapboxPlace({
+    required this.id,
+    required this.placeName,
+    required this.text,
+    required this.coordinates,
+    this.address,
+    this.placeType,
+    this.context,
+  });
+
+  factory MapboxPlace.fromJson(Map<String, dynamic> json) {
+    final coords = json['geometry']['coordinates'] as List;
+    
+    return MapboxPlace(
+      id: json['id'] ?? '',
+      placeName: json['place_name'] ?? '',
+      text: json['text'] ?? '',
+      coordinates: LatLng(coords[1] as double, coords[0] as double),
+      address: json['properties']?['address'],
+      placeType: (json['place_type'] as List?)?.first,
+      context: json['context'] != null ? Map<String, dynamic>.from(json) : null,
+    );
+  }
+
+  /// Obtener información del contexto (ciudad, región, país)
+  String get contextInfo {
+    if (context == null) return '';
+    
+    final parts = <String>[];
+    final contextList = context!['context'] as List?;
+    
+    if (contextList != null) {
+      for (var item in contextList) {
+        if (item['id'].toString().startsWith('place.') ||
+            item['id'].toString().startsWith('region.')) {
+          parts.add(item['text']);
+        }
+      }
+    }
+    
+    return parts.join(', ');
+  }
 }

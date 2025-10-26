@@ -11,6 +11,22 @@ class RouteNames {
   static const String home = '/home';
   static const String locationPicker = '/location-picker';
   
+  // Rutas de usuario
+  static const String requestTrip = '/request_trip';
+  static const String confirmTrip = '/confirm_trip';
+  static const String trackingTrip = '/tracking_trip';
+  static const String userProfile = '/user_profile';
+  static const String editProfile = '/edit_profile';
+  static const String paymentMethods = '/payment_methods';
+  static const String tripHistory = '/trip_history';
+  static const String favoritePlaces = '/favorite_places';
+  static const String promotions = '/promotions';
+  static const String settings = '/settings';
+  static const String help = '/help';
+  static const String about = '/about';
+  static const String terms = '/terms';
+  static const String privacy = '/privacy';
+  
   // Rutas de administrador
   static const String adminHome = '/admin/home';
   static const String adminUsers = '/admin/users';

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/features/user/presentation/screens/home_user.dart';
+import 'package:ping_go/src/features/user/presentation/screens/select_destination_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/confirm_trip_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/user_profile_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/payment_methods_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/trip_history_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/settings_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/register_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/phone_auth_screen.dart';
@@ -86,6 +92,50 @@ class AppRouter {
       case RouteNames.home:
         // Cuando el usuario se autentique debe ir a la pantalla principal (HomeUserScreen)
         return MaterialPageRoute(builder: (_) => const HomeUserScreen());
+      
+      // Rutas de usuario
+      case RouteNames.requestTrip:
+        return MaterialPageRoute(builder: (_) => const SelectDestinationScreen());
+      case RouteNames.confirmTrip:
+        return MaterialPageRoute(
+          builder: (_) => const ConfirmTripScreen(),
+          settings: settings,
+        );
+      case RouteNames.userProfile:
+        return MaterialPageRoute(builder: (_) => const UserProfileScreen());
+      case RouteNames.paymentMethods:
+        return MaterialPageRoute(builder: (_) => const PaymentMethodsScreen());
+      case RouteNames.tripHistory:
+        return MaterialPageRoute(builder: (_) => const TripHistoryScreen());
+      case RouteNames.settings:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
+      case RouteNames.favoritePlaces:
+      case RouteNames.promotions:
+      case RouteNames.help:
+      case RouteNames.about:
+      case RouteNames.terms:
+      case RouteNames.privacy:
+      case RouteNames.editProfile:
+      case RouteNames.trackingTrip:
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              title: const Text('Próximamente', style: TextStyle(color: Colors.white)),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: const Center(
+              child: Text(
+                'Esta función estará disponible pronto',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
+        );
       
       // Rutas de administrador
       case RouteNames.adminHome:

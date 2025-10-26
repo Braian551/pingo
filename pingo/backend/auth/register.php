@@ -55,8 +55,8 @@ try {
     // Insertar nuevo usuario
     $uuid = uniqid('user_', true);
     $query = "
-        INSERT INTO usuarios (uuid, nombre, apellido, email, telefono, hash_contrasena, creado_en) 
-        VALUES (?, ?, ?, ?, ?, ?, NOW())
+        INSERT INTO usuarios (uuid, nombre, apellido, email, telefono, hash_contrasena) 
+        VALUES (?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $db->prepare($query);
