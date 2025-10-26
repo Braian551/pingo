@@ -62,7 +62,9 @@ try {
                 dc.total_viajes,
                 dc.disponible,
                 dc.estado_verificacion,
-                dc.fecha_ultima_verificacion
+                dc.fecha_ultima_verificacion,
+                dc.aprobado,
+                dc.estado_aprobacion
               FROM usuarios u
               LEFT JOIN detalles_conductor dc ON u.id = dc.usuario_id
               WHERE u.id = :conductor_id AND u.tipo_usuario = 'conductor'";
@@ -89,6 +91,8 @@ try {
         'disponible' => (bool)($conductor['disponible'] ?? false),
         'estado_verificacion' => $conductor['estado_verificacion'] ?? 'pendiente',
         'fecha_ultima_verificacion' => $conductor['fecha_ultima_verificacion'],
+        'aprobado' => (int)($conductor['aprobado'] ?? 0),
+        'estado_aprobacion' => $conductor['estado_aprobacion'] ?? 'pendiente',
         
         // License information
         'licencia' => null,
@@ -100,7 +104,8 @@ try {
         'is_profile_complete' => false,
         'completion_percentage' => 0.0,
         'pending_tasks' => [],
-        'documentos_pendientes' => []
+        'documentos_pendientes' => [],
+        'documentos_rechazados' => []
     ];
 
     // Build license info if exists

@@ -33,13 +33,23 @@ try {
     }
 
     // Verificar si existe registro en detalles_conductor
-    $query_check = "SELECT id FROM detalles_conductor WHERE usuario_id = :conductor_id";
+    $query_check = "SELECT id, aprobado, estado_verificacion FROM detalles_conductor WHERE usuario_id = :conductor_id";
     $stmt_check = $db->prepare($query_check);
     $stmt_check->bindParam(':conductor_id', $conductor_id, PDO::PARAM_INT);
     $stmt_check->execute();
     $existe = $stmt_check->fetch(PDO::FETCH_ASSOC);
 
     if ($existe) {
+        // Si el conductor intenta activar la disponibilidad, verificar que esté aprobado
+        if ($disponible == 1) {
+            $aprobado = intval($existe['aprobado']);
+            $estado_verificacion = $existe['estado_verificacion'];
+            
+            if ($aprobado != 1 || $estado_verificacion != 'aprobado') {
+                throw new Exception('Tu perfil debe estar aprobado por un administrador antes de poder activar la disponibilidad. Por favor espera la aprobación o completa los documentos pendientes.');
+            }
+        }
+        
         // Actualizar registro existente
         $query = "UPDATE detalles_conductor 
                   SET disponible = :disponible";

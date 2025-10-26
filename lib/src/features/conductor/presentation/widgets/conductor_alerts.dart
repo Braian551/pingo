@@ -8,6 +8,7 @@ enum ProfileAction {
   submitVerification,
   completeProfile,
   inReview,
+  awaitingApproval,
 }
 
 /// Helper function to determine the action type based on profile
@@ -22,8 +23,13 @@ ProfileAction getProfileActionType(ConductorProfileModel? profile) {
   }
 
   // Si está aprobado, no necesita hacer nada
-  if (profile.estadoVerificacion == VerificationStatus.aprobado) {
+  if (profile.estadoVerificacion == VerificationStatus.aprobado && profile.aprobado) {
     return ProfileAction.completeProfile;
+  }
+
+  // Si el perfil está completo pero no aprobado (esperando aprobación)
+  if (profile.isProfileComplete && !profile.aprobado) {
+    return ProfileAction.awaitingApproval;
   }
 
   // Si no tiene licencia o está incompleta
@@ -234,6 +240,8 @@ class ProfileIncompleteAlert extends StatelessWidget {
         return 'Completar Ahora';
       case ProfileAction.inReview:
         return 'Mi Perfil';
+      case ProfileAction.awaitingApproval:
+        return 'Ver Perfil';
     }
   }
 
@@ -249,6 +257,8 @@ class ProfileIncompleteAlert extends StatelessWidget {
         return 'Perfil Incompleto';
       case ProfileAction.inReview:
         return 'Verificación en Proceso';
+      case ProfileAction.awaitingApproval:
+        return 'Esperando Aprobación';
     }
   }
 
@@ -264,6 +274,8 @@ class ProfileIncompleteAlert extends StatelessWidget {
         return 'Para activar tu disponibilidad y recibir viajes, debes completar tu perfil de conductor.';
       case ProfileAction.inReview:
         return 'Tu documentación está siendo revisada. Te notificaremos cuando el proceso esté completo.';
+      case ProfileAction.awaitingApproval:
+        return 'Tu perfil está completo y enviado. Un administrador revisará tus documentos pronto y te notificaremos cuando seas aprobado.';
     }
   }
 

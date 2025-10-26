@@ -43,17 +43,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
     });
   }
 
-  // 🛠️ DEBUG: Método para resetear el estado de notificación de aprobación
-  // Llama a esto si quieres volver a ver la alerta de aprobación
-  Future<void> _debugResetApprovalNotification() async {
-    if (_conductorId != null) {
-      await ApprovalNotificationService.resetApprovalStatus(_conductorId!);
-      print('🔄 Estado de notificación reseteado para conductor $_conductorId');
-      // Recargar datos para mostrar la alerta nuevamente
-      _loadConductorData();
-    }
-  }
-
   Future<void> _loadConductorData() async {
     if (!mounted) return;
     
@@ -202,6 +191,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case ProfileAction.submitVerification:
       case ProfileAction.completeProfile:
       case ProfileAction.inReview:
+      case ProfileAction.awaitingApproval:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -283,14 +273,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         ],
       ),
       actions: [
-        // 🛠️ DEBUG: Botón para resetear la notificación de aprobación
-        // Solo visible en modo debug
-        if (const bool.fromEnvironment('dart.vm.product') == false)
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.orange),
-            tooltip: 'Reset notificación de aprobación',
-            onPressed: _debugResetApprovalNotification,
-          ),
         Consumer<ConductorProvider>(
           builder: (context, provider, child) {
             return Container(
