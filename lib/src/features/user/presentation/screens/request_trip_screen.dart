@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ping_go/src/global/services/nominatim_service.dart';
+import 'trip_preview_screen.dart';
+import 'select_destination_screen.dart';
 
 class RequestTripScreen extends StatefulWidget {
   const RequestTripScreen({super.key});
@@ -217,15 +219,24 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
       return;
     }
 
-    Navigator.pushNamed(
+    // Navegar directamente a TripPreviewScreen con las ubicaciones
+    Navigator.push(
       context,
-      '/vehicle_selection',
-      arguments: {
-        'pickup': _pickupLocation,
-        'destination': _destinationLocation,
-        'pickupAddress': _pickupAddress,
-        'destinationAddress': _destinationAddress,
-      },
+      MaterialPageRoute(
+        builder: (context) => TripPreviewScreen(
+          origin: SimpleLocation(
+            latitude: _pickupLocation!.latitude,
+            longitude: _pickupLocation!.longitude,
+            address: _pickupAddress ?? 'Origen',
+          ),
+          destination: SimpleLocation(
+            latitude: _destinationLocation!.latitude,
+            longitude: _destinationLocation!.longitude,
+            address: _destinationAddress ?? 'Destino',
+          ),
+          vehicleType: 'moto', // Por defecto moto, luego podrás agregar selección
+        ),
+      ),
     );
   }
 
