@@ -29,6 +29,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
   final TextEditingController _searchController = TextEditingController();
   LatLng? _mapCenterCache;
   Timer? _moveDebounce;
+  Timer? _searchDebounce; // Debounce para búsqueda
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearchFocused = false;
   
@@ -85,6 +86,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
   @override
   void dispose() {
     _moveDebounce?.cancel();
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     _pinAnimationController.dispose();
@@ -93,9 +95,26 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
   }
 
   void _onSearch(String q) async {
+    // Cancelar búsqueda anterior
+    _searchDebounce?.cancel();
+    
     if (q.length > 2) {
+      // Esperar 500ms antes de buscar (debounce)
+      _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+        final prov = Provider.of<MapProvider>(context, listen: false);
+        
+        // Asegurarse de que el provider tenga la ubicación actual
+        if (_mapCenterCache != null && prov.currentLocation == null) {
+          prov.setCurrentLocation(_mapCenterCache);
+        }
+        
+        // Buscar con el query
+        prov.searchAddress(q);
+      });
+    } else {
+      // Si el query es muy corto, limpiar resultados
       final prov = Provider.of<MapProvider>(context, listen: false);
-      prov.searchAddress(q);
+      prov.clearSearch();
     }
   }
 
@@ -230,6 +249,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                     interactive: true,
                     onLocationSelected: (loc) async {
                       _mapCenterCache = loc;
+                      // Actualizar la ubicación actual en el provider
+                      prov.setCurrentLocation(loc);
                       await prov.selectLocation(loc);
                       // Solo actualizar el campo de búsqueda visualmente, NO el addressController del padre
                       _searchController.text = prov.selectedAddress ?? _searchController.text;
@@ -242,6 +263,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                     },
                     onMapMoved: (center) {
                       _mapCenterCache = center;
+                      // Actualizar la ubicación actual en el provider
+                      prov.setCurrentLocation(center);
                       _handleMapMovedDebounced(center);
                     },
                     onMapMoveStart: _onMapMoveStart,

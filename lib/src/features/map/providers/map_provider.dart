@@ -70,7 +70,7 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Buscar dirección por texto
+  /// Buscar dirección por texto - Mejorado para Colombia
   void searchAddress(String query) async {
     _searchQuery = query;
 
@@ -86,10 +86,15 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _searchResults = await NominatimService.searchAddress(query);
+      // Usar la ubicación actual como proximidad si está disponible
+      _searchResults = await NominatimService.searchAddress(
+        query,
+        proximity: _currentLocation ?? _selectedLocation,
+        limit: 10, // Más resultados para mejor cobertura
+      );
     } catch (e) {
       _searchResults = [];
-      // Puedes propagar o mostrar un mensaje si lo deseas
+      print('Error buscando dirección: $e');
     }
 
     _isLoading = false;
@@ -148,7 +153,11 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await NominatimService.searchAddress(query);
+      final results = await NominatimService.searchAddress(
+        query,
+        proximity: _currentLocation ?? _selectedLocation,
+        limit: 10,
+      );
       if (results.isNotEmpty) {
         // Seleccionar el primer resultado
         selectSearchResult(results.first);
