@@ -147,6 +147,58 @@ INSERT INTO `calificaciones` VALUES (1,1,1,7,5,'Excelente conductor!','2025-10-2
 UNLOCK TABLES;
 
 --
+-- Table structure for table `configuracion_precios`
+--
+
+DROP TABLE IF EXISTS `configuracion_precios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `configuracion_precios` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tipo_vehiculo` enum('moto','carro','moto_carga','carro_carga') NOT NULL DEFAULT 'moto',
+  `tarifa_base` decimal(10,2) NOT NULL DEFAULT '5000.00' COMMENT 'Tarifa m├¡nima del viaje en COP',
+  `costo_por_km` decimal(10,2) NOT NULL DEFAULT '2500.00' COMMENT 'Costo por kil├│metro recorrido',
+  `costo_por_minuto` decimal(10,2) NOT NULL DEFAULT '300.00' COMMENT 'Costo por minuto de duraci├│n',
+  `tarifa_minima` decimal(10,2) NOT NULL DEFAULT '8000.00' COMMENT 'Precio m├¡nimo total del viaje',
+  `tarifa_maxima` decimal(10,2) DEFAULT NULL COMMENT 'Precio m├íximo permitido (NULL = sin l├¡mite)',
+  `recargo_hora_pico` decimal(5,2) NOT NULL DEFAULT '20.00' COMMENT 'Porcentaje de recargo en hora pico',
+  `recargo_nocturno` decimal(5,2) NOT NULL DEFAULT '25.00' COMMENT 'Porcentaje de recargo nocturno (10pm-6am)',
+  `recargo_festivo` decimal(5,2) NOT NULL DEFAULT '30.00' COMMENT 'Porcentaje de recargo en d├¡as festivos',
+  `descuento_distancia_larga` decimal(5,2) NOT NULL DEFAULT '10.00' COMMENT 'Descuento para viajes > umbral_km',
+  `umbral_km_descuento` decimal(10,2) NOT NULL DEFAULT '15.00' COMMENT 'Kil├│metros para aplicar descuento',
+  `hora_pico_inicio_manana` time DEFAULT '07:00:00',
+  `hora_pico_fin_manana` time DEFAULT '09:00:00',
+  `hora_pico_inicio_tarde` time DEFAULT '17:00:00',
+  `hora_pico_fin_tarde` time DEFAULT '19:00:00',
+  `hora_nocturna_inicio` time DEFAULT '22:00:00',
+  `hora_nocturna_fin` time DEFAULT '06:00:00',
+  `comision_plataforma` decimal(5,2) NOT NULL DEFAULT '15.00' COMMENT 'Porcentaje de comisi├│n para la plataforma',
+  `comision_metodo_pago` decimal(5,2) NOT NULL DEFAULT '2.50' COMMENT 'Comisi├│n adicional por pago digital',
+  `distancia_minima` decimal(10,2) NOT NULL DEFAULT '1.00' COMMENT 'Distancia m├¡nima del viaje en km',
+  `distancia_maxima` decimal(10,2) NOT NULL DEFAULT '50.00' COMMENT 'Distancia m├íxima del viaje en km',
+  `tiempo_espera_gratis` int NOT NULL DEFAULT '3' COMMENT 'Minutos de espera gratuita',
+  `costo_tiempo_espera` decimal(10,2) NOT NULL DEFAULT '500.00' COMMENT 'Costo por minuto de espera adicional',
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `notas` text COMMENT 'Notas sobre cambios de precios',
+  PRIMARY KEY (`id`),
+  KEY `idx_tipo_vehiculo` (`tipo_vehiculo`),
+  KEY `idx_activo` (`activo`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuraci├│n de precios por tipo de veh├¡culo';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configuracion_precios`
+--
+
+LOCK TABLES `configuracion_precios` WRITE;
+/*!40000 ALTER TABLE `configuracion_precios` DISABLE KEYS */;
+INSERT INTO `configuracion_precios` VALUES (1,'moto',4000.00,2000.00,250.00,6000.00,NULL,15.00,20.00,25.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:37:09','2025-10-26 18:37:09','Configuraci├│n inicial para servicio de moto - Octubre 2025'),(2,'carro',6000.00,3000.00,400.00,9000.00,NULL,20.00,25.00,30.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:37:09','2025-10-26 18:37:09','Configuraci├│n inicial para servicio de carro - Octubre 2025'),(3,'moto_carga',5000.00,2500.00,300.00,7500.00,NULL,15.00,20.00,25.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:37:09','2025-10-26 18:37:09','Configuraci├│n inicial para servicio de mensajer├¡a en moto - Octubre 2025'),(4,'carro_carga',8000.00,3500.00,450.00,12000.00,NULL,20.00,25.00,30.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:37:09','2025-10-26 18:37:09','Configuraci├│n inicial para servicio de carga en carro - Octubre 2025'),(5,'moto',4000.00,2000.00,250.00,6000.00,NULL,15.00,20.00,25.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:40:23','2025-10-26 18:40:23','Configuraci├│n inicial para servicio de moto - Octubre 2025'),(6,'carro',6000.00,3000.00,400.00,9000.00,NULL,20.00,25.00,30.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:40:23','2025-10-26 18:40:23','Configuraci├│n inicial para servicio de carro - Octubre 2025'),(7,'moto_carga',5000.00,2500.00,300.00,7500.00,NULL,15.00,20.00,25.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:40:23','2025-10-26 18:40:23','Configuraci├│n inicial para servicio de mensajer├¡a en moto - Octubre 2025'),(8,'carro_carga',8000.00,3500.00,450.00,12000.00,NULL,20.00,25.00,30.00,10.00,15.00,'07:00:00','09:00:00','17:00:00','19:00:00','22:00:00','06:00:00',15.00,2.50,1.00,50.00,3,500.00,1,'2025-10-26 18:40:23','2025-10-26 18:40:23','Configuraci├│n inicial para servicio de carga en carro - Octubre 2025');
+/*!40000 ALTER TABLE `configuracion_precios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `configuraciones_app`
 --
 
@@ -246,7 +298,7 @@ CREATE TABLE `detalles_conductor` (
 
 LOCK TABLES `detalles_conductor` WRITE;
 /*!40000 ALTER TABLE `detalles_conductor` DISABLE KEYS */;
-INSERT INTO `detalles_conductor` VALUES (1,7,'42424224242','2036-10-25','2020-10-08','C1','uploads/documentos/conductor_7/licencia_1761492375_1a4c4887f68f6988.jpg','motocicleta','toyota','corolla',2020,'Blanco','3232323',NULL,NULL,NULL,NULL,'3232323','2027-10-26','uploads/documentos/conductor_7/soat_1761492819_87a1e30ab2e6b43c.jpg','323232332','2027-10-26','uploads/documentos/conductor_7/tecnomecanica_1761492819_a331dc0207ae3a9d.jpg','32323','uploads/documentos/conductor_7/tarjeta_propiedad_1761492820_ad1097b64c039a5d.jpg',0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-26 15:45:50',0,NULL,NULL,NULL,0,'en_revision','2025-10-26 15:45:50','2025-10-24 11:53:16');
+INSERT INTO `detalles_conductor` VALUES (1,7,'42424224242','2036-10-25','2020-10-08','C1','uploads/documentos/conductor_7/licencia_1761492375_1a4c4887f68f6988.jpg','motocicleta','toyota','corolla',2020,'Blanco','3232323',NULL,NULL,NULL,NULL,'3232323','2027-10-26','uploads/documentos/conductor_7/soat_1761492819_87a1e30ab2e6b43c.jpg','323232332','2027-10-26','uploads/documentos/conductor_7/tecnomecanica_1761492819_a331dc0207ae3a9d.jpg','32323','uploads/documentos/conductor_7/tarjeta_propiedad_1761492820_ad1097b64c039a5d.jpg',1,'aprobado',0.00,0,'2025-10-24 11:53:16','2025-10-26 17:06:21',1,NULL,NULL,NULL,0,'aprobado','2025-10-26 16:22:01','2025-10-24 11:53:16');
 /*!40000 ALTER TABLE `detalles_conductor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -385,6 +437,40 @@ LOCK TABLES `estadisticas_sistema` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `historial_precios`
+--
+
+DROP TABLE IF EXISTS `historial_precios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `historial_precios` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `configuracion_id` bigint unsigned NOT NULL,
+  `campo_modificado` varchar(100) NOT NULL,
+  `valor_anterior` text,
+  `valor_nuevo` text,
+  `usuario_id` bigint unsigned DEFAULT NULL,
+  `fecha_cambio` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `motivo` text COMMENT 'Raz├│n del cambio de precio',
+  PRIMARY KEY (`id`),
+  KEY `idx_configuracion` (`configuracion_id`),
+  KEY `idx_fecha` (`fecha_cambio`),
+  KEY `fk_historial_usuario` (`usuario_id`),
+  CONSTRAINT `fk_historial_config` FOREIGN KEY (`configuracion_id`) REFERENCES `configuracion_precios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_historial_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Auditor├¡a de cambios en configuraci├│n de precios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `historial_precios`
+--
+
+LOCK TABLES `historial_precios` WRITE;
+/*!40000 ALTER TABLE `historial_precios` DISABLE KEYS */;
+/*!40000 ALTER TABLE `historial_precios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `historial_seguimiento`
 --
 
@@ -443,7 +529,7 @@ CREATE TABLE `logs_auditoria` (
   KEY `idx_accion` (`accion`),
   KEY `idx_fecha` (`fecha_creacion`),
   CONSTRAINT `fk_logs_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -452,7 +538,7 @@ CREATE TABLE `logs_auditoria` (
 
 LOCK TABLES `logs_auditoria` WRITE;
 /*!40000 ALTER TABLE `logs_auditoria` DISABLE KEYS */;
-INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27'),(3,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-25 15:41:26'),(4,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 16:08:02'),(5,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 18:47:52'),(6,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:05:06'),(7,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-26 15:45:50'),(8,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:48:18');
+INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27'),(3,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-25 15:41:26'),(4,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 16:08:02'),(5,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 18:47:52'),(6,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:05:06'),(7,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-26 15:45:50'),(8,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:48:18'),(9,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 16:23:40'),(10,6,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 17:07:32'),(11,6,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 17:53:51');
 /*!40000 ALTER TABLE `logs_auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -765,7 +851,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'user_68daf618780e50.65802566','braian','oquendo','braianoquen@gmail.com','3013636902','$2y$10$H2Un4DmxCsM6XOGA1fiX8.5VB42Z9v8uwqERrGBms83dk2CQVQKnO','administrador',NULL,NULL,0,1,'2025-09-29 21:11:52','2025-10-22 14:16:12',NULL),(2,'user_68e44706c14db4.53994811','braian890','oquendo','braian890@gmail.com','32323232','$2y$10$NB9S4hWQLrK7HhTjc9yneu9RTb6otip3dtZ1muEgukWWLKcSpxRF6','cliente',NULL,NULL,0,1,'2025-10-06 22:47:34',NULL,NULL),(3,'user_68e44d12079086.97442308','braianoquen79','oquendo','braianoquen79@gmail.com','34343434','$2y$10$6LhMx5vHi.3LrrM/EjFjw.ZztZWhhGQgqf1sD76h2RtJ4B7nN/sjC','cliente',NULL,NULL,0,1,'2025-10-06 23:13:22',NULL,NULL),(4,'user_68f5142e614579.71603626','braianoquen323','oquendo','braianoquen323@gmail.com','213131313131','$2y$10$qSZ1igIQd1BQJmq.MRMwM.2EUfUYhvXhsf4g0h7GJJDJ8uaR66/qy','cliente',NULL,NULL,0,1,'2025-10-19 16:39:10',NULL,NULL),(5,'user_68f6b9b1f1cb28.57297864','braianoquen324','oquendo','braianoquen324@gmail.com','4274672','$2y$10$Oji7gxZcVki50Pyk5aReKexUhCGPbXLGNe.rsnlzAaZvI.Bo.UexS','cliente',NULL,NULL,0,1,'2025-10-20 22:37:37',NULL,NULL),(6,'user_68f8e56f0736b2.62296910','braianoquendurango','oquendo','braianoquendurango@gmail.com','323121','$2y$10$DDOIUEJ8jv1ILAu7PKj3LutCGRru.7sVUs2himDiKZ4yqY.VtvRb6','cliente',NULL,NULL,0,1,'2025-10-22 14:08:47',NULL,NULL),(7,'user_68f8e5efd5f888.59258279','braianoquen2','oqeundo','braianoquen2@gmail.com','3242442','$2y$10$DUUZdDrKiyespZGSJfk9JeGYuvOkAjrlMemg9BA/BZfyXlamgobjW','conductor',NULL,NULL,0,1,'2025-10-22 14:10:55','2025-10-22 14:15:38',NULL);
+INSERT INTO `usuarios` VALUES (1,'user_68daf618780e50.65802566','braian','oquendo','braianoquen@gmail.com','3013636902','$2y$10$H2Un4DmxCsM6XOGA1fiX8.5VB42Z9v8uwqERrGBms83dk2CQVQKnO','administrador',NULL,NULL,0,1,'2025-09-29 21:11:52','2025-10-22 14:16:12',NULL),(2,'user_68e44706c14db4.53994811','braian890','oquendo','braian890@gmail.com','32323232','$2y$10$NB9S4hWQLrK7HhTjc9yneu9RTb6otip3dtZ1muEgukWWLKcSpxRF6','cliente',NULL,NULL,0,1,'2025-10-06 22:47:34',NULL,NULL),(3,'user_68e44d12079086.97442308','braianoquen79','oquendo','braianoquen79@gmail.com','34343434','$2y$10$6LhMx5vHi.3LrrM/EjFjw.ZztZWhhGQgqf1sD76h2RtJ4B7nN/sjC','cliente',NULL,NULL,0,1,'2025-10-06 23:13:22',NULL,NULL),(4,'user_68f5142e614579.71603626','braianoquen323','oquendo','braianoquen323@gmail.com','213131313131','$2y$10$qSZ1igIQd1BQJmq.MRMwM.2EUfUYhvXhsf4g0h7GJJDJ8uaR66/qy','cliente',NULL,NULL,0,1,'2025-10-19 16:39:10',NULL,NULL),(5,'user_68f6b9b1f1cb28.57297864','braianoquen324','oquendo','braianoquen324@gmail.com','4274672','$2y$10$Oji7gxZcVki50Pyk5aReKexUhCGPbXLGNe.rsnlzAaZvI.Bo.UexS','cliente',NULL,NULL,0,1,'2025-10-20 22:37:37',NULL,NULL),(6,'user_68f8e56f0736b2.62296910','braianoquendurango','oquendo','braianoquendurango@gmail.com','323121','$2y$10$DDOIUEJ8jv1ILAu7PKj3LutCGRru.7sVUs2himDiKZ4yqY.VtvRb6','cliente',NULL,NULL,0,1,'2025-10-22 14:08:47',NULL,NULL),(7,'user_68f8e5efd5f888.59258279','braianoquen2','oqeundo','braianoquen2@gmail.com','3242442','$2y$10$DUUZdDrKiyespZGSJfk9JeGYuvOkAjrlMemg9BA/BZfyXlamgobjW','conductor',NULL,NULL,1,1,'2025-10-22 14:10:55','2025-10-26 16:22:01',NULL);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -836,12 +922,71 @@ INSERT INTO `verification_codes` VALUES (1,'braianoquen@gmail.com','184773','202
 UNLOCK TABLES;
 
 --
+-- Temporary view structure for view `vista_precios_activos`
+--
+
+DROP TABLE IF EXISTS `vista_precios_activos`;
+/*!50001 DROP VIEW IF EXISTS `vista_precios_activos`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vista_precios_activos` AS SELECT 
+ 1 AS `id`,
+ 1 AS `tipo_vehiculo`,
+ 1 AS `tarifa_base`,
+ 1 AS `costo_por_km`,
+ 1 AS `costo_por_minuto`,
+ 1 AS `tarifa_minima`,
+ 1 AS `tarifa_maxima`,
+ 1 AS `recargo_hora_pico`,
+ 1 AS `recargo_nocturno`,
+ 1 AS `recargo_festivo`,
+ 1 AS `descuento_distancia_larga`,
+ 1 AS `umbral_km_descuento`,
+ 1 AS `hora_pico_inicio_manana`,
+ 1 AS `hora_pico_fin_manana`,
+ 1 AS `hora_pico_inicio_tarde`,
+ 1 AS `hora_pico_fin_tarde`,
+ 1 AS `hora_nocturna_inicio`,
+ 1 AS `hora_nocturna_fin`,
+ 1 AS `comision_plataforma`,
+ 1 AS `comision_metodo_pago`,
+ 1 AS `distancia_minima`,
+ 1 AS `distancia_maxima`,
+ 1 AS `tiempo_espera_gratis`,
+ 1 AS `costo_tiempo_espera`,
+ 1 AS `activo`,
+ 1 AS `fecha_creacion`,
+ 1 AS `fecha_actualizacion`,
+ 1 AS `notas`,
+ 1 AS `periodo_actual`,
+ 1 AS `recargo_actual`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Dumping events for database 'pingo'
 --
 
 --
 -- Dumping routines for database 'pingo'
 --
+
+--
+-- Final view structure for view `vista_precios_activos`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vista_precios_activos`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = cp850 */;
+/*!50001 SET character_set_results     = cp850 */;
+/*!50001 SET collation_connection      = cp850_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vista_precios_activos` AS select `cp`.`id` AS `id`,`cp`.`tipo_vehiculo` AS `tipo_vehiculo`,`cp`.`tarifa_base` AS `tarifa_base`,`cp`.`costo_por_km` AS `costo_por_km`,`cp`.`costo_por_minuto` AS `costo_por_minuto`,`cp`.`tarifa_minima` AS `tarifa_minima`,`cp`.`tarifa_maxima` AS `tarifa_maxima`,`cp`.`recargo_hora_pico` AS `recargo_hora_pico`,`cp`.`recargo_nocturno` AS `recargo_nocturno`,`cp`.`recargo_festivo` AS `recargo_festivo`,`cp`.`descuento_distancia_larga` AS `descuento_distancia_larga`,`cp`.`umbral_km_descuento` AS `umbral_km_descuento`,`cp`.`hora_pico_inicio_manana` AS `hora_pico_inicio_manana`,`cp`.`hora_pico_fin_manana` AS `hora_pico_fin_manana`,`cp`.`hora_pico_inicio_tarde` AS `hora_pico_inicio_tarde`,`cp`.`hora_pico_fin_tarde` AS `hora_pico_fin_tarde`,`cp`.`hora_nocturna_inicio` AS `hora_nocturna_inicio`,`cp`.`hora_nocturna_fin` AS `hora_nocturna_fin`,`cp`.`comision_plataforma` AS `comision_plataforma`,`cp`.`comision_metodo_pago` AS `comision_metodo_pago`,`cp`.`distancia_minima` AS `distancia_minima`,`cp`.`distancia_maxima` AS `distancia_maxima`,`cp`.`tiempo_espera_gratis` AS `tiempo_espera_gratis`,`cp`.`costo_tiempo_espera` AS `costo_tiempo_espera`,`cp`.`activo` AS `activo`,`cp`.`fecha_creacion` AS `fecha_creacion`,`cp`.`fecha_actualizacion` AS `fecha_actualizacion`,`cp`.`notas` AS `notas`,(case when (curtime() between `cp`.`hora_pico_inicio_manana` and `cp`.`hora_pico_fin_manana`) then 'hora_pico_manana' when (curtime() between `cp`.`hora_pico_inicio_tarde` and `cp`.`hora_pico_fin_tarde`) then 'hora_pico_tarde' when ((curtime() >= `cp`.`hora_nocturna_inicio`) or (curtime() <= `cp`.`hora_nocturna_fin`)) then 'nocturno' else 'normal' end) AS `periodo_actual`,(case when (curtime() between `cp`.`hora_pico_inicio_manana` and `cp`.`hora_pico_fin_manana`) then `cp`.`recargo_hora_pico` when (curtime() between `cp`.`hora_pico_inicio_tarde` and `cp`.`hora_pico_fin_tarde`) then `cp`.`recargo_hora_pico` when ((curtime() >= `cp`.`hora_nocturna_inicio`) or (curtime() <= `cp`.`hora_nocturna_fin`)) then `cp`.`recargo_nocturno` else 0.00 end) AS `recargo_actual` from `configuracion_precios` `cp` where (`cp`.`activo` = 1) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -852,4 +997,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-26 10:49:54
+-- Dump completed on 2025-10-26 13:51:49

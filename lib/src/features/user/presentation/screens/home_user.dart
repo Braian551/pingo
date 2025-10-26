@@ -149,13 +149,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  const Color(0xFFFFFF00).withOpacity(0.15),
-                  Colors.transparent,
-                ],
-                stops: const [0.1, 0.8],
-              ),
+              color: const Color(0xFFFFFF00).withOpacity(0.1),
             ),
             child: ShaderMask(
               shaderCallback: (Rect bounds) {
@@ -515,12 +509,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          const Color(0xFFFFFF00).withOpacity(0.3),
-                          const Color(0xFFFFFF00).withOpacity(0.1),
-                        ],
-                      ),
+                      color: const Color(0xFFFFFF00).withOpacity(0.1),
                     ),
                     child: Center(
                       child: Text(
