@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ping_go/src/global/services/mapbox_service.dart';
+import 'package:ping_go/src/global/services/nominatim_service.dart';
 
 class RequestTripScreen extends StatefulWidget {
   const RequestTripScreen({super.key});
@@ -72,7 +72,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   
-  List<MapboxPlace> _searchResults = [];
+  List<NominatimResult> _searchResults = [];
   Timer? _debounceTimer;
   
   // Estado de selección: 'pickup' o 'destination'
@@ -111,12 +111,12 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     }
 
     try {
-      final results = await MapboxService.searchPlaces(
-        query: query,
+      final results = await NominatimService.searchAddress(
+        query,
         proximity: _currentPosition != null
             ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
             : null,
-        limit: 5,
+        limit: 10,
       );
 
       if (mounted) {
@@ -171,14 +171,17 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
 
   Future<void> _getReverseGeocode(LatLng position, bool isPickup) async {
     try {
-      final place = await MapboxService.reverseGeocode(position: position);
+      final place = await NominatimService.reverseGeocode(
+        position.latitude,
+        position.longitude,
+      );
       
       if (place != null && mounted) {
         setState(() {
           if (isPickup) {
-            _pickupAddress = place.placeName;
+            _pickupAddress = place.getFormattedAddress();
           } else {
-            _destinationAddress = place.placeName;
+            _destinationAddress = place.getFormattedAddress();
           }
         });
       }
@@ -187,14 +190,14 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     }
   }
 
-  void _selectPlace(MapboxPlace place) {
+  void _selectPlace(NominatimResult place) {
     setState(() {
       if (_selectingFor == 'pickup') {
         _pickupLocation = place.coordinates;
-        _pickupAddress = place.placeName;
+        _pickupAddress = place.getFormattedAddress();
       } else if (_selectingFor == 'destination') {
         _destinationLocation = place.coordinates;
-        _destinationAddress = place.placeName;
+        _destinationAddress = place.getFormattedAddress();
       }
       _selectingFor = null;
       _searchController.clear();
@@ -737,7 +740,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          place.text,
+                                          place.getShortName(),
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
@@ -745,19 +748,17 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                                             letterSpacing: -0.2,
                                           ),
                                         ),
-                                        if (place.placeName != place.text) ...[
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            place.placeName,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.white.withOpacity(0.5),
-                                              letterSpacing: -0.2,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          place.getFormattedAddress(),
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.white.withOpacity(0.5),
+                                            letterSpacing: -0.2,
                                           ),
-                                        ],
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ],
                                     ),
                                   ),
