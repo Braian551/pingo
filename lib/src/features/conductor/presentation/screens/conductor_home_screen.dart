@@ -192,6 +192,13 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case ProfileAction.completeProfile:
       case ProfileAction.inReview:
       case ProfileAction.awaitingApproval:
+        // Navegar a la pantalla de perfil
+        // La pantalla detectará automáticamente si el conductor está aprobado
+        final profileProvider = Provider.of<ConductorProfileProvider>(
+          context,
+          listen: false,
+        );
+        
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -200,10 +207,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
             ),
           ),
         ).then((result) {
-          final profileProvider = Provider.of<ConductorProfileProvider>(
-            context,
-            listen: false,
-          );
           profileProvider.loadProfile(_conductorId!);
         });
         break;

@@ -80,6 +80,12 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
             );
           }
 
+          // Si el conductor está aprobado, mostrar vista de perfil aprobado
+          if (profile.aprobado && profile.estadoVerificacion == VerificationStatus.aprobado) {
+            return _buildApprovedProfileView(profile);
+          }
+
+          // Si no está aprobado, mostrar vista de verificación
           return SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -865,6 +871,599 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  // ========== VISTA DE PERFIL APROBADO ==========
+  
+  Widget _buildApprovedProfileView(ConductorProfileModel profile) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            _buildApprovedBadge(),
+            const SizedBox(height: 24),
+            _buildApprovedPersonalInfoSection(profile),
+            const SizedBox(height: 24),
+            _buildApprovedLicenseSection(profile),
+            const SizedBox(height: 24),
+            _buildApprovedVehicleSection(profile),
+            const SizedBox(height: 24),
+            _buildApprovedDocumentsSection(profile),
+            const SizedBox(height: 24),
+            _buildApprovedSettingsSection(),
+            const SizedBox(height: 24),
+            _buildApprovedAccountSection(),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApprovedBadge() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.green.withOpacity(0.2),
+                Colors.green.withOpacity(0.1),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.green.withOpacity(0.4),
+              width: 2,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.verified_rounded,
+                  color: Colors.green,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '¡Conductor Verificado!',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Tu perfil ha sido aprobado y verificado',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApprovedPersonalInfoSection(ConductorProfileModel profile) {
+    return _buildApprovedSection(
+      title: 'Información Personal',
+      icon: Icons.person_rounded,
+      children: [
+        _buildApprovedInfoTile(
+          icon: Icons.badge_rounded,
+          label: 'Estado',
+          value: 'Conductor Activo',
+          valueColor: Colors.green,
+        ),
+        const Divider(color: Colors.white12),
+        _buildApprovedInfoTile(
+          icon: Icons.calendar_today_rounded,
+          label: 'Verificado desde',
+          value: _formatDate(profile.fechaUltimaVerificacion),
+        ),
+        const Divider(color: Colors.white12),
+        _buildApprovedInfoTile(
+          icon: Icons.security_rounded,
+          label: 'Estado de Documentos',
+          value: 'Todos verificados',
+          valueColor: Colors.green,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildApprovedLicenseSection(ConductorProfileModel profile) {
+    final license = profile.licencia;
+    final hasLicense = license != null && license.isComplete;
+
+    return _buildApprovedSection(
+      title: 'Licencia de Conducción',
+      icon: Icons.credit_card_rounded,
+      trailing: hasLicense
+          ? IconButton(
+              icon: const Icon(Icons.edit_rounded, color: Color(0xFFFFFF00)),
+              onPressed: () => _editLicense(license),
+            )
+          : null,
+      children: hasLicense
+          ? [
+              _buildApprovedInfoTile(
+                icon: Icons.numbers_rounded,
+                label: 'Número',
+                value: license.numero,
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.category_rounded,
+                label: 'Categoría',
+                value: license.categoria.label,
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.event_rounded,
+                label: 'Fecha de Vencimiento',
+                value: '${license.fechaVencimiento.day}/${license.fechaVencimiento.month}/${license.fechaVencimiento.year}',
+                valueColor: license.isValid 
+                    ? (license.isExpiringSoon ? Colors.orange : Colors.white)
+                    : Colors.red,
+              ),
+              if (license.isExpiringSoon || !license.isValid)
+                ...[
+                  const Divider(color: Colors.white12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: (license.isValid ? Colors.orange : Colors.red).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_rounded,
+                          color: license.isValid ? Colors.orange : Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            license.isValid 
+                                ? 'Tu licencia vence pronto. Considera renovarla.'
+                                : 'Tu licencia está vencida. Renuévala urgentemente.',
+                            style: TextStyle(
+                              color: license.isValid ? Colors.orange : Colors.red,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+            ]
+          : [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'No has registrado tu licencia',
+                  style: TextStyle(color: Colors.white54),
+                ),
+              ),
+            ],
+    );
+  }
+
+  Widget _buildApprovedVehicleSection(ConductorProfileModel profile) {
+    final vehicle = profile.vehiculo;
+    final hasVehicle = vehicle != null && vehicle.isBasicComplete;
+
+    return _buildApprovedSection(
+      title: 'Información del Vehículo',
+      icon: Icons.directions_car_rounded,
+      trailing: hasVehicle
+          ? IconButton(
+              icon: const Icon(Icons.edit_rounded, color: Color(0xFFFFFF00)),
+              onPressed: () => _editVehicle(vehicle),
+            )
+          : null,
+      children: hasVehicle
+          ? [
+              _buildApprovedInfoTile(
+                icon: Icons.pin_rounded,
+                label: 'Placa',
+                value: vehicle.placa.toUpperCase(),
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.car_rental_rounded,
+                label: 'Tipo',
+                value: vehicle.tipo.label,
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.business_rounded,
+                label: 'Marca',
+                value: vehicle.marca ?? 'N/A',
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.inventory_rounded,
+                label: 'Modelo',
+                value: vehicle.modelo ?? 'N/A',
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.calendar_today_rounded,
+                label: 'Año',
+                value: vehicle.anio?.toString() ?? 'N/A',
+              ),
+              const Divider(color: Colors.white12),
+              _buildApprovedInfoTile(
+                icon: Icons.palette_rounded,
+                label: 'Color',
+                value: vehicle.color ?? 'N/A',
+              ),
+            ]
+          : [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'No has registrado tu vehículo',
+                  style: TextStyle(color: Colors.white54),
+                ),
+              ),
+            ],
+    );
+  }
+
+  Widget _buildApprovedDocumentsSection(ConductorProfileModel profile) {
+    return _buildApprovedSection(
+      title: 'Documentos',
+      icon: Icons.folder_rounded,
+      children: [
+        _buildDocumentItem(
+          'Licencia de Conducción',
+          Icons.badge_rounded,
+          verified: profile.licencia != null,
+        ),
+        const Divider(color: Colors.white12),
+        _buildDocumentItem(
+          'SOAT',
+          Icons.description_rounded,
+          verified: profile.vehiculo?.fotoSoat != null,
+        ),
+        const Divider(color: Colors.white12),
+        _buildDocumentItem(
+          'Tarjeta de Propiedad',
+          Icons.description_rounded,
+          verified: profile.vehiculo?.fotoTarjetaPropiedad != null,
+        ),
+        const Divider(color: Colors.white12),
+        _buildDocumentItem(
+          'Tecnomecánica',
+          Icons.build_rounded,
+          verified: profile.vehiculo?.fotoTecnomecanica != null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDocumentItem(String title, IconData icon, {required bool verified}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: (verified ? Colors.green : Colors.orange).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: verified ? Colors.green : Colors.orange,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Icon(
+            verified ? Icons.check_circle_rounded : Icons.warning_rounded,
+            color: verified ? Colors.green : Colors.orange,
+            size: 24,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildApprovedSettingsSection() {
+    return _buildApprovedSection(
+      title: 'Configuración',
+      icon: Icons.settings_rounded,
+      children: [
+        _buildSettingItem(
+          'Notificaciones',
+          Icons.notifications_rounded,
+          onTap: () => _showComingSoon('Notificaciones'),
+        ),
+        const Divider(color: Colors.white12),
+        _buildSettingItem(
+          'Privacidad',
+          Icons.privacy_tip_rounded,
+          onTap: () => _showComingSoon('Privacidad'),
+        ),
+        const Divider(color: Colors.white12),
+        _buildSettingItem(
+          'Idioma',
+          Icons.language_rounded,
+          trailing: 'Español',
+          onTap: () => _showComingSoon('Idioma'),
+        ),
+        const Divider(color: Colors.white12),
+        _buildSettingItem(
+          'Modo Oscuro',
+          Icons.dark_mode_rounded,
+          trailing: 'Activado',
+          onTap: () => _showComingSoon('Modo Oscuro'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildApprovedAccountSection() {
+    return _buildApprovedSection(
+      title: 'Cuenta',
+      icon: Icons.account_circle_rounded,
+      children: [
+        _buildSettingItem(
+          'Ayuda y Soporte',
+          Icons.help_rounded,
+          onTap: () => _showComingSoon('Ayuda y Soporte'),
+        ),
+        const Divider(color: Colors.white12),
+        _buildSettingItem(
+          'Términos y Condiciones',
+          Icons.article_rounded,
+          onTap: () => _showComingSoon('Términos y Condiciones'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildApprovedSection({
+    required String title,
+    required IconData icon,
+    Widget? trailing,
+    required List<Widget> children,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFF00).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: const Color(0xFFFFFF00),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (trailing != null) trailing,
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Column(
+                  children: children,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApprovedInfoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white54, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: valueColor ?? Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingItem(
+    String title,
+    IconData icon, {
+    String? trailing,
+    Color? textColor,
+    Color? iconColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: iconColor ?? Colors.white70,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: textColor ?? Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (trailing != null)
+              Text(
+                trailing,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 14,
+                ),
+              ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white54,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'N/A';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _editLicense(license) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LicenseRegistrationScreen(
+          conductorId: widget.conductorId,
+          existingLicense: license,
+        ),
+      ),
+    );
+    if (result == true && mounted) {
+      Provider.of<ConductorProfileProvider>(context, listen: false)
+          .loadProfile(widget.conductorId);
+    }
+  }
+
+  void _editVehicle(vehicle) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleOnlyRegistrationScreen(
+          conductorId: widget.conductorId,
+          existingVehicle: vehicle,
+        ),
+      ),
+    );
+    if (result == true && mounted) {
+      Provider.of<ConductorProfileProvider>(context, listen: false)
+          .loadProfile(widget.conductorId);
+    }
+  }
+
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature estará disponible próximamente'),
+        backgroundColor: Colors.blue,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );
