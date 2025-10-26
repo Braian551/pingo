@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/conductor_profile_provider.dart';
 import '../../models/conductor_profile_model.dart';
 import 'license_registration_screen.dart';
@@ -41,11 +42,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
       body: Consumer<ConductorProfileProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFFFF00),
-              ),
-            );
+            return _buildShimmerLoading();
           }
 
           final profile = provider.profile;
@@ -818,6 +815,56 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            // Completion progress shimmer
+            _buildShimmerBox(height: 120, width: double.infinity),
+            const SizedBox(height: 32),
+            // Verification status shimmer
+            _buildShimmerBox(height: 90, width: double.infinity),
+            const SizedBox(height: 24),
+            // License section shimmer
+            _buildShimmerBox(height: 200, width: double.infinity),
+            const SizedBox(height: 24),
+            // Vehicle section shimmer
+            _buildShimmerBox(height: 250, width: double.infinity),
+            const SizedBox(height: 24),
+            // Pending tasks title shimmer
+            _buildShimmerBox(height: 24, width: 180),
+            const SizedBox(height: 16),
+            // Pending task items shimmer
+            _buildShimmerBox(height: 60, width: double.infinity),
+            const SizedBox(height: 12),
+            _buildShimmerBox(height: 60, width: double.infinity),
+            const SizedBox(height: 12),
+            _buildShimmerBox(height: 60, width: double.infinity),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({required double height, double? width}) {
+    return Shimmer.fromColors(
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF2A2A2A),
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     );

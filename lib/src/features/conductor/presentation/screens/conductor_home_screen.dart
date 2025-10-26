@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/conductor_provider.dart';
 import '../../providers/conductor_profile_provider.dart';
 import '../../models/conductor_profile_model.dart';
@@ -333,9 +334,67 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   }
 
   Widget _buildLoading() {
-    return const Center(
-      child: CircularProgressIndicator(
-        color: Color(0xFFFFFF00),
+    return _buildShimmerLoading();
+  }
+
+  Widget _buildShimmerLoading() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            // Welcome section shimmer
+            _buildShimmerBox(height: 20, width: 120),
+            const SizedBox(height: 8),
+            _buildShimmerBox(height: 40, width: 200),
+            const SizedBox(height: 24),
+            // Disponibility card shimmer
+            _buildShimmerBox(height: 100, width: double.infinity),
+            const SizedBox(height: 24),
+            // Stats title shimmer
+            _buildShimmerBox(height: 28, width: 180),
+            const SizedBox(height: 16),
+            // Stats cards shimmer
+            Row(
+              children: [
+                Expanded(child: _buildShimmerBox(height: 100)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildShimmerBox(height: 100)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _buildShimmerBox(height: 100)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildShimmerBox(height: 100)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            // Active trips title shimmer
+            _buildShimmerBox(height: 28, width: 150),
+            const SizedBox(height: 16),
+            // Active trips card shimmer
+            _buildShimmerBox(height: 150, width: double.infinity),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({required double height, double? width}) {
+    return Shimmer.fromColors(
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF2A2A2A),
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/conductor_earnings_provider.dart';
 
 class ConductorEarningsScreen extends StatefulWidget {
@@ -45,11 +46,7 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen> {
               child: Consumer<ConductorEarningsProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoading && provider.earnings == null) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFFFFF00),
-                      ),
-                    );
+                    return _buildShimmerLoading();
                   }
 
                   if (provider.errorMessage != null && provider.earnings == null) {
@@ -647,6 +644,58 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Total earnings card shimmer
+            _buildShimmerBox(height: 200, width: double.infinity),
+            const SizedBox(height: 24),
+            // Stats grid shimmer
+            Row(
+              children: [
+                Expanded(child: _buildShimmerBox(height: 150)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildShimmerBox(height: 150)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            // Breakdown title shimmer
+            _buildShimmerBox(height: 24, width: 180),
+            const SizedBox(height: 16),
+            // Breakdown items shimmer
+            _buildShimmerBox(height: 80, width: double.infinity),
+            const SizedBox(height: 12),
+            _buildShimmerBox(height: 80, width: double.infinity),
+            const SizedBox(height: 12),
+            _buildShimmerBox(height: 80, width: double.infinity),
+            const SizedBox(height: 24),
+            // Withdraw button shimmer
+            _buildShimmerBox(height: 54, width: double.infinity),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({required double height, double? width}) {
+    return Shimmer.fromColors(
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF2A2A2A),
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     );

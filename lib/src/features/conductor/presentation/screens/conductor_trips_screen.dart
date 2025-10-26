@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/conductor_trips_provider.dart';
 import '../../services/conductor_trips_service.dart';
 import 'package:intl/intl.dart';
@@ -78,11 +79,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
               child: Consumer<ConductorTripsProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoading && provider.trips.isEmpty) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFFFFF00),
-                      ),
-                    );
+                    return _buildShimmerLoading();
                   }
 
                   if (provider.errorMessage != null && provider.trips.isEmpty) {
@@ -708,6 +705,41 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Trip cards shimmer
+            ...List.generate(5, (index) => Column(
+              children: [
+                _buildShimmerBox(height: 300, width: double.infinity),
+                if (index < 4) const SizedBox(height: 16),
+              ],
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({required double height, double? width}) {
+    return Shimmer.fromColors(
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF2A2A2A),
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
     );
   }
