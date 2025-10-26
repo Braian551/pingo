@@ -6,27 +6,32 @@ import 'package:latlong2/latlong.dart';
 import 'package:ping_go/src/global/services/mapbox_service.dart';
 import 'package:ping_go/src/core/config/env_config.dart';
 
-/// Shimmer loading effect
-class ShimmerLoading extends StatefulWidget {
+// Efecto de pulsación suave
+class PulseAnimation extends StatefulWidget {
   final Widget child;
   
-  const ShimmerLoading({super.key, required this.child});
+  const PulseAnimation({super.key, required this.child});
 
   @override
-  State<ShimmerLoading> createState() => _ShimmerLoadingState();
+  State<PulseAnimation> createState() => _PulseAnimationState();
 }
 
-class _ShimmerLoadingState extends State<ShimmerLoading>
+class _PulseAnimationState extends State<PulseAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -38,26 +43,11 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _animation,
       child: widget.child,
       builder: (context, child) {
-        return ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [
-                _controller.value - 0.3,
-                _controller.value,
-                _controller.value + 0.3,
-              ],
-              colors: const [
-                Color(0xFF1A1A1A),
-                Color(0xFFFFD700),
-                Color(0xFF1A1A1A),
-              ],
-            ).createShader(bounds);
-          },
+        return Opacity(
+          opacity: _animation.value,
           child: child,
         );
       },
@@ -122,7 +112,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
 
   void _setupAnimations() {
     _slideAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
@@ -247,20 +237,20 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
 
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withOpacity(0.85),
       builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Dialog(
           backgroundColor: Colors.transparent,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A).withOpacity(0.95),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(
                     color: Colors.white.withOpacity(0.1),
                     width: 1,
@@ -270,32 +260,34 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      width: 70,
+                      height: 70,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFD700).withOpacity(0.1),
+                        color: const Color(0xFFFFD700).withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.check_circle,
                         color: Color(0xFFFFD700),
-                        size: 48,
+                        size: 40,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     const Text(
                       '¡Viaje solicitado!',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 22,
+                        fontSize: 24,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.1),
                           width: 1,
@@ -305,14 +297,17 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                         children: [
                           _buildInfoRow('Vehículo', 'Moto'),
                           if (_route != null) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
                             _buildInfoRow('Distancia', _route!.formattedDistance),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
                             _buildInfoRow('Tiempo', _route!.formattedDuration),
                           ],
-                          const SizedBox(height: 12),
-                          const Divider(color: Color(0xFFFFD700), height: 1),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
+                          Container(
+                            height: 1,
+                            color: const Color(0xFFFFD700).withOpacity(0.3),
+                          ),
+                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -322,6 +317,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  letterSpacing: -0.2,
                                 ),
                               ),
                               Text(
@@ -329,7 +325,8 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                                 style: const TextStyle(
                                   color: Color(0xFFFFD700),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20,
+                                  fontSize: 22,
+                                  letterSpacing: -0.5,
                                 ),
                               ),
                             ],
@@ -337,16 +334,20 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    ShimmerLoading(
+                    const SizedBox(height: 24),
+                    PulseAnimation(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                          horizontal: 20,
+                          vertical: 14,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xFFFFD700).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFFFD700).withOpacity(0.3),
+                            width: 1,
+                          ),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -356,19 +357,21 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                               color: Color(0xFFFFD700),
                               size: 20,
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: 12),
                             Text(
                               'Buscando conductor disponible...',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.2,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -382,15 +385,16 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 0,
                         ),
                         child: const Text(
                           'Aceptar',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: -0.3,
                           ),
                         ),
                       ),
@@ -412,16 +416,18 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withOpacity(0.6),
             fontSize: 14,
+            letterSpacing: -0.2,
           ),
         ),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
           ),
         ),
       ],
@@ -542,16 +548,16 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
       right: 0,
       child: ClipRRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 8,
-              left: 16,
-              right: 16,
-              bottom: 16,
+              top: MediaQuery.of(context).padding.top + 12,
+              left: 20,
+              right: 20,
+              bottom: 20,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.8),
+              color: const Color(0xFF1A1A1A).withOpacity(0.9),
               border: Border(
                 bottom: BorderSide(
                   color: Colors.white.withOpacity(0.1),
@@ -561,13 +567,20 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
             ),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFD700).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700), size: 20),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,20 +589,22 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                       Row(
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 10,
+                            height: 10,
                             decoration: const BoxDecoration(
                               color: Color(0xFFFFD700),
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               _pickupAddress ?? 'Origen',
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.2,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -597,24 +612,26 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 10,
+                            height: 10,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               _destinationAddress ?? 'Destino',
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.2,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -625,13 +642,37 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                     ],
                   ),
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cambiar',
-                    style: TextStyle(
-                      color: Color(0xFFFFD700),
-                      fontWeight: FontWeight.w600,
+                const SizedBox(width: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          'Cambiar',
+                          style: TextStyle(
+                            color: Color(0xFFFFD700),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -657,7 +698,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
       position: _slideAnimation,
       child: ClipRRect(
         borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
+          top: Radius.circular(24),
         ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -665,7 +706,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
             decoration: BoxDecoration(
               color: const Color(0xFF1A1A1A).withOpacity(0.95),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: Radius.circular(24),
               ),
               border: Border(
                 top: BorderSide(
@@ -680,27 +721,28 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.fromLTRB(24, 20, 24, 16),
                     child: Text(
                       'Selecciona tu vehículo',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        letterSpacing: -0.5,
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: const Color(0xFFFFD700).withOpacity(0.3),
                               width: 2,
@@ -709,15 +751,16 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(16),
+                                width: 60,
+                                height: 60,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: const Color(0xFFFFD700).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: const Icon(
                                   Icons.two_wheeler,
                                   color: Color(0xFFFFD700),
-                                  size: 40,
+                                  size: 32,
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -731,6 +774,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
+                                        letterSpacing: -0.3,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -739,26 +783,29 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white.withOpacity(0.7),
+                                        letterSpacing: -0.2,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 2),
                                     Text(
                                       _vehicleOption['description'] as String,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white.withOpacity(0.5),
+                                        letterSpacing: -0.2,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 12),
                               Text(
                                 _formatPrice(price),
                                 style: const TextStyle(
-                                  fontSize: 22,
+                                  fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFFFD700),
+                                  letterSpacing: -0.5,
                                 ),
                               ),
                             ],
@@ -771,56 +818,67 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.payments_outlined,
-                                  color: Color(0xFFFFD700),
-                                  size: 24,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              // TODO: Implementar cambio de método de pago
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.1),
+                                  width: 1,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Text(
-                                  'Efectivo',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFD700).withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.payments_outlined,
+                                      color: Color(0xFFFFD700),
+                                      size: 24,
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(width: 16),
+                                  const Expanded(
+                                    child: Text(
+                                      'Efectivo',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
+                                ],
                               ),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: Colors.white.withOpacity(0.3),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: SizedBox(
@@ -832,7 +890,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 0,
                         ),
@@ -841,6 +899,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: -0.3,
                           ),
                         ),
                       ),
@@ -860,7 +919,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
     return Container(
       color: const Color(0xFF121212).withOpacity(0.95),
       child: Center(
-        child: ShimmerLoading(
+        child: PulseAnimation(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -888,6 +947,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  letterSpacing: -0.3,
                 ),
               ),
             ],
@@ -902,15 +962,15 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
       color: const Color(0xFF121212).withOpacity(0.95),
       child: Center(
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
             child: Container(
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
                 color: const Color(0xFF1A1A1A).withOpacity(0.95),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.1),
                   width: 1,
@@ -920,38 +980,40 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    width: 70,
+                    height: 70,
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.error_outline,
                       color: Colors.red,
-                      size: 48,
+                      size: 40,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   const Text(
                     'Error',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Text(
                     _errorMessage!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 15,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Expanded(
                         child: OutlinedButton(
@@ -959,16 +1021,20 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,
                             side: BorderSide(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withOpacity(0.2),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: const Text(
                             'Volver',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              letterSpacing: -0.2,
+                            ),
                           ),
                         ),
                       ),
@@ -979,15 +1045,19 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFFD700),
                             foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
                           ),
                           child: const Text(
                             'Reintentar',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              letterSpacing: -0.2,
+                            ),
                           ),
                         ),
                       ),

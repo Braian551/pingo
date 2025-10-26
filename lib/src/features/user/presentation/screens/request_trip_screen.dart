@@ -12,27 +12,32 @@ class RequestTripScreen extends StatefulWidget {
   State<RequestTripScreen> createState() => _RequestTripScreenState();
 }
 
-// Shimmer loading effect
-class ShimmerLoading extends StatefulWidget {
+// Efecto de pulsación suave
+class PulseAnimation extends StatefulWidget {
   final Widget child;
   
-  const ShimmerLoading({super.key, required this.child});
+  const PulseAnimation({super.key, required this.child});
 
   @override
-  State<ShimmerLoading> createState() => _ShimmerLoadingState();
+  State<PulseAnimation> createState() => _PulseAnimationState();
 }
 
-class _ShimmerLoadingState extends State<ShimmerLoading>
+class _PulseAnimationState extends State<PulseAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -44,26 +49,11 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _animation,
       child: widget.child,
       builder: (context, child) {
-        return ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [
-                _controller.value - 0.3,
-                _controller.value,
-                _controller.value + 0.3,
-              ],
-              colors: const [
-                Color(0xFF1A1A1A),
-                Color(0xFFFFD700),
-                Color(0xFF1A1A1A),
-              ],
-            ).createShader(bounds);
-          },
+        return Opacity(
+          opacity: _animation.value,
           child: child,
         );
       },
@@ -167,11 +157,10 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
 
       setState(() {
         _currentPosition = position;
-        _pickupLocation = LatLng(position.latitude, position.longitude);
         _isLoadingLocation = false;
       });
 
-      _getReverseGeocode(_pickupLocation!, true);
+      // No establecemos automáticamente el pickup, solo lo dejamos disponible
     } catch (e) {
       print('Error obteniendo ubicación: $e');
       setState(() => _isLoadingLocation = false);
@@ -251,28 +240,32 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
       return Scaffold(
         backgroundColor: const Color(0xFF121212),
         body: Center(
-          child: ShimmerLoading(
+          child: PulseAnimation(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     color: const Color(0xFF1A1A1A),
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withOpacity(0.3),
+                      width: 2,
+                    ),
                   ),
                   child: const Icon(
                     Icons.location_on,
                     color: Color(0xFFFFD700),
-                    size: 30,
+                    size: 40,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 const Text(
-                  'Obteniendo ubicación...',
+                  'Preparando...',
                   style: TextStyle(
-                    color: Color(0xFFFFD700),
+                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -293,76 +286,120 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.only(left: 8),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                color: const Color(0xFF1A1A1A).withOpacity(0.8),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ),
+          ),
         ),
         title: const Text(
           '¿A dónde vamos?',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
           ),
         ),
+        centerTitle: false,
       ),
       body: Column(
         children: [
+          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                // Campo de origen
-                _buildLocationField(
-                  icon: Icons.my_location,
-                  iconColor: const Color(0xFFFFD700),
-                  label: 'Ubicación actual',
-                  value: _pickupAddress,
-                  isSelected: false,
-                  onTap: () {
-                    setState(() {
-                      _selectingFor = 'pickup';
-                    });
+                // Campo de origen con animación - EDITABLE
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 20 * (1 - value)),
+                        child: child,
+                      ),
+                    );
                   },
-                  onClear: _pickupLocation != null
-                      ? () {
-                          setState(() {
-                            _pickupLocation = null;
-                            _pickupAddress = null;
-                          });
-                        }
-                      : null,
+                  child: _buildLocationField(
+                    icon: Icons.my_location,
+                    iconColor: const Color(0xFFFFD700),
+                    label: _pickupLocation != null ? 'Origen' : 'Seleccionar origen',
+                    value: _pickupAddress,
+                    isSelected: false,
+                    onTap: () {
+                      setState(() {
+                        _selectingFor = 'pickup';
+                      });
+                    },
+                    onClear: _pickupLocation != null
+                        ? () {
+                            setState(() {
+                              _pickupLocation = null;
+                              _pickupAddress = null;
+                            });
+                          }
+                        : null,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                // Campo de destino
-                _buildLocationField(
-                  icon: Icons.location_on,
-                  iconColor: const Color(0xFFFFD700),
-                  label: '¿A dónde vamos?',
-                  value: _destinationAddress,
-                  isSelected: false,
-                  onTap: () {
-                    setState(() {
-                      _selectingFor = 'destination';
-                    });
+                const SizedBox(height: 16),
+                // Campo de destino con animación
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 20 * (1 - value)),
+                        child: child,
+                      ),
+                    );
                   },
-                  onClear: _destinationLocation != null
-                      ? () {
-                          setState(() {
-                            _destinationLocation = null;
-                            _destinationAddress = null;
-                          });
-                        }
-                      : null,
+                  child: _buildLocationField(
+                    icon: Icons.location_on,
+                    iconColor: const Color(0xFFFFD700),
+                    label: '¿A dónde vamos?',
+                    value: _destinationAddress,
+                    isSelected: false,
+                    onTap: () {
+                      setState(() {
+                        _selectingFor = 'destination';
+                      });
+                    },
+                    onClear: _destinationLocation != null
+                        ? () {
+                            setState(() {
+                              _destinationLocation = null;
+                              _destinationAddress = null;
+                            });
+                          }
+                        : null,
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 24),
+          const SizedBox(height: 24),
           // Accesos rápidos
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 _buildQuickAccess(Icons.home, 'Casa'),
@@ -373,7 +410,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           // Lugares sugeridos (aquí podrías agregar historial)
           Expanded(
             child: _buildSuggestedPlaces(),
@@ -381,35 +418,41 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
         ],
       ),
       bottomNavigationBar: _pickupLocation != null && _destinationLocation != null
-          ? Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: SafeArea(
-                child: ElevatedButton(
-                  onPressed: _confirmTrip,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          ? ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A).withOpacity(0.9),
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
+                      ),
                     ),
-                    elevation: 0,
                   ),
-                  child: const Text(
-                    'Confirmar ubicaciones',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  child: SafeArea(
+                    child: ElevatedButton(
+                      onPressed: _confirmTrip,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFD700),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Confirmar ubicaciones',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -423,92 +466,166 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
-          onPressed: () {
-            setState(() {
-              _selectingFor = null;
-              _searchController.clear();
-              _searchResults = [];
-            });
-            _searchFocusNode.unfocus();
-          },
-        ),
-        title: const Text(
-          'Buscar ubicación',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+        leading: Container(
+          margin: const EdgeInsets.only(left: 8),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                color: const Color(0xFF1A1A1A).withOpacity(0.8),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+                  onPressed: () {
+                    setState(() {
+                      _selectingFor = null;
+                      _searchController.clear();
+                      _searchResults = [];
+                    });
+                    _searchFocusNode.unfocus();
+                  },
+                ),
+              ),
+            ),
           ),
         ),
+        title: Text(
+          _selectingFor == 'pickup' ? 'Punto de origen' : 'Punto de destino',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
+          ),
+        ),
+        centerTitle: false,
       ),
       body: Column(
         children: [
+          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 // Campo de origen (read-only) si seleccionando destino
-                if (_selectingFor == 'destination')
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFFD700),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            _pickupAddress ?? 'Ubicación actual',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 15,
+                if (_selectingFor == 'destination' && _pickupAddress != null)
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                                width: 1,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFFD700),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    _pickupAddress!,
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.5),
+                                      fontSize: 15,
+                                      letterSpacing: -0.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
-                if (_selectingFor == 'destination') const SizedBox(height: 12),
+                // Campo de destino (read-only) si seleccionando origen
+                if (_selectingFor == 'pickup' && _destinationAddress != null)
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFFD700),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    _destinationAddress!,
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.5),
+                                      fontSize: 15,
+                                      letterSpacing: -0.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 // Campo de búsqueda activo
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
+                          color: const Color(0xFFFFD700).withOpacity(0.3),
+                          width: 1.5,
                         ),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 10,
+                            height: 10,
                             decoration: const BoxDecoration(
                               color: Color(0xFFFFD700),
                               shape: BoxShape.circle,
@@ -523,12 +640,16 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
+                                letterSpacing: -0.2,
                               ),
                               decoration: InputDecoration(
-                                hintText: '¿A dónde vamos?',
+                                hintText: _selectingFor == 'pickup' 
+                                    ? '¿Desde dónde?' 
+                                    : '¿A dónde vamos?',
                                 hintStyle: TextStyle(
                                   color: Colors.white.withOpacity(0.4),
                                   fontSize: 15,
+                                  letterSpacing: -0.2,
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
@@ -542,10 +663,17 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                                 _searchController.clear();
                                 setState(() => _searchResults = []);
                               },
-                              child: Icon(
-                                Icons.close,
-                                color: Colors.white.withOpacity(0.5),
-                                size: 20,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.white.withOpacity(0.6),
+                                  size: 18,
+                                ),
                               ),
                             ),
                         ],
@@ -556,62 +684,90 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
           // Resultados de búsqueda
           if (_searchResults.isNotEmpty)
             Expanded(
               child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   final place = _searchResults[index];
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    margin: const EdgeInsets.only(bottom: 12),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
-                            ),
-                          ),
-                          child: ListTile(
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.location_on,
-                                color: Color(0xFFFFD700),
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(
-                              place.text,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
-                            subtitle: place.placeName != place.text
-                                ? Text(
-                                    place.placeName,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.white.withOpacity(0.5),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  )
-                                : null,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             onTap: () => _selectPlace(place),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFD700).withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.location_on,
+                                      color: Color(0xFFFFD700),
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          place.text,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            letterSpacing: -0.2,
+                                          ),
+                                        ),
+                                        if (place.placeName != place.text) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            place.placeName,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.white.withOpacity(0.5),
+                                              letterSpacing: -0.2,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -631,85 +787,200 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
 
   Widget _buildSearchSuggestions() {
     return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+        // Opción para usar ubicación actual (solo cuando se selecciona origen)
+        if (_selectingFor == 'pickup' && _currentPosition != null) ...[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () async {
+                    setState(() {
+                      _pickupLocation = LatLng(
+                        _currentPosition!.latitude,
+                        _currentPosition!.longitude,
+                      );
+                    });
+                    await _getReverseGeocode(_pickupLocation!, true);
+                    setState(() {
+                      _selectingFor = null;
+                      _searchController.clear();
+                      _searchResults = [];
+                    });
+                    _searchFocusNode.unfocus();
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFD700).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFFFD700).withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFD700).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.my_location,
+                            color: Color(0xFFFFD700),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Text(
+                            'Usar mi ubicación actual',
+                            style: TextStyle(
+                              color: Color(0xFFFFD700),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: const Color(0xFFFFD700).withOpacity(0.5),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  // TODO: Implementar selección en mapa
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: Colors.white.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.location_searching,
-                      color: Color(0xFFFFD700),
-                      size: 20,
+                      width: 1,
                     ),
                   ),
-                  title: const Text(
-                    'Señalar la ubicación en el mapa',
-                    style: TextStyle(color: Colors.white),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD700).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.location_searching,
+                          color: Color(0xFFFFD700),
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Text(
+                          'Señalar la ubicación en el mapa',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                    ],
                   ),
-                  onTap: () {
-                    // TODO: Implementar selección en mapa
-                  },
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-                child: ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  // TODO: Implementar agregar ubicación favorita
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: Colors.white.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.add_location,
-                      color: Color(0xFFFFD700),
-                      size: 20,
+                      width: 1,
                     ),
                   ),
-                  title: const Text(
-                    'Agregar ubicación',
-                    style: TextStyle(color: Colors.white),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD700).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.add_location,
+                          color: Color(0xFFFFD700),
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Text(
+                          'Agregar ubicación',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                    ],
                   ),
-                  onTap: () {
-                    // TODO: Implementar agregar ubicación favorita
-                  },
                 ),
               ),
             ),
@@ -721,38 +992,42 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
 
   Widget _buildQuickAccess(IconData icon, String label) {
     return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          // TODO: Implementar accesos rápidos
-        },
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, color: const Color(0xFFFFD700), size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                // TODO: Implementar accesos rápidos
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
                   ),
-                ],
+                ),
+                child: Column(
+                  children: [
+                    Icon(icon, color: const Color(0xFFFFD700), size: 24),
+                    const SizedBox(height: 8),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -762,9 +1037,8 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
   }
 
   Widget _buildSuggestedPlaces() {
-    // Aquí podrías mostrar lugares del historial o sugerencias
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -772,18 +1046,20 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             'Lugares recientes',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
-            ),
+              letterSpacing: 0.5,
+              textBaseline: TextBaseline.alphabetic,
+            ).copyWith(height: 1.2),
           ),
-          const SizedBox(height: 16),
-          // Aquí podrías agregar una lista de lugares recientes
+          const SizedBox(height: 20),
           Center(
             child: Text(
               'No hay lugares recientes',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.3),
                 fontSize: 14,
+                letterSpacing: -0.2,
               ),
             ),
           ),
@@ -801,58 +1077,67 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     required VoidCallback onTap,
     VoidCallback? onClear,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.1),
-                width: 1,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: iconColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    value ?? label,
-                    style: TextStyle(
-                      color: value != null ? Colors.white : Colors.white.withOpacity(0.5),
-                      fontSize: 15,
-                      fontWeight: value != null ? FontWeight.w500 : FontWeight.normal,
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: iconColor,
+                      shape: BoxShape.circle,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                if (value != null && onClear != null)
-                  GestureDetector(
-                    onTap: onClear,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.white.withOpacity(0.5),
-                        size: 20,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      value ?? label,
+                      style: TextStyle(
+                        color: value != null ? Colors.white : Colors.white.withOpacity(0.5),
+                        fontSize: 15,
+                        fontWeight: value != null ? FontWeight.w500 : FontWeight.normal,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (value != null && onClear != null)
+                    GestureDetector(
+                      onTap: onClear,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white.withOpacity(0.6),
+                          size: 16,
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
