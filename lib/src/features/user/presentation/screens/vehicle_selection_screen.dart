@@ -67,6 +67,7 @@ class VehicleSelectionScreen extends StatefulWidget {
 class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
     with TickerProviderStateMixin {
   final MapController _mapController = MapController();
+  final DraggableScrollableController _draggableController = DraggableScrollableController();
 
   LatLng? _pickupLocation;
   LatLng? _destinationLocation;
@@ -76,6 +77,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
   MapboxRoute? _route;
   bool _isLoadingRoute = true;
   String? _errorMessage;
+  bool _isPanelExpanded = false;
 
   final Map<String, dynamic> _vehicleOption = {
     'id': 'moto',
@@ -92,13 +94,10 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
     'arrivalTime': '2-5 min',
   };
 
-  late AnimationController _slideAnimationController;
-  late Animation<Offset> _slideAnimation;
-
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
+    _draggableController.addListener(_onPanelDrag);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadArguments();
     });
@@ -106,23 +105,18 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
 
   @override
   void dispose() {
-    _slideAnimationController.dispose();
+    _draggableController.removeListener(_onPanelDrag);
+    _draggableController.dispose();
     super.dispose();
   }
 
-  void _setupAnimations() {
-    _slideAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideAnimationController,
-      curve: Curves.easeOutCubic,
-    ));
+  void _onPanelDrag() {
+    final size = _draggableController.size;
+    if (size > 0.6 && !_isPanelExpanded) {
+      setState(() => _isPanelExpanded = true);
+    } else if (size <= 0.6 && _isPanelExpanded) {
+      setState(() => _isPanelExpanded = false);
+    }
   }
 
   void _loadArguments() {
@@ -162,9 +156,6 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
       });
 
       _fitMapToRoute();
-
-      await Future.delayed(const Duration(milliseconds: 500));
-      _slideAnimationController.forward();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -448,12 +439,7 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
 
           // Panel inferior con opciones
           if (!_isLoadingRoute && _route != null)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildVehiclePanel(),
-            ),
+            _buildDraggablePanel(),
 
           // Loading overlay
           if (_isLoadingRoute) _buildLoadingOverlay(),
@@ -498,17 +484,17 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
             if (_pickupLocation != null)
               Marker(
                 point: _pickupLocation!,
-                width: 40,
-                height: 40,
+                width: 32,
+                height: 32,
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFD700),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.black, width: 3),
+                    border: Border.all(color: Colors.white, width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFD700).withOpacity(0.5),
-                        blurRadius: 10,
+                        color: const Color(0xFFFFD700).withOpacity(0.4),
+                        blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ],
@@ -518,8 +504,8 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
             if (_destinationLocation != null)
               Marker(
                 point: _destinationLocation!,
-                width: 40,
-                height: 40,
+                width: 32,
+                height: 32,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -527,8 +513,8 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                     border: Border.all(color: const Color(0xFFFFD700), width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.5),
-                        blurRadius: 10,
+                        color: Colors.white.withOpacity(0.4),
+                        blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ],
@@ -691,37 +677,56 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
         )}';
   }
 
-  Widget _buildVehiclePanel() {
+  Widget _buildDraggablePanel() {
     final price = _calculatePrice();
     
-    return SlideTransition(
-      position: _slideAnimation,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
-                  width: 1,
+    return DraggableScrollableSheet(
+      controller: _draggableController,
+      initialChildSize: 0.38,
+      minChildSize: 0.38,
+      maxChildSize: 0.75,
+      snap: true,
+      snapSizes: const [0.38, 0.75],
+      builder: (BuildContext context, ScrollController scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(24),
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1A).withOpacity(0.95),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
               ),
-            ),
-            child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.zero,
                 children: [
+                  // Drag handle - Línea blanca
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  
                   const Padding(
-                    padding: EdgeInsets.fromLTRB(24, 20, 24, 16),
+                    padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
                     child: Text(
                       'Selecciona tu vehículo',
                       style: TextStyle(
@@ -732,6 +737,8 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                       ),
                     ),
                   ),
+                  
+                  // Opción de Moto
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ClipRRect(
@@ -814,7 +821,10 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                       ),
                     ),
                   ),
+                  
                   const SizedBox(height: 16),
+                  
+                  // Opción de Efectivo
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ClipRRect(
@@ -878,7 +888,85 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                       ),
                     ),
                   ),
+                  
+                  // Mensaje cuando está expandido
+                  if (_isPanelExpanded) ...[
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFFD700).withOpacity(0.15),
+                                  const Color(0xFFFFD700).withOpacity(0.05),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFFFFD700).withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFD700).withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.info_outline,
+                                    color: Color(0xFFFFD700),
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '¡Próximamente!',
+                                        style: TextStyle(
+                                          color: Color(0xFFFFD700),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.3,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Pronto habrá más servicios disponibles',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: -0.2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  
                   const SizedBox(height: 20),
+                  
+                  // Botón de solicitar viaje
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: SizedBox(
@@ -905,13 +993,14 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
                 ],
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

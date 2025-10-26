@@ -353,41 +353,41 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
             // Origen
             Marker(
               point: widget.origin.toLatLng(),
-              width: 40,
-              height: 40,
+              width: 28,
+              height: 28,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
+                  border: Border.all(color: Colors.white, width: 2.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
+                      blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Icon(Icons.my_location, color: Colors.white, size: 20),
+                child: const Icon(Icons.circle, color: Colors.white, size: 10),
               ),
             ),
             // Destino
             Marker(
               point: widget.destination.toLatLng(),
-              width: 40,
-              height: 40,
+              width: 28,
+              height: 28,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
+                  border: Border.all(color: Colors.white, width: 2.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
+                      blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Icon(Icons.place, color: Colors.white, size: 20),
+                child: const Icon(Icons.circle, color: Colors.white, size: 10),
               ),
             ),
           ],
