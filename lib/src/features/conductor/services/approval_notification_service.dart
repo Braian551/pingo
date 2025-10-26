@@ -14,48 +14,46 @@ class ApprovalNotificationService {
   ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Claves únicas por conductor
       final shownKey = '$_keyPrefix$conductorId';
       final statusKey = '$_lastStatusKey$conductorId';
-      
+
       // Verificar si ya se mostró la alerta
       final hasShownAlert = prefs.getBool(shownKey) ?? false;
-      
+
       // Obtener el último estado guardado
       final lastStatus = prefs.getString(statusKey);
-      
+
       print('🔔 Verificando alerta de aprobación:');
       print('   - Conductor ID: $conductorId');
       print('   - Estado actual: $currentStatus');
       print('   - Aprobado: $isApproved');
       print('   - Último estado guardado: ${lastStatus ?? "ninguno"}');
       print('   - Ya se mostró alerta: $hasShownAlert');
-      
+
       // Guardar el estado actual
       await prefs.setString(statusKey, currentStatus);
-      
+
       // Caso especial: Si nunca se ha guardado un estado y el conductor está aprobado
       // probablemente es la primera vez que inicia sesión después de ser aprobado
-      if (lastStatus == null && currentStatus == 'aprobado' && isApproved && !hasShownAlert) {
+      if (lastStatus == null && (currentStatus == 'aprobado' || isApproved) && !hasShownAlert) {
         print('   ✅ Primera vez detectando estado aprobado - MOSTRARÁ ALERTA');
         return true;
       }
-      
+
       // Mostrar alerta solo si:
       // 1. No se ha mostrado antes
-      // 2. El estado actual es "aprobado"
-      // 3. El conductor está aprobado (aprobado == true)
-      // 4. El estado anterior era diferente a "aprobado"
-      if (!hasShownAlert && 
-          currentStatus == 'aprobado' && 
-          isApproved &&
+      // 2. El estado actual es "aprobado" O el conductor está aprobado
+      // 3. El estado anterior era diferente a "aprobado"
+      if (!hasShownAlert &&
+          (currentStatus == 'aprobado' || isApproved) &&
           lastStatus != null &&
           lastStatus != 'aprobado') {
         print('   ✅ Cambio de estado detectado - MOSTRARÁ ALERTA');
         return true;
       }
-      
+
       print('   ❌ No se mostrará alerta');
       return false;
     } catch (e) {
