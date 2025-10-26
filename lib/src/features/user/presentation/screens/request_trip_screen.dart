@@ -157,10 +157,12 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
 
       setState(() {
         _currentPosition = position;
+        _pickupLocation = LatLng(position.latitude, position.longitude);
         _isLoadingLocation = false;
       });
 
-      // No establecemos automáticamente el pickup, solo lo dejamos disponible
+      // Establecer automáticamente la ubicación actual como punto de origen
+      _getReverseGeocode(_pickupLocation!, true);
     } catch (e) {
       print('Error obteniendo ubicación: $e');
       setState(() => _isLoadingLocation = false);
@@ -263,7 +265,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Preparando...',
+                  'Obteniendo ubicación actual...',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
