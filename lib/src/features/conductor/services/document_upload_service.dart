@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../core/config/app_config.dart';
@@ -17,60 +18,79 @@ class DocumentUploadService {
     required String tipoDocumento,
     required String imagePath,
   }) async {
+    debugPrint('Iniciando subida de documento: $tipoDocumento para conductor: $conductorId');
+    debugPrint('Ruta del archivo: $imagePath');
+
     try {
       final file = File(imagePath);
-      
+
       if (!await file.exists()) {
-        print('Error: El archivo no existe: $imagePath');
+        debugPrint('Error: El archivo no existe: $imagePath');
         return null;
       }
 
       // Validar tamaño (max 5MB)
       final fileSize = await file.length();
+      debugPrint('Tamaño del archivo: ${fileSize} bytes (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)');
+
       if (fileSize > 5 * 1024 * 1024) {
-        print('Error: El archivo excede 5MB');
+        debugPrint('Error: El archivo excede 5MB');
         return null;
       }
 
       final uri = Uri.parse('${AppConfig.conductorServiceUrl}/upload_documents.php');
+      debugPrint('URL del endpoint: $uri');
+
       final request = http.MultipartRequest('POST', uri);
 
       // Agregar campos
       request.fields['conductor_id'] = conductorId.toString();
       request.fields['tipo_documento'] = tipoDocumento;
+      debugPrint('Campos enviados: conductor_id=$conductorId, tipo_documento=$tipoDocumento');
 
       // Agregar archivo
+      final fileName = imagePath.split(Platform.pathSeparator).last;
+      debugPrint('Nombre del archivo: $fileName');
+
+      // Verificar nuevamente que el archivo existe justo antes de subirlo
+      if (!await file.exists()) {
+        debugPrint('El archivo dejó de existir antes de subirlo: $imagePath');
+        return null;
+      }
+
       final multipartFile = await http.MultipartFile.fromPath(
         'documento',
         imagePath,
-        filename: imagePath.split('/').last,
+        filename: fileName,
       );
       request.files.add(multipartFile);
+      debugPrint('Archivo agregado al request correctamente');
 
       // Enviar request
-      print('Subiendo documento: $tipoDocumento para conductor: $conductorId');
+      debugPrint('Enviando request...');
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           final url = data['data']['url'];
-          print('✓ Documento subido exitosamente: $url');
+          debugPrint('Documento subido exitosamente: $url');
           return url;
         } else {
-          print('Error del servidor: ${data['message']}');
+          debugPrint('Error del servidor: ${data['message']}');
           return null;
         }
       } else {
-        print('Error HTTP: ${response.statusCode}');
+        debugPrint('Error HTTP: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error al subir documento: $e');
+      debugPrint('Error al subir documento: $e');
+      debugPrint('Stack trace: ${StackTrace.current}');
       return null;
     }
   }

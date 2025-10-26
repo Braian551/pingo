@@ -39,6 +39,7 @@ try {
                 dc.licencia_expedicion,
                 dc.licencia_vencimiento,
                 dc.licencia_categoria,
+                dc.licencia_foto_url,
                 dc.vehiculo_tipo,
                 dc.vehiculo_marca,
                 dc.vehiculo_modelo,
@@ -48,11 +49,15 @@ try {
                 dc.aseguradora,
                 dc.numero_poliza_seguro,
                 dc.vencimiento_seguro,
+                dc.seguro_foto_url,
                 dc.soat_numero,
                 dc.soat_vencimiento,
+                dc.soat_foto_url,
                 dc.tecnomecanica_numero,
                 dc.tecnomecanica_vencimiento,
+                dc.tecnomecanica_foto_url,
                 dc.tarjeta_propiedad_numero,
+                dc.tarjeta_propiedad_foto_url,
                 dc.calificacion_promedio,
                 dc.total_viajes,
                 dc.disponible,
@@ -106,8 +111,8 @@ try {
             'licencia_vencimiento' => $conductor['licencia_vencimiento'],
             'licencia_categoria' => $conductor['licencia_categoria'] ?? 'C1',
             'estado' => 'activa',
-            'licencia_foto' => null, // Not in current DB structure
-            'licencia_foto_reverso' => null // Not in current DB structure
+            'licencia_foto_url' => $conductor['licencia_foto_url'],
+            'licencia_foto_reverso' => null // Not yet implemented
         ];
     }
 
@@ -123,15 +128,16 @@ try {
             'aseguradora' => $conductor['aseguradora'],
             'numero_poliza_seguro' => $conductor['numero_poliza_seguro'],
             'vencimiento_seguro' => $conductor['vencimiento_seguro'],
+            'seguro_foto_url' => $conductor['seguro_foto_url'],
             'soat_numero' => $conductor['soat_numero'],
             'soat_vencimiento' => $conductor['soat_vencimiento'],
+            'soat_foto_url' => $conductor['soat_foto_url'],
             'tecnomecanica_numero' => $conductor['tecnomecanica_numero'],
             'tecnomecanica_vencimiento' => $conductor['tecnomecanica_vencimiento'],
+            'tecnomecanica_foto_url' => $conductor['tecnomecanica_foto_url'],
             'tarjeta_propiedad_numero' => $conductor['tarjeta_propiedad_numero'],
-            'foto_vehiculo' => null, // Not in current DB structure
-            'foto_tarjeta_propiedad' => null, // Not in current DB structure
-            'foto_soat' => null, // Not in current DB structure
-            'foto_tecnomecanica' => null // Not in current DB structure
+            'tarjeta_propiedad_foto_url' => $conductor['tarjeta_propiedad_foto_url'],
+            'foto_vehiculo' => null // Not yet implemented
         ];
     }
 

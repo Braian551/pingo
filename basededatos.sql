@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `pingo` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `pingo`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pingo
@@ -248,7 +246,7 @@ CREATE TABLE `detalles_conductor` (
 
 LOCK TABLES `detalles_conductor` WRITE;
 /*!40000 ALTER TABLE `detalles_conductor` DISABLE KEYS */;
-INSERT INTO `detalles_conductor` VALUES (1,7,'','2025-10-25',NULL,'C1',NULL,'motocicleta','','',NULL,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-25 19:28:58',0,NULL,NULL,NULL,0,'pendiente','2025-10-25 15:41:26','2025-10-24 11:53:16');
+INSERT INTO `detalles_conductor` VALUES (1,7,'42424224242','2036-10-25','2020-10-08','C1','uploads/documentos/conductor_7/licencia_1761492375_1a4c4887f68f6988.jpg','motocicleta','toyota','corolla',2020,'Blanco','3232323',NULL,NULL,NULL,NULL,'3232323','2027-10-26','uploads/documentos/conductor_7/soat_1761492819_87a1e30ab2e6b43c.jpg','323232332','2027-10-26','uploads/documentos/conductor_7/tecnomecanica_1761492819_a331dc0207ae3a9d.jpg','32323','uploads/documentos/conductor_7/tarjeta_propiedad_1761492820_ad1097b64c039a5d.jpg',0,'pendiente',0.00,0,'2025-10-24 11:53:16','2025-10-26 15:45:50',0,NULL,NULL,NULL,0,'en_revision','2025-10-26 15:45:50','2025-10-24 11:53:16');
 /*!40000 ALTER TABLE `detalles_conductor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -336,7 +334,7 @@ CREATE TABLE `documentos_conductor_historial` (
   KEY `idx_fecha_carga` (`fecha_carga`),
   KEY `idx_activo` (`activo`),
   CONSTRAINT `fk_doc_historial_conductor` FOREIGN KEY (`conductor_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de documentos subidos por conductores';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de documentos subidos por conductores';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -345,6 +343,7 @@ CREATE TABLE `documentos_conductor_historial` (
 
 LOCK TABLES `documentos_conductor_historial` WRITE;
 /*!40000 ALTER TABLE `documentos_conductor_historial` DISABLE KEYS */;
+INSERT INTO `documentos_conductor_historial` VALUES (1,7,'licencia','uploads/documentos/conductor_7/licencia_1761492375_1a4c4887f68f6988.jpg','2025-10-26 15:26:15',1,NULL),(2,7,'soat','uploads/documentos/conductor_7/soat_1761492819_87a1e30ab2e6b43c.jpg','2025-10-26 15:33:39',1,NULL),(3,7,'tecnomecanica','uploads/documentos/conductor_7/tecnomecanica_1761492819_a331dc0207ae3a9d.jpg','2025-10-26 15:33:39',1,NULL),(4,7,'tarjeta_propiedad','uploads/documentos/conductor_7/tarjeta_propiedad_1761492820_ad1097b64c039a5d.jpg','2025-10-26 15:33:40',1,NULL);
 /*!40000 ALTER TABLE `documentos_conductor_historial` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -444,7 +443,7 @@ CREATE TABLE `logs_auditoria` (
   KEY `idx_accion` (`accion`),
   KEY `idx_fecha` (`fecha_creacion`),
   CONSTRAINT `fk_logs_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de todas las acciones importantes del sistema';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,7 +452,7 @@ CREATE TABLE `logs_auditoria` (
 
 LOCK TABLES `logs_auditoria` WRITE;
 /*!40000 ALTER TABLE `logs_auditoria` DISABLE KEYS */;
-INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27'),(3,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-25 15:41:26'),(4,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 16:08:02'),(5,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 18:47:52');
+INSERT INTO `logs_auditoria` VALUES (1,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-22 14:37:21'),(2,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-24 11:11:27'),(3,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-25 15:41:26'),(4,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 16:08:02'),(5,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-25 18:47:52'),(6,7,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:05:06'),(7,7,'submit_verification','detalles_conductor',7,'Conductor envió perfil para verificación',NULL,NULL,NULL,NULL,'2025-10-26 15:45:50'),(8,1,'login',NULL,NULL,'Usuario inició sesión exitosamente','127.0.0.1','Dart/3.9 (dart:io)',NULL,NULL,'2025-10-26 15:48:18');
 /*!40000 ALTER TABLE `logs_auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -853,4 +852,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-25 14:31:30
+-- Dump completed on 2025-10-26 10:49:54

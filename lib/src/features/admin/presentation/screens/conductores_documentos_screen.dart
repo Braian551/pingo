@@ -35,6 +35,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   @override
   void initState() {
     super.initState();
+    print('ConductoresDocumentosScreen: adminId recibido: ${widget.adminId}');
+    print('ConductoresDocumentosScreen: adminUser completo: ${widget.adminUser}');
     _loadDocumentos();
   }
 
@@ -264,11 +266,11 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                 final isSelected = _filtroEstado == entry.key;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
+                  child: FilterChip(
                     label: Text(
                       entry.value,
                       style: TextStyle(
-                        color: isSelected ? Colors.black : const Color.fromARGB(255, 255, 255, 255),
+                        color: isSelected ? Colors.black : Colors.white,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -278,8 +280,9 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                       setState(() => _filtroEstado = entry.key);
                       _loadDocumentos();
                     },
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.transparent,
                     selectedColor: const Color(0xFFFFFF00),
+                    checkmarkColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
@@ -288,6 +291,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                       ),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    labelPadding: EdgeInsets.zero,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 );
               },
@@ -615,6 +620,13 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                             _buildDetailRow('Expedición', _formatDate(conductor['licencia_expedicion'])),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['licencia_vencimiento'])),
                           ]),
+                          const SizedBox(height: 16),
+                          if (conductor['licencia_foto_url'] != null)
+                            _buildDocumentButton(
+                              label: 'Ver Foto de Licencia',
+                              documentUrl: conductor['licencia_foto_url'],
+                              icon: Icons.photo_camera_rounded,
+                            ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Vehículo', [
                             _buildDetailRow('Tipo', conductor['vehiculo_tipo']),
@@ -629,27 +641,69 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                             _buildDetailRow('Número', conductor['soat_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['soat_vencimiento'])),
                           ]),
+                          const SizedBox(height: 16),
+                          if (conductor['soat_foto_url'] != null)
+                            _buildDocumentButton(
+                              label: 'Ver Foto de SOAT',
+                              documentUrl: conductor['soat_foto_url'],
+                              icon: Icons.photo_camera_rounded,
+                            ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Tecnomecánica', [
                             _buildDetailRow('Número', conductor['tecnomecanica_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['tecnomecanica_vencimiento'])),
                           ]),
+                          const SizedBox(height: 16),
+                          if (conductor['tecnomecanica_foto_url'] != null)
+                            _buildDocumentButton(
+                              label: 'Ver Foto de Tecnomecánica',
+                              documentUrl: conductor['tecnomecanica_foto_url'],
+                              icon: Icons.photo_camera_rounded,
+                            ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Seguro', [
                             _buildDetailRow('Aseguradora', conductor['aseguradora']),
                             _buildDetailRow('Póliza', conductor['numero_poliza_seguro']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['vencimiento_seguro'])),
                           ]),
+                          const SizedBox(height: 16),
+                          if (conductor['seguro_foto_url'] != null)
+                            _buildDocumentButton(
+                              label: 'Ver Foto de Seguro',
+                              documentUrl: conductor['seguro_foto_url'],
+                              icon: Icons.photo_camera_rounded,
+                            ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Otros Documentos', [
                             _buildDetailRow('Tarjeta de propiedad', conductor['tarjeta_propiedad_numero']),
                           ]),
+                          const SizedBox(height: 16),
+                          if (conductor['tarjeta_propiedad_foto_url'] != null)
+                            _buildDocumentButton(
+                              label: 'Ver Tarjeta de Propiedad',
+                              documentUrl: conductor['tarjeta_propiedad_foto_url'],
+                              icon: Icons.photo_camera_rounded,
+                            ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Estado de Verificación', [
                             _buildDetailRow('Estado', conductor['estado_verificacion']),
                             _buildDetailRow('Aprobado', conductor['aprobado'] == 1 ? 'Sí' : 'No'),
                             _buildDetailRow('Última verificación', _formatDate(conductor['fecha_ultima_verificacion'])),
                           ]),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () => _showDocumentHistory(conductor['usuario_id']),
+                            icon: const Icon(Icons.history_rounded),
+                            label: const Text('Ver Historial de Documentos'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF667eea),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
                           if (conductor['documentos_vencidos'] != null && (conductor['documentos_vencidos'] as List).isNotEmpty)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,6 +1020,372 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     }
   }
 
+  /// Muestra el historial de documentos de un conductor
+  Future<void> _showDocumentHistory(int conductorId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
+      ),
+    );
+
+    try {
+      final response = await AdminService.getDocumentosHistorial(
+        adminId: widget.adminId,
+        conductorId: conductorId,
+      );
+
+      Navigator.pop(context); // Cerrar loading
+
+      if (response['success'] == true && response['data'] != null) {
+        final List<Map<String, dynamic>> historial = 
+            List<Map<String, dynamic>>.from(response['data']['historial'] ?? []);
+
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => _buildHistorialSheet(historial),
+        );
+      } else {
+        _showError(response['message'] ?? 'Error al cargar historial');
+      }
+    } catch (e) {
+      Navigator.pop(context); // Cerrar loading
+      _showError('Error al cargar historial: $e');
+    }
+  }
+
+  /// Widget para mostrar el historial de documentos
+  Widget _buildHistorialSheet(List<Map<String, dynamic>> historial) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.8,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              child: Column(
+                children: [
+                  _buildSheetHandle(),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.history_rounded, color: Color(0xFFFFFF00), size: 28),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Historial de Documentos',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: historial.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.folder_open_rounded,
+                                  size: 64,
+                                  color: Colors.white.withOpacity(0.3),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No hay historial de documentos',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.6),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                            itemCount: historial.length,
+                            itemBuilder: (context, index) {
+                              final doc = historial[index];
+                              return _buildHistorialItem(doc);
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Widget para un item del historial
+  Widget _buildHistorialItem(Map<String, dynamic> doc) {
+    final estado = doc['estado'] ?? 'pendiente';
+    final Color estadoColor = estado == 'aprobado' 
+        ? const Color(0xFF11998e) 
+        : estado == 'rechazado'
+            ? const Color(0xFFf5576c)
+            : const Color(0xFFffa726);
+
+    final Map<String, String> tiposDocumento = {
+      'licencia': 'Licencia de Conducción',
+      'soat': 'SOAT',
+      'tecnomecanica': 'Tecnomecánica',
+      'tarjeta_propiedad': 'Tarjeta de Propiedad',
+      'seguro': 'Seguro',
+    };
+
+    final String nombreDoc = tiposDocumento[doc['tipo_documento']] ?? doc['tipo_documento'];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: estadoColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: estadoColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.description_rounded,
+                  color: estadoColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nombreDoc,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDate(doc['fecha_subida']),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: estadoColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: estadoColor.withOpacity(0.5)),
+                ),
+                child: Text(
+                  estado.toUpperCase(),
+                  style: TextStyle(
+                    color: estadoColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (doc['motivo_rechazo'] != null && doc['motivo_rechazo'].toString().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFf5576c).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      color: Color(0xFFf5576c),
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        doc['motivo_rechazo'],
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (doc['ruta_archivo'] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context); // Cerrar el historial
+                  _viewDocument(context, doc['ruta_archivo'], nombreDoc);
+                },
+                icon: const Icon(Icons.visibility_rounded, size: 18),
+                label: const Text('Ver Documento'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: estadoColor.withOpacity(0.2),
+                  foregroundColor: estadoColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Muestra un documento en pantalla completa
+  void _viewDocument(BuildContext context, String? documentUrl, String documentName) {
+    if (documentUrl == null || documentUrl.isEmpty) {
+      _showError('Documento no disponible');
+      return;
+    }
+
+    // Construir URL completa si es relativa
+    final String fullUrl = documentUrl.startsWith('http') 
+        ? documentUrl 
+        : 'http://10.0.2.2/pingo/backend/$documentUrl';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _DocumentViewerScreen(
+          documentUrl: fullUrl,
+          documentName: documentName,
+        ),
+      ),
+    );
+  }
+
+  /// Widget para mostrar botón de documento con preview
+  Widget _buildDocumentButton({
+    required String label,
+    required String? documentUrl,
+    required IconData icon,
+  }) {
+    final bool hasDocument = documentUrl != null && documentUrl.isNotEmpty;
+    
+    return GestureDetector(
+      onTap: hasDocument 
+          ? () => _viewDocument(context, documentUrl, label)
+          : null,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: hasDocument 
+              ? const Color(0xFF667eea).withOpacity(0.15)
+              : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: hasDocument 
+                ? const Color(0xFF667eea).withOpacity(0.3)
+                : Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: hasDocument 
+                    ? const Color(0xFF667eea).withOpacity(0.2)
+                    : Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: hasDocument ? const Color(0xFF667eea) : Colors.white.withOpacity(0.3),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: hasDocument ? Colors.white : Colors.white.withOpacity(0.5),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    hasDocument ? 'Toca para ver' : 'No disponible',
+                    style: TextStyle(
+                      color: hasDocument 
+                          ? const Color(0xFF667eea) 
+                          : Colors.white.withOpacity(0.3),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (hasDocument)
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Color(0xFF667eea),
+                size: 16,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildShimmerLoading() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -987,6 +1407,143 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Pantalla para visualizar documentos en pantalla completa
+class _DocumentViewerScreen extends StatelessWidget {
+  final String documentUrl;
+  final String documentName;
+
+  const _DocumentViewerScreen({
+    required this.documentUrl,
+    required this.documentName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          documentName,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download_rounded, color: Color(0xFFFFFF00)),
+            onPressed: () => _showDownloadInfo(context),
+            tooltip: 'Información de descarga',
+          ),
+        ],
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Image.network(
+            documentUrl,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  color: const Color(0xFFFFFF00),
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.red,
+                    size: 64,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Error al cargar el documento',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    documentUrl,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDownloadInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.info_outline_rounded, color: Color(0xFFFFFF00)),
+            SizedBox(width: 12),
+            Text('URL del Documento', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Para descargar el documento, copia esta URL:',
+              style: TextStyle(color: Colors.white.withOpacity(0.8)),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                documentUrl,
+                style: const TextStyle(
+                  color: Color(0xFFFFFF00),
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar', style: TextStyle(color: Colors.white70)),
+          ),
+        ],
       ),
     );
   }

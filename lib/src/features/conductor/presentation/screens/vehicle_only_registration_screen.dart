@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/vehicle_model.dart';
 import '../../providers/conductor_profile_provider.dart';
+import '../../../../core/config/app_config.dart';
 import 'license_registration_screen.dart';
 import '../widgets/document_upload_widget.dart';
 
@@ -64,7 +65,34 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       _tecnomecanicaNumberController.text = vehicle.tecnomecanicaNumero ?? '';
       _tecnomecanicaVencimiento = vehicle.tecnomecanicaVencimiento;
       _tarjetaPropiedadController.text = vehicle.tarjetaPropiedadNumero ?? '';
+      
+      // Cargar las URLs de las fotos si existen
+      if (vehicle.fotoSoat != null && vehicle.fotoSoat!.isNotEmpty) {
+        _soatFotoPath = _buildFullUrl(vehicle.fotoSoat!);
+      }
+      if (vehicle.fotoTecnomecanica != null && vehicle.fotoTecnomecanica!.isNotEmpty) {
+        _tecnomecanicaFotoPath = _buildFullUrl(vehicle.fotoTecnomecanica!);
+      }
+      if (vehicle.fotoTarjetaPropiedad != null && vehicle.fotoTarjetaPropiedad!.isNotEmpty) {
+        _tarjetaPropiedadFotoPath = _buildFullUrl(vehicle.fotoTarjetaPropiedad!);
+      }
     }
+  }
+
+  /// Construye la URL completa del documento
+  String _buildFullUrl(String relativeUrl) {
+    if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
+      return relativeUrl;
+    }
+    // Las URLs relativas vienen como 'uploads/documentos/...'
+    // Necesitamos construir la URL base sin el '/backend' del path
+    final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/pingo/backend', '');
+    return '$baseUrlWithoutPath/$relativeUrl';
+  }
+
+  /// Verifica si una ruta es una URL remota
+  bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
   }
 
   @override
@@ -884,24 +912,40 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
 
     // Primero subir las fotos si existen
     if (_soatFotoPath != null || _tecnomecanicaFotoPath != null || _tarjetaPropiedadFotoPath != null) {
-      final uploadResults = await provider.uploadVehicleDocuments(
-        conductorId: widget.conductorId,
-        soatFotoPath: _soatFotoPath,
-        tecnomecanicaFotoPath: _tecnomecanicaFotoPath,
-        tarjetaPropiedadFotoPath: _tarjetaPropiedadFotoPath,
-      );
+      // Filtrar solo las fotos que son archivos locales (no URLs remotas)
+      final Map<String, String> documentsToUpload = {};
+      
+      if (_soatFotoPath != null && !_isRemoteUrl(_soatFotoPath!)) {
+        documentsToUpload['soat'] = _soatFotoPath!;
+      }
+      if (_tecnomecanicaFotoPath != null && !_isRemoteUrl(_tecnomecanicaFotoPath!)) {
+        documentsToUpload['tecnomecanica'] = _tecnomecanicaFotoPath!;
+      }
+      if (_tarjetaPropiedadFotoPath != null && !_isRemoteUrl(_tarjetaPropiedadFotoPath!)) {
+        documentsToUpload['tarjeta_propiedad'] = _tarjetaPropiedadFotoPath!;
+      }
 
-      // Verificar si algún upload falló
-      final failedUploads = uploadResults.entries.where((e) => e.value == null).toList();
-      if (failedUploads.isNotEmpty && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Advertencia: No se pudieron subir algunas fotos: ${failedUploads.map((e) => e.key).join(", ")}',
-            ),
-            backgroundColor: Colors.orange,
-          ),
+      // Solo subir si hay documentos nuevos
+      if (documentsToUpload.isNotEmpty) {
+        final uploadResults = await provider.uploadVehicleDocuments(
+          conductorId: widget.conductorId,
+          soatFotoPath: documentsToUpload['soat'],
+          tecnomecanicaFotoPath: documentsToUpload['tecnomecanica'],
+          tarjetaPropiedadFotoPath: documentsToUpload['tarjeta_propiedad'],
         );
+
+        // Verificar si algún upload falló
+        final failedUploads = uploadResults.entries.where((e) => e.value == null).toList();
+        if (failedUploads.isNotEmpty && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Advertencia: No se pudieron subir algunas fotos: ${failedUploads.map((e) => e.key).join(", ")}',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       }
     }
 

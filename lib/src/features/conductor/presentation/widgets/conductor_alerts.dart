@@ -225,15 +225,15 @@ class ProfileIncompleteAlert extends StatelessWidget {
   String _getButtonText() {
     switch (actionType) {
       case ProfileAction.registerLicense:
-        return 'Registrar Licencia';
+        return 'Licencia';
       case ProfileAction.registerVehicle:
-        return 'Registrar Vehículo';
+        return 'Vehículo';
       case ProfileAction.submitVerification:
-        return 'Ver Mi Perfil';
+        return 'Mi Perfil';
       case ProfileAction.completeProfile:
         return 'Completar Ahora';
       case ProfileAction.inReview:
-        return 'Ver Mi Perfil';
+        return 'Mi Perfil';
     }
   }
 

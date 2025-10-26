@@ -207,15 +207,57 @@ class DocumentUploadWidget extends StatelessWidget {
   }
 
   Widget _buildImagePreview() {
+    final isRemoteUrl = filePath!.startsWith('http://') || filePath!.startsWith('https://');
+    
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.file(
-            File(filePath!),
-            fit: BoxFit.cover,
-          ),
+          isRemoteUrl
+              ? Image.network(
+                  filePath!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade800,
+                      child: const Icon(
+                        Icons.broken_image_rounded,
+                        color: Colors.white54,
+                        size: 32,
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey.shade800,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                              : null,
+                          strokeWidth: 2,
+                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : Image.file(
+                  File(filePath!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade800,
+                      child: const Icon(
+                        Icons.broken_image_rounded,
+                        color: Colors.white54,
+                        size: 32,
+                      ),
+                    );
+                  },
+                ),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -289,6 +331,8 @@ class DocumentUploadWidget extends StatelessWidget {
   void _showFullPreview(BuildContext context) {
     if (filePath == null || filePath!.isEmpty) return;
 
+    final isRemoteUrl = filePath!.startsWith('http://') || filePath!.startsWith('https://');
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -318,10 +362,74 @@ class DocumentUploadWidget extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        File(filePath!),
-                        fit: BoxFit.contain,
-                      ),
+                      child: isRemoteUrl
+                          ? Image.network(
+                              filePath!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  padding: const EdgeInsets.all(32),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.broken_image_rounded,
+                                        color: Colors.white54,
+                                        size: 64,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'No se pudo cargar la imagen',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
+                                  ),
+                                );
+                              },
+                            )
+                          : Image.file(
+                              File(filePath!),
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  padding: const EdgeInsets.all(32),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.broken_image_rounded,
+                                        color: Colors.white54,
+                                        size: 64,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'No se pudo cargar la imagen',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                     ),
                   ),
                 ),
@@ -423,25 +531,37 @@ class DocumentPickerHelper {
         documentType: documentType,
       );
 
-      if (action == null) return null;
+      if (action == null) {
+        debugPrint('Usuario canceló la selección de documento');
+        return null;
+      }
+
+      debugPrint('Acción seleccionada: $action');
 
       if (action == 'pdf') {
         // Seleccionar PDF
+        debugPrint('Seleccionando PDF...');
         final result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
           allowedExtensions: ['pdf'],
         );
 
         if (result != null && result.files.single.path != null) {
-          return result.files.single.path!;
+          final path = result.files.single.path!;
+          debugPrint('PDF seleccionado: $path');
+          return path;
+        } else {
+          debugPrint('No se seleccionó ningún PDF');
         }
       } else {
-        // Seleccionar imagen (cámara o galería)
-        final ImagePicker picker = ImagePicker();
+        // Seleccionar imagen directamente sin verificar permisos manualmente
+        // ImagePicker maneja los permisos automáticamente
+        debugPrint('Seleccionando imagen desde: $action');
         final ImageSource source = action == 'camera'
             ? ImageSource.camera
             : ImageSource.gallery;
-
+        
+        final ImagePicker picker = ImagePicker();
         final XFile? image = await picker.pickImage(
           source: source,
           maxWidth: 1920,
@@ -450,15 +570,40 @@ class DocumentPickerHelper {
         );
 
         if (image != null) {
-          return image.path;
+          debugPrint('Imagen seleccionada: ${image.path}');
+          debugPrint('Tamaño original: ${await image.length()} bytes');
+
+          // Verificar que el archivo existe
+          final file = File(image.path);
+          if (await file.exists()) {
+            debugPrint('Archivo existe en el sistema de archivos');
+            
+            // Usar directamente el path de ImagePicker, es seguro
+            // ImagePicker ya guarda el archivo en cache y es estable
+            return image.path;
+          } else {
+            debugPrint('Archivo no existe después de ser seleccionado');
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Error: La imagen no se guardó correctamente'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+            return null;
+          }
+        } else {
+          debugPrint('No se seleccionó ninguna imagen');
         }
       }
     } catch (e) {
-      print('Error al seleccionar documento: $e');
+      debugPrint('Error al seleccionar documento: $e');
+      debugPrint('Stack trace: ${StackTrace.current}');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error al seleccionar documento'),
+          SnackBar(
+            content: Text('Error al seleccionar documento: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

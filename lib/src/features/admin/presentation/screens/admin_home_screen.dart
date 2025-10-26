@@ -43,6 +43,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
+    
+    // Debug: verificar admin_user en HomeScreen
+    print('AdminHomeScreen: adminUser recibido: ${widget.adminUser}');
 
     return Scaffold(
       backgroundColor: Colors.black,

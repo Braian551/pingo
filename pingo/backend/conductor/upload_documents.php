@@ -40,6 +40,10 @@ try {
         throw new Exception('Método no permitido');
     }
 
+    // Log de debug
+    error_log("Upload request received. POST data: " . print_r($_POST, true));
+    error_log("FILES data: " . print_r($_FILES, true));
+
     // Validar que se recibió un archivo
     if (!isset($_FILES['documento']) || $_FILES['documento']['error'] === UPLOAD_ERR_NO_FILE) {
         throw new Exception('No se recibió ningún archivo');
@@ -98,7 +102,8 @@ try {
         throw new Exception('Extensión de archivo no permitida');
     }
 
-    $db = getDB();
+    $db = new Database();
+    $db = $db->getConnection();
 
     // Verificar que el conductor existe
     $stmt = $db->prepare("
@@ -115,10 +120,24 @@ try {
 
     // Crear directorio del conductor si no existe
     $conductorDir = UPLOAD_DIR . 'conductor_' . $conductorId . '/';
+    error_log("Intentando crear directorio: $conductorDir");
+    
     if (!file_exists($conductorDir)) {
+        error_log("Directorio no existe, creando...");
         if (!mkdir($conductorDir, 0755, true)) {
+            error_log("Error: No se pudo crear el directorio $conductorDir");
             throw new Exception('No se pudo crear el directorio del conductor');
+        } else {
+            error_log("Directorio creado exitosamente: $conductorDir");
         }
+    } else {
+        error_log("Directorio ya existe: $conductorDir");
+    }
+
+    // Verificar permisos del directorio
+    if (!is_writable($conductorDir)) {
+        error_log("Error: Directorio no tiene permisos de escritura: $conductorDir");
+        throw new Exception('El directorio no tiene permisos de escritura');
     }
 
     // Generar nombre único para el archivo
@@ -126,9 +145,25 @@ try {
     $filePath = $conductorDir . $fileName;
     $relativeUrl = 'uploads/documentos/conductor_' . $conductorId . '/' . $fileName;
 
+    error_log("Nombre de archivo generado: $fileName");
+    error_log("Ruta completa del archivo: $filePath");
+    error_log("URL relativa: $relativeUrl");
+
     // Mover archivo
-    if (!move_uploaded_file($file['tmp_name'], $filePath)) {
+    error_log("Moviendo archivo desde {$_FILES['documento']['tmp_name']} hacia $filePath");
+    if (!move_uploaded_file($_FILES['documento']['tmp_name'], $filePath)) {
+        error_log("Error: move_uploaded_file falló");
         throw new Exception('Error al guardar el archivo');
+    } else {
+        error_log("Archivo movido exitosamente");
+        
+        // Verificar que el archivo existe después de moverlo
+        if (!file_exists($filePath)) {
+            error_log("Error: Archivo no existe después de move_uploaded_file");
+            throw new Exception('Error al guardar el archivo - no se encontró después de moverlo');
+        } else {
+            error_log("Archivo verificado en destino. Tamaño: " . filesize($filePath) . " bytes");
+        }
     }
 
     // Actualizar base de datos

@@ -88,10 +88,8 @@ class VehicleModel {
       'tecnomecanica_numero': tecnomecanicaNumero,
       'tecnomecanica_vencimiento': tecnomecanicaVencimiento?.toIso8601String(),
       'tarjeta_propiedad_numero': tarjetaPropiedadNumero,
-      'foto_vehiculo': fotoVehiculo,
-      'foto_tarjeta_propiedad': fotoTarjetaPropiedad,
-      'foto_soat': fotoSoat,
-      'foto_tecnomecanica': fotoTecnomecanica,
+      // Nota: Las fotos se suben por separado usando upload_documents.php
+      // No se incluyen en el toJson() porque update_vehicle.php no las maneja
     };
   }
 

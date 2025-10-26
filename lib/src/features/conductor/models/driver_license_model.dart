@@ -42,8 +42,8 @@ class DriverLicenseModel {
       'licencia_expedicion': fechaExpedicion.toIso8601String(),
       'licencia_vencimiento': fechaVencimiento.toIso8601String(),
       'licencia_categoria': categoria.value,
-      'licencia_foto': foto,
-      'licencia_foto_reverso': fotoReverso,
+      // Nota: Las fotos se suben por separado usando upload_documents.php
+      // No se incluyen en el toJson() porque update_license.php no las maneja
       'licencia_verificada': isVerified ? 1 : 0,
     };
   }

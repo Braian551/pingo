@@ -482,4 +482,52 @@ class AdminService {
       return {'success': false, 'message': e.toString()};
     }
   }
+
+  /// Obtiene el historial de documentos de un conductor
+  static Future<Map<String, dynamic>> getDocumentosHistorial({
+    required int adminId,
+    required int conductorId,
+  }) async {
+    try {
+      final queryParams = {
+        'admin_id': adminId.toString(),
+        'conductor_id': conductorId.toString(),
+      };
+
+      final uri = Uri.parse('$_baseUrl/get_documentos_historial.php')
+          .replace(queryParameters: queryParams);
+
+      print('AdminService.getDocumentosHistorial - URL: $uri');
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar con el servidor');
+        },
+      );
+
+      print('AdminService.getDocumentosHistorial - Status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      } else if (response.statusCode == 403) {
+        return {
+          'success': false,
+          'message': 'Acceso denegado. Solo administradores pueden ver historial.'
+        };
+      }
+
+      return {'success': false, 'message': 'Error al obtener historial de documentos'};
+    } catch (e) {
+      print('Error en getDocumentosHistorial: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
 }

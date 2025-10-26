@@ -184,6 +184,7 @@ try {
             'licencia_vencimiento' => $row['licencia_vencimiento'],
             'licencia_expedicion' => $row['licencia_expedicion'],
             'licencia_categoria' => $row['licencia_categoria'],
+            'licencia_foto_url' => $row['licencia_foto_url'],
             
             // Vehículo
             'vehiculo_tipo' => $row['vehiculo_tipo'],
@@ -197,11 +198,15 @@ try {
             'aseguradora' => $row['aseguradora'],
             'numero_poliza_seguro' => $row['numero_poliza_seguro'],
             'vencimiento_seguro' => $row['vencimiento_seguro'],
+            'seguro_foto_url' => $row['seguro_foto_url'],
             'soat_numero' => $row['soat_numero'],
             'soat_vencimiento' => $row['soat_vencimiento'],
+            'soat_foto_url' => $row['soat_foto_url'],
             'tecnomecanica_numero' => $row['tecnomecanica_numero'],
             'tecnomecanica_vencimiento' => $row['tecnomecanica_vencimiento'],
+            'tecnomecanica_foto_url' => $row['tecnomecanica_foto_url'],
             'tarjeta_propiedad_numero' => $row['tarjeta_propiedad_numero'],
+            'tarjeta_propiedad_foto_url' => $row['tarjeta_propiedad_foto_url'],
             
             // Estado de aprobación
             'aprobado' => $row['aprobado'],

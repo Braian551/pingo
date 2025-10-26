@@ -36,6 +36,9 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     setState(() => _isLoading = true);
 
     try {
+      // Debug: Verificar qué datos estamos recibiendo en adminUser
+      print('AdminDashboardTab: adminUser completo: ${widget.adminUser}');
+      
       final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
       
       print('AdminDashboardTab: Cargando datos para adminId: $adminId');

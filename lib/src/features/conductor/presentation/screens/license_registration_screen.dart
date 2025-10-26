@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/driver_license_model.dart';
 import '../../providers/conductor_profile_provider.dart';
+import '../../../../core/config/app_config.dart';
 import 'vehicle_only_registration_screen.dart';
 import '../widgets/document_upload_widget.dart';
 
@@ -41,7 +42,28 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       _licenseExpedicion = license.fechaExpedicion;
       _licenseVencimiento = license.fechaVencimiento;
       _selectedCategory = license.categoria;
+      
+      // Cargar la URL de la foto si existe
+      if (license.foto != null && license.foto!.isNotEmpty) {
+        _licenceFotoPath = _buildFullUrl(license.foto!);
+      }
     }
+  }
+
+  /// Construye la URL completa del documento
+  String _buildFullUrl(String relativeUrl) {
+    if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
+      return relativeUrl;
+    }
+    // Las URLs relativas vienen como 'uploads/documentos/...'
+    // Necesitamos construir la URL base sin el '/backend' del path
+    final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/pingo/backend', '');
+    return '$baseUrlWithoutPath/$relativeUrl';
+  }
+
+  /// Verifica si una ruta es una URL remota
+  bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
   }
 
   @override
@@ -511,23 +533,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       return;
     }
 
-    // Primero subir la foto si existe
-    if (_licenceFotoPath != null) {
-      final uploadResult = await provider.uploadLicensePhoto(
-        conductorId: widget.conductorId,
-        licenciaFotoPath: _licenceFotoPath!,
-      );
-
-      if (uploadResult == null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Advertencia: No se pudo subir la foto de la licencia'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
-
+    // Primero guardar los datos de la licencia
     final license = DriverLicenseModel(
       numero: _licenseNumberController.text,
       fechaExpedicion: _licenseExpedicion!,
@@ -540,16 +546,54 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       license: license,
     );
 
-    if (mounted) {
-      if (success) {
+    if (!success) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isEditing ? 'Licencia actualizada exitosamente' : 'Licencia guardada exitosamente',
-            ),
-            backgroundColor: Colors.green,
+            content: Text(provider.errorMessage ?? 'Error al guardar licencia'),
+            backgroundColor: Colors.red,
           ),
         );
+      }
+      return;
+    }
+
+    // Subir la foto si existe (después de guardar los datos)
+    bool photoUploaded = true;
+    if (_licenceFotoPath != null && !_isRemoteUrl(_licenceFotoPath!)) {
+      // Solo subir si es un archivo local (no una URL remota existente)
+      final uploadResult = await provider.uploadLicensePhoto(
+        conductorId: widget.conductorId,
+        licenciaFotoPath: _licenceFotoPath!,
+      );
+
+      if (uploadResult == null) {
+        photoUploaded = false;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Licencia guardada pero no se pudo subir la foto. Puedes intentar subirla después.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    }
+
+    if (mounted) {
+      if (success) {
+        // Solo mostrar éxito si no hubo problema con la foto o si no había foto
+        if (photoUploaded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                isEditing ? 'Licencia actualizada exitosamente' : 'Licencia guardada exitosamente',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
         
         // Si es registro nuevo (no edición), verificar si falta el vehículo
         if (!isEditing && provider.profile != null) {
@@ -586,15 +630,6 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         }
         
         Navigator.pop(context, true);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              provider.errorMessage ?? 'Error al guardar licencia',
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
       }
     }
   }

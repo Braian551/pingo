@@ -252,14 +252,19 @@ class UserService {
   static const String _kUserName = 'pingo_user_name';
   static const String _kUserPhone = 'pingo_user_phone';
 
-  static Future<void> saveSession(Map<String, dynamic>? user) async {
-    if (user == null) return;
+  static Future<void> saveSession(Map<String, dynamic> user) async {
     final prefs = await SharedPreferences.getInstance();
+    
+    // Debug: verificar qué estamos guardando
+    print('UserService.saveSession: Guardando usuario: $user');
+    
     if (user.containsKey('email') && user['email'] != null) {
       await prefs.setString(_kUserEmail, user['email'].toString());
     }
     if (user.containsKey('id') && user['id'] != null) {
-      await prefs.setInt(_kUserId, int.tryParse(user['id'].toString()) ?? 0);
+      final userId = int.tryParse(user['id'].toString()) ?? 0;
+      print('UserService.saveSession: Guardando ID: $userId');
+      await prefs.setInt(_kUserId, userId);
     }
     if (user.containsKey('tipo_usuario') && user['tipo_usuario'] != null) {
       await prefs.setString(_kUserType, user['tipo_usuario'].toString());
@@ -281,14 +286,21 @@ class UserService {
     final tipoUsuario = prefs.getString(_kUserType);
     final nombre = prefs.getString(_kUserName);
     final telefono = prefs.getString(_kUserPhone);
+    
     if (email == null && id == null) return null;
-    return {
+    
+    final session = {
       if (id != null) 'id': id,
       if (email != null) 'email': email,
       if (tipoUsuario != null) 'tipo_usuario': tipoUsuario,
       if (nombre != null) 'nombre': nombre,
       if (telefono != null) 'telefono': telefono,
     };
+    
+    // Debug: verificar qué estamos recuperando
+    print('UserService.getSavedSession: Sesión recuperada: $session');
+    
+    return session;
   }
 
   static Future<void> clearSession() async {

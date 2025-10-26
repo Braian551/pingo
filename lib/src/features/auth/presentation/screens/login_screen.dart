@@ -68,30 +68,32 @@ class _LoginScreenState extends State<LoginScreen> {
         if (resp['success'] == true) {
           _showSuccess('¡Bienvenido de nuevo!');
           await Future.delayed(const Duration(milliseconds: 500));
+          
+          // El backend siempre devuelve 'user', independientemente del tipo
+          final user = resp['data']?['user'];
+          final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
+          
+          // Debug: verificar que tenemos el ID correcto
+          print('LoginScreen: Usuario recibido: ${user?['id']}, tipo: $tipoUsuario');
+          
           try {
-            // Determinar qué datos guardar en la sesión según el tipo de usuario
-            final user = resp['data']?['user'];
-            final admin = resp['data']?['admin'];
-            final tipoUsuario = user?['tipo_usuario'] ?? admin?['tipo_usuario'] ?? 'cliente';
-            
-            if (tipoUsuario == 'administrador') {
-              await UserService.saveSession(admin ?? {'email': emailToUse});
+            // Guardar sesión con los datos del usuario
+            if (user != null) {
+              await UserService.saveSession(user);
             } else {
-              await UserService.saveSession(user ?? {'email': emailToUse});
+              await UserService.saveSession({'email': emailToUse});
             }
-          } catch (_) {}
+          } catch (e) {
+            print('Error guardando sesión: $e');
+          }
 
           if (mounted) {
-            final user = resp['data']?['user'];
-            final admin = resp['data']?['admin'];
-            final tipoUsuario = user?['tipo_usuario'] ?? admin?['tipo_usuario'] ?? 'cliente';
-            
             // Redirigir según el tipo de usuario
             if (tipoUsuario == 'administrador') {
               Navigator.pushReplacementNamed(
                 context,
                 RouteNames.adminHome,
-                arguments: {'admin_user': admin},
+                arguments: {'admin_user': user},
               );
             } else if (tipoUsuario == 'conductor') {
               Navigator.pushReplacementNamed(
