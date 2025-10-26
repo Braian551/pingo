@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/admin/admin_service.dart';
 import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:ping_go/src/widgets/dialogs/admin_dialog_helper.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ConductoresDocumentosScreen extends StatefulWidget {
@@ -927,43 +928,43 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   Future<void> _aprobarConductor(Map<String, dynamic> conductor) async {
     Navigator.pop(context); // Cerrar el sheet
 
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Aprobar Conductor', style: TextStyle(color: Colors.white)),
-        content: Text(
-          '¿Estás seguro de que deseas aprobar a ${conductor['nombre_completo']}?',
-          style: TextStyle(color: Colors.white.withOpacity(0.8)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white70)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF11998e),
-            ),
-            child: const Text('Aprobar'),
-          ),
-        ],
-      ),
+    final confirm = await AdminDialogHelper.showApprovalConfirmation(
+      context,
+      conductorName: conductor['nombre_completo'] ?? 'Conductor',
+      subtitle: 'Licencia: ${conductor['licencia_conduccion'] ?? 'N/A'}',
     );
 
     if (confirm == true) {
-      final response = await AdminService.aprobarConductor(
-        adminId: widget.adminId,
-        conductorId: conductor['usuario_id'],
-      );
+      // Mostrar loading
+      AdminDialogHelper.showLoading(context, message: 'Aprobando conductor...');
 
-      if (response['success'] == true) {
-        _showSuccess('Conductor aprobado exitosamente');
-        _loadDocumentos();
-      } else {
-        _showError(response['message'] ?? 'Error al aprobar conductor');
+      try {
+        final response = await AdminService.aprobarConductor(
+          adminId: widget.adminId,
+          conductorId: conductor['usuario_id'],
+        );
+
+        // Cerrar loading
+        if (mounted) Navigator.pop(context);
+        
+        // Esperar un poco
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        if (!mounted) return;
+
+        if (response['success'] == true) {
+          _showSuccess('Conductor aprobado exitosamente');
+          _loadDocumentos();
+        } else {
+          _showError(response['message'] ?? 'Error al aprobar conductor');
+        }
+      } catch (e) {
+        // Cerrar loading si hay error
+        if (mounted) Navigator.pop(context);
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (mounted) {
+          _showError('Error al aprobar conductor: $e');
+        }
       }
     }
   }
@@ -971,74 +972,43 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   Future<void> _rechazarConductor(Map<String, dynamic> conductor) async {
     Navigator.pop(context); // Cerrar el sheet
 
-    final motivoController = TextEditingController();
-    
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Rechazar Conductor', style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Indica el motivo del rechazo para ${conductor['nombre_completo']}:',
-              style: TextStyle(color: Colors.white.withOpacity(0.8)),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: motivoController,
-              maxLines: 3,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Escribe el motivo...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.1),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white70)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (motivoController.text.trim().isEmpty) {
-                _showError('Debes indicar el motivo del rechazo');
-                return;
-              }
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFf5576c),
-            ),
-            child: const Text('Rechazar'),
-          ),
-        ],
-      ),
+    final motivo = await AdminDialogHelper.showRejectionDialog(
+      context,
+      conductorName: conductor['nombre_completo'] ?? 'Conductor',
     );
 
-    if (confirm == true && motivoController.text.trim().isNotEmpty) {
-      final response = await AdminService.rechazarConductor(
-        adminId: widget.adminId,
-        conductorId: conductor['usuario_id'],
-        motivo: motivoController.text.trim(),
-      );
+    if (motivo != null && motivo.isNotEmpty) {
+      // Mostrar loading
+      AdminDialogHelper.showLoading(context, message: 'Rechazando conductor...');
 
-      if (response['success'] == true) {
-        _showSuccess('Conductor rechazado');
-        _loadDocumentos();
-      } else {
-        _showError(response['message'] ?? 'Error al rechazar conductor');
+      try {
+        final response = await AdminService.rechazarConductor(
+          adminId: widget.adminId,
+          conductorId: conductor['usuario_id'],
+          motivo: motivo,
+        );
+
+        // Cerrar loading
+        if (mounted) Navigator.pop(context);
+        
+        // Esperar un poco
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        if (!mounted) return;
+
+        if (response['success'] == true) {
+          _showSuccess('Conductor rechazado');
+          _loadDocumentos();
+        } else {
+          _showError(response['message'] ?? 'Error al rechazar conductor');
+        }
+      } catch (e) {
+        // Cerrar loading si hay error
+        if (mounted) Navigator.pop(context);
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (mounted) {
+          _showError('Error al rechazar conductor: $e');
+        }
       }
     }
   }
@@ -1046,19 +1016,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   /// Muestra el historial de documentos de un conductor
   Future<void> _showDocumentHistory(int conductorId) async {
     // Mostrar loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => PopScope(
-        canPop: false,
-        child: Container(
-          color: Colors.black.withOpacity(0.5),
-          child: const Center(
-            child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
-          ),
-        ),
-      ),
-    );
+    AdminDialogHelper.showLoading(context, message: 'Cargando historial...');
 
     try {
       final response = await AdminService.getDocumentosHistorial(
@@ -1080,7 +1038,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
 
         // Si no hay historial, mostrar alerta
         if (historial.isEmpty) {
-          _showNoHistoryAlert();
+          await AdminDialogHelper.showNoHistoryDialog(context);
           return;
         }
 
@@ -1105,133 +1063,6 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         _showError('Error al cargar historial: $e');
       }
     }
-  }
-
-  /// Muestra una alerta cuando no hay historial de documentos
-  void _showNoHistoryAlert() {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.7),
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFF00).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.info_outline_rounded, 
-                color: Color(0xFFFFFF00), 
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Text(
-                'Sin Historial', 
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.folder_open_rounded,
-                    size: 64,
-                    color: Colors.white.withOpacity(0.3),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Este conductor aún no tiene historial de documentos registrado.',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 15,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFF00).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: const Color(0xFFFFFF00).withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.lightbulb_outline_rounded,
-                          color: Color(0xFFFFFF00),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'El historial se genera cuando el conductor sube o actualiza sus documentos.',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 13,
-                              height: 1.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFFF00),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: const Text(
-                'Entendido',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-      ),
-    );
   }
 
   /// Widget para mostrar el historial de documentos

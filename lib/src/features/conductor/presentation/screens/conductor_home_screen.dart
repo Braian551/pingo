@@ -5,9 +5,11 @@ import 'package:shimmer/shimmer.dart';
 import '../../providers/conductor_provider.dart';
 import '../../providers/conductor_profile_provider.dart';
 import '../../models/conductor_profile_model.dart';
+import '../../services/approval_notification_service.dart';
 import '../widgets/conductor_stats_card.dart';
 import '../widgets/viaje_activo_card.dart';
 import '../widgets/conductor_alerts.dart';
+import '../widgets/approval_success_dialog.dart';
 import 'conductor_profile_screen.dart';
 import 'conductor_earnings_screen.dart';
 import 'conductor_trips_screen.dart';
@@ -39,6 +41,17 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadConductorData();
     });
+  }
+
+  // 🛠️ DEBUG: Método para resetear el estado de notificación de aprobación
+  // Llama a esto si quieres volver a ver la alerta de aprobación
+  Future<void> _debugResetApprovalNotification() async {
+    if (_conductorId != null) {
+      await ApprovalNotificationService.resetApprovalStatus(_conductorId!);
+      print('🔄 Estado de notificación reseteado para conductor $_conductorId');
+      // Recargar datos para mostrar la alerta nuevamente
+      _loadConductorData();
+    }
   }
 
   Future<void> _loadConductorData() async {
@@ -82,34 +95,55 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
-      if (profile != null && !_hasShownProfileAlert) {
-        final actionType = getProfileActionType(profile);
-        
-        // Only show alert if there are pending actions (not in review or complete)
-        if (actionType == ProfileAction.registerLicense || 
-            actionType == ProfileAction.registerVehicle || 
-            actionType == ProfileAction.submitVerification) {
-          _hasShownProfileAlert = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              ProfileIncompleteAlert.show(
-                context,
-                missingItems: profile.pendingTasks.isEmpty 
-                  ? [
-                      'Registrar licencia de conducción',
-                      'Registrar vehículo',
-                      'Completar documentos',
-                    ]
-                  : profile.pendingTasks,
-                dismissible: true,
-                actionType: actionType,
-              ).then((shouldComplete) {
-                if (shouldComplete == true && mounted) {
-                  _handleProfileAction(actionType, profile);
-                }
-              });
-            }
-          });
+      if (profile != null) {
+        // Verificar si debe mostrar alerta de aprobación
+        final shouldShowApproval = await ApprovalNotificationService.shouldShowApprovalAlert(
+          _conductorId!,
+          profile.estadoVerificacion.value,
+          profile.aprobado,
+        );
+
+        if (shouldShowApproval && mounted) {
+          // Esperar un poco antes de mostrar el diálogo
+          await Future.delayed(const Duration(milliseconds: 500));
+          
+          if (mounted) {
+            await ApprovalSuccessDialog.show(context);
+            // Marcar como mostrado
+            await ApprovalNotificationService.markApprovalAlertAsShown(_conductorId!);
+          }
+        }
+
+        // Verificar alertas de perfil incompleto
+        if (!_hasShownProfileAlert) {
+          final actionType = getProfileActionType(profile);
+          
+          // Only show alert if there are pending actions (not in review or complete)
+          if (actionType == ProfileAction.registerLicense || 
+              actionType == ProfileAction.registerVehicle || 
+              actionType == ProfileAction.submitVerification) {
+            _hasShownProfileAlert = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                ProfileIncompleteAlert.show(
+                  context,
+                  missingItems: profile.pendingTasks.isEmpty 
+                    ? [
+                        'Registrar licencia de conducción',
+                        'Registrar vehículo',
+                        'Completar documentos',
+                      ]
+                    : profile.pendingTasks,
+                  dismissible: true,
+                  actionType: actionType,
+                ).then((shouldComplete) {
+                  if (shouldComplete == true && mounted) {
+                    _handleProfileAction(actionType, profile);
+                  }
+                });
+              }
+            });
+          }
         }
       }
       
@@ -249,6 +283,14 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         ],
       ),
       actions: [
+        // 🛠️ DEBUG: Botón para resetear la notificación de aprobación
+        // Solo visible en modo debug
+        if (const bool.fromEnvironment('dart.vm.product') == false)
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.orange),
+            tooltip: 'Reset notificación de aprobación',
+            onPressed: _debugResetApprovalNotification,
+          ),
         Consumer<ConductorProvider>(
           builder: (context, provider, child) {
             return Container(

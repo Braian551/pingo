@@ -98,23 +98,33 @@ try {
         $stmt->bind_param("i", $conductor_id);
         $stmt->execute();
 
-        // Registrar en logs de auditoría
-        $accion = 'rechazar_conductor';
-        $descripcion = "Conductor ID $conductor_id rechazado por administrador ID $admin_id - Motivo: $motivo";
-        
-        $stmt = $conn->prepare("
-            INSERT INTO logs_auditoria (usuario_id, accion, tabla_afectada, registro_id, descripcion, fecha_creacion)
-            VALUES (?, ?, 'detalles_conductor', ?, ?, CURRENT_TIMESTAMP)
-        ");
-        $stmt->bind_param("isis", $admin_id, $accion, $conductor_id, $descripcion);
-        $stmt->execute();
+        // Registrar en logs de auditoría (opcional)
+        try {
+            $accion = 'rechazar_conductor';
+            $descripcion = "Conductor ID $conductor_id rechazado por administrador ID $admin_id - Motivo: $motivo";
+            
+            $stmt = $conn->prepare("
+                INSERT INTO logs_auditoria (usuario_id, accion, tabla_afectada, registro_id, descripcion, fecha_creacion)
+                VALUES (?, ?, 'detalles_conductor', ?, ?, CURRENT_TIMESTAMP)
+            ");
+            $stmt->bind_param("isis", $admin_id, $accion, $conductor_id, $descripcion);
+            $stmt->execute();
+        } catch (Exception $log_error) {
+            error_log("Error al registrar log de auditoría: " . $log_error->getMessage());
+        }
 
         // Confirmar transacción
         $conn->commit();
 
+        http_response_code(200);
         echo json_encode([
             'success' => true,
-            'message' => 'Conductor rechazado exitosamente'
+            'message' => 'Conductor rechazado exitosamente',
+            'data' => [
+                'conductor_id' => $conductor_id,
+                'estado_verificacion' => 'rechazado',
+                'motivo' => $motivo
+            ]
         ], JSON_UNESCAPED_UNICODE);
 
     } catch (Exception $e) {

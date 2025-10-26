@@ -96,26 +96,36 @@ try {
         $stmt->bind_param("i", $conductor_id);
         $stmt->execute();
 
-        // Registrar en logs de auditoría
-        $accion = 'aprobar_conductor';
-        $descripcion = "Conductor ID $conductor_id aprobado por administrador ID $admin_id";
-        if ($notas) {
-            $descripcion .= " - Notas: $notas";
+        // Registrar en logs de auditoría (opcional, no debe bloquear la operación)
+        try {
+            $accion = 'aprobar_conductor';
+            $descripcion = "Conductor ID $conductor_id aprobado por administrador ID $admin_id";
+            if ($notas) {
+                $descripcion .= " - Notas: $notas";
+            }
+            
+            $stmt = $conn->prepare("
+                INSERT INTO logs_auditoria (usuario_id, accion, tabla_afectada, registro_id, descripcion, fecha_creacion)
+                VALUES (?, ?, 'detalles_conductor', ?, ?, CURRENT_TIMESTAMP)
+            ");
+            $stmt->bind_param("isis", $admin_id, $accion, $conductor_id, $descripcion);
+            $stmt->execute();
+        } catch (Exception $log_error) {
+            // No lanzar error si falla el log, solo registrar
+            error_log("Error al registrar log de auditoría: " . $log_error->getMessage());
         }
-        
-        $stmt = $conn->prepare("
-            INSERT INTO logs_auditoria (usuario_id, accion, tabla_afectada, registro_id, descripcion, fecha_creacion)
-            VALUES (?, ?, 'detalles_conductor', ?, ?, CURRENT_TIMESTAMP)
-        ");
-        $stmt->bind_param("isis", $admin_id, $accion, $conductor_id, $descripcion);
-        $stmt->execute();
 
         // Confirmar transacción
         $conn->commit();
 
+        http_response_code(200);
         echo json_encode([
             'success' => true,
-            'message' => 'Conductor aprobado exitosamente'
+            'message' => 'Conductor aprobado exitosamente',
+            'data' => [
+                'conductor_id' => $conductor_id,
+                'estado_verificacion' => 'aprobado'
+            ]
         ], JSON_UNESCAPED_UNICODE);
 
     } catch (Exception $e) {
