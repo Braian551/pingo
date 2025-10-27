@@ -563,15 +563,6 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             color: const Color(0xFFFFFF00),
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.star,
-            title: 'Calificación',
-            value: '5.0',
-            color: Colors.amber,
-          ),
-        ),
       ],
     );
   }

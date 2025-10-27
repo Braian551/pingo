@@ -139,10 +139,7 @@ function handleGetUsers($db, $input) {
         FROM usuarios 
         $whereClause
         ORDER BY fecha_registro DESC
-        LIMIT ? OFFSET ?";
-        
-        $params[] = $perPage;
-        $params[] = $offset;
+        LIMIT $perPage OFFSET $offset";
         
         error_log("handleGetUsers - Query: $query");
         error_log("handleGetUsers - Params: " . json_encode($params));
@@ -171,44 +168,63 @@ function handleGetUsers($db, $input) {
 }
 
 function handleUpdateUser($db, $input) {
-    if (empty($input['user_id'])) {
-        sendJsonResponse(false, 'ID de usuario requerido');
-    }
-
-    $updates = [];
-    $params = [];
-
-    // Campos actualizables
-    $allowedFields = ['nombre', 'apellido', 'telefono', 'tipo_usuario', 'es_activo', 'es_verificado'];
-    
-    foreach ($allowedFields as $field) {
-        if (isset($input[$field])) {
-            $updates[] = "$field = ?";
-            $params[] = $input[$field];
+    try {
+        error_log("handleUpdateUser - Iniciando con input: " . json_encode($input));
+        
+        if (empty($input['user_id'])) {
+            error_log("handleUpdateUser - Error: user_id vacío");
+            sendJsonResponse(false, 'ID de usuario requerido');
+            return;
         }
+
+        $updates = [];
+        $params = [];
+
+        // Campos actualizables
+        $allowedFields = ['nombre', 'apellido', 'telefono', 'tipo_usuario', 'es_activo', 'es_verificado'];
+        
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field])) {
+                $updates[] = "$field = ?";
+                $params[] = $input[$field];
+                error_log("handleUpdateUser - Campo a actualizar: $field = " . $input[$field]);
+            }
+        }
+
+        if (empty($updates)) {
+            error_log("handleUpdateUser - Error: No hay campos para actualizar");
+            sendJsonResponse(false, 'No hay campos para actualizar');
+            return;
+        }
+
+        $params[] = $input['user_id'];
+        
+        $query = "UPDATE usuarios SET " . implode(', ', $updates) . ", fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ?";
+        error_log("handleUpdateUser - Query: $query");
+        error_log("handleUpdateUser - Params: " . json_encode($params));
+        
+        $stmt = $db->prepare($query);
+        $result = $stmt->execute($params);
+        
+        error_log("handleUpdateUser - Resultado de la actualización: " . ($result ? 'éxito' : 'fallo'));
+
+        // Registrar en auditoría
+        $logQuery = "INSERT INTO logs_auditoria (usuario_id, accion, entidad, entidad_id, descripcion) 
+                     VALUES (?, 'actualizar_usuario', 'usuarios', ?, ?)";
+        $logStmt = $db->prepare($logQuery);
+        $logStmt->execute([
+            $input['admin_id'],
+            $input['user_id'],
+            'Administrador actualizó datos del usuario'
+        ]);
+
+        error_log("handleUpdateUser - Usuario actualizado exitosamente");
+        sendJsonResponse(true, 'Usuario actualizado exitosamente');
+    } catch (Exception $e) {
+        error_log("handleUpdateUser - Error: " . $e->getMessage());
+        error_log("handleUpdateUser - Stack: " . $e->getTraceAsString());
+        sendJsonResponse(false, 'Error al actualizar usuario: ' . $e->getMessage());
     }
-
-    if (empty($updates)) {
-        sendJsonResponse(false, 'No hay campos para actualizar');
-    }
-
-    $params[] = $input['user_id'];
-    
-    $query = "UPDATE usuarios SET " . implode(', ', $updates) . ", fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ?";
-    $stmt = $db->prepare($query);
-    $stmt->execute($params);
-
-    // Registrar en auditoría
-    $logQuery = "INSERT INTO logs_auditoria (usuario_id, accion, entidad, entidad_id, descripcion) 
-                 VALUES (?, 'actualizar_usuario', 'usuarios', ?, ?)";
-    $logStmt = $db->prepare($logQuery);
-    $logStmt->execute([
-        $input['admin_id'],
-        $input['user_id'],
-        'Administrador actualizó datos del usuario'
-    ]);
-
-    sendJsonResponse(true, 'Usuario actualizado exitosamente');
 }
 
 function handleDeleteUser($db, $input) {

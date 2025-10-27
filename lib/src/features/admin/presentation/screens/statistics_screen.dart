@@ -56,9 +56,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
   }
 
   Future<void> _loadStats() async {
+    if (!mounted) return;
+    
     setState(() => _isLoading = true);
     
     final response = await AdminService.getDashboardStats(adminId: widget.adminId);
+    
+    if (!mounted) return;
     
     if (response['success'] == true && response['data'] != null) {
       setState(() {
@@ -276,6 +280,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
     return Expanded(
       child: GestureDetector(
         onTap: () {
+          if (!mounted) return;
           setState(() => _selectedPeriod = value);
           _loadStats();
         },

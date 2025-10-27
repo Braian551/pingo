@@ -241,15 +241,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              icon: Icons.star,
-              title: 'Calificación',
-              value: '4.9',
-              color: Colors.amber,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
               icon: Icons.credit_card,
               title: 'Pagos',
               value: '3',

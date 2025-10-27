@@ -136,7 +136,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         if (!mounted || _isDisposed) return;
         
         if (userExists) {
-          // Usuario existe - mostrar SnackBar breve y redirigir al login
+          // Usuario existe (puede ser admin, conductor o cliente) - redirigir al login
+          print('EmailVerification: Usuario existe con email ${widget.email}, redirigiendo a login');
+          
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
@@ -147,6 +149,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           }
 
           if (!mounted || _isDisposed) return;
+          
+          print('EmailVerification: Navegando a login con email: ${widget.email}');
           Navigator.pushReplacementNamed(
             context,
             RouteNames.login,
@@ -157,6 +161,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           );
         } else {
           // Usuario no existe - mostrar SnackBar breve y redirigir al registro
+          print('EmailVerification: Usuario NO existe, redirigiendo a registro');
+          
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
@@ -178,6 +184,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         }
       } catch (e) {
         if (!mounted || _isDisposed) return;
+        
+        print('EmailVerification: Error verificando usuario: $e');
         
         // Si hay error al verificar, mostrar warning y continuar con registro
         await DialogHelper.showWarning(

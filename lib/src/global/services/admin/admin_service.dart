@@ -71,79 +71,65 @@ class AdminService {
     bool? esActivo,
   }) async {
     try {
-      // Primero intentar con el endpoint simple para debug
-      final simpleUri = Uri.parse('$_baseUrl/test_users_simple.php')
-          .replace(queryParameters: {'admin_id': adminId.toString()});
+      // Construir query parameters
+      final queryParams = {
+        'admin_id': adminId.toString(),
+        'page': page.toString(),
+        'per_page': perPage.toString(),
+      };
 
-      print('AdminService.getUsers - Intentando endpoint simple: $simpleUri');
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
 
-      var response = await http.get(
-        simpleUri,
+      if (tipoUsuario != null) {
+        queryParams['tipo_usuario'] = tipoUsuario;
+      }
+
+      if (esActivo != null) {
+        queryParams['es_activo'] = esActivo ? '1' : '0';
+      }
+
+      final uri = Uri.parse('$_baseUrl/user_management.php')
+          .replace(queryParameters: queryParams);
+
+      print('AdminService.getUsers - URL: $uri');
+
+      final response = await http.get(
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
       ).timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 30),
         onTimeout: () {
           throw Exception('Timeout: No se pudo conectar con el servidor');
         },
       );
 
-      print('AdminService.getUsers - Status (simple): ${response.statusCode}');
-      print('AdminService.getUsers - Body (simple): ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...');
+      print('AdminService.getUsers - Status: ${response.statusCode}');
+      print('AdminService.getUsers - Body preview: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...');
 
       if (response.statusCode == 200) {
-        var data = jsonDecode(response.body) as Map<String, dynamic>;
-        
-        if (data['success'] == true) {
-          // Aplicar filtros del lado del cliente si es necesario
-          var usuarios = data['data']['usuarios'] as List;
-          
-          if (tipoUsuario != null) {
-            usuarios = usuarios.where((u) => u['tipo_usuario'] == tipoUsuario).toList();
-          }
-          
-          if (esActivo != null) {
-            usuarios = usuarios.where((u) => u['es_activo'] == (esActivo ? 1 : 0)).toList();
-          }
-          
-          if (search != null && search.isNotEmpty) {
-            final searchLower = search.toLowerCase();
-            usuarios = usuarios.where((u) {
-              final nombre = (u['nombre'] ?? '').toLowerCase();
-              final apellido = (u['apellido'] ?? '').toLowerCase();
-              final email = (u['email'] ?? '').toLowerCase();
-              final telefono = (u['telefono'] ?? '').toLowerCase();
-              return nombre.contains(searchLower) || 
-                     apellido.contains(searchLower) || 
-                     email.contains(searchLower) || 
-                     telefono.contains(searchLower);
-            }).toList();
-          }
-          
-          return {
-            'success': true,
-            'message': 'Usuarios obtenidos',
-            'data': {
-              'usuarios': usuarios,
-              'pagination': {
-                'total': usuarios.length,
-                'page': page,
-                'per_page': perPage,
-                'total_pages': 1
-              }
-            }
-          };
-        }
-        
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data;
-      } else {
+      } else if (response.statusCode == 403) {
         return {
           'success': false,
-          'message': 'Error del servidor: ${response.statusCode}'
+          'message': 'Acceso denegado. Solo administradores pueden ver usuarios.'
+        };
+      } else if (response.statusCode == 400) {
+        return {
+          'success': false,
+          'message': 'Solicitud inválida'
         };
       }
+
+      return {
+        'success': false,
+        'message': 'Error del servidor: ${response.statusCode}'
+      };
     } catch (e, stackTrace) {
       print('AdminService.getUsers - Exception: $e');
       print('AdminService.getUsers - StackTrace: $stackTrace');

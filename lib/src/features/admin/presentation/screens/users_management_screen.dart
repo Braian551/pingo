@@ -922,7 +922,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
     if (action == 'details') {
       _showUserDetails(user);
     } else if (action == 'edit') {
-      CustomSnackbar.showInfo(context, message: 'Función de edición en desarrollo');
+      _showEditUserDialog(user);
     } else if (action == 'deactivate' || action == 'activate') {
       final newState = action == 'activate';
       final response = await AdminService.updateUser(
@@ -942,5 +942,403 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         CustomSnackbar.showError(context, message: errorMsg);
       }
     }
+  }
+
+  void _showEditUserDialog(Map<String, dynamic> user) {
+    final userId = int.tryParse(user['id']?.toString() ?? '0') ?? 0;
+    final nombreController = TextEditingController(text: user['nombre'] ?? '');
+    final apellidoController = TextEditingController(text: user['apellido'] ?? '');
+    final telefonoController = TextEditingController(text: user['telefono'] ?? '');
+    
+    String selectedTipoUsuario = user['tipo_usuario'] ?? 'cliente';
+    bool isActive = user['es_activo'] == 1;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                left: 24,
+                right: 24,
+                top: 24,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1A).withOpacity(0.95),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 1.5,
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFF00).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.edit_rounded,
+                                color: Color(0xFFFFFF00),
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Editar Usuario',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Nombre
+                    _buildEditTextField(
+                      controller: nombreController,
+                      label: 'Nombre',
+                      icon: Icons.person_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Apellido
+                    _buildEditTextField(
+                      controller: apellidoController,
+                      label: 'Apellido',
+                      icon: Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Teléfono
+                    _buildEditTextField(
+                      controller: telefonoController,
+                      label: 'Teléfono',
+                      icon: Icons.phone_rounded,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Tipo de usuario
+                    Text(
+                      'Tipo de usuario',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedTipoUsuario,
+                          isExpanded: true,
+                          dropdownColor: const Color(0xFF1A1A1A),
+                          icon: const Icon(Icons.arrow_drop_down_rounded, color: Color(0xFFFFFF00)),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: 'cliente',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.person_rounded,
+                                    color: const Color(0xFF11998e),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text('Cliente'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'conductor',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.local_taxi_rounded,
+                                    color: const Color(0xFF667eea),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text('Conductor'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'administrador',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.admin_panel_settings_rounded,
+                                    color: const Color(0xFFf5576c),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text('Administrador'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setModalState(() {
+                                selectedTipoUsuario = value;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Estado activo
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: SwitchListTile(
+                        title: const Text(
+                          'Usuario activo',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Text(
+                          isActive ? 'El usuario puede iniciar sesión' : 'El usuario no puede iniciar sesión',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 13,
+                          ),
+                        ),
+                        value: isActive,
+                        activeColor: const Color(0xFFFFFF00),
+                        onChanged: (value) {
+                          setModalState(() {
+                            isActive = value;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Botones
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: const Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFFFFF00), Color(0xFFFFD700)],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: TextButton(
+                              onPressed: () async {
+                                // Validaciones
+                                if (nombreController.text.trim().isEmpty) {
+                                  CustomSnackbar.showError(context, message: 'El nombre es requerido');
+                                  return;
+                                }
+                                if (apellidoController.text.trim().isEmpty) {
+                                  CustomSnackbar.showError(context, message: 'El apellido es requerido');
+                                  return;
+                                }
+                                if (telefonoController.text.trim().isEmpty) {
+                                  CustomSnackbar.showError(context, message: 'El teléfono es requerido');
+                                  return;
+                                }
+
+                                // Actualizar usuario
+                                final response = await AdminService.updateUser(
+                                  adminId: widget.adminId,
+                                  userId: userId,
+                                  nombre: nombreController.text.trim(),
+                                  apellido: apellidoController.text.trim(),
+                                  telefono: telefonoController.text.trim(),
+                                  tipoUsuario: selectedTipoUsuario,
+                                  esActivo: isActive,
+                                );
+
+                                if (response['success'] == true) {
+                                  Navigator.pop(context);
+                                  CustomSnackbar.showSuccess(
+                                    context,
+                                    message: 'Usuario actualizado exitosamente',
+                                  );
+                                  _loadUsers();
+                                } else {
+                                  final errorMsg = response['message'] ?? 'Error al actualizar usuario';
+                                  CustomSnackbar.showError(context, message: errorMsg);
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: const Text(
+                                'Guardar',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Limpiar controllers
+      nombreController.dispose();
+      apellidoController.dispose();
+      telefonoController.dispose();
+    });
+  }
+
+  Widget _buildEditTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A).withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.15),
+              width: 1.5,
+            ),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                icon,
+                color: const Color(0xFFFFFF00),
+                size: 20,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
