@@ -43,9 +43,10 @@ class LocationService {
         return null;
       }
 
+      // Usar timeout más largo para emuladores que pueden ser lentos
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10),
+        timeLimit: Duration(seconds: 30), // Aumentado para emuladores
       );
       
       return position;

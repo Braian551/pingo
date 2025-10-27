@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import '../../../../global/services/mapbox_service.dart';
+import '../../../../global/services/sound_service.dart';
 import '../../services/trip_request_search_service.dart';
 
 /// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
@@ -40,6 +41,9 @@ class _ConductorSearchingPassengersScreenState
   
   List<Map<String, dynamic>> _pendingRequests = [];
   Map<String, dynamic>? _selectedRequest;
+  
+  // IDs de solicitudes ya mostradas para evitar reproducir sonido múltiples veces
+  final Set<int> _notifiedRequestIds = {};
   
   String _searchMessage = 'Buscando solicitudes cercanas...';
   
@@ -270,10 +274,10 @@ class _ConductorSearchingPassengersScreenState
       }
 
       print('✅ Obteniendo ubicación actual...');
-      // Obtener ubicación actual con timeout
+      // Obtener ubicación actual con timeout más largo para emuladores
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        timeLimit: const Duration(seconds: 30), // Timeout más largo
       );
 
       print('✅ Ubicación obtenida: ${position.latitude}, ${position.longitude}');
@@ -294,7 +298,7 @@ class _ConductorSearchingPassengersScreenState
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
           distanceFilter: 10, // Actualizar cada 10 metros
-          timeLimit: Duration(seconds: 10),
+          // No usar timeLimit en streams para evitar timeouts constantes
         ),
       ).listen(
         (Position position) {
@@ -372,7 +376,7 @@ class _ConductorSearchingPassengersScreenState
       onRequestsFound: (requests) {
         if (!mounted) return;
         
-        print('✅ Solicitudes encontradas: ${requests.length}');
+        print('✅ [DEBUG] Solicitudes encontradas: ${requests.length}');
         
         setState(() {
           _pendingRequests = requests;
@@ -389,9 +393,21 @@ class _ConductorSearchingPassengersScreenState
             
             // Mostrar la primera solicitud si no hay una seleccionada
             if (_selectedRequest == null && !_showingRequest) {
+              print('🎯 [DEBUG] Mostrando nueva solicitud al conductor');
               _selectedRequest = requests.first;
               _showingRequest = true;
               _requestPanelController.forward();
+              
+              // 🔊 Reproducir sonido de notificación si es una solicitud nueva
+              final requestId = requests.first['id'] as int;
+              print('🔊 [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
+              if (!_notifiedRequestIds.contains(requestId)) {
+                _notifiedRequestIds.add(requestId);
+                print('🔊 [DEBUG] Reproduciendo sonido para solicitud #$requestId');
+                SoundService.playRequestNotification();
+              } else {
+                print('🔊 [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
+              }
               
               // Iniciar temporizador de auto-rechazo
               _timerController.reset();
@@ -400,6 +416,7 @@ class _ConductorSearchingPassengersScreenState
               _autoRejectTimer?.cancel();
               _autoRejectTimer = Timer(const Duration(seconds: 30), () {
                 if (mounted && _selectedRequest != null) {
+                  print('⏰ [DEBUG] Auto-rechazando solicitud por timeout');
                   _rejectRequest();
                 }
               });
@@ -437,6 +454,12 @@ class _ConductorSearchingPassengersScreenState
     // Detener temporizador
     _autoRejectTimer?.cancel();
     _timerController.stop();
+    
+    // Detener el loop de sonido continuo
+    SoundService.stopSound();
+    
+    // 🔊 Reproducir sonido de confirmación
+    SoundService.playAcceptSound();
 
     // Mostrar loading
     showDialog(
@@ -482,6 +505,9 @@ class _ConductorSearchingPassengersScreenState
     // Detener temporizador
     _autoRejectTimer?.cancel();
     _timerController.stop();
+    
+    // Detener cualquier sonido que se esté reproduciendo
+    SoundService.stopSound();
 
     final result = await TripRequestSearchService.rejectRequest(
       solicitudId: _selectedRequest!['id'],
@@ -1041,6 +1067,40 @@ class _ConductorSearchingPassengersScreenState
                               ),
                             ),
                           ),
+                        // 🔊 BOTÓN DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
+                        if (_pendingRequests.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: GestureDetector(
+                              onTap: () {
+                                print('🧪 Probando sonido de notificación...');
+                                SoundService.playRequestNotification();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('🔊 Reproduciendo sonido de prueba'),
+                                    backgroundColor: Colors.blue,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: Colors.blue.withOpacity(0.5),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.volume_up,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -1159,7 +1219,7 @@ class _ConductorSearchingPassengersScreenState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '🎯 Nueva solicitud',
+                                      'Nueva solicitud',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 22,
