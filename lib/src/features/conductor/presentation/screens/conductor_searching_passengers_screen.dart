@@ -48,6 +48,20 @@ class _ConductorSearchingPassengersScreenState
   
   late AnimationController _requestPanelController;
   late Animation<Offset> _requestPanelSlideAnimation;
+  late Animation<double> _requestPanelFadeAnimation;
+  
+  late AnimationController _acceptButtonController;
+  late Animation<double> _acceptButtonScaleAnimation;
+  
+  late AnimationController _topPanelController;
+  late Animation<Offset> _topPanelSlideAnimation;
+  late Animation<double> _topPanelFadeAnimation;
+  
+  late AnimationController _timerController;
+  late Animation<double> _timerAnimation;
+  
+  bool _showingRequest = false;
+  Timer? _autoRejectTimer;
 
   @override
   void initState() {
@@ -63,6 +77,10 @@ class _ConductorSearchingPassengersScreenState
     _positionStream?.cancel();
     _pulseAnimationController.dispose();
     _requestPanelController.dispose();
+    _acceptButtonController.dispose();
+    _topPanelController.dispose();
+    _timerController.dispose();
+    _autoRejectTimer?.cancel();
     
     // Desactivar disponibilidad al salir sin aceptar viaje
     _setDriverUnavailable();
@@ -90,23 +108,23 @@ class _ConductorSearchingPassengersScreenState
   }
 
   void _setupAnimations() {
-    // Animación de pulso para el marcador del conductor
+    // Animación de pulso para el marcador del conductor (más suave)
     _pulseAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
       vsync: this,
     )..repeat(reverse: true);
     
     _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.3,
+      begin: 0.85,
+      end: 1.15,
     ).animate(CurvedAnimation(
       parent: _pulseAnimationController,
       curve: Curves.easeInOut,
     ));
 
-    // Animación del panel de solicitud
+    // Animación del panel de solicitud (más fluida)
     _requestPanelController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     
@@ -116,6 +134,71 @@ class _ConductorSearchingPassengersScreenState
     ).animate(CurvedAnimation(
       parent: _requestPanelController,
       curve: Curves.easeOutCubic,
+    ));
+    
+    _requestPanelFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _requestPanelController,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+    ));
+
+    // Animación del botón de aceptar (efecto de pulso)
+    _acceptButtonController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _acceptButtonScaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _acceptButtonController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Animación del panel superior (entrada)
+    _topPanelController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _topPanelSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _topPanelController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    _topPanelFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _topPanelController,
+      curve: Curves.easeOut,
+    ));
+
+    // Iniciar animación del panel superior
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _topPanelController.forward();
+      }
+    });
+
+    // Temporizador para auto-rechazar solicitud (30 segundos)
+    _timerController = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    );
+    
+    _timerAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _timerController,
+      curve: Curves.linear,
     ));
   }
 
@@ -272,15 +355,30 @@ class _ConductorSearchingPassengersScreenState
           
           if (requests.isEmpty) {
             _searchMessage = 'Buscando solicitudes cercanas...';
-            _selectedRequest = null;
-            _requestPanelController.reverse();
+            if (_showingRequest) {
+              _selectedRequest = null;
+              _requestPanelController.reverse();
+              _showingRequest = false;
+            }
           } else {
             _searchMessage = '${requests.length} solicitud${requests.length > 1 ? "es" : ""} disponible${requests.length > 1 ? "s" : ""}';
             
             // Mostrar la primera solicitud si no hay una seleccionada
-            if (_selectedRequest == null) {
+            if (_selectedRequest == null && !_showingRequest) {
               _selectedRequest = requests.first;
+              _showingRequest = true;
               _requestPanelController.forward();
+              
+              // Iniciar temporizador de auto-rechazo
+              _timerController.reset();
+              _timerController.forward();
+              
+              _autoRejectTimer?.cancel();
+              _autoRejectTimer = Timer(const Duration(seconds: 30), () {
+                if (mounted && _selectedRequest != null) {
+                  _rejectRequest();
+                }
+              });
             }
           }
         });
@@ -312,12 +410,16 @@ class _ConductorSearchingPassengersScreenState
   Future<void> _acceptRequest() async {
     if (_selectedRequest == null) return;
 
+    // Detener temporizador
+    _autoRejectTimer?.cancel();
+    _timerController.stop();
+
     // Mostrar loading
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
+        child: CircularProgressIndicator(color: Color(0xFFFFD700)),
       ),
     );
 
@@ -352,6 +454,10 @@ class _ConductorSearchingPassengersScreenState
 
   Future<void> _rejectRequest() async {
     if (_selectedRequest == null) return;
+
+    // Detener temporizador
+    _autoRejectTimer?.cancel();
+    _timerController.stop();
 
     final result = await TripRequestSearchService.rejectRequest(
       solicitudId: _selectedRequest!['id'],
@@ -404,71 +510,186 @@ class _ConductorSearchingPassengersScreenState
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: IconButton(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: const Color(0xFF1A1A1A).withOpacity(0.9),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xFFFFD700).withOpacity(0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-          child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: () {
+                // Confirmar antes de salir
+                showDialog(
+                  context: context,
+                  builder: (context) => _buildExitConfirmDialog(),
+                );
+              },
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
         ),
-        onPressed: () {
-          // Confirmar antes de salir
-          showDialog(
-            context: context,
-            builder: (context) => _buildExitConfirmDialog(),
-          );
-        },
       ),
     );
   }
 
   Widget _buildExitConfirmDialog() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF1A1A1A).withOpacity(0.95),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: const Color(0xFFFFFF00).withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          title: const Text(
-            '¿Dejar de buscar?',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'Si sales, dejarás de recibir solicitudes de viaje',
-            style: TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Cancelar',
-                style: TextStyle(color: Colors.white70),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: const Color(0xFFFFD700).withOpacity(0.2),
+                width: 1.5,
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Cerrar diálogo
-                Navigator.pop(context, false); // Salir de la pantalla
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFFF00),
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 30,
+                  spreadRadius: 5,
                 ),
-              ),
-              child: const Text('Salir'),
+              ],
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Ícono
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFD700).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.logout_rounded,
+                    color: Color(0xFFFFD700),
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Título
+                const Text(
+                  '¿Salir del modo en línea?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.3,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Descripción
+                Text(
+                  'Dejarás de recibir solicitudes de viaje hasta que vuelvas a conectarte',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                // Botones
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 52,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => Navigator.pop(context),
+                            child: const Center(
+                              child: Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        height: 52,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFFD700).withOpacity(0.3),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Cerrar diálogo
+                            Navigator.pop(context, false); // Salir de la pantalla
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFD700),
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: const Text(
+                            'Salir',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -497,53 +718,80 @@ class _ConductorSearchingPassengersScreenState
           userAgentPackageName: 'com.example.ping_go',
         ),
         
-        // Marcador del conductor con pulso
+        // Marcador del conductor con pulso mejorado
         MarkerLayer(
           markers: [
             Marker(
               point: _currentLocation!,
-              width: 80,
-              height: 80,
+              width: 100,
+              height: 100,
               child: AnimatedBuilder(
                 animation: _pulseAnimation,
                 builder: (context, child) {
                   return Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Pulso exterior
+                      // Pulso exterior suave
                       Container(
-                        width: 60 * _pulseAnimation.value,
-                        height: 60 * _pulseAnimation.value,
+                        width: 70 * _pulseAnimation.value,
+                        height: 70 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFFFFFF00).withOpacity(
+                          color: const Color(0xFFFFD700).withOpacity(
+                            0.2 / _pulseAnimation.value,
+                          ),
+                        ),
+                      ),
+                      // Anillo intermedio
+                      Container(
+                        width: 50 * _pulseAnimation.value,
+                        height: 50 * _pulseAnimation.value,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFFFFD700).withOpacity(
                             0.3 / _pulseAnimation.value,
                           ),
                         ),
                       ),
-                      // Círculo principal
+                      // Sombra del marcador
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 15,
+                              spreadRadius: 3,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Círculo principal con borde
+                      Container(
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: const Color(0xFF1A1A1A),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFFFFF00),
-                            width: 3,
+                            color: const Color(0xFFFFD700),
+                            width: 3.5,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFFFFF00).withOpacity(0.5),
-                              blurRadius: 12,
-                              spreadRadius: 2,
-                            ),
-                          ],
+                        ),
+                      ),
+                      // Ícono del conductor
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.navigation,
-                          color: Color(0xFFFFFF00),
-                          size: 20,
+                          Icons.navigation_rounded,
+                          color: Color(0xFFFFD700),
+                          size: 26,
                         ),
                       ),
                     ],
@@ -554,7 +802,7 @@ class _ConductorSearchingPassengersScreenState
           ],
         ),
         
-        // Marcadores de solicitudes pendientes
+        // Marcadores de solicitudes pendientes con animación mejorada
         if (_pendingRequests.isNotEmpty)
           MarkerLayer(
             markers: _pendingRequests.map((request) {
@@ -564,45 +812,95 @@ class _ConductorSearchingPassengersScreenState
                   double.parse(request['latitud_origen'].toString()),
                   double.parse(request['longitud_origen'].toString()),
                 ),
-                width: 60,
-                height: 60,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedRequest = request;
-                      _requestPanelController.forward();
-                    });
+                width: 80,
+                height: 80,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
                   },
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFFFFFF00)
-                              : Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? const Color(0xFFFFFF00)
-                                : Colors.grey,
-                            width: 2,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedRequest = request;
+                        if (!_showingRequest) {
+                          _showingRequest = true;
+                          _requestPanelController.forward();
+                        }
+                      });
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Pulso de fondo si está seleccionado
+                        if (isSelected)
+                          AnimatedBuilder(
+                            animation: _pulseAnimation,
+                            builder: (context, child) {
+                              return Container(
+                                width: 60 * _pulseAnimation.value,
+                                height: 60 * _pulseAnimation.value,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFFFD700).withOpacity(
+                                    0.3 / _pulseAnimation.value,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                        // Pin del pasajero
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFFFFD700)
+                                    : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFFFFD700)
+                                      : Colors.grey.shade300,
+                                  width: 3,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isSelected
+                                        ? const Color(0xFFFFD700).withOpacity(0.5)
+                                        : Colors.black.withOpacity(0.3),
+                                    blurRadius: isSelected ? 15 : 8,
+                                    spreadRadius: isSelected ? 3 : 1,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.person_pin_circle_rounded,
+                                color: isSelected ? Colors.black : const Color(0xFF2196F3),
+                                size: 32,
+                              ),
+                            ),
+                            // Sombra en el suelo
+                            Container(
+                              margin: const EdgeInsets.only(top: 4),
+                              width: 25,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.person_pin_circle,
-                          color: isSelected ? Colors.black : Colors.blue,
-                          size: 28,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -618,65 +916,110 @@ class _ConductorSearchingPassengersScreenState
       left: 0,
       right: 0,
       child: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A).withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFFFFFF00).withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
+        child: SlideTransition(
+          position: _topPanelSlideAnimation,
+          child: FadeTransition(
+            opacity: _topPanelFadeAnimation,
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A).withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: const Color(0xFFFFD700).withOpacity(0.2),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFF00).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.search,
-                            color: Color(0xFFFFFF00),
-                            size: 24,
-                          ),
+                        // Icono animado
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.elasticOut,
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFD700).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.near_me,
+                                  color: Color(0xFFFFD700),
+                                  size: 28,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 16),
+                        // Texto informativo
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Estás disponible',
+                                '🟢 En línea',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                _searchMessage,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 14,
-                                ),
+                              TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.0, end: 1.0),
+                                duration: const Duration(milliseconds: 1000),
+                                curve: Curves.easeOut,
+                                builder: (context, value, child) {
+                                  return Opacity(
+                                    opacity: value,
+                                    child: Text(
+                                      _searchMessage,
+                                      style: TextStyle(
+                                        color: const Color(0xFFFFD700).withOpacity(0.9),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
                         ),
+                        // Indicador de búsqueda
+                        if (_pendingRequests.isEmpty)
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                const Color(0xFFFFD700).withOpacity(0.8),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -696,6 +1039,10 @@ class _ConductorSearchingPassengersScreenState
     final precioEstimado = double.tryParse(
       _selectedRequest!['precio_estimado']?.toString() ?? '0',
     ) ?? 0;
+    
+    final duracionMinutos = int.tryParse(
+      _selectedRequest!['duracion_minutos']?.toString() ?? '0',
+    ) ?? 0;
 
     return Positioned(
       bottom: 0,
@@ -703,148 +1050,467 @@ class _ConductorSearchingPassengersScreenState
       right: 0,
       child: SlideTransition(
         position: _requestPanelSlideAnimation,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Drag handle
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+        child: FadeTransition(
+          opacity: _requestPanelFadeAnimation,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A).withOpacity(0.95),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(32),
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFFFD700).withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 30,
+                      offset: const Offset(0, -10),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Título
-                  const Text(
-                    'Nueva solicitud de viaje',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Información del viaje
-                  _buildTripInfo(
-                    icon: Icons.circle,
-                    iconColor: const Color(0xFFFFFF00),
-                    label: 'Origen',
-                    value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTripInfo(
-                    icon: Icons.location_on,
-                    iconColor: const Color(0xFFFFFF00),
-                    label: 'Destino',
-                    value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Detalles del viaje
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  ],
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailItem(
+                        // Drag handle
+                        Center(
+                          child: Container(
+                            width: 50,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Header con animación
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 600),
+                          curve: Curves.easeOut,
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, 20 * (1 - value)),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFD700),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFFFD700).withOpacity(0.3),
+                                      blurRadius: 12,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.person_pin_circle,
+                                  color: Colors.black,
+                                  size: 32,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '🎯 Nueva solicitud',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Desliza hacia arriba para más detalles',
+                                      style: TextStyle(
+                                        color: Color(0xFFFFD700),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        
+                        // Tarjeta de ganancia destacada con animación
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.elasticOut,
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: 0.8 + (0.2 * value),
+                              child: Opacity(
+                                opacity: value,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFD700),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFFD700).withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.attach_money,
+                                  color: Colors.black,
+                                  size: 32,
+                                ),
+                                const SizedBox(width: 8),
+                                TweenAnimationBuilder<double>(
+                                  tween: Tween(begin: 0.0, end: precioEstimado),
+                                  duration: const Duration(milliseconds: 1000),
+                                  curve: Curves.easeOut,
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      '\$${value.toStringAsFixed(0)}',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: -1,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'COP',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Temporizador de auto-rechazo
+                        AnimatedBuilder(
+                          animation: _timerAnimation,
+                          builder: (context, child) {
+                            final secondsLeft = (_timerAnimation.value * 30).ceil();
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: secondsLeft <= 10
+                                    ? Colors.red.withOpacity(0.15)
+                                    : const Color(0xFF2A2A2A).withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: secondsLeft <= 10
+                                      ? Colors.red.withOpacity(0.3)
+                                      : Colors.white.withOpacity(0.1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.timer_outlined,
+                                    color: secondsLeft <= 10
+                                        ? Colors.red
+                                        : const Color(0xFFFFD700),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          secondsLeft <= 10
+                                              ? '⚠️ Solicitud expirando'
+                                              : 'Tiempo para responder',
+                                          style: TextStyle(
+                                            color: secondsLeft <= 10
+                                                ? Colors.red
+                                                : Colors.white.withOpacity(0.7),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: LinearProgressIndicator(
+                                            value: _timerAnimation.value,
+                                            backgroundColor: Colors.white.withOpacity(0.1),
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              secondsLeft <= 10
+                                                  ? Colors.red
+                                                  : const Color(0xFFFFD700),
+                                            ),
+                                            minHeight: 6,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: secondsLeft <= 10
+                                          ? Colors.red
+                                          : const Color(0xFFFFD700).withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${secondsLeft}s',
+                                      style: TextStyle(
+                                        color: secondsLeft <= 10
+                                            ? Colors.white
+                                            : const Color(0xFFFFD700),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Detalles del viaje con animación escalonada
+                        _buildAnimatedDetailRow(
+                          delay: 200,
                           icon: Icons.straighten,
                           label: 'Distancia',
                           value: '${distanciaKm.toStringAsFixed(1)} km',
                         ),
-                        Container(
-                          width: 1,
-                          height: 40,
-                          color: Colors.white.withOpacity(0.1),
+                        const SizedBox(height: 12),
+                        _buildAnimatedDetailRow(
+                          delay: 300,
+                          icon: Icons.access_time,
+                          label: 'Tiempo estimado',
+                          value: '$duracionMinutos min',
                         ),
-                        _buildDetailItem(
-                          icon: Icons.attach_money,
-                          label: 'Ganancia',
-                          value: '\$${precioEstimado.toStringAsFixed(0)}',
+                        const SizedBox(height: 20),
+                        
+                        // Direcciones con animación
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 700),
+                          curve: Curves.easeOut,
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, 20 * (1 - value)),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildLocationInfo(
+                                  icon: Icons.my_location,
+                                  iconColor: const Color(0xFF4CAF50),
+                                  label: 'Recoger en',
+                                  value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 18),
+                                      Column(
+                                        children: List.generate(
+                                          3,
+                                          (index) => Container(
+                                            margin: const EdgeInsets.only(bottom: 3),
+                                            width: 3,
+                                            height: 3,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.3),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                _buildLocationInfo(
+                                  icon: Icons.location_on,
+                                  iconColor: const Color(0xFFFFD700),
+                                  label: 'Dejar en',
+                                  value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        
+                        // Botones de acción con animaciones
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.easeOut,
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, 30 * (1 - value)),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              // Botón de rechazar compacto
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2A2A2A),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: _rejectRequest,
+                                    child: const Icon(
+                                      Icons.close_rounded,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              // Botón de aceptar expandido con animación
+                              Expanded(
+                                child: AnimatedBuilder(
+                                  animation: _acceptButtonScaleAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _acceptButtonScaleAnimation.value,
+                                      child: child,
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFFFFD700).withOpacity(0.4),
+                                          blurRadius: 20,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                    child: ElevatedButton(
+                                      onPressed: _acceptRequest,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFFFFD700),
+                                        foregroundColor: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        elevation: 0,
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.check_circle,
+                                            size: 24,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Aceptar viaje',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  
-                  // Botones de acción
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _rejectRequest,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.3),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text(
-                            'Rechazar',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                          onPressed: _acceptRequest,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFFF00),
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            'Aceptar viaje',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -852,23 +1518,98 @@ class _ConductorSearchingPassengersScreenState
       ),
     );
   }
-
-  Widget _buildTripInfo({
+  
+  Widget _buildAnimatedDetailRow({
+    required int delay,
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 600 + delay),
+      curve: Curves.easeOut,
+      builder: (context, animValue, child) {
+        return Opacity(
+          opacity: animValue,
+          child: Transform.translate(
+            offset: Offset(20 * (1 - animValue), 0),
+            child: child,
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2A2A).withOpacity(0.5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD700).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFFFFD700),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildLocationInfo({
     required IconData icon,
     required Color iconColor,
     required String label,
     required String value,
   }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
+            color: iconColor.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: iconColor, size: 16),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -878,51 +1619,25 @@ class _ConductorSearchingPassengersScreenState
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
                 value,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  height: 1.3,
                 ),
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDetailItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Column(
-      children: [
-        Icon(icon, color: const Color(0xFFFFFF00), size: 24),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
-            fontSize: 12,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
           ),
         ),
       ],
