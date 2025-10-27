@@ -117,22 +117,41 @@ class TripRequestService {
   /// Cancelar solicitud de viaje
   static Future<bool> cancelTripRequest(int solicitudId) async {
     try {
+      print('🚫 Cancelando solicitud ID: $solicitudId');
+      
+      final url = '$baseUrl/user/cancel_trip_request.php';
       final response = await http.post(
-        Uri.parse('$baseUrl/user/cancel_trip_request.php'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'solicitud_id': solicitudId,
         }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Tiempo de espera agotado al cancelar');
+        },
       );
+
+      print('📥 Respuesta de cancelación - Status: ${response.statusCode}');
+      print('📄 Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['success'] == true;
+        if (data['success'] == true) {
+          print('✅ Solicitud cancelada exitosamente');
+          return true;
+        } else {
+          print('❌ Error al cancelar: ${data['message']}');
+          throw Exception(data['message'] ?? 'Error al cancelar la solicitud');
+        }
+      } else {
+        print('❌ Error del servidor: ${response.statusCode}');
+        throw Exception('Error del servidor: ${response.statusCode}');
       }
-      return false;
     } catch (e) {
-      print('Error cancelando solicitud: $e');
-      return false;
+      print('❌ Error cancelando solicitud: $e');
+      rethrow;
     }
   }
 

@@ -139,39 +139,25 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              duration: const Duration(seconds: 3),
             ),
           );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Row(
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.white),
-                    SizedBox(width: 12),
-                    Text('No se pudo cancelar el viaje'),
-                  ],
-                ),
-                backgroundColor: const Color(0xFFFF5252),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-            setState(() => _isCancelling = false);
-          }
         }
       }
     } catch (e) {
       if (mounted) {
+        setState(() => _isCancelling = false);
+        
+        // Extraer el mensaje de error
+        String errorMessage = e.toString().replaceFirst('Exception: ', '');
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text('Error: ${e.toString()}')),
+                Expanded(child: Text(errorMessage)),
               ],
             ),
             backgroundColor: const Color(0xFFFF5252),
@@ -179,9 +165,9 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            duration: const Duration(seconds: 4),
           ),
         );
-        setState(() => _isCancelling = false);
       }
     }
   }
