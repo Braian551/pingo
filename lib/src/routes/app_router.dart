@@ -21,6 +21,7 @@ import 'package:ping_go/src/features/admin/presentation/screens/users_management
 import 'package:ping_go/src/features/admin/presentation/screens/statistics_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/audit_logs_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/conductores_documentos_screen.dart';
+import 'package:ping_go/src/features/admin/presentation/screens/pricing_management_screen.dart';
 import 'package:ping_go/src/features/conductor/presentation/screens/conductor_home_screen.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/routes/animated_routes.dart';
@@ -181,6 +182,15 @@ class AppRouter {
           return MaterialPageRoute(
             builder: (_) => ConductoresDocumentosScreen(
               adminId: args?['admin_id'] ?? 0,
+              adminUser: args?['admin_user'] ?? {},
+            ),
+          );
+        }
+      case RouteNames.adminPricing:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => PricingManagementScreen(
               adminUser: args?['admin_user'] ?? {},
             ),
           );

@@ -34,6 +34,7 @@ class RouteNames {
   static const String adminAuditLogs = '/admin/audit-logs';
   static const String adminConfig = '/admin/config';
   static const String adminConductorDocs = '/admin/conductor-docs';
+  static const String adminPricing = '/admin/pricing';
   
   // Rutas de conductor
   static const String conductorHome = '/conductor/home';

@@ -170,7 +170,11 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 icon: Icons.attach_money_rounded,
                 accentColor: const Color(0xFFFFFF00),
                 onTap: () {
-                  _showComingSoon();
+                  Navigator.pushNamed(
+                    context,
+                    RouteNames.adminPricing,
+                    arguments: {'admin_user': widget.adminUser},
+                  );
                 },
               ),
               _ManagementItem(
