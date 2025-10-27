@@ -495,23 +495,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         SizedBox(
           height: 560,
-          child: AddressStepWidget(
-            addressController: _addressController,
-            onLocationSelected: (data) {
-              setState(() {
-                _addressController.text = data['address'] ?? _addressController.text;
-                _selectedLat = (data['lat'] as double?);
-                _selectedLng = (data['lon'] as double?);
-                _selectedCity = data['city'] as String?;
-                _selectedState = data['state'] as String?;
-              });
-            },
-            onConfirmed: () {
-              // Avanzar al siguiente paso automáticamente
-              setState(() {
-                if (_currentStep < 3) _currentStep++;
-              });
-            },
+          child: ChangeNotifierProvider(
+            create: (_) => MapProvider(),
+            child: AddressStepWidget(
+              addressController: _addressController,
+              onLocationSelected: (data) {
+                setState(() {
+                  _addressController.text = data['address'] ?? _addressController.text;
+                  _selectedLat = (data['lat'] as double?);
+                  _selectedLng = (data['lon'] as double?);
+                  _selectedCity = data['city'] as String?;
+                  _selectedState = data['state'] as String?;
+                });
+              },
+              onConfirmed: () {
+                // Avanzar al siguiente paso automáticamente
+                setState(() {
+                  if (_currentStep < 3) _currentStep++;
+                });
+              },
+            ),
           ),
         ),
         const SizedBox(height: 20),

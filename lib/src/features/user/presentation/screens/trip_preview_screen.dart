@@ -666,14 +666,14 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
         if (_markerScaleAnimation.value > 0.5)
           MarkerLayer(
             markers: [
-              // Cuadro de información del origen (posicionado al lado derecho del marcador)
+              // Cuadro de información del origen (posicionado arriba del marcador)
               Marker(
                 point: widget.origin.toLatLng(),
                 width: 220,
                 height: 80,
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.bottomCenter,
                 child: Transform.translate(
-                  offset: const Offset(65, -10),
+                  offset: const Offset(0, -120),
                   child: TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: const Duration(milliseconds: 500),
@@ -1392,8 +1392,8 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
                     child: ElevatedButton(
                       onPressed: _confirmTrip,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.yellow.shade700,
-                        foregroundColor: Colors.black,
+                        backgroundColor: const Color.fromARGB(255, 171, 122, 1),
+                        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
