@@ -331,7 +331,7 @@ class _ConductorSearchingPassengersScreenState
     }
   }
 
-  void _startSearching() {
+  Future<void> _startSearching() async {
     if (_currentLocation == null) {
       print('⚠️ Ubicación aún no disponible, reintentando en 1 segundo...');
       Future.delayed(const Duration(seconds: 1), _startSearching);
@@ -340,6 +340,30 @@ class _ConductorSearchingPassengersScreenState
 
     print('🔍 Iniciando búsqueda de solicitudes...');
     print('📍 Ubicación: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+    
+    // Activar disponibilidad del conductor primero
+    try {
+      final url = Uri.parse(
+        'http://10.0.2.2/pingo/backend/conductor/actualizar_disponibilidad.php',
+      );
+      
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'conductor_id': widget.conductorId,
+          'disponible': 1,
+        }),
+      ).timeout(const Duration(seconds: 3));
+      
+      if (response.statusCode == 200) {
+        print('✅ Disponibilidad activada');
+      } else {
+        print('❌ Error activando disponibilidad: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error activando disponibilidad: $e');
+    }
     
     TripRequestSearchService.startSearching(
       conductorId: widget.conductorId,
@@ -990,7 +1014,7 @@ class _ConductorSearchingPassengersScreenState
                                 curve: Curves.easeOut,
                                 builder: (context, value, child) {
                                   return Opacity(
-                                    opacity: value,
+                                    opacity: value.clamp(0.0, 1.0),
                                     child: Text(
                                       _searchMessage,
                                       style: TextStyle(
@@ -1101,7 +1125,7 @@ class _ConductorSearchingPassengersScreenState
                           curve: Curves.easeOut,
                           builder: (context, value, child) {
                             return Opacity(
-                              opacity: value,
+                              opacity: value.clamp(0.0, 1.0),
                               child: Transform.translate(
                                 offset: Offset(0, 20 * (1 - value)),
                                 child: child,
@@ -1169,7 +1193,7 @@ class _ConductorSearchingPassengersScreenState
                             return Transform.scale(
                               scale: 0.8 + (0.2 * value),
                               child: Opacity(
-                                opacity: value,
+                                opacity: value.clamp(0.0, 1.0),
                                 child: child,
                               ),
                             );
@@ -1348,7 +1372,7 @@ class _ConductorSearchingPassengersScreenState
                           curve: Curves.easeOut,
                           builder: (context, value, child) {
                             return Opacity(
-                              opacity: value,
+                              opacity: value.clamp(0.0, 1.0),
                               child: Transform.translate(
                                 offset: Offset(0, 20 * (1 - value)),
                                 child: child,
@@ -1414,7 +1438,7 @@ class _ConductorSearchingPassengersScreenState
                           curve: Curves.easeOut,
                           builder: (context, value, child) {
                             return Opacity(
-                              opacity: value,
+                              opacity: value.clamp(0.0, 1.0),
                               child: Transform.translate(
                                 offset: Offset(0, 30 * (1 - value)),
                                 child: child,
@@ -1531,7 +1555,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeOut,
       builder: (context, animValue, child) {
         return Opacity(
-          opacity: animValue,
+          opacity: animValue.clamp(0.0, 1.0),
           child: Transform.translate(
             offset: Offset(20 * (1 - animValue), 0),
             child: child,
