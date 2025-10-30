@@ -8,10 +8,10 @@ on:
 
 jobs:
   build-and-distribute:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       FLUTTER_VERSION: '3.35.3'
-      GRADLE_OPTS: "-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+UseSerialGC -XX:+UseCompressedOops"
+      GRADLE_OPTS: "-Xmx3g -Xms512m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -XX:+UseStringDeduplication -Dfile.encoding=UTF-8"
 
     steps:
       - name: Free disk space
@@ -85,6 +85,10 @@ jobs:
           android.useAndroidX=true
           android.enableJetifier=true
           org.gradle.daemon=false
+          org.gradle.parallel=false
+          org.gradle.configureondemand=true
+          org.gradle.caching=false
+          org.gradle.workers.max=1
           EOF
 
       - name: Clean Gradle cache and free memory
@@ -100,7 +104,19 @@ jobs:
           echo "Disk space:"
           df -h
 
+      - name: Check system resources before build
+        run: |
+          echo "=== System Resources ==="
+          free -h
+          echo "=== CPU Info ==="
+          nproc
+          echo "=== Memory Info ==="
+          cat /proc/meminfo | head -10
+          echo "=== Disk Usage ==="
+          df -h /
+
       - name: Build release APK (ultra low memory build)
+        timeout-minutes: 30
         run: flutter build apk --release --target-platform android-arm64 --no-shrink
 
       - name: Build release AAB
