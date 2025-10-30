@@ -77,8 +77,21 @@ jobs:
           MY_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
           EOF
 
-      - name: Build release APK (split-per-abi for lower memory)
-        run: flutter build apk --release --split-per-abi --target-platform android-arm64
+      - name: Clean Gradle cache and free memory
+        run: |
+          # Clean Gradle cache
+          ./gradlew clean --no-daemon || true
+          rm -rf ~/.gradle/caches
+          rm -rf android/.gradle
+          # Free more memory
+          sudo sysctl -w vm.drop_caches=3
+          echo "Memory status after cleanup:"
+          free -h
+          echo "Disk space:"
+          df -h
+
+      - name: Build release APK (simple build for lower memory)
+        run: flutter build apk --release --target-platform android-arm64
 
       - name: Build release AAB
         run: flutter build appbundle --release
@@ -88,7 +101,7 @@ jobs:
 
       - name: Upload APK to Firebase App Distribution
         run: |
-          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
             --app ${{ secrets.FIREBASE_APP_ID }} \
             --groups testers \
             --release-notes "Automated build from GitHub Actions (arm64)" \
