@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/admin/admin_service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 
 class StatisticsScreen extends StatefulWidget {
   final int adminId;
