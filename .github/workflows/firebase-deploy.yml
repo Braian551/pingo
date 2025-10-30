@@ -58,21 +58,21 @@ jobs:
           firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}"
 
       - name: Set up Firebase SDK
-        uses: w9jds/firebase-action@v1
+        uses: w9jds/firebase-action@main
         with:
           args: projects:list
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Upload APK to Firebase App Distribution
-        uses: w9jds/firebase-action@v1
+        uses: w9jds/firebase-action@main
         with:
           args: appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk --app ${{ secrets.FIREBASE_APP_ID }} --groups testers --release-notes "Automated build from GitHub Actions"
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Upload AAB to Firebase App Distribution
-        uses: w9jds/firebase-action@v1
+        uses: w9jds/firebase-action@main
         with:
           args: appdistribution:distribute build/app/outputs/bundle/release/app-release.aab --app ${{ secrets.FIREBASE_APP_ID }} --groups testers --release-notes "Automated build from GitHub Actions"
         env:
