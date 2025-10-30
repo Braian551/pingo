@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       FLUTTER_VERSION: '3.35.3'
+      GRADLE_OPTS: "-Xmx512m -XX:MaxMetaspaceSize=256m -XX:+UseSerialGC"
 
     steps:
       - name: Free disk space
