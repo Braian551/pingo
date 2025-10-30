@@ -15,26 +15,26 @@ dependencies:
   http: ^1.1.0
   crypto: ^3.0.3
   # Mapas y utilidades geográficas
-  flutter_map: ^6.1.0
+  flutter_map: ^8.2.2
   latlong2: ^0.9.1
   mapbox_maps_flutter: ^2.12.0
   # Dependencias para geolocalización (simplificada)
-  geolocator: ^10.1.0
-  geocoding: ^2.1.1
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
   # Dependencias para UI y utilidades
   pin_code_fields: ^8.0.1
   uuid: ^4.2.1
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
-  intl: 0.18.1
-  fl_chart: ^0.68.0
+  intl: ^0.20.2
+  fl_chart: ^1.1.1
   font_awesome_flutter: ^10.7.0
   image_picker: ^1.0.7
-  file_picker: ^8.0.0
-  permission_handler: ^11.3.0
+  file_picker: ^10.3.3
+  permission_handler: ^12.0.1
   path_provider: ^2.1.3
   # Dependencias para manejo de estado
-  flutter_bloc: ^8.1.3
+  flutter_bloc: ^9.1.1
   equatable: ^2.0.5
   # Audio
   audioplayers: ^6.1.0  
@@ -42,7 +42,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
