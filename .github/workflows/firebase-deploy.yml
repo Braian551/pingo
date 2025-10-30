@@ -13,6 +13,15 @@ jobs:
       FLUTTER_VERSION: '3.27.1'
 
     steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo docker system prune -af
+          df -h
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -68,8 +77,8 @@ jobs:
           MY_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
           EOF
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Build release APK (split-per-abi for lower memory)
+        run: flutter build apk --release --split-per-abi --target-platform android-arm64
 
       - name: Build release AAB
         run: flutter build appbundle --release
@@ -79,10 +88,10 @@ jobs:
 
       - name: Upload APK to Firebase App Distribution
         run: |
-          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
             --app ${{ secrets.FIREBASE_APP_ID }} \
             --groups testers \
-            --release-notes "Automated build from GitHub Actions" \
+            --release-notes "Automated build from GitHub Actions (arm64)" \
             --token "${{ secrets.FIREBASE_TOKEN }}"
 
       - name: Upload AAB to Firebase App Distribution
