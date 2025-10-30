@@ -21,6 +21,27 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
+      - name: Create env_config.dart
+        run: |
+          cat > lib/src/core/config/env_config.dart <<'EOF'
+          class EnvConfig {
+            static const String mapboxPublicToken = 'pk.placeholder';
+            static const String mapboxSecretToken = 'sk.placeholder';
+            static const String nominatimUserAgent = 'PingGo CI/CD';
+            static const String nominatimEmail = 'ci@pinggo.app';
+            static const String tomtomApiKey = 'placeholder';
+            static const int mapboxMonthlyRequestLimit = 100000;
+            static const int mapboxMonthlyRoutingLimit = 100000;
+            static const int tomtomDailyRequestLimit = 2500;
+            static const double warningThreshold = 0.5;
+            static const double dangerThreshold = 0.75;
+            static const double criticalThreshold = 0.9;
+            static const bool enableQuotaMonitoring = true;
+            static const bool showQuotaAlerts = true;
+            static const bool enableMapboxStatistics = true;
+          }
+          EOF
+
       - name: Install deps
         run: flutter pub get
 
