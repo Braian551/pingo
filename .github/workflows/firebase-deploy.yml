@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FLUTTER_VERSION: '3.35.3'
-      GRADLE_OPTS: "-Xmx3g -Xms512m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -XX:+UseStringDeduplication -Dfile.encoding=UTF-8"
+      GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+UseSerialGC -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -Dfile.encoding=UTF-8 -XX:+DisableExplicitGC -XX:MaxGCPauseMillis=50 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat"
 
     steps:
       - name: Free disk space
@@ -114,6 +114,12 @@ jobs:
           cat /proc/meminfo | head -10
           echo "=== Disk Usage ==="
           df -h /
+
+      - name: Kill any existing Gradle processes
+        run: |
+          pkill -f gradle || true
+          pkill -f java.*gradle || true
+          sleep 5
 
       - name: Build release APK (ultra low memory build)
         timeout-minutes: 30
