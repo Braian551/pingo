@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       FLUTTER_VERSION: '3.35.3'
-      GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g --no-daemon"
+      GRADLE_OPTS: "-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+UseSerialGC -XX:+UseCompressedOops"
 
     steps:
       - name: Free disk space
@@ -84,6 +84,7 @@ jobs:
           MY_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
           android.useAndroidX=true
           android.enableJetifier=true
+          org.gradle.daemon=false
           EOF
 
       - name: Clean Gradle cache and free memory
