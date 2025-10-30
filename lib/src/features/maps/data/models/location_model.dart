@@ -58,8 +58,8 @@ class RouteModel extends Route {
     return RouteModel(
       origen: LocationModel.fromJson(json['origen']),
       destino: LocationModel.fromJson(json['destino']),
-      distanciaKm: _parseDouble(json['distancia_km']) ?? 0.0,
-      duracionMinutos: _parseInt(json['duracion_minutos']) ?? 0,
+      distanciaKm: _parseDouble(json['distancia_km']),
+      duracionMinutos: _parseInt(json['duracion_minutos']),
       puntos: puntos,
       instrucciones: json['instrucciones'],
     );
