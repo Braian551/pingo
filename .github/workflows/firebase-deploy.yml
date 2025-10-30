@@ -10,7 +10,7 @@ jobs:
   build-and-distribute:
     runs-on: ubuntu-22.04
     env:
-      FLUTTER_VERSION: '3.27.1'
+      FLUTTER_VERSION: '3.35.3'
 
     steps:
       - name: Free disk space
