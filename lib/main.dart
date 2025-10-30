@@ -24,7 +24,6 @@ void main() async {
         // Database Provider (legacy)
         ChangeNotifierProvider(create: (_) => DatabaseProvider()),
         
-        // ========== MICROSERVICES ARCHITECTURE (Clean Architecture) ==========
         
         // User Microservice Provider
         ChangeNotifierProvider(

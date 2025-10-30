@@ -1,0 +1,61 @@
+name: Flutter Android CI -> Firebase App Distribution
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+    env:
+      FLUTTER_VERSION: '3.24.0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install deps
+        run: flutter pub get
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test --no-fail-on-empty-suite
+
+      - name: Restore google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+
+      - name: Restore keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/release-keystore.jks
+
+      - name: Create gradle.properties for signing
+        run: |
+          cat > android/gradle.properties <<EOF
+          MY_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
+          MY_KEY_ALIAS=${{ secrets.KEY_ALIAS }}
+          MY_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Authenticate to Firebase
+        run: |
+          echo "${{ secrets.FIREBASE_TOKEN }}" > ~/.config/firebase/token
+          firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}"
+
+      - name: Set up Firebase SDK
+        uses: firebase/firebase-tools-github-action@v1
+        with:
+          projectId: ping-go-8a3df
+          token: ${{ secrets.FIREBASE_TOKEN }}
