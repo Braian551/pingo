@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-distribute:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       FLUTTER_VERSION: '3.27.1'
 
@@ -90,8 +90,8 @@ jobs:
           echo "Disk space:"
           df -h
 
-      - name: Build release APK (simple build for lower memory)
-        run: flutter build apk --release --target-platform android-arm64
+      - name: Build release APK (ultra low memory build)
+        run: flutter build apk --release --target-platform android-arm64 --no-shrink
 
       - name: Build release AAB
         run: flutter build appbundle --release
