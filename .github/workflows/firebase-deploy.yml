@@ -49,13 +49,31 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
       - name: Authenticate to Firebase
         run: |
           echo "${{ secrets.FIREBASE_TOKEN }}" > ~/.config/firebase/token
           firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}"
 
       - name: Set up Firebase SDK
-        uses: firebase/firebase-tools-github-action@v1
+        uses: w9jds/firebase-action@v12.7.0
         with:
-          projectId: ping-go-8a3df
-          token: ${{ secrets.FIREBASE_TOKEN }}
+          args: projects:list
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Upload APK to Firebase App Distribution
+        uses: w9jds/firebase-action@v12.7.0
+        with:
+          args: appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk --app ${{ secrets.FIREBASE_APP_ID }} --groups testers --release-notes "Automated build from GitHub Actions"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Upload AAB to Firebase App Distribution
+        uses: w9jds/firebase-action@v12.7.0
+        with:
+          args: appdistribution:distribute build/app/outputs/bundle/release/app-release.aab --app ${{ secrets.FIREBASE_APP_ID }} --groups testers --release-notes "Automated build from GitHub Actions"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
