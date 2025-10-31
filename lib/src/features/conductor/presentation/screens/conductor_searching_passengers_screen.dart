@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import '../../../../global/services/mapbox_service.dart';
 import '../../../../global/services/sound_service.dart';
 import '../../services/trip_request_search_service.dart';
+import '../../services/conductor_service.dart';
 
 /// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
 /// 
@@ -94,18 +93,10 @@ class _ConductorSearchingPassengersScreenState
   
   Future<void> _setDriverUnavailable() async {
     try {
-      final url = Uri.parse(
-        'http://10.0.2.2/pingo/backend/conductor/actualizar_disponibilidad.php',
+      await ConductorService.actualizarDisponibilidad(
+        conductorId: widget.conductorId,
+        disponible: false,
       );
-      
-      await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'conductor_id': widget.conductorId,
-          'disponible': 0,
-        }),
-      ).timeout(const Duration(seconds: 3));
     } catch (e) {
       print('Error desactivando disponibilidad: $e');
     }
@@ -347,24 +338,11 @@ class _ConductorSearchingPassengersScreenState
     
     // Activar disponibilidad del conductor primero
     try {
-      final url = Uri.parse(
-        'http://10.0.2.2/pingo/backend/conductor/actualizar_disponibilidad.php',
+      await ConductorService.actualizarDisponibilidad(
+        conductorId: widget.conductorId,
+        disponible: true,
       );
-      
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'conductor_id': widget.conductorId,
-          'disponible': 1,
-        }),
-      ).timeout(const Duration(seconds: 3));
-      
-      if (response.statusCode == 200) {
-        print('✅ Disponibilidad activada');
-      } else {
-        print('❌ Error activando disponibilidad: ${response.statusCode}');
-      }
+      print('✅ Disponibilidad activada');
     } catch (e) {
       print('❌ Error activando disponibilidad: $e');
     }

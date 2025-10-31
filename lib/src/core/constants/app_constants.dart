@@ -1,4 +1,5 @@
 // lib/src/core/constants/app_constants.dart
+import 'package:ping_go/src/core/config/app_config.dart';
 
 class AppConstants {
   // ============================================
@@ -25,17 +26,27 @@ class AppConstants {
   // NOTA: email_service.php YA FUE MOVIDO a auth/ microservicio
   // Usar: AppConfig.authServiceUrl + '/email_service.php'
   @Deprecated('Usar AppConfig.authServiceUrl + \'/email_service.php\' en su lugar')
-  static const String emailApiUrl = 'http://10.0.2.2/pingo/backend/auth/email_service.php';
+  static String get emailApiUrl => '${AppConfig.authServiceUrl}/email_service.php';
   static const bool useEmailMock = false;
   
   // ============================================
   // CONFIGURACIÓN DE BASE DE DATOS
   // ============================================
-  static const String databaseHost = '10.0.2.2';
+  // NOTA: La app ahora usa API REST, no conexión directa a MySQL
+  // La base de datos se maneja a través del backend de Railway
+  // Ver: lib/src/global/config/api_config.dart para URLs de API
+
+  // Configuración legacy (ya no se usa - mantener por compatibilidad)
+  @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
+  static const String databaseHost = 'sql10.freesqldatabase.com';
+  @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
   static const String databasePort = '3306';
-  static const String databaseName = 'pingo';
-  static const String databaseUser = 'root';
-  static const String databasePassword = 'root';
+  @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
+  static const String databaseName = 'sql10805022';
+  @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
+  static const String databaseUser = 'sql10805022';
+  @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
+  static const String databasePassword = 'BVeitwKy1q';
   
   // ============================================
   // CONFIGURACIÓN DE LA APLICACIÓN

@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ping_go/src/core/config/app_config.dart';
 
 class UserService {
   static Future<Map<String, dynamic>> registerUser({
@@ -39,7 +40,7 @@ class UserService {
       if (requestData['country'] == null) requestData['country'] = 'Colombia';
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/pingo/backend/auth/register.php'),
+        Uri.parse('${AppConfig.authServiceUrl}/register.php'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -111,7 +112,7 @@ class UserService {
   static Future<bool> checkUserExists(String email) async {
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/pingo/backend/auth/check_user.php'),
+        Uri.parse('${AppConfig.authServiceUrl}/check_user.php'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -132,7 +133,7 @@ class UserService {
 
   static Future<Map<String, dynamic>?> getAdminProfile({int? adminId, String? email}) async {
     try {
-      final uri = Uri.parse('http://10.0.2.2/pingo/backend/admin/dashboard_stats.php')
+      final uri = Uri.parse('${AppConfig.adminServiceUrl}/dashboard_stats.php')
           .replace(queryParameters: adminId != null ? {'admin_id': adminId.toString()} : null);
 
       final response = await http.get(uri, headers: {
@@ -158,7 +159,7 @@ class UserService {
 
   static Future<Map<String, dynamic>?> getProfile({int? userId, String? email}) async {
     try {
-      final uri = Uri.parse('http://10.0.2.2/pingo/backend/auth/profile.php')
+      final uri = Uri.parse('${AppConfig.authServiceUrl}/profile.php')
           .replace(queryParameters: userId != null ? {'userId': userId.toString()} : (email != null ? {'email': email} : null));
 
       // Debug: print requested URI
@@ -226,7 +227,7 @@ class UserService {
       if (state != null) body['state'] = state;
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/pingo/backend/auth/profile_update.php'),
+        Uri.parse('${AppConfig.authServiceUrl}/profile_update.php'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -318,7 +319,7 @@ class UserService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/pingo/backend/auth/login.php'),
+        Uri.parse('${AppConfig.authServiceUrl}/login.php'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

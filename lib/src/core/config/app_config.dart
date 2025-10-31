@@ -22,7 +22,7 @@
 /// ```
 class AppConfig {
   // Ambiente actual
-  static const Environment environment = Environment.development;
+  static const Environment environment = Environment.production;
 
   // URLs base según ambiente
   static String get baseUrl {
@@ -34,7 +34,8 @@ class AppConfig {
       case Environment.staging:
         return 'https://staging-api.pingo.com';
       case Environment.production:
-        return 'https://api.pingo.com';
+        // Railway backend URL - actualizada
+        return 'https://pinggo-backend-production.up.railway.app';
     }
   }
 

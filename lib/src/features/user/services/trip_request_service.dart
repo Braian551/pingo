@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../global/config/api_config.dart';
+import '../../../core/config/app_config.dart';
 
 class TripRequestService {
-  static const String baseUrl = ApiConfig.baseUrl;
+  static String get baseUrl => AppConfig.baseUrl;
 
   /// Crear una nueva solicitud de viaje
   static Future<Map<String, dynamic>> createTripRequest({

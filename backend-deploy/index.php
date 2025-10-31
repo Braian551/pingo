@@ -17,7 +17,11 @@ $path = parse_url($requestUri, PHP_URL_PATH);
 $path = ltrim($path, '/');
 
 // Route to appropriate API endpoints
-if (strpos($path, 'user/') === 0) {
+if ($path === '') {
+    // Health check for root path
+    http_response_code(200);
+    echo json_encode(['status' => 'healthy', 'message' => 'PingGo API Backend is running']);
+} elseif (strpos($path, 'user/') === 0) {
     $endpoint = substr($path, 5); // Remove 'user/'
     require_once __DIR__ . '/user/' . $endpoint . '.php';
 } elseif (strpos($path, 'conductor/') === 0) {

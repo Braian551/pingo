@@ -3,6 +3,7 @@ nixPkgs = ["...", "apache2", "php82", "php82Packages.composer"]
 
 [phases.install]
 cmds = [
+  "cd pingo/backend",
   "composer install --no-dev --optimize-autoloader",
   "mkdir -p /app/logs /app/uploads",
   "chmod 755 /app/logs /app/uploads"
@@ -15,4 +16,4 @@ cmds = [
 ]
 
 [start]
-cmd = "apache2-foreground"
+cmd = "cd pingo/backend && apache2-foreground"

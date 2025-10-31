@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["...", "apache2", "php82", "php82Packages.composer"]
+nixPkgs = ["...", "php83", "php83Packages.composer"]
 
 [phases.install]
 cmds = [
@@ -15,4 +15,4 @@ cmds = [
 ]
 
 [start]
-cmd = "apache2-foreground"
+cmd = "php -S 0.0.0.0:$PORT -t ."

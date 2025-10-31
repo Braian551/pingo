@@ -4,6 +4,7 @@ import 'package:ping_go/src/global/services/admin/admin_service.dart';
 import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:ping_go/src/widgets/dialogs/admin_dialog_helper.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:ping_go/src/core/config/app_config.dart';
 
 class ConductoresDocumentosScreen extends StatefulWidget {
   final int adminId;
@@ -1472,7 +1473,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     // Construir URL completa si es relativa
     final String fullUrl = documentUrl.startsWith('http') 
         ? documentUrl 
-        : 'http://10.0.2.2/pingo/backend/$documentUrl';
+        : '${AppConfig.baseUrl}/$documentUrl';
 
     Navigator.push(
       context,

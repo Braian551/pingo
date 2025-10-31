@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:ping_go/src/core/config/app_config.dart';
 
 class AdminService {
-  static const String _baseUrl = 'http://10.0.2.2/pingo/backend/admin';
+  static String get _baseUrl => AppConfig.adminServiceUrl;
 
   /// Obtiene estadísticas del dashboard
   static Future<Map<String, dynamic>> getDashboardStats({

@@ -9,11 +9,11 @@ class Database {
     public $conn;
 
     public function __construct() {
-        // Railway environment variables
-        $this->host = getenv('MYSQLHOST') ?: getenv('DATABASE_HOST') ?: 'localhost';
-        $this->db_name = getenv('MYSQLDATABASE') ?: getenv('DATABASE_NAME') ?: 'pingo';
-        $this->username = getenv('MYSQLUSER') ?: getenv('DATABASE_USER') ?: 'root';
-        $this->password = getenv('MYSQLPASSWORD') ?: getenv('DATABASE_PASSWORD') ?: 'root';
+        // Free SQL Database credentials
+        $this->host = 'sql10.freesqldatabase.com';
+        $this->db_name = 'sql10805022';
+        $this->username = 'sql10805022';
+        $this->password = 'BVeitwKy1q';
     }
 
     public function getConnection() {

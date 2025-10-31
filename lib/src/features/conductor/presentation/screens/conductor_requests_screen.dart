@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:http/http.dart' as http;
-import '../../../../global/config/api_config.dart';
+import '../../../../core/config/app_config.dart';
 
 class ConductorRequestsScreen extends StatefulWidget {
   final int conductorId;
@@ -47,7 +47,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
   Future<void> _loadPendingRequests() async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/conductor/get_pending_requests.php?conductor_id=${widget.conductorId}'),
+        Uri.parse('${AppConfig.baseUrl}/conductor/get_pending_requests.php?conductor_id=${widget.conductorId}'),
       );
 
       if (response.statusCode == 200) {
@@ -70,7 +70,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
   Future<void> _acceptRequest(Map<String, dynamic> request) async {
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/conductor/accept_trip_request.php'),
+        Uri.parse('${AppConfig.baseUrl}/conductor/accept_trip_request.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'solicitud_id': request['id'],

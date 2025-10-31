@@ -3,6 +3,9 @@
 
 echo "🚀 Starting Railway deployment..."
 
+# Change to backend directory
+cd pingo/backend
+
 # Install dependencies
 composer install --no-dev --optimize-autoloader
 
@@ -15,9 +18,7 @@ chmod 755 logs uploads
 # Run database migrations if database is available
 if [ -n "$MYSQLHOST" ]; then
     echo "📊 Running database migrations..."
-    cd pingo/backend
     php migrations/run_migrations.php
-    cd ../..
     echo "✅ Database migrations completed!"
 else
     echo "⚠ Database not configured yet. Run migrations manually after setup."
