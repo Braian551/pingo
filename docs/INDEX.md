@@ -3,6 +3,9 @@
 ## 🏠 **Inicio**
 - [README Principal](../README.md) - Información general del proyecto
 
+## 📋 **Requerimientos y Especificaciones**
+- [📋 Requerimientos Funcionales y No Funcionales](REQUERIMIENTOS_FUNCIONALES_NO_FUNCIONALES.md) - Especificaciones completas del sistema
+
 ## 🏗️ **Arquitectura del Sistema**
 
 ### 📋 **Documentos Principales**
@@ -32,6 +35,8 @@
 - [🚨 Error Mapbox SDK](SOLUCION_MAPBOX_ERROR.md)
 - [🔍 Resumen Ejecutivo Mapbox](mapbox/RESUMEN_EJECUTIVO.md)
 
+## 🚗 **Conductor**
+
 ## 👤 **Usuario y Autenticación**
 
 ### 📱 **Interfaz de Usuario**
@@ -45,6 +50,12 @@
 - [✅ Checklist](user/CHECKLIST.md)
 - [🔄 Cambios en UX](user/NUEVA_EXPERIENCIA_USUARIO.md)
 - [📊 Resumen de Cambios](user/RESUMEN_CAMBIOS.md)
+
+## 🚕 **Sistema de Viajes**
+
+### 💰 **Precios y Cotizaciones**
+- [💰 Sistema de Precios](IMPLEMENTACION_COMPLETADA_SISTEMA_PRECIOS.md)
+- [📱 Sistema Doble Pantalla](SISTEMA_PRECIOS_DOBLE_PANTALLA.md)
 
 ## 🚗 **Conductor**
 
@@ -96,6 +107,7 @@
 ## 🔧 **Desarrollo y Deployment**
 
 ### 🚀 **Deployment**
+- [🚀 Guía de Despliegue](DEPLOYMENT.md) - Configuración completa del despliegue
 - **Frontend**: Build manual (APK/AAB)
 - **Backend**: Railway (https://pinggo-backend-production.up.railway.app)
 - **Base de datos**: MySQL en Railway
