@@ -35,11 +35,6 @@ flutter pub get
 - ✅ **TomTom**: Token configurado (opcional)
 - ✅ **Nominatim**: Sin configuración requerida
 
-### 3. **Configurar Firebase (Opcional)**
-- ✅ **Firebase SDK**: Configurado en `android/`
-- ✅ **Keystore**: `android/release-keystore.jks` (contraseña: `Braian8052`)
-- 🔄 **Token CI**: Pendiente (ver sección CI/CD)
-
 ### 4. **Ejecutar**
 ```bash
 flutter run
@@ -111,7 +106,6 @@ docs/                        # Documentación completa
 - [✅ Implementación Completada](docs/mapbox/IMPLEMENTACION_COMPLETADA.md)
 - [🚨 Solución Error Mapbox](docs/SOLUCION_MAPBOX_ERROR.md)
 - [🎨 Mejoras UI Registro](docs/MEJORAS_UI_REGISTRO.md)
-- [🚀 Firebase CI/CD Setup](docs/FIREBASE_CI_CD_SETUP.md)
 
 ## 🤝 **Contribuir**
 
@@ -120,40 +114,6 @@ docs/                        # Documentación completa
 3. Commit cambios (`git commit -am 'Agrega nueva funcionalidad'`)
 4. Push (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
-
-## � **CI/CD - Despliegue Automático**
-
-### ✅ **Configuración Lista**
-- ✅ **GitHub Actions**: Workflow creado (`.github/workflows/firebase-deploy.yml`)
-- ✅ **Firebase SDK**: Configurado en Android
-- ✅ **Keystore**: Configurado para builds firmados
-
-### 🔑 **Configurar Secretos en GitHub**
-
-1. **Generar Token Firebase CI** (en tu máquina local):
-   ```bash
-   # Instalar Firebase CLI (si no lo tienes)
-   npm install -g firebase-tools
-   
-   # Generar token (abre navegador para autenticación)
-   firebase login:ci
-   ```
-
-2. **Agregar Secretos en GitHub**:
-   - Ve a: `Repositorio → Settings → Secrets and variables → Actions`
-   - **FIREBASE_TOKEN**: El token generado arriba
-   - **FIREBASE_APP_ID**: ID de tu app Firebase (ej: `1:123456789:android:abc123def456`)
-
-### 🎯 **Cómo Funciona**
-- **Push a `main`**: Se ejecuta automáticamente
-- **Build APK + AAB**: Ambos formatos generados
-- **Despliegue**: Subido a Firebase App Distribution
-- **Testers**: Grupo "testers" recibe notificaciones
-
-### 📱 **Distribución**
-- **APK**: Para tests internos rápidos
-- **AAB**: Para Google Play Store
-- **Grupos**: Configurable en Firebase Console
 
 ## �📄 **Licencia**
 
