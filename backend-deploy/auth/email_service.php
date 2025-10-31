@@ -48,7 +48,7 @@ try {
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
     $mail->Username = 'braianoquendurango@gmail.com';
-    $mail->Password = 'nvok ghfu usmp apmc';
+    $mail->Password = 'nvok ghfu usmp apmc'; // Usar contraseña de aplicación, no la contraseña normal
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
@@ -64,6 +64,7 @@ try {
     } else {
         throw new Exception("Error al enviar email: " . $mail->ErrorInfo);
     }
+
 } catch (Exception $e) {
     http_response_code(500);
     sendJsonResponse(false, 'Error: ' . $e->getMessage());
