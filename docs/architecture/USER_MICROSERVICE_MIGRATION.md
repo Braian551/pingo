@@ -357,7 +357,6 @@ test('UserRemoteDataSource should register user successfully', () async {
 8. **Dockerización**
    - Dockerfile por servicio
    - docker-compose.yml
-   - CI/CD con GitHub Actions
 
 9. **Observabilidad**
    - Logging centralizado (ELK Stack)

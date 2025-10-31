@@ -127,7 +127,7 @@ Migra a microservicios cuando detectes estas señales:
   - `POST /notifications/send-email`
   - `POST /notifications/send-sms`
 - **Base de datos**: MongoDB (logs de notificaciones)
-- **Integración**: Firebase Cloud Messaging, SendGrid, Twilio
+- **Integración**: SendGrid, Twilio (notificaciones push vía servicios alternativos)
 - **Stack sugerido**: Node.js (manejo asíncrono)
 
 #### 7. **Admin Service** (Panel de Administración)

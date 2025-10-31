@@ -323,7 +323,6 @@ class _HomeScreenState extends State<HomeScreen> {
 - Dockerizar servicios
 - Event-driven architecture entre servicios
 - Observabilidad (Prometheus + Grafana)
-- CI/CD con GitHub Actions
 
 ---
 
