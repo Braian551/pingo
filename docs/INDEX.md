@@ -3,7 +3,25 @@
 ## 🏠 **Inicio**
 - [README Principal](../README.md) - Información general del proyecto
 
-## 📋 **Requerimientos y Especificaciones**
+## 🚀 **Configuración y Despliegue**
+
+### ⚡ **Inicio Rápido**
+- [⚡ Guía Rápida de Entornos](GUIA_RAPIDA_ENTORNOS.md) - Cambio rápido Local ↔ Producción
+
+### 🏠 **Desarrollo Local**
+- [🔧 Configuración de Entornos](CONFIGURACION_ENTORNOS.md) - Guía completa Local vs Producción
+- [💻 Setup con Laragon](SETUP_LARAGON.md) - Guía paso a paso para desarrollo local
+- [📋 Resumen de Cambios Local](RESUMEN_CAMBIOS_LOCAL.md) - Documentación de cambios realizados
+
+### 🚀 **Scripts de Configuración**
+- [📜 setup_local.ps1](../setup_local.ps1) - Script PowerShell para configurar Laragon
+- [📜 setup_local.bat](../setup_local.bat) - Script Batch alternativo
+
+### ☁️ **Producción**
+- [🚀 Guía de Despliegue](DEPLOYMENT.md) - Despliegue a Railway/producción
+- [📋 Comandos Útiles](COMANDOS_UTILES.md) - Comandos frecuentes
+
+## �📋 **Requerimientos y Especificaciones**
 - [📋 Requerimientos Funcionales y No Funcionales](REQUERIMIENTOS_FUNCIONALES_NO_FUNCIONALES.md) - Especificaciones completas del sistema
 
 ## 🏗️ **Arquitectura del Sistema**

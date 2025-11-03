@@ -54,39 +54,12 @@ try {
         throw new Exception("PHPMailer no está disponible");
     }
 
-    // MODO PRUEBAS: Simular envío exitoso para testing
-    // En producción, descomenta las líneas de PHPMailer abajo
-    error_log("Email simulation - To: $email, Code: $code, User: $userName");
-    sendJsonResponse(true, 'Codigo enviado correctamente (modo pruebas)');
-
-    /*
-    // CONFIGURACIÓN REAL PARA PRODUCCIÓN:
-    $mail = new PHPMailer(true);
-
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = 'braianoquendurango@gmail.com';
-    $mail->Password = 'nvok ghfu usmp apmc';
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
-
-    $mail->setFrom('braianoquendurango@gmail.com', 'PingGo');
-    $mail->addAddress($email, $userName);
-    $mail->isHTML(true);
-    $mail->Subject = 'Tu codigo de verificacion PingGo';
-    $mail->Body = "<h2>Hola $userName,</h2><p>Tu codigo de verificacion para PingGo es:</p><h1 style='color: #39FF14; font-size: 32px; text-align: center;'>$code</h1><p>Este codigo expirara en 10 minutos.</p><p>Saludos,<br>El equipo de PingGo</p>";
-    $mail->AltBody = "Hola $userName,\n\nTu codigo de verificacion para PingGo es: $code\n\nEste codigo expirara en 10 minutos.\n\nSaludos,\nEl equipo de PingGo";
-
-    if ($mail->send()) {
-        sendJsonResponse(true, 'Codigo enviado correctamente');
-    } else {
-        throw new Exception("Error al enviar email: " . $mail->ErrorInfo);
-    }
-    */
+    // Simular envío exitoso sin realmente enviar email
+    sendJsonResponse(true, 'Simulacion exitosa - Email no enviado');
 
 } catch (Exception $e) {
     error_log("Email service error: " . $e->getMessage());
     http_response_code(500);
     sendJsonResponse(false, 'Error: ' . $e->getMessage());
 }
+?>

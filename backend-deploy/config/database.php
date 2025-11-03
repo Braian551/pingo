@@ -9,11 +9,14 @@ class Database {
     public $conn;
 
     public function __construct() {
-        // Free SQL Database credentials
-        $this->host = 'sql10.freesqldatabase.com';
-        $this->db_name = 'sql10805022';
-        $this->username = 'sql10805022';
-        $this->password = 'BVeitwKy1q';
+        // Configuración local Laragon
+        $this->host = 'localhost';
+        $this->db_name = 'pingo';
+        $this->username = 'root';
+        $this->password = 'root';
+        
+        // Puerto por defecto de MySQL en Laragon (3306)
+        // Si necesitas especificar el puerto: 'localhost:3306'
     }
 
     public function getConnection() {

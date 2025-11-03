@@ -41,27 +41,52 @@ Backend (PHP + MySQL - Railway)
 
 ## 🚀 Inicio Rápido
 
-### 1. **Instalar Dependencias**
+### Opción A: Desarrollo Local con Laragon (Recomendado)
+
+#### 1. **Configurar Backend Local**
+```bash
+# Ejecutar script automático
+.\setup_local.ps1
+```
+
+O manualmente:
+1. Copia `backend-deploy` a `C:\laragon\www\ping_go\`
+2. Crea base de datos `pingo` en MySQL
+3. Importa `basededatos (2).sql`
+4. Verifica: `http://localhost/ping_go/backend-deploy/health.php`
+
+**Documentación completa**: [`docs/SETUP_LARAGON.md`](docs/SETUP_LARAGON.md)
+
+#### 2. **Configuración de Entorno**
+Los archivos ya están configurados para desarrollo local:
+- `backend-deploy/config/database.php` → localhost/root/root/pingo
+- `lib/src/core/config/app_config.dart` → Environment.development
+- `lib/src/global/config/api_config.dart` → http://localhost/ping_go/backend-deploy
+
+#### 3. **Ejecutar la App**
 ```bash
 flutter pub get
-```
-
-### 2. **Configurar APIs y Backend**
-- ✅ **Mapbox**: Token configurado en `lib/src/core/config/env_config.dart`
-- ✅ **TomTom**: Token configurado (opcional)
-- ✅ **Nominatim**: Sin configuración requerida
-- ✅ **Backend**: URLs configuradas en `lib/src/core/constants/app_constants.dart`
-- ✅ **Base de datos**: Conexión MySQL en Railway
-
-### 3. **Ejecutar**
-```bash
-# Desarrollo
 flutter run
-
-# Build de producción
-flutter build apk --release
-flutter build appbundle --release
 ```
+
+### Opción B: Usar Backend en Producción (Railway)
+
+#### 1. **Cambiar a Modo Producción**
+Edita `lib/src/core/config/app_config.dart`:
+```dart
+static const Environment environment = Environment.production;
+```
+
+#### 2. **Ejecutar**
+```bash
+flutter pub get
+flutter run
+```
+
+### 📚 Documentación de Configuración
+- **Guía completa de entornos**: [`docs/CONFIGURACION_ENTORNOS.md`](docs/CONFIGURACION_ENTORNOS.md)
+- **Setup con Laragon**: [`docs/SETUP_LARAGON.md`](docs/SETUP_LARAGON.md)
+- **Guía de despliegue**: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 
 ## 📊 **APIs y Servicios**
 
@@ -75,7 +100,41 @@ flutter build appbundle --release
 | **MySQL Database** | - | ✅ Activo | sql10.freesqldatabase.com |
 | **Email Service** | - | ✅ Activo | Gmail SMTP |
 
-### 🔧 **URLs de Producción**
+### 🔧 **Configuración de Entornos**
+
+#### **Entorno LOCAL (Laragon)**
+```dart
+// lib/src/core/config/app_config.dart
+static const Environment environment = Environment.development;
+
+// lib/src/global/config/api_config.dart
+static const String baseUrl = 'http://localhost/ping_go/backend-deploy';
+
+// backend-deploy/config/database.php
+$this->host = 'localhost';
+$this->db_name = 'pingo';
+$this->username = 'root';
+$this->password = 'root';
+```
+
+#### **Entorno PRODUCCIÓN (Railway)**
+```dart
+// lib/src/core/config/app_config.dart
+static const Environment environment = Environment.production;
+
+// lib/src/global/config/api_config.dart
+static const String baseUrl = 'https://pinggo-backend-production.up.railway.app';
+
+// backend-deploy/config/database.php
+$this->host = 'sql10.freesqldatabase.com';
+$this->db_name = 'sql10805022';
+$this->username = 'sql10805022';
+$this->password = 'BVeitwKy1q';
+```
+
+**Ver documentación completa**: [`docs/CONFIGURACION_ENTORNOS.md`](docs/CONFIGURACION_ENTORNOS.md)
+
+### 🔧 **URLs de Producción (Railway)**
 ```dart
 // Backend URLs (lib/src/core/constants/app_constants.dart)
 const String baseUrl = 'https://pinggo-backend-production.up.railway.app';

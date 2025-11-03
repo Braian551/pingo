@@ -10,7 +10,9 @@ echo "   VERIFICACIÓN DE ENDPOINT: get_historial.php   \n";
 echo "=================================================\n\n";
 
 // Configuración
-$base_url = 'http://localhost/pingo/backend/conductor';
+// LOCAL: 'http://localhost/ping_go/backend-deploy/conductor'
+// PRODUCCIÓN: 'https://pinggo-backend-production.up.railway.app/conductor'
+$base_url = 'http://localhost/ping_go/backend-deploy/conductor';
 $conductor_id = 7;
 $page = 1;
 $limit = 20;

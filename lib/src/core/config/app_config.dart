@@ -21,20 +21,22 @@
 /// static const conductorServiceUrl = '$apiGateway/conductor/v1';
 /// ```
 class AppConfig {
-  // Ambiente actual
-  static const Environment environment = Environment.production;
+  // Ambiente actual - CAMBIAR AQUÍ PARA ALTERNAR ENTRE LOCAL Y PRODUCCIÓN
+  static const Environment environment = Environment.development;
 
   // URLs base según ambiente
   static String get baseUrl {
     switch (environment) {
       case Environment.development:
-        // Para emulador Android usa 10.0.2.2 en lugar de localhost
-        // Para dispositivo físico usa la IP de tu máquina (ej: 192.168.1.X)
-        return 'http://10.0.2.2/pingo/backend'; // Laragon local desde emulador
+        // DESARROLLO LOCAL CON LARAGON
+        // Para navegador web o depuración desde VS Code: localhost
+        // Para emulador Android: 10.0.2.2 (IMPORTANTE: usar esta para emulador)
+        // Para dispositivo físico: usar IP de tu máquina (ej: 192.168.1.X)
+        return 'http://10.0.2.2/ping_go/backend-deploy'; // Laragon local desde emulador
       case Environment.staging:
         return 'https://staging-api.pingo.com';
       case Environment.production:
-        // Railway backend URL - actualizada
+        // Railway backend URL - PRODUCCIÓN
         return 'https://pinggo-backend-production.up.railway.app';
     }
   }

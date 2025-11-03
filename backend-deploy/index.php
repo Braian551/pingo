@@ -38,8 +38,12 @@ if ($path === '') {
     require_once __DIR__ . '/pricing/' . $endpoint . '.php';
 } elseif ($path === 'verify_system') {
     require_once __DIR__ . '/verify_system.php';
+} elseif ($path === 'health') {
+    require_once __DIR__ . '/health.php';
+} elseif ($path === 'check_phpmailer') {
+    require_once __DIR__ . '/check_phpmailer.php';
 } else {
     http_response_code(404);
-    echo json_encode(['error' => 'Endpoint not found']);
+    echo json_encode(['error' => 'Endpoint not found', 'path' => $path]);
 }
 ?>

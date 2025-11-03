@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 void main() async {
-  const String baseUrl = 'https://pinggo-backend-production.up.railway.app';
+  // Cambiar según el entorno:
+  // LOCAL: 'http://localhost/ping_go/backend-deploy'
+  // PRODUCCIÓN: 'https://pinggo-backend-production.up.railway.app'
+  const String baseUrl = 'http://localhost/ping_go/backend-deploy';
 
   print('🧪 Testing PingGo Backend API');
   print('=' * 50);
