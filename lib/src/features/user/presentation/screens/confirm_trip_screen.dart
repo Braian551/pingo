@@ -4,6 +4,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ping_go/src/global/services/mapbox_service.dart';
 import 'package:ping_go/src/core/config/env_config.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
+import '../../services/trip_request_service.dart';
 
 /// Pantalla de confirmación de viaje
 /// Muestra detalles del viaje, precio estimado y opciones de vehículo
@@ -113,22 +116,116 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
     });
   }
 
-  void _confirmTrip() {
-    // Navegar directamente sin verificar método de pago por ahora
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Viaje solicitado'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
+  void _confirmTrip() async {
+    // Obtener argumentos de la ruta
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final pickupAddress = args?['pickupAddress'] as String? ?? 'Origen';
+    final destinationAddress = args?['destinationAddress'] as String? ?? 'Destino';
+    
+    // Obtener ID del usuario
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.currentUser?.id;
+    
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: Usuario no identificado'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Mostrar loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Creando solicitud...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-    
-    // Volver al home después de 1 segundo
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        Navigator.popUntil(context, ModalRoute.withName('/home_user'));
+
+    try {
+      // Crear solicitud de viaje
+      final result = await TripRequestService.createTripRequest(
+        userId: userId,
+        latitudOrigen: _pickupLocation!.latitude,
+        longitudOrigen: _pickupLocation!.longitude,
+        direccionOrigen: pickupAddress,
+        latitudDestino: _destinationLocation!.latitude,
+        longitudDestino: _destinationLocation!.longitude,
+        direccionDestino: destinationAddress,
+        tipoServicio: 'viaje',
+        tipoVehiculo: _selectedVehicleType,
+        distanciaKm: _estimatedDistance,
+        duracionMinutos: _estimatedTime,
+        precioEstimado: _estimatedPrice,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context); // Cerrar loading
+
+      if (result['success'] == true) {
+        final solicitudId = result['solicitud_id'];
+        
+        // Navegar a pantalla de espera
+        final resultWaiting = await Navigator.pushNamed(
+          context,
+          '/user/waiting_driver',
+          arguments: {
+            'solicitud_id': solicitudId,
+            'cliente_id': userId,
+            'direccion_origen': pickupAddress,
+            'direccion_destino': destinationAddress,
+          },
+        );
+
+        // Si volvió de la pantalla de espera, regresar al home
+        if (mounted && resultWaiting != null) {
+          Navigator.popUntil(context, (route) => route.isFirst);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Error al crear solicitud'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Cerrar loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override

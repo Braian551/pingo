@@ -174,4 +174,65 @@ class TripRequestService {
       return null;
     }
   }
+
+  /// Obtener estado completo del viaje con info del conductor
+  static Future<Map<String, dynamic>> getTripStatus({
+    required int solicitudId,
+  }) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/user/get_trip_status.php?solicitud_id=$solicitudId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Error al obtener estado: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      print('❌ Error obteniendo estado: $e');
+      return {
+        'success': false,
+        'message': 'Error de conexión: $e',
+      };
+    }
+  }
+
+  /// Cancelar solicitud con parámetros completos
+  static Future<Map<String, dynamic>> cancelTripRequestWithReason({
+    required int solicitudId,
+    required int clienteId,
+    String motivo = 'Cliente canceló',
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/user/cancel_trip_request.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'solicitud_id': solicitudId,
+          'cliente_id': clienteId,
+          'motivo': motivo,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Error del servidor: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      print('❌ Error cancelando solicitud: $e');
+      return {
+        'success': false,
+        'message': 'Error de conexión: $e',
+      };
+    }
+  }
 }

@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:ui';
+import 'package:flutter/material.dart';
 import '../../models/conductor_profile_model.dart';
 
 /// Tipo de acción requerida para completar el perfil
@@ -72,159 +73,194 @@ class ProfileIncompleteAlert extends StatelessWidget {
     final buttonText = _getButtonText();
     final title = _getTitle();
     final message = _getMessage();
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFFFFFF00).withOpacity(0.5),
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFFFF00).withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFF00).withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.warning_rounded,
-                    color: Color(0xFFFFFF00),
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  message,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (missingItems.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Pendiente:',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ...missingItems.take(3).map((item) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    size: 6,
-                                    color: Color(0xFFFFFF00),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ],
-                    ),
-                  ),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: 24,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1A1A1A).withOpacity(0.95),
+                  const Color(0xFF0D0D0D).withOpacity(0.95),
                 ],
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    if (onDismiss != null)
-                      Expanded(
-                        child: TextButton(
-                          onPressed: onDismiss,
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: Colors.white.withOpacity(0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Después',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (onDismiss != null) const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: onComplete,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFFFFF00),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          buttonText,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: const Color(0xFFFFFF00).withOpacity(0.4),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFFFF00).withOpacity(0.2),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(isSmallScreen ? 18 : 22),
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFFFFF00).withOpacity(0.25),
+                          const Color(0xFFFFFF00).withOpacity(0.1),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.warning_rounded,
+                      color: const Color(0xFFFFFF00),
+                      size: isSmallScreen ? 44 : 52,
+                    ),
+                  ),
+                  SizedBox(height: isSmallScreen ? 18 : 24),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isSmallScreen ? 22 : 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 10 : 14),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: isSmallScreen ? 14 : 16,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (missingItems.isNotEmpty) ...[
+                    SizedBox(height: isSmallScreen ? 14 : 18),
+                    Container(
+                      padding: EdgeInsets.all(isSmallScreen ? 14 : 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Pendiente:',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ...missingItems.take(3).map((item) => Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.circle,
+                                      size: 6,
+                                      color: Color(0xFFFFFF00),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: isSmallScreen ? 20 : 28),
+                  Row(
+                    children: [
+                      if (onDismiss != null)
+                        Expanded(
+                          child: TextButton(
+                            onPressed: onDismiss,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: isSmallScreen ? 14 : 16,
+                              ),
+                              backgroundColor: Colors.white.withOpacity(0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Después',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (onDismiss != null) const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onComplete,
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 14 : 16,
+                            ),
+                            backgroundColor: const Color(0xFFFFFF00),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 8,
+                            shadowColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                          ),
+                          child: Text(
+                            buttonText,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
+      ),
     );
   }
 
@@ -320,132 +356,168 @@ class DocumentExpiryAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: isExpired
-                  ? Colors.red.withOpacity(0.5)
-                  : Colors.orange.withOpacity(0.5),
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: 24,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1A1A1A).withOpacity(0.95),
+                  const Color(0xFF0D0D0D).withOpacity(0.95),
+                ],
               ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    isExpired ? Icons.error_rounded : Icons.warning_rounded,
-                    color: isExpired ? Colors.red : Colors.orange,
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isExpired ? 'Documento Vencido' : 'Documento por Vencer',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  isExpired
-                      ? 'Tu $documentName ha vencido. No podrás recibir viajes hasta renovarlo.'
-                      : 'Tu $documentName vence en $daysUntilExpiry días. Renuévalo pronto.',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'Vence: ${expiryDate.day}/${expiryDate.month}/${expiryDate.year}',
-                    style: TextStyle(
-                      color: isExpired ? Colors.red : Colors.orange,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    if (onDismiss != null && !isExpired)
-                      Expanded(
-                        child: TextButton(
-                          onPressed: onDismiss,
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: Colors.white.withOpacity(0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Después',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (onDismiss != null && !isExpired) const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: onRenew,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: isExpired ? Colors.red : const Color(0xFFFFFF00),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Renovar Ahora',
-                          style: TextStyle(
-                            color: isExpired ? Colors.white : Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: isExpired
+                    ? Colors.red.withOpacity(0.4)
+                    : Colors.orange.withOpacity(0.4),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.25),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(isSmallScreen ? 18 : 22),
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          (isExpired ? Colors.red : Colors.orange).withOpacity(0.25),
+                          (isExpired ? Colors.red : Colors.orange).withOpacity(0.1),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isExpired ? Icons.error_rounded : Icons.warning_rounded,
+                      color: isExpired ? Colors.red : Colors.orange,
+                      size: isSmallScreen ? 44 : 52,
+                    ),
+                  ),
+                  SizedBox(height: isSmallScreen ? 18 : 24),
+                  Text(
+                    isExpired ? 'Documento Vencido' : 'Documento por Vencer',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isSmallScreen ? 22 : 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 10 : 14),
+                  Text(
+                    isExpired
+                        ? 'Tu $documentName ha vencido. No podrás recibir viajes hasta renovarlo.'
+                        : 'Tu $documentName vence en $daysUntilExpiry días. Renuévalo pronto.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: isSmallScreen ? 14 : 16,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 10 : 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      'Vence: ${expiryDate.day}/${expiryDate.month}/${expiryDate.year}',
+                      style: TextStyle(
+                        color: isExpired ? Colors.red : Colors.orange,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: isSmallScreen ? 20 : 28),
+                  Row(
+                    children: [
+                      if (onDismiss != null && !isExpired)
+                        Expanded(
+                          child: TextButton(
+                            onPressed: onDismiss,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: isSmallScreen ? 14 : 16,
+                              ),
+                              backgroundColor: Colors.white.withOpacity(0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Después',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (onDismiss != null && !isExpired) const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onRenew,
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 14 : 16,
+                            ),
+                            backgroundColor: isExpired ? Colors.red : const Color(0xFFFFFF00),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 8,
+                            shadowColor: (isExpired ? Colors.red : const Color(0xFFFFFF00)).withOpacity(0.5),
+                          ),
+                          child: Text(
+                            'Renovar Ahora',
+                            style: TextStyle(
+                              color: isExpired ? Colors.white : Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
+      ),
     );
   }
 
@@ -494,52 +566,136 @@ class ConfirmationAlert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = accentColor ?? const Color(0xFFFFFF00);
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.98),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(color: Colors.white, fontSize: 24),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: 24,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1A1A1A).withOpacity(0.95),
+                  const Color(0xFF0D0D0D).withOpacity(0.95),
+                ],
               ),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 1.5,
               ),
-              const SizedBox(height: 24),
-              Row(
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (cancelText != null)
-                    Expanded(
-                      child: TextButton(
-                        onPressed: onCancel ?? () => Navigator.of(context).pop(),
-                        child: Text(cancelText!, style: const TextStyle(color: Colors.white70)),
+                  if (icon != null) ...[
+                    Container(
+                      padding: EdgeInsets.all(isSmallScreen ? 18 : 22),
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          colors: [
+                            color.withOpacity(0.25),
+                            color.withOpacity(0.1),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        color: color,
+                        size: isSmallScreen ? 44 : 52,
                       ),
                     ),
-                  if (cancelText != null) const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onConfirm,
-                      style: ElevatedButton.styleFrom(backgroundColor: color),
-                      child: Text(confirmText, style: const TextStyle(color: Colors.black)),
+                    SizedBox(height: isSmallScreen ? 18 : 24),
+                  ],
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isSmallScreen ? 22 : 26,
+                      fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 10 : 14),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: isSmallScreen ? 14 : 16,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: isSmallScreen ? 20 : 28),
+                  Row(
+                    children: [
+                      if (cancelText != null)
+                        Expanded(
+                          child: TextButton(
+                            onPressed: onCancel ?? () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: isSmallScreen ? 14 : 16,
+                              ),
+                              backgroundColor: Colors.white.withOpacity(0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: Text(
+                              cancelText!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (cancelText != null) const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onConfirm,
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 14 : 16,
+                            ),
+                            backgroundColor: color,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 8,
+                            shadowColor: color.withOpacity(0.5),
+                          ),
+                          child: Text(
+                            confirmText,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -631,177 +787,213 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: 24,
+      ),
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: const Color(0xFFFFFF00).withOpacity(0.5),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFFF00).withOpacity(0.3),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 420),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF1A1A1A).withOpacity(0.95),
+                    const Color(0xFF0D0D0D).withOpacity(0.95),
+                  ],
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Timer badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _remainingSeconds <= 10
-                          ? Colors.red.withOpacity(0.2)
-                          : const Color(0xFFFFFF00).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.timer_rounded,
-                          color: _remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '$_remainingSeconds seg',
-                          style: TextStyle(
-                            color: _remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    '¡Nueva Solicitud!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Customer info
-                  _buildInfoCard(
-                    icon: Icons.person_rounded,
-                    label: 'Pasajero',
-                    value: widget.tripData['customerName'] ?? 'Cliente',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    icon: Icons.star_rounded,
-                    label: 'Calificación',
-                    value: '${widget.tripData['customerRating'] ?? '5.0'} ⭐',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    icon: Icons.location_on_rounded,
-                    label: 'Recogida',
-                    value: widget.tripData['pickupAddress'] ?? 'Calle 123',
-                    isMultiline: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    icon: Icons.flag_rounded,
-                    label: 'Destino',
-                    value: widget.tripData['destinationAddress'] ?? 'Calle 456',
-                    isMultiline: true,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildInfoCard(
-                          icon: Icons.route_rounded,
-                          label: 'Distancia',
-                          value: '${widget.tripData['distance'] ?? '5.2'} km',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInfoCard(
-                          icon: Icons.attach_money,
-                          label: 'Tarifa',
-                          value: '\$${widget.tripData['fare'] ?? '15000'}',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Action buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            widget.onReject();
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            'Rechazar',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            widget.onAccept();
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFFFFFF00),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            'Aceptar Viaje',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: const Color(0xFFFFFF00).withOpacity(0.4),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFFF00).withOpacity(0.25),
+                    blurRadius: 40,
+                    offset: const Offset(0, 10),
                   ),
                 ],
+              ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Timer badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: _remainingSeconds <= 10
+                                ? [Colors.red.withOpacity(0.3), Colors.red.withOpacity(0.15)]
+                                : [const Color(0xFFFFFF00).withOpacity(0.3), const Color(0xFFFFFF00).withOpacity(0.15)],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: (_remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00)).withOpacity(0.4),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.timer_rounded,
+                              color: _remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00),
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '$_remainingSeconds seg',
+                              style: TextStyle(
+                                color: _remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00),
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: isSmallScreen ? 18 : 24),
+                      Text(
+                        '¡Nueva Solicitud!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isSmallScreen ? 24 : 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: isSmallScreen ? 20 : 26),
+                      // Customer info
+                      _buildInfoCard(
+                        icon: Icons.person_rounded,
+                        label: 'Pasajero',
+                        value: widget.tripData['customerName'] ?? 'Cliente',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoCard(
+                        icon: Icons.star_rounded,
+                        label: 'Calificación',
+                        value: '${widget.tripData['customerRating'] ?? '5.0'} ⭐',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoCard(
+                        icon: Icons.location_on_rounded,
+                        label: 'Recogida',
+                        value: widget.tripData['pickupAddress'] ?? 'Calle 123',
+                        isMultiline: true,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoCard(
+                        icon: Icons.flag_rounded,
+                        label: 'Destino',
+                        value: widget.tripData['destinationAddress'] ?? 'Calle 456',
+                        isMultiline: true,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoCard(
+                              icon: Icons.route_rounded,
+                              label: 'Distancia',
+                              value: '${widget.tripData['distance'] ?? '5.2'} km',
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInfoCard(
+                              icon: Icons.attach_money,
+                              label: 'Tarifa',
+                              value: '\$${widget.tripData['fare'] ?? '15000'}',
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: isSmallScreen ? 20 : 28),
+                      // Action buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                widget.onReject();
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isSmallScreen ? 14 : 16,
+                                ),
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 8,
+                                shadowColor: Colors.red.withOpacity(0.5),
+                              ),
+                              child: const Text(
+                                'Rechazar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                widget.onAccept();
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isSmallScreen ? 14 : 16,
+                                ),
+                                backgroundColor: const Color(0xFFFFFF00),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 8,
+                                shadowColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                              ),
+                              child: const Text(
+                                'Aceptar Viaje',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
+      ),
     );
   }
 

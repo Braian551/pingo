@@ -6,6 +6,7 @@ import 'package:ping_go/src/features/user/presentation/screens/user_profile_scre
 import 'package:ping_go/src/features/user/presentation/screens/payment_methods_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/trip_history_screen.dart';
 import 'package:ping_go/src/features/user/presentation/screens/settings_screen.dart';
+import 'package:ping_go/src/features/user/presentation/screens/waiting_for_driver_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/register_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/phone_auth_screen.dart';
@@ -105,6 +106,19 @@ class AppRouter {
           builder: (_) => const ConfirmTripScreen(),
           settings: settings,
         );
+      case '/user/waiting_driver':
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (_) => WaitingForDriverScreen(
+              solicitudId: args?['solicitud_id'] ?? 0,
+              clienteId: args?['cliente_id'] ?? 0,
+              direccionOrigen: args?['direccion_origen'] ?? 'Origen',
+              direccionDestino: args?['direccion_destino'] ?? 'Destino',
+            ),
+            settings: settings,
+          );
+        }
       case RouteNames.userProfile:
         return MaterialPageRoute(builder: (_) => const UserProfileScreen());
       case RouteNames.paymentMethods:
