@@ -4,12 +4,12 @@ header('Content-Type: application/json');
 
 // Datos de prueba (ajustar según tus IDs)
 $testData = [
-    'solicitud_id' => 1, // ID de una solicitud pendiente
+    'solicitud_id' => 25, // ID de una solicitud pendiente
     'conductor_id' => 7  // ID del conductor
 ];
 
 // Hacer petición al endpoint
-$ch = curl_init('http://localhost:8000/conductor/accept_trip_request.php');
+$ch = curl_init('http://localhost/ping_go/backend-deploy/conductor/accept_trip_request.php');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

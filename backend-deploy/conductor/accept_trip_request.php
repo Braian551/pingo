@@ -29,7 +29,7 @@ try {
     try {
         // Verificar que la solicitud existe y está pendiente
         $stmt = $db->prepare("
-            SELECT id, estado, usuario_id, tipo_vehiculo 
+            SELECT id, estado, cliente_id, tipo_servicio 
             FROM solicitudes_servicio 
             WHERE id = ? 
             FOR UPDATE
@@ -65,15 +65,23 @@ try {
             throw new Exception('Conductor no disponible');
         }
         
-        if ($conductor['vehiculo_tipo'] !== $solicitud['tipo_vehiculo']) {
-            throw new Exception('Tipo de vehículo no coincide');
+        // Verificar compatibilidad de vehículo según el tipo de servicio
+        // Para transporte, cualquier vehículo aprobado puede servir
+        // Para envío de paquetes, verificar tipo de vehículo si es necesario
+        if ($solicitud['tipo_servicio'] === 'envio_paquete') {
+            // Para paquetes, preferir furgonetas o carros, pero permitir motocicletas para paquetes pequeños
+            $vehiculosPermitidos = ['carro', 'furgoneta', 'motocicleta'];
+            if (!in_array($conductor['vehiculo_tipo'], $vehiculosPermitidos)) {
+                throw new Exception('Tipo de vehículo no compatible con el servicio de envío');
+            }
         }
+        // Para transporte, cualquier vehículo aprobado está bien
         
         // Actualizar la solicitud
         $stmt = $db->prepare("
             UPDATE solicitudes_servicio 
             SET estado = 'aceptada',
-                fecha_actualizacion = NOW()
+                aceptado_en = NOW()
             WHERE id = ?
         ");
         $stmt->execute([$solicitudId]);
@@ -83,7 +91,7 @@ try {
             INSERT INTO asignaciones_conductor (
                 solicitud_id, 
                 conductor_id, 
-                fecha_asignacion, 
+                asignado_en, 
                 estado
             ) VALUES (?, ?, NOW(), 'asignado')
         ");
