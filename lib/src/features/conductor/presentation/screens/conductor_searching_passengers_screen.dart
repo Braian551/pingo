@@ -587,8 +587,8 @@ class _ConductorSearchingPassengersScreenState
           // Mapa
           _buildMap(),
           
-          // Panel superior con estado
-          _buildTopPanel(),
+          // Panel superior con estado (solo cuando no hay solicitud)
+          if (_selectedRequest == null) _buildTopPanel(),
           
           // Panel inferior con solicitud (si hay)
           if (_selectedRequest != null) _buildRequestPanel(),
