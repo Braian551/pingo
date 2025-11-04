@@ -174,8 +174,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
       body: Container(
-    
-        color: const Color(0xFF0A0A0A),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF1A1A1A),
+              const Color(0xFF0A0A0A),
+              const Color(0xFF000000),
+            ],
+          ),
+        ),
         child: Column(
           children: [
             // Modern step header: titles + dots
