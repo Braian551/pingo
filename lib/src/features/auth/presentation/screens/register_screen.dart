@@ -172,28 +172,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: EdgeInsets.zero,
           ),
         ),
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
-          ),
-          child: const Text(
-            'Completa tu perfil',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        centerTitle: true,
       ),
       body: Container(
-        // Fondo sólido para evitar efectos visuales extraños detrás del formulario
+    
         color: const Color(0xFF0A0A0A),
         child: Column(
           children: [
