@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../screens/conductor_active_trip_screen.dart';
 
 class ViajeActivoCard extends StatelessWidget {
   final Map<String, dynamic> viaje;
@@ -149,7 +150,40 @@ class ViajeActivoCard extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // TODO: Ver detalles del viaje
+                        // Intentar navegar a la pantalla de ruta si tenemos coordenadas
+                        final origenLat = double.tryParse(viaje['latitud_origen']?.toString() ?? viaje['origen_lat']?.toString() ?? '');
+                        final origenLng = double.tryParse(viaje['longitud_origen']?.toString() ?? viaje['origen_lng']?.toString() ?? '');
+                        final destinoLat = double.tryParse(viaje['latitud_destino']?.toString() ?? viaje['destino_lat']?.toString() ?? '');
+                        final destinoLng = double.tryParse(viaje['longitud_destino']?.toString() ?? viaje['destino_lng']?.toString() ?? '');
+
+                        final conductorId = int.tryParse(viaje['conductor_id']?.toString() ?? '0') ?? 0;
+                        final solicitudId = int.tryParse(viaje['solicitud_id']?.toString() ?? viaje['id']?.toString() ?? '0');
+
+                        if (origenLat != null && origenLng != null && destinoLat != null && destinoLng != null && conductorId > 0) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ConductorActiveTripScreen(
+                                conductorId: conductorId,
+                                solicitudId: solicitudId,
+                                origenLat: origenLat,
+                                origenLng: origenLng,
+                                destinoLat: destinoLat,
+                                destinoLng: destinoLng,
+                                direccionOrigen: viaje['direccion_origen']?.toString() ?? origen,
+                                direccionDestino: viaje['direccion_destino']?.toString() ?? destino,
+                                clienteNombre: clienteNombre,
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No hay datos suficientes para navegar el viaje'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.navigation, size: 18),
                       label: const Text('Navegar'),

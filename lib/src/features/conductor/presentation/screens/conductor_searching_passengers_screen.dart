@@ -8,6 +8,7 @@ import '../../../../global/services/mapbox_service.dart';
 import '../../../../global/services/sound_service.dart';
 import '../../services/trip_request_search_service.dart';
 import '../../services/conductor_service.dart';
+import 'conductor_active_trip_screen.dart';
 
 /// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
 /// 
@@ -469,9 +470,33 @@ class _ConductorSearchingPassengersScreenState
         ),
       );
       
-      // TODO: Navegar a pantalla de viaje activo
-      // Por ahora, volver atrás
-      Navigator.pop(context, true);
+      // Navegar a la pantalla de navegación activa (ruta)
+      final origenLat = double.tryParse(_selectedRequest!['latitud_origen']?.toString() ?? '0') ?? 0;
+      final origenLng = double.tryParse(_selectedRequest!['longitud_origen']?.toString() ?? '0') ?? 0;
+      final destinoLat = double.tryParse(_selectedRequest!['latitud_destino']?.toString() ?? '0') ?? 0;
+      final destinoLng = double.tryParse(_selectedRequest!['longitud_destino']?.toString() ?? '0') ?? 0;
+
+      // Algunos backends devuelven viaje_id al aceptar
+      final viajeId = int.tryParse(result['viaje_id']?.toString() ?? '0');
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConductorActiveTripScreen(
+            conductorId: widget.conductorId,
+            solicitudId: _selectedRequest!['id'] as int,
+            viajeId: (viajeId != null && viajeId > 0) ? viajeId : null,
+            origenLat: origenLat,
+            origenLng: origenLng,
+            destinoLat: destinoLat,
+            destinoLng: destinoLng,
+            direccionOrigen: _selectedRequest!['direccion_origen'] ?? '',
+            direccionDestino: _selectedRequest!['direccion_destino'] ?? '',
+            clienteNombre: _selectedRequest!['cliente_nombre']?.toString(),
+          ),
+        ),
+      );
     } else {
       _showError(result['message'] ?? 'Error al aceptar solicitud');
     }
@@ -861,6 +886,25 @@ class _ConductorSearchingPassengersScreenState
                           _requestPanelController.forward();
                         }
                       });
+
+                      // Ajustar cámara para mostrar conductor y cliente
+                      if (_currentLocation != null) {
+                        final origin = LatLng(
+                          double.parse(request['latitud_origen'].toString()),
+                          double.parse(request['longitud_origen'].toString()),
+                        );
+                        final minLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a < b ? a : b);
+                        final maxLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a > b ? a : b);
+                        final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
+                        final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
+                        final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
+                        _mapController.fitCamera(
+                          CameraFit.bounds(
+                            bounds: bounds,
+                            padding: const EdgeInsets.only(top: 120, bottom: 300, left: 60, right: 60),
+                          ),
+                        );
+                      }
                     },
                     child: Stack(
                       alignment: Alignment.center,
