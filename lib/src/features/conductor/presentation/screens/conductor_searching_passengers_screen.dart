@@ -874,7 +874,7 @@ class _ConductorSearchingPassengersScreenState
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.navigation_rounded,
+                          Icons.directions_car,
                           color: Color(0xFFFFD700),
                           size: 26,
                         ),
