@@ -42,21 +42,6 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
             padding: EdgeInsets.zero,
           ),
         ),
-        centerTitle: true,
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
-          ),
-          child: const Text(
-            'Correo',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
