@@ -119,13 +119,13 @@ try {
     );
     
     // Usar la ubicación del conductor como referencia
-    // Crear origen cerca del conductor (mismo punto o muy cerca)
-    $latitudOrigen = $conductor['latitud_actual'];
-    $longitudOrigen = $conductor['longitud_actual'];
+    // Crear origen DENTRO del radio de búsqueda (5km)
+    $latitudOrigen = $conductor['latitud_actual'] + 0.025; // ~2.5 km hacia el norte
+    $longitudOrigen = $conductor['longitud_actual'] + 0.020; // ~2 km hacia el este
     
-    // Destino a unos 3-5 km de distancia (aproximadamente)
-    $latitudDestino = $latitudOrigen + 0.03; // ~3 km hacia el norte
-    $longitudDestino = $longitudOrigen + 0.02; // ~2 km hacia el este
+    // Destino a una distancia razonable del origen
+    $latitudDestino = $latitudOrigen + 0.035; // ~3.5 km más hacia el norte
+    $longitudDestino = $longitudOrigen + 0.030; // ~3 km más hacia el este
     
     $stmt = $db->prepare("
         INSERT INTO solicitudes_servicio (
@@ -152,12 +152,12 @@ try {
         'transporte',
         $latitudOrigen,
         $longitudOrigen,
-        'Punto de Recogida - Prueba (cerca del conductor)',
+        'Punto de Recogida - Prueba (dentro de 5km)',
         $latitudDestino,
         $longitudDestino,
         'Punto de Destino - Prueba',
-        4.5, // km
-        15,  // minutos
+        7.0, // km (distancia total razonable)
+        20,  // minutos (tiempo estimado)
         'pendiente'
     ]);
     
@@ -171,7 +171,7 @@ try {
     echo "   ║ 🔑 UUID:        " . substr($uuid, 0, 18) . "...║\n";
     echo "   ║ 👤 Cliente:     {$cliente['nombre']} {$cliente['apellido']}\n";
     echo "   ║ 📞 Teléfono:    {$cliente['telefono']}     ║\n";
-    echo "   ║ 🚗 Conductor:   {$conductor['nombre']} (cerca)\n";
+    echo "   ║ 🚗 Conductor:   {$conductor['nombre']} (dentro radio)\n";
     echo "   ║                                            ║\n";
     echo "   ║ 📍 ORIGEN:                                 ║\n";
     echo "   ║    Lat: " . number_format($latitudOrigen, 4) . "                    ║\n";
@@ -181,8 +181,8 @@ try {
     echo "   ║    Lat: " . number_format($latitudDestino, 4) . "                    ║\n";
     echo "   ║    Lng: " . number_format($longitudDestino, 4) . "                   ║\n";
     echo "   ║                                            ║\n";
-    echo "   ║ 📏 Distancia: 4.5 km                       ║\n";
-    echo "   ║ ⏱️  Tiempo:    15 min                       ║\n";
+    echo "   ║ 📏 Distancia: 7.0 km                       ║\n";
+    echo "   ║ ⏱️  Tiempo:    20 min                       ║\n";
     echo "   ║ ✅ Estado:    PENDIENTE                    ║\n";
     echo "   ╚════════════════════════════════════════════╝\n";
     
@@ -191,7 +191,7 @@ try {
     // ==========================================
     echo "\n📝 PASO 5: Verificando si el conductor puede ver la solicitud...\n";
     
-    $radioKm = 10.0;
+    $radioKm = 5.0;
     
     $stmt = $db->prepare("
         SELECT 
