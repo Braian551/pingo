@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import '../../../../global/services/mapbox_service.dart';
 import '../../../../global/services/sound_service.dart';
 import '../../services/trip_request_search_service.dart';
@@ -568,6 +569,11 @@ class _ConductorSearchingPassengersScreenState
     } else {
       _showError(result['message'] ?? 'Error al rechazar solicitud');
     }
+  }
+
+  String _formatPrice(double price) {
+    final formatter = NumberFormat('#,###', 'es_CO');
+    return formatter.format(price.round());
   }
 
   @override
@@ -1270,7 +1276,7 @@ class _ConductorSearchingPassengersScreenState
                         ),
                         const SizedBox(height: 12),
                         
-                        // Header con precio y resumen estilo DiDi
+                        // Header con precio destacado estilo Uber/DiDi
                         TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0.0, end: 1.0),
                           duration: const Duration(milliseconds: 600),
@@ -1284,103 +1290,146 @@ class _ConductorSearchingPassengersScreenState
                               ),
                             );
                           },
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700),
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFFFD700).withOpacity(0.3),
-                                      blurRadius: 12,
-                                      spreadRadius: 2,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.person_pin_circle,
-                                  color: Colors.black,
-                                  size: 28,
-                                ),
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFFD700).withOpacity(0.2),
+                                  const Color(0xFFFFD700).withOpacity(0.1),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Nueva solicitud',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.3,
-                                      ),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFFFFD700).withOpacity(0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                // Precio súper destacado
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFFFFD700), Color(0xFFFFC107)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
-                                    const SizedBox(height: 6),
-                                    // Info compacta estilo DiDi: precio + distancia + tiempo
-                                    Row(
-                                      children: [
-                                        // Precio destacado
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFFFD700).withOpacity(0.4),
+                                        blurRadius: 20,
+                                        spreadRadius: 2,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '\$',
+                                        style: TextStyle(
+                                          color: Colors.black.withOpacity(0.8),
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        _formatPrice(precioEstimado),
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -1,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'COP',
+                                        style: TextStyle(
+                                          color: Colors.black.withOpacity(0.7),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Info adicional: distancia y tiempo
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Distancia
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.2),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.straighten,
                                             color: const Color(0xFFFFD700),
-                                            borderRadius: BorderRadius.circular(8),
+                                            size: 16,
                                           ),
-                                          child: Text(
-                                            '\$${precioEstimado.toStringAsFixed(0)}',
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '${distanciaKm.toStringAsFixed(1)} km',
                                             style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w800,
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    // Tiempo
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.2),
+                                          width: 1,
                                         ),
-                                        const SizedBox(width: 10),
-                                        // Distancia
-                                        Icon(
-                                          Icons.straighten,
-                                          color: Colors.white.withOpacity(0.7),
-                                          size: 14,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '${distanciaKm.toStringAsFixed(1)} km',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.9),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.schedule,
+                                            color: const Color(0xFFFFD700),
+                                            size: 16,
                                           ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        // Tiempo
-                                        Icon(
-                                          Icons.schedule,
-                                          color: Colors.white.withOpacity(0.7),
-                                          size: 14,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '$duracionMinutos min',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.9),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '$duracionMinutos min',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
