@@ -22,6 +22,9 @@ class MapProvider with ChangeNotifier {
   List<TrafficIncident> _trafficIncidents = [];
   QuotaStatus? _quotaStatus;
 
+  // Protección contra llamadas concurrentes
+  bool _isSelectingLocation = false;
+
   // Getters
   LatLng? get selectedLocation => _selectedLocation;
   String? get selectedAddress => _selectedAddress;
@@ -39,9 +42,12 @@ class MapProvider with ChangeNotifier {
   List<TrafficIncident> get trafficIncidents => _trafficIncidents;
   QuotaStatus? get quotaStatus => _quotaStatus;
 
-  /// Seleccionar ubicacin desde el mapa
+  /// Seleccionar ubicación desde el mapa
   Future<void> selectLocation(LatLng location) async {
-    _selectedLocation = location;
+    // Prevenir llamadas concurrentes
+    if (_isSelectingLocation) return;
+    
+    _isSelectingLocation = true;
     _isLoading = true;
     notifyListeners();
 
@@ -64,10 +70,11 @@ class MapProvider with ChangeNotifier {
       _selectedAddress = '${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}';
       _selectedCity = null;
       _selectedState = null;
+    } finally {
+      _isSelectingLocation = false;
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   /// Buscar dirección por texto - Mejorado para Colombia

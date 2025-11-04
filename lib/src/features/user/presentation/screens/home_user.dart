@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeUserScreen extends StatefulWidget {
   const HomeUserScreen({super.key});
@@ -25,6 +27,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
     super.initState();
     _setupAnimations();
     _loadUserData();
+    _requestLocationPermissionOnFirstRun();
   }
 
   void _setupAnimations() {
@@ -50,6 +53,72 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
     _navScaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
       CurvedAnimation(parent: _navAnimationController, curve: Curves.easeOutBack),
     );
+  }
+
+  Future<void> _requestLocationPermissionOnFirstRun() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasRequestedLocation = prefs.getBool('has_requested_location') ?? false;
+      
+      if (!hasRequestedLocation) {
+        // Esperar un poco para que la UI se cargue primero
+        await Future.delayed(const Duration(milliseconds: 1000));
+        
+        if (!mounted) return;
+        
+        // Verificar servicios de ubicación
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Activa los servicios de ubicación para usar Ping Go'),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+          await prefs.setBool('has_requested_location', true);
+          return;
+        }
+        
+        // Solicitar permisos
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        
+        if (permission == LocationPermission.denied || 
+            permission == LocationPermission.deniedForever) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Necesitamos tu ubicación para ofrecerte viajes cerca de ti'),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        } else {
+          // Permiso otorgado
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('¡Ubicación activada! Ahora puedes solicitar viajes'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        }
+        
+        // Marcar como solicitado para no volver a preguntar
+        await prefs.setBool('has_requested_location', true);
+      }
+    } catch (e) {
+      // Ignorar errores silenciosamente
+      print('Error requesting location: $e');
+    }
   }
 
   Future<void> _loadUserData() async {

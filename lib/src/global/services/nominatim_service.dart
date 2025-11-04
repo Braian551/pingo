@@ -50,7 +50,7 @@ class NominatimService {
           'Accept-Language': 'es-CO,es;q=0.9',
         },
       )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 8)); // Reducir timeout a 8 segundos
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -91,7 +91,7 @@ class NominatimService {
           'Accept-Language': 'es-CO,es;q=0.9',
         },
       )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 5)); // Reducir timeout a 5 segundos
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);

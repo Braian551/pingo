@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ping_go/src/routes/route_names.dart';
 import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/features/auth/presentation/widgets/address_step_widget.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:ping_go/src/features/map/providers/map_provider.dart';
 import 'package:ping_go/src/widgets/entrance_fader.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -27,7 +22,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   
@@ -35,12 +29,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   int _currentStep = 0;
-  
-  // Variables para almacenar la ubicación seleccionada
-  double? _selectedLat;
-  double? _selectedLng;
-  String? _selectedCity;
-  String? _selectedState;
 
   @override
   void initState() {
@@ -53,7 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _nameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -93,11 +80,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: _nameController.text,
           lastName: _lastNameController.text,
           phone: _phoneController.text,
-          address: _addressController.text,
-          latitude: _selectedLat,
-          longitude: _selectedLng,
-          city: _selectedCity,
-          state: _selectedState,
         );
 
         // Debug: imprimir respuesta para depuración
@@ -105,12 +87,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           print('Register response: $response');
         } catch (_) {}
 
-        // Consideramos el registro completado si la llamada retornó (modo dev)
+        // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('¡Registro exitoso! Redirigiendo...'),
-            backgroundColor: Colors.yellow,
-            duration: const Duration(seconds: 2),
+            content: const Text('¡Registro exitoso!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
           ),
         );
 
@@ -125,7 +107,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         } catch (_) {}
 
         await Future.delayed(const Duration(milliseconds: 1500));
-  Navigator.pushReplacementNamed(context, RouteNames.home, arguments: {'email': widget.email});
+        
+        // Navegar al splash de bienvenida
+        Navigator.pushReplacementNamed(
+          context, 
+          RouteNames.welcomeSplash,
+          arguments: {'email': widget.email},
+        );
       } catch (e) {
         // Manejar errores específicos de conexión o servidor
         String errorMessage = 'Error: $e';
@@ -164,190 +152,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF0A0A0A),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Completa tu perfil',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Modern step header: titles + dots
-          _buildStepperHeader(),
-          
-          // Contenido del formulario con espacio para crecer
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: EntranceFader(
-                delay: const Duration(milliseconds: 120),
-                child: Form(
-                  key: _formKey,
-                  child: _buildStepContent(),
-                ),
-              ),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.3),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
             ),
           ),
-          
-          // Botones fijos en la parte inferior con mejor diseño
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            onPressed: () => Navigator.pop(context),
+            padding: EdgeInsets.zero,
+          ),
+        ),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Botón Atrás mejorado
-                if (_currentStep > 0)
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _currentStep--;
-                          });
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 1.5,
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_rounded, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Atrás',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  const SizedBox(width: 0),
-                
-                // Botón Siguiente/Crear Cuenta mejorado
-                Expanded(
-                  flex: _currentStep > 0 ? 1 : 2,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : () {
-                      if (_currentStep < 3) {
-                        // Validación del paso actual
-                        if (_currentStep == 0) {
-                          if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Por favor completa todos los campos'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                        } else if (_currentStep == 1) {
-                          if (_phoneController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Por favor ingresa tu teléfono'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                        }
-                        // El paso 2 (dirección) ahora es opcional - no se valida
-
-                        setState(() { _currentStep++; });
-                        if (_currentStep == 2) {
-                          _ensureLocationPermissionAndFetch();
-                        }
-                      } else {
-                        _register();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFFF00),
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                      disabledBackgroundColor: const Color(0xFFFFFF00).withOpacity(0.5),
-                      disabledForegroundColor: Colors.black.withOpacity(0.5),
-                    ),
-                    child: _currentStep < 3
-                        ? const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Siguiente',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Icon(Icons.arrow_forward_rounded, size: 20),
-                            ],
-                          )
-                        : _isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.black,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                            : const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.check_circle_rounded, size: 20),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Crear Cuenta',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
-                              ),
+          ),
+          child: const Text(
+            'Completa tu perfil',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        // Fondo sólido para evitar efectos visuales extraños detrás del formulario
+        color: const Color(0xFF0A0A0A),
+        child: Column(
+          children: [
+            // Modern step header: titles + dots
+            _buildStepperHeader(),
+            
+            // Contenido del formulario con espacio para crecer
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                physics: const BouncingScrollPhysics(),
+                child: EntranceFader(
+                  delay: const Duration(milliseconds: 120),
+                  child: Form(
+                    key: _formKey,
+                    child: _buildStepContent(),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+            
+            // Botones fijos en la parte inferior con mejor diseño
+            _buildBottomButtons(),
+          ],
+        ),
       ),
     );
   }
@@ -359,8 +230,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       case 1:
         return _buildContactStep();
       case 2:
-        return _buildAddressStep();
-      case 3:
         return _buildSecurityStep();
       default:
         return _buildPersonalInfoStep();
@@ -368,78 +237,210 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildStepperHeader() {
-    final titles = ['Personal', 'Contacto', 'Dirección', 'Seguridad'];
+    final titles = ['Personal', 'Contacto', 'Seguridad'];
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-      ),
+      padding: const EdgeInsets.only(top: 100, left: 24, right: 24, bottom: 24),
+      // Sin degradados superpuestos para mantener un fondo limpio
+      color: Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Título del paso actual con animación
           Center(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 400),
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return FadeTransition(
                   opacity: animation,
                   child: SlideTransition(
                     position: Tween<Offset>(
-                      begin: const Offset(0.0, 0.15),
+                      begin: const Offset(0.0, 0.2),
                       end: Offset.zero,
-                    ).animate(animation),
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    )),
                     child: child,
                   ),
                 );
               },
-              child: Text(
-                titles[_currentStep],
+              child: Column(
                 key: ValueKey<int>(_currentStep),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                ),
+                children: [
+                  // Icono animado según el paso
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFFFFFF00),
+                          const Color(0xFFFFDD00),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFFF00).withOpacity(0.4),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      _getStepIcon(_currentStep),
+                      color: Colors.black,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    titles[_currentStep],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _getStepDescription(_currentStep),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 24),
           
-          // Indicador de progreso moderno y minimalista
+          // Indicador de progreso moderno y fluido
+          Stack(
+            children: [
+              // Barra de fondo
+              Container(
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              // Barra de progreso animada
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                height: 6,
+                width: MediaQuery.of(context).size.width * 
+                    ((_currentStep + 1) / titles.length) - 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFFFFF00),
+                      const Color(0xFFFFDD00),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.5),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Indicadores de paso con números
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(titles.length, (i) {
               final isActive = i == _currentStep;
               final isPassed = i < _currentStep;
               
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 350),
-                curve: Curves.easeOutCubic,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: isActive ? 40 : 10,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isActive 
-                    ? const Color(0xFFFFFF00)
-                    : isPassed 
-                      ? const Color(0xFFFFFF00).withOpacity(0.6)
-                      : Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: isActive ? [
-                    BoxShadow(
-                      color: const Color(0xFFFFFF00).withOpacity(0.3),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ] : null,
+              return Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          gradient: isActive || isPassed
+                              ? LinearGradient(
+                                  colors: [
+                                    const Color(0xFFFFFF00),
+                                    const Color(0xFFFFDD00),
+                                  ],
+                                )
+                              : null,
+                          color: !isActive && !isPassed 
+                              ? Colors.white.withOpacity(0.1)
+                              : null,
+                          shape: BoxShape.circle,
+                          border: isActive
+                              ? Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                )
+                              : null,
+                          boxShadow: isActive || isPassed ? [
+                            BoxShadow(
+                              color: const Color(0xFFFFFF00).withOpacity(0.3),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            ),
+                          ] : null,
+                        ),
+                        child: Center(
+                          child: isPassed
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  color: Colors.black,
+                                  size: 18,
+                                )
+                              : Text(
+                                  '${i + 1}',
+                                  style: TextStyle(
+                                    color: isActive || isPassed 
+                                        ? Colors.black 
+                                        : Colors.white.withOpacity(0.5),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        titles[i],
+                        style: TextStyle(
+                          color: isActive 
+                              ? Colors.white 
+                              : isPassed
+                                  ? Colors.white.withOpacity(0.7)
+                                  : Colors.white.withOpacity(0.4),
+                          fontSize: 11,
+                          fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -449,169 +450,289 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildAddressStep() {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        // Mensaje informativo de que es opcional
-        Container(
-          padding: const EdgeInsets.all(14),
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.blue.withOpacity(0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.blue,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Este paso es opcional. Puedes añadir tu dirección ahora o saltarlo.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 560,
-          child: ChangeNotifierProvider(
-            create: (_) => MapProvider(),
-            child: AddressStepWidget(
-              addressController: _addressController,
-              onLocationSelected: (data) {
-                setState(() {
-                  _addressController.text = data['address'] ?? _addressController.text;
-                  _selectedLat = (data['lat'] as double?);
-                  _selectedLng = (data['lon'] as double?);
-                  _selectedCity = data['city'] as String?;
-                  _selectedState = data['state'] as String?;
-                });
-              },
-              onConfirmed: () {
-                // Avanzar al siguiente paso automáticamente
-                setState(() {
-                  if (_currentStep < 3) _currentStep++;
-                });
-              },
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Future<void> _ensureLocationPermissionAndFetch() async {
-    try {
-      // Primero verificar que los servicios de localización del dispositivo estén activos
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Activa la ubicación del dispositivo para autocompletar tu dirección'),
-          backgroundColor: Colors.orange,
-        ));
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Permiso de ubicación denegado. Actívalo en ajustes para autocompletar.'),
-          backgroundColor: Colors.orange,
-        ));
-        return;
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Permiso de ubicación denegado permanentemente. Habilítalo manualmente en ajustes.'),
-          backgroundColor: Colors.orange,
-        ));
-        return;
-      }
-
-      // Permiso otorgado
-      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-      final prov = Provider.of<MapProvider>(context, listen: false);
-      final latLng = LatLng(pos.latitude, pos.longitude);
-      prov.setCurrentLocation(latLng);
-      // Seleccionar para trigger reverse geocode y rellenar el campo
-      await prov.selectLocation(latLng);
-      setState(() {
-        _addressController.text = prov.selectedAddress ?? _addressController.text;
-        _selectedLat = pos.latitude;
-        _selectedLng = pos.longitude;
-        _selectedCity = prov.selectedCity;
-        _selectedState = prov.selectedState;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Ubicación actual: ${pos.latitude.toStringAsFixed(6)}, ${pos.longitude.toStringAsFixed(6)}'),
-        backgroundColor: Colors.yellow,
-        duration: const Duration(seconds: 2),
-      ));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('No se pudo obtener la ubicación: $e'),
-        backgroundColor: Colors.red,
-      ));
+  IconData _getStepIcon(int step) {
+    switch (step) {
+      case 0:
+        return Icons.person_rounded;
+      case 1:
+        return Icons.phone_rounded;
+      case 2:
+        return Icons.lock_rounded;
+      default:
+        return Icons.person_rounded;
     }
   }
 
+  String _getStepDescription(int step) {
+    switch (step) {
+      case 0:
+        return 'Información básica sobre ti';
+      case 1:
+        return 'Cómo contactarte';
+      case 2:
+        return 'Protege tu cuenta';
+      default:
+        return '';
+    }
+  }
+
+  Widget _buildBottomButtons() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            Colors.black.withOpacity(0.9),
+            Colors.black,
+          ],
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withOpacity(0.05),
+            width: 1,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Botón Atrás con efecto glass
+            if (_currentStep > 0)
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.08),
+                        Colors.white.withOpacity(0.04),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _currentStep--;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white.withOpacity(0.9),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Atrás',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              const SizedBox(width: 0),
+            
+            // Botón Siguiente/Crear Cuenta con gradiente
+            Expanded(
+              flex: _currentStep > 0 ? 1 : 2,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: _isLoading
+                        ? [
+                            const Color(0xFFFFFF00).withOpacity(0.5),
+                            const Color(0xFFFFDD00).withOpacity(0.5),
+                          ]
+                        : [
+                            const Color(0xFFFFFF00),
+                            const Color(0xFFFFDD00),
+                          ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: !_isLoading ? [
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.4),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 4),
+                    ),
+                  ] : [],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _isLoading ? null : () {
+                      if (_currentStep < 2) {
+                        // Validación del paso actual
+                        if (_currentStep == 0) {
+                          if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Por favor completa todos los campos'),
+                                backgroundColor: Colors.red.shade600,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                        } else if (_currentStep == 1) {
+                          if (_phoneController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Por favor ingresa tu teléfono'),
+                                backgroundColor: Colors.red.shade600,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                        }
+
+                        setState(() { _currentStep++; });
+                      } else {
+                        _register();
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Center(
+                      child: _currentStep < 2
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Siguiente',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.black,
+                                  size: 20,
+                                ),
+                              ],
+                            )
+                          : _isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_rounded,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      'Crear Cuenta',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPersonalInfoStep() {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        _buildModernTextField(
-          controller: _nameController,
-          label: 'Nombre',
-          icon: Icons.person_rounded,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu nombre';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
-        _buildModernTextField(
-          controller: _lastNameController,
-          label: 'Apellido',
-          icon: Icons.person_outline_rounded,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu apellido';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 40),
-      ],
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 500),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: Column(
+              children: [
+                const SizedBox(height: 32),
+                _buildModernTextField(
+                  controller: _nameController,
+                  label: 'Nombre',
+                  icon: Icons.person_rounded,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu nombre';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                _buildModernTextField(
+                  controller: _lastNameController,
+                  label: 'Apellido',
+                  icon: Icons.person_outline_rounded,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu apellido';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -624,246 +745,277 @@ class _RegisterScreenState extends State<RegisterScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-        ),
-      ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-        ),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(
-            color: Colors.white.withOpacity(0.6),
-            fontSize: 16,
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 400),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.95 + (0.05 * value),
+          child: Opacity(
+            opacity: value,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.08),
+                    Colors.white.withOpacity(0.04),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: TextFormField(
+                controller: controller,
+                keyboardType: keyboardType,
+                obscureText: obscureText,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
+                decoration: InputDecoration(
+                  labelText: label,
+                  labelStyle: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  prefixIcon: Container(
+                    margin: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFFFFF00),
+                          const Color(0xFFFFDD00),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFFF00).withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                  suffixIcon: suffixIcon,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                validator: validator,
+              ),
+            ),
           ),
-          prefixIcon: Icon(
-            icon,
-            color: const Color(0xFFFFFF00),
-            size: 22,
-          ),
-          suffixIcon: suffixIcon,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.auto,
-        ),
-        validator: validator,
-      ),
+        );
+      },
     );
   }
 
   Widget _buildContactStep() {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        _buildModernTextField(
-          controller: _phoneController,
-          label: 'Teléfono',
-          icon: Icons.phone_rounded,
-          keyboardType: TextInputType.phone,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu teléfono';
-            }
-            if (value.length < 10) {
-              return 'El teléfono debe tener al menos 10 dígitos';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
-        
-        // Información de coordenadas seleccionadas
-        if (_selectedLat != null && _selectedLng != null)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFF00).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFFFFFF00).withOpacity(0.3),
-              ),
-            ),
-            child: Row(
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 500),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: Column(
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFF00),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Colors.black,
-                    size: 18,
-                  ),
+                const SizedBox(height: 32),
+                _buildModernTextField(
+                  controller: _phoneController,
+                  label: 'Teléfono',
+                  icon: Icons.phone_rounded,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu teléfono';
+                    }
+                    if (value.length < 10) {
+                      return 'El teléfono debe tener al menos 10 dígitos';
+                    }
+                    return null;
+                  },
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSecurityStep() {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 500),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: Column(
+              children: [
+                const SizedBox(height: 32),
+                _buildModernTextField(
+                  controller: _passwordController,
+                  label: 'Contraseña',
+                  icon: Icons.lock_rounded,
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa una contraseña';
+                    }
+                    if (value.length < 6) {
+                      return 'La contraseña debe tener al menos 6 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                _buildModernTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirmar contraseña',
+                  icon: Icons.lock_outline_rounded,
+                  obscureText: _obscureConfirmPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor confirma tu contraseña';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Las contraseñas no coinciden';
+                    }
+                    return null;
+                  },
+                ),
+                
+                const SizedBox(height: 28),
+                
+                // Información adicional para modo de pruebas con diseño mejorado
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.orange.withOpacity(0.15),
+                        Colors.orange.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.orange.withOpacity(0.4),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.15),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Ubicación guardada',
-                        style: TextStyle(
-                          color: Color(0xFFFFFF00),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.info_outline_rounded,
+                          color: Colors.orange,
+                          size: 22,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${_selectedLat!.toStringAsFixed(6)}, ${_selectedLng!.toStringAsFixed(6)}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Modo Pruebas',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Errores técnicos menores serán ignorados durante el desarrollo.',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+                
+                const SizedBox(height: 32),
               ],
             ),
           ),
-        
-        const SizedBox(height: 40),
-      ],
-    );
-  }
-
-  Widget _buildSecurityStep() {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        _buildModernTextField(
-          controller: _passwordController,
-          label: 'Contraseña',
-          icon: Icons.lock_rounded,
-          obscureText: _obscurePassword,
-          suffixIcon: IconButton(
-            icon: Icon(
-              _obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-              color: Colors.white.withOpacity(0.6),
-            ),
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa una contraseña';
-            }
-            if (value.length < 6) {
-              return 'La contraseña debe tener al menos 6 caracteres';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 20),
-        _buildModernTextField(
-          controller: _confirmPasswordController,
-          label: 'Confirmar contraseña',
-          icon: Icons.lock_outline_rounded,
-          obscureText: _obscureConfirmPassword,
-          suffixIcon: IconButton(
-            icon: Icon(
-              _obscureConfirmPassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-              color: Colors.white.withOpacity(0.6),
-            ),
-            onPressed: () {
-              setState(() {
-                _obscureConfirmPassword = !_obscureConfirmPassword;
-              });
-            },
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor confirma tu contraseña';
-            }
-            if (value != _passwordController.text) {
-              return 'Las contraseñas no coinciden';
-            }
-            return null;
-          },
-        ),
-        
-        const SizedBox(height: 20),
-        
-        // Información adicional para modo de pruebas con mejor diseño
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: Colors.orange.withOpacity(0.3),
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.orange,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Modo Pruebas',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Errores técnicos menores serán ignorados durante el desarrollo.',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        const SizedBox(height: 20),
-      ],
+        );
+      },
     );
   }
 }

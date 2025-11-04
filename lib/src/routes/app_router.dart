@@ -15,6 +15,7 @@ import 'package:ping_go/src/features/onboarding/presentation/screens/onboarding_
 // import 'package:ping_go/src/features/map/presentation/screens/location_selection_screen.dart'; // COMENTADO - YA NO SE USA
 import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:ping_go/src/features/auth/presentation/screens/welcome_splash_screen.dart';
 import 'package:ping_go/src/features/auth/presentation/screens/splash_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/admin_home_screen.dart';
 import 'package:ping_go/src/features/admin/presentation/screens/users_management_screen.dart';
@@ -78,6 +79,8 @@ class AppRouter {
             settings: settings,
           );
         }
+      case RouteNames.welcomeSplash:
+        return FadeSlidePageRoute(page: const WelcomeSplashScreen(), settings: settings);
       case RouteNames.locationPicker:
         {
           final args = settings.arguments as Map<String, dynamic>?;

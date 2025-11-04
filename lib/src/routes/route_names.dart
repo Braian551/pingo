@@ -7,6 +7,7 @@ class RouteNames {
   static const String emailVerification = '/email-verification';
   static const String login = '/login';
   static const String register = '/register';
+  static const String welcomeSplash = '/welcome-splash';
   static const String phoneAuth = '/phone-auth';
   static const String home = '/home';
   static const String locationPicker = '/location-picker';

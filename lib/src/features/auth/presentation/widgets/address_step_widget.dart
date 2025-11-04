@@ -62,11 +62,11 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
       curve: Curves.easeOutBack,
     ));
     
-    // Animación de pulso para el pin
+    // Animación de pulso para el pin - solo cuando no se está moviendo
     _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
-    )..repeat(reverse: true);
+    );
     
     _pulseAnimation = Tween<double>(
       begin: 1.0,
@@ -75,18 +75,49 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
       parent: _pulseAnimationController,
       curve: Curves.easeInOut,
     ));
+    
+    // Iniciar la animación de pulso solo si no se está moviendo inicialmente
+    if (!_isMapMoving) {
+      _pulseAnimationController.repeat(reverse: true);
+    }
   }
 
   void _onSearchFocusChange() {
-    setState(() {
-      _isSearchFocused = _searchFocusNode.hasFocus;
-    });
+    final wasFocused = _isSearchFocused;
+    final isFocused = _searchFocusNode.hasFocus;
+    
+    if (wasFocused != isFocused) {
+      setState(() {
+        _isSearchFocused = isFocused;
+      });
+      
+      // Usar post frame callback para evitar conflictos con el layout
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _searchFocusNode.hasFocus == isFocused) { // Verificar que aún sea válido
+          // Cancelar búsquedas pendientes cuando se pierde el foco
+          if (!isFocused) {
+            _searchDebounce?.cancel();
+            // Limpiar resultados de búsqueda cuando se pierde el foco
+            final prov = Provider.of<MapProvider>(context, listen: false);
+            prov.clearSearch();
+          }
+        }
+      });
+    }
+  }
+
+  // Método para manejar taps fuera del campo de búsqueda
+  void _onTapOutside() {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
+    }
   }
 
   @override
   void dispose() {
     _moveDebounce?.cancel();
     _searchDebounce?.cancel();
+    _mapMoveTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     _pinAnimationController.dispose();
@@ -98,21 +129,26 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
     // Cancelar búsqueda anterior
     _searchDebounce?.cancel();
     
+    if (q.trim().isEmpty) {
+      final prov = Provider.of<MapProvider>(context, listen: false);
+      prov.clearSearch();
+      return;
+    }
+    
     if (q.length > 2) {
-      // Esperar 500ms antes de buscar (debounce)
-      _searchDebounce = Timer(const Duration(milliseconds: 500), () {
-        final prov = Provider.of<MapProvider>(context, listen: false);
-        
-        // Asegurarse de que el provider tenga la ubicación actual
-        if (_mapCenterCache != null && prov.currentLocation == null) {
-          prov.setCurrentLocation(_mapCenterCache);
+      // Aumentar debounce a 800ms para reducir llamadas
+      _searchDebounce = Timer(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          final prov = Provider.of<MapProvider>(context, listen: false);
+          
+          if (_mapCenterCache != null && prov.currentLocation == null) {
+            prov.setCurrentLocation(_mapCenterCache);
+          }
+          
+          prov.searchAddress(q.trim());
         }
-        
-        // Buscar con el query
-        prov.searchAddress(q);
       });
     } else {
-      // Si el query es muy corto, limpiar resultados
       final prov = Provider.of<MapProvider>(context, listen: false);
       prov.clearSearch();
     }
@@ -126,12 +162,9 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
     final formatted = result.getFormattedAddress();
     _searchController.text = formatted;
 
-    // Guardar temporalmente hasta confirmar
+    // Guardar temporalmente las coordenadas
     _tempLat = result.lat;
     _tempLon = result.lon;
-    _tempAddress = formatted;
-    _tempCity = result.getCity();
-    _tempState = result.getState();
 
     // Ocultar teclado y perder foco
     _searchFocusNode.unfocus();
@@ -143,9 +176,6 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
   // Variables temporales para guardar la ubicación hasta que se confirme
   double? _tempLat;
   double? _tempLon;
-  String? _tempAddress;
-  String? _tempCity;
-  String? _tempState;
 
   void _onMapMoveStart() {
     setState(() {
@@ -153,6 +183,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
     });
     _mapMoveTimer?.cancel();
     _pinAnimationController.forward();
+    _pulseAnimationController.stop(); // Detener pulso durante movimiento
   }
 
   void _onMapMoveEnd() {
@@ -162,6 +193,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
         _isMapMoving = false;
       });
       _pinAnimationController.reverse();
+      _pulseAnimationController.repeat(reverse: true); // Reiniciar pulso
     });
   }
 
@@ -188,202 +220,237 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
       return;
     }
 
-    // Preparar los datos finales
-    final address = _tempAddress ?? prov.selectedAddress ?? _searchController.text;
-    final city = _tempCity ?? prov.selectedCity;
-    final state = _tempState ?? prov.selectedState;
-
-    final data = {
-      'lat': lat,
-      'lon': lon,
-      'address': address,
-      'city': city,
-      'state': state,
-    };
-
-    // SOLO AHORA notificar al padre con los datos confirmados
-    widget.addressController.text = address;
-    widget.onLocationSelected(data);
-
-    // Mostrar feedback visual y avanzar al siguiente paso si se provee callback
+    // Mostrar indicador de carga
     setState(() {
       _confirmed = true;
     });
-    _showConfirmedSnack();
 
-    // Ligeramente esperar la animación/feedback y notificar al padre para avanzar
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (widget.onConfirmed != null) widget.onConfirmed!();
+    // AHORA SÍ hacer el reverse geocoding al confirmar
+    final location = LatLng(lat, lon);
+    prov.selectLocation(location).then((_) {
+      if (!mounted) return;
+      
+      final address = prov.selectedAddress ?? (_searchController.text.isEmpty 
+          ? 'Lat: ${lat.toStringAsFixed(6)}, Lon: ${lon.toStringAsFixed(6)}'
+          : _searchController.text);
+      final city = prov.selectedCity;
+      final state = prov.selectedState;
+
+      final data = {
+        'lat': lat,
+        'lon': lon,
+        'address': address,
+        'city': city,
+        'state': state,
+      };
+
+      widget.addressController.text = address;
+      widget.onLocationSelected(data);
+
+      _showConfirmedSnack();
+
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted && widget.onConfirmed != null) {
+          widget.onConfirmed!();
+        }
+      });
+    }).catchError((error) {
+      // Si falla el reverse geocoding, usar coordenadas
+      final address = 'Lat: ${lat.toStringAsFixed(6)}, Lon: ${lon.toStringAsFixed(6)}';
+      final data = {
+        'lat': lat,
+        'lon': lon,
+        'address': address,
+        'city': null,
+        'state': null,
+      };
+
+      widget.addressController.text = address;
+      widget.onLocationSelected(data);
+
+      _showConfirmedSnack();
+
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted && widget.onConfirmed != null) {
+          widget.onConfirmed!();
+        }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final prov = Provider.of<MapProvider>(context);
+    return Consumer<MapProvider>(
+      builder: (context, prov, child) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        final availableHeight = screenHeight - keyboardHeight;
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.84,
-      child: Stack(
-        children: [
-          // Mapa con bordes redondeados y efecto de profundidad mejorado
+        return SizedBox(
+          height: availableHeight,
+          child: GestureDetector(
+            onTap: _onTapOutside,
+            behavior: HitTestBehavior.translucent,
+            child: Stack(
+              children: [
+          // Mapa a pantalla completa sin márgenes
           Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white12),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
+            child: AbsorbPointer(
+              absorbing: _isSearchFocused, // Absorber toques cuando el teclado está abierto
+              child: RepaintBoundary(
+                child: OSMMapWidget(
+                  initialLocation: prov.selectedLocation,
+                  interactive: !_isSearchFocused, // Desactivar interacción cuando el teclado está abierto
+                  onLocationSelected: (loc) async {
+                    _mapCenterCache = loc;
+                    prov.setCurrentLocation(loc);
+                    
+                    // Solo guardar coordenadas, NO hacer reverse geocoding aquí
+                    _tempLat = loc.latitude;
+                    _tempLon = loc.longitude;
+                  },
+                  onMapMoved: _isSearchFocused ? null : (center) {
+                    _mapCenterCache = center;
+                    prov.setCurrentLocation(center);
+                    _handleMapMovedDebounced(center);
+                  },
+                  onMapMoveStart: _onMapMoveStart,
+                  onMapMoveEnd: _onMapMoveEnd,
+                  showMarkers: false,
+                ),
+              ),
+            ),
+          ),
+
+          // Barra de búsqueda estilo Uber - fija arriba
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.black.withOpacity(0.4),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.7, 1.0],
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _isSearchFocused 
+                      ? const Color(0xFFFFFF00)
+                      : Colors.grey.shade300,
+                    width: _isSearchFocused ? 2.5 : 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(_isSearchFocused ? 0.3 : 0.15),
+                      blurRadius: _isSearchFocused ? 24 : 12,
+                      offset: Offset(0, _isSearchFocused ? 8 : 4),
+                    ),
+                    if (_isSearchFocused)
                       BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 15,
-                        offset: const Offset(0, 6),
+                        color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 0),
                         spreadRadius: 2,
                       ),
-                    ],
-                  ),
-                  child: OSMMapWidget(
-                    initialLocation: prov.selectedLocation,
-                    interactive: true,
-                    onLocationSelected: (loc) async {
-                      _mapCenterCache = loc;
-                      // Actualizar la ubicación actual en el provider
-                      prov.setCurrentLocation(loc);
-                      await prov.selectLocation(loc);
-                      // Solo actualizar el campo de búsqueda visualmente, NO el addressController del padre
-                      _searchController.text = prov.selectedAddress ?? _searchController.text;
-                      // Guardar temporalmente hasta confirmar
-                      _tempLat = loc.latitude;
-                      _tempLon = loc.longitude;
-                      _tempAddress = prov.selectedAddress;
-                      _tempCity = prov.selectedCity;
-                      _tempState = prov.selectedState;
-                    },
-                    onMapMoved: (center) {
-                      _mapCenterCache = center;
-                      // Actualizar la ubicación actual en el provider
-                      prov.setCurrentLocation(center);
-                      _handleMapMovedDebounced(center);
-                    },
-                    onMapMoveStart: _onMapMoveStart,
-                    onMapMoveEnd: _onMapMoveEnd,
-                    showMarkers: false,
-                  ),
+                  ],
                 ),
-              ),
-            ),
-          ),
-
-          // Barra de búsqueda moderna con efecto glass y animaciones suaves
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.75),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _isSearchFocused 
-                    ? const Color(0xFFFFFF00).withOpacity(0.8)
-                    : Colors.white.withOpacity(0.15),
-                  width: _isSearchFocused ? 2 : 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: _isSearchFocused ? 24 : 16,
-                    offset: const Offset(0, 8),
-                    spreadRadius: _isSearchFocused ? 2 : 0,
-                  ),
-                  if (_isSearchFocused)
-                    BoxShadow(
-                      color: const Color(0xFFFFFF00).withOpacity(0.15),
-                      blurRadius: 20,
-                      offset: const Offset(0, 0),
-                      spreadRadius: 2,
-                    ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: Row(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          Icons.search_rounded,
-                          color: _isSearchFocused 
-                            ? const Color(0xFFFFFF00)
-                            : Colors.white.withOpacity(0.6),
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          focusNode: _searchFocusNode,
-                          onChanged: _onSearch,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Buscar dirección...',
-                            hintStyle: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                        ),
-                      ),
-                      if (_searchController.text.isNotEmpty)
-                        AnimatedScale(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          scale: 1.0,
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              shape: BoxShape.circle,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _isSearchFocused 
+                              ? const Color(0xFFFFFF00).withOpacity(0.15)
+                              : Colors.grey.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: _isSearchFocused 
+                              ? const Color(0xFFFFFF00)
+                              : Colors.grey.shade600,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            focusNode: _searchFocusNode,
+                            onChanged: _onSearch,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.close_rounded,
-                                color: Colors.white.withOpacity(0.7),
-                                size: 18,
+                            decoration: InputDecoration(
+                              hintText: 'Buscar dirección...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
                               ),
-                              onPressed: () {
-                                _searchController.clear();
-                                Provider.of<MapProvider>(context, listen: false).clearSearch();
-                                _searchFocusNode.unfocus();
-                              },
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              splashRadius: 16,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                           ),
                         ),
-                    ],
+                        if (_searchController.text.isNotEmpty)
+                          AnimatedScale(
+                            duration: const Duration(milliseconds: 200),
+                            scale: 1.0,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.grey.shade700,
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  Provider.of<MapProvider>(context, listen: false).clearSearch();
+                                  _searchFocusNode.unfocus();
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                splashRadius: 16,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
 
-          // Pin de ubicación profesional estilo Uber con animaciones suaves
+          // Pin de ubicación estilo Uber mejorado
           Center(
             child: IgnorePointer(
               ignoring: true,
@@ -395,63 +462,66 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Pin moderno inspirado en Uber
                         Stack(
                           alignment: Alignment.center,
                           clipBehavior: Clip.none,
                           children: [
-                            // Pulso animado de fondo (solo cuando no se mueve el mapa)
+                            // Pulso animado
                             if (!_isMapMoving)
                               Transform.scale(
                                 scale: _pulseAnimation.value,
                                 child: Container(
-                                  width: 32,
-                                  height: 32,
+                                  width: 40,
+                                  height: 40,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFFF00).withOpacity(0.2),
+                                    color: const Color(0xFFFFFF00).withOpacity(0.25),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                               ),
                             
-                            // Pin principal
+                            // Pin principal más grande
                             Container(
-                              width: 48,
-                              height: 48,
+                              width: 56,
+                              height: 56,
                               decoration: BoxDecoration(
                                 color: Colors.black,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: 3,
+                                  width: 3.5,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
+                                    color: Colors.black.withOpacity(0.4),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 6),
+                                    spreadRadius: 2,
                                   ),
                                   BoxShadow(
-                                    color: const Color(0xFFFFFF00).withOpacity(0.2),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 2),
-                                    spreadRadius: 2,
+                                    color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                    blurRadius: 24,
+                                    spreadRadius: 3,
                                   ),
                                 ],
                               ),
                               child: Center(
                                 child: Container(
-                                  width: 16,
-                                  height: 16,
+                                  width: 20,
+                                  height: 20,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFFF00),
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        const Color(0xFFFFFF00),
+                                        const Color(0xFFFFDD00),
+                                      ],
+                                    ),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFFFFFF00).withOpacity(0.5),
-                                        blurRadius: 8,
-                                        spreadRadius: 1,
+                                        color: const Color(0xFFFFFF00).withOpacity(0.6),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
                                       ),
                                     ],
                                   ),
@@ -459,20 +529,20 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                               ),
                             ),
                             
-                            // Indicador de punta (punto de referencia exacto)
+                            // Punto de referencia
                             Positioned(
-                              bottom: -8,
+                              bottom: -10,
                               child: Container(
-                                width: 4,
-                                height: 4,
+                                width: 5,
+                                height: 5,
                                 decoration: BoxDecoration(
                                   color: Colors.black,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.4),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
+                                      color: Colors.black.withOpacity(0.5),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
@@ -481,24 +551,23 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                           ],
                         ),
                         
-                        // Sombra debajo del pin
-                        const SizedBox(height: 4),
-                        Transform.scale(
-                          scale: _isMapMoving ? 0.8 : 1.0,
-                          child: Container(
-                            width: 24,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
+                        const SizedBox(height: 6),
+                        
+                        // Sombra mejorada
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: _isMapMoving ? 24 : 32,
+                          height: _isMapMoving ? 6 : 8,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(_isMapMoving ? 0.2 : 0.3),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -509,232 +578,230 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
             ),
           ),
 
-          // Tarjeta inferior profesional con efecto glass
+          // Panel inferior estilo Uber - más compacto y elegante
           Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 400),
               curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: _confirmed 
-                    ? const Color(0xFFFFFF00).withOpacity(0.4)
-                    : Colors.white.withOpacity(0.15),
-                  width: 1.5,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.85),
+                    Colors.black,
+                  ],
+                  stops: const [0.0, 0.3, 1.0],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                    spreadRadius: 2,
-                  ),
-                  if (_confirmed)
-                    BoxShadow(
-                      color: const Color(0xFFFFFF00).withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 0),
-                      spreadRadius: 2,
-                    ),
-                ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Campo de dirección mejorado
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.12),
-                      ),
-                    ),
-                    child: TextField(
-                      controller: widget.addressController,
-                      readOnly: false,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      maxLines: 2,
-                      minLines: 1,
-                      decoration: InputDecoration(
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 12, right: 8),
-                          child: Icon(
-                            Icons.location_on_rounded,
-                            color: const Color(0xFFFFFF00),
-                            size: 22,
-                          ),
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 44,
-                          minHeight: 44,
-                        ),
-                        hintText: 'Dirección seleccionada...',
-                        hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 15,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        filled: false,
-                      ),
-                    ),
-                  ),
-                  
-                  // Indicador de estado confirmado
-                  if (_confirmed)
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
-                      margin: const EdgeInsets.only(top: 16),
-                      padding: const EdgeInsets.all(14),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Campo de dirección mejorado estilo Uber
+                    Container(
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFF00).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFFFFF00).withOpacity(0.3),
-                        ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 28,
-                            height: 28,
+                            width: 44,
+                            height: 44,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFFF00),
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFFFF00),
+                                  const Color(0xFFFFDD00),
+                                ],
+                              ),
                               shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                             ),
                             child: const Icon(
-                              Icons.check_rounded,
+                              Icons.location_on_rounded,
                               color: Colors.black,
-                              size: 18,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              'Ubicación confirmada',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Tu ubicación',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.addressController.text.isEmpty 
+                                    ? 'Selecciona en el mapa' 
+                                    : widget.addressController.text,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-
-                  // Botones de acción
-                  if (!_confirmed)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Row(
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Botones de acción
+                    if (!_confirmed)
+                      Row(
                         children: [
-                          // Botón de confirmar (principal)
+                          // Botón de confirmar (principal) - estilo Uber
                           Expanded(
-                            flex: 3,
-                            child: AnimatedScale(
-                              duration: const Duration(milliseconds: 200),
-                              scale: 1.0,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  LatLng? center = _mapCenterCache ?? prov.selectedLocation;
-                                  // Si hay una ubicación en el centro pero no se ha seleccionado dirección, hacerlo
-                                  if (center != null && prov.selectedAddress == null) {
-                                    prov.selectLocation(center);
-                                  }
-                                  // El _onConfirm se encargará de actualizar el addressController
-                                  _onConfirm(center);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFFFF00),
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(vertical: 18),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  elevation: 0,
-                                  shadowColor: const Color(0xFFFFFF00).withOpacity(0.4),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle_rounded,
-                                      size: 20,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Confirmar',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
+                            child: Container(
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFFFFFF00),
+                                    const Color(0xFFFFDD00),
                                   ],
                                 ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFFFF00).withOpacity(0.4),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          
-                          // Botón de limpiar
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.15),
-                              ),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                Provider.of<MapProvider>(context, listen: false).clearSelection();
-                                widget.addressController.clear();
-                                _searchController.clear();
-                                setState(() {
-                                  _confirmed = false;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.refresh_rounded,
-                                color: Colors.white.withOpacity(0.8),
-                                size: 24,
-                              ),
-                              style: IconButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    LatLng? center = _mapCenterCache ?? prov.selectedLocation;
+                                    if (center != null && prov.selectedAddress == null) {
+                                      prov.selectLocation(center);
+                                    }
+                                    _onConfirm(center);
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: const Center(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_rounded,
+                                          color: Colors.black,
+                                          size: 22,
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          'Confirmar ubicación',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ],
+                      )
+                    else
+                      // Indicador de confirmación
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFFFFF00).withOpacity(0.2),
+                              const Color(0xFFFFDD00).withOpacity(0.15),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFFFFF00).withOpacity(0.5),
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFFF00),
+                                    Color(0xFFFFDD00),
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check_rounded,
+                                color: Colors.black,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Text(
+                                '¡Ubicación confirmada!',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
 
-          // Resultados de búsqueda con diseño profesional
+          // Resultados de búsqueda estilo Uber con fondo blanco
           if (prov.searchResults.isNotEmpty && _isSearchFocused)
             Positioned(
               top: 84,
@@ -747,16 +814,14 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.9),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.15),
-                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 24,
-                        offset: const Offset(0, 12),
+                        offset: const Offset(0, 8),
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
@@ -770,7 +835,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                         itemCount: prov.searchResults.length,
                         separatorBuilder: (context, index) => Divider(
                           height: 1,
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.grey.withOpacity(0.15),
                           indent: 60,
                           endIndent: 20,
                         ),
@@ -783,34 +848,34 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
-                                  vertical: 12,
+                                  vertical: 14,
                                 ),
                                 child: Row(
                                   children: [
                                     // Icono de ubicación
                                     Container(
-                                      width: 40,
-                                      height: 40,
+                                      width: 44,
+                                      height: 44,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFFFF00).withOpacity(0.15),
-                                        shape: BoxShape.circle,
+                                        color: const Color(0xFFF5F5F5),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: const Icon(
                                         Icons.location_on_rounded,
-                                        color: Color(0xFFFFFF00),
-                                        size: 20,
+                                        color: Colors.black87,
+                                        size: 22,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 14),
                                     
                                     // Texto de la dirección
                                     Expanded(
                                       child: Text(
                                         r.getFormattedAddress(),
                                         style: const TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.black87,
                                           fontSize: 15,
-                                          fontWeight: FontWeight.w400,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
@@ -820,7 +885,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
                                     // Icono de flecha
                                     Icon(
                                       Icons.arrow_forward_ios_rounded,
-                                      color: Colors.white.withOpacity(0.4),
+                                      color: Colors.grey.withOpacity(0.4),
                                       size: 16,
                                     ),
                                   ],
@@ -837,29 +902,28 @@ class _AddressStepWidgetState extends State<AddressStepWidget> with TickerProvid
             ),
         ],
       ),
+      ),
+    );
+      },
     );
   }
 
   void _handleMapMovedDebounced(LatLng? center) {
-    if (center == null) return;
+    // NO HACER REVERSE GEOCODING durante el movimiento
+    // Solo actualizar el centro del mapa sin bloquear el UI
+    if (_isSearchFocused || center == null || !mounted) return;
+    
     _moveDebounce?.cancel();
-    final prov = Provider.of<MapProvider>(context, listen: false);
-    _moveDebounce = Timer(const Duration(milliseconds: 800), () async {
-      try {
-        await prov.selectLocation(center);
-        setState(() {
-          // Solo actualizar el campo de búsqueda visualmente, NO el addressController del padre
-          _searchController.text = prov.selectedAddress ?? _searchController.text;
-          // Guardar temporalmente hasta confirmar
-          _tempLat = center.latitude;
-          _tempLon = center.longitude;
-          _tempAddress = prov.selectedAddress;
-          _tempCity = prov.selectedCity;
-          _tempState = prov.selectedState;
-        });
-      } catch (_) {
-        // ignore errors silently for now
-      }
+    
+    // Solo guardar las coordenadas, NO hacer reverse geocoding
+    _moveDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      
+      setState(() {
+        _tempLat = center.latitude;
+        _tempLon = center.longitude;
+        // NO actualizar el texto de búsqueda durante el movimiento
+      });
     });
   }
 }

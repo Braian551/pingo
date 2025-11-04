@@ -10,7 +10,7 @@ class UserService {
     required String name,
     required String lastName,
     required String phone,
-    required String address,
+    String? address,
     double? latitude,
     double? longitude,
     String? city,
@@ -23,8 +23,12 @@ class UserService {
         'name': name,
         'lastName': lastName,
         'phone': phone,
-        'address': address,
       };
+
+      // Agregar dirección si está disponible
+      if (address != null && address.isNotEmpty) {
+        requestData['address'] = address;
+      }
 
       // Agregar datos de ubicación si están disponibles
       if (latitude != null && longitude != null) {
