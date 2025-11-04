@@ -66,6 +66,7 @@ class _ConductorSearchingPassengersScreenState
   
   bool _showingRequest = false;
   Timer? _autoRejectTimer;
+  bool _panelExpanded = false;
 
   @override
   void initState() {
@@ -375,7 +376,38 @@ class _ConductorSearchingPassengersScreenState
               print('🎯 [DEBUG] Mostrando nueva solicitud al conductor');
               _selectedRequest = requests.first;
               _showingRequest = true;
+              _panelExpanded = false;
               _requestPanelController.forward();
+              
+              // Ajustar cámara para mostrar conductor y cliente
+              if (_currentLocation != null) {
+                final origin = LatLng(
+                  double.parse(requests.first['latitud_origen'].toString()),
+                  double.parse(requests.first['longitud_origen'].toString()),
+                );
+                final minLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a < b ? a : b);
+                final maxLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a > b ? a : b);
+                final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
+                final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
+                
+                // Validar que los bounds tengan área suficiente (no sean un solo punto)
+                final latDiff = (maxLat - minLat).abs();
+                final lngDiff = (maxLng - minLng).abs();
+                
+                if (latDiff > 0.0001 && lngDiff > 0.0001) {
+                  // Solo hacer fit si hay una distancia significativa
+                  final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
+                  _mapController.fitCamera(
+                    CameraFit.bounds(
+                      bounds: bounds,
+                      padding: const EdgeInsets.only(top: 120, bottom: 240, left: 60, right: 60),
+                    ),
+                  );
+                } else {
+                  // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
+                  _mapController.move(origin, 15);
+                }
+              }
               
               // 🔊 Reproducir sonido de notificación si es una solicitud nueva
               final requestId = requests.first['id'] as int;
@@ -897,13 +929,24 @@ class _ConductorSearchingPassengersScreenState
                         final maxLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a > b ? a : b);
                         final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
                         final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
-                        final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
-                        _mapController.fitCamera(
-                          CameraFit.bounds(
-                            bounds: bounds,
-                            padding: const EdgeInsets.only(top: 120, bottom: 300, left: 60, right: 60),
-                          ),
-                        );
+                        
+                        // Validar que los bounds tengan área suficiente (no sean un solo punto)
+                        final latDiff = (maxLat - minLat).abs();
+                        final lngDiff = (maxLng - minLng).abs();
+                        
+                        if (latDiff > 0.0001 && lngDiff > 0.0001) {
+                          // Solo hacer fit si hay una distancia significativa
+                          final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
+                          _mapController.fitCamera(
+                            CameraFit.bounds(
+                              bounds: bounds,
+                              padding: const EdgeInsets.only(top: 120, bottom: 300, left: 60, right: 60),
+                            ),
+                          );
+                        } else {
+                          // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
+                          _mapController.move(origin, 15);
+                        }
                       }
                     },
                     child: Stack(
@@ -1150,6 +1193,20 @@ class _ConductorSearchingPassengersScreenState
       _selectedRequest!['duracion_minutos']?.toString() ?? '0',
     ) ?? 0;
 
+    // Calcular distancia del conductor al punto de recogida del cliente
+    double distanciaConductorCliente = 0;
+    if (_currentLocation != null) {
+      final clienteLat = double.parse(_selectedRequest!['latitud_origen'].toString());
+      final clienteLng = double.parse(_selectedRequest!['longitud_origen'].toString());
+      
+      const Distance distance = Distance();
+      distanciaConductorCliente = distance.as(
+        LengthUnit.Kilometer,
+        LatLng(_currentLocation!.latitude, _currentLocation!.longitude),
+        LatLng(clienteLat, clienteLng),
+      );
+    }
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -1162,7 +1219,18 @@ class _ConductorSearchingPassengersScreenState
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
+              child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  if (details.primaryVelocity != null) {
+                    final v = details.primaryVelocity!;
+                    if (v < -100) {
+                      setState(() => _panelExpanded = true);
+                    } else if (v > 100) {
+                      setState(() => _panelExpanded = false);
+                    }
+                  }
+                },
+                child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A).withOpacity(0.95),
                   borderRadius: const BorderRadius.vertical(
@@ -1181,6 +1249,7 @@ class _ConductorSearchingPassengersScreenState
                   ],
                 ),
                 child: SafeArea(
+                  top: false, // No aplicar SafeArea arriba para evitar espacio extra
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
                     child: Column(
@@ -1192,15 +1261,16 @@ class _ConductorSearchingPassengersScreenState
                           child: Container(
                             width: 50,
                             height: 5,
+                            margin: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
                         
-                        // Header con animación
+                        // Header con precio y resumen estilo DiDi
                         TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0.0, end: 1.0),
                           duration: const Duration(milliseconds: 600),
@@ -1215,12 +1285,13 @@ class _ConductorSearchingPassengersScreenState
                             );
                           },
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFD700),
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(0xFFFFD700).withOpacity(0.3),
@@ -1232,31 +1303,79 @@ class _ConductorSearchingPassengersScreenState
                                 child: const Icon(
                                   Icons.person_pin_circle,
                                   color: Colors.black,
-                                  size: 32,
+                                  size: 28,
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              const Expanded(
+                              const SizedBox(width: 14),
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Nueva solicitud',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 22,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.3,
                                       ),
                                     ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      'Desliza hacia arriba para más detalles',
-                                      style: TextStyle(
-                                        color: Color(0xFFFFD700),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    const SizedBox(height: 6),
+                                    // Info compacta estilo DiDi: precio + distancia + tiempo
+                                    Row(
+                                      children: [
+                                        // Precio destacado
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFFD700),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            '\$${precioEstimado.toStringAsFixed(0)}',
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        // Distancia
+                                        Icon(
+                                          Icons.straighten,
+                                          color: Colors.white.withOpacity(0.7),
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${distanciaKm.toStringAsFixed(1)} km',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        // Tiempo
+                                        Icon(
+                                          Icons.schedule,
+                                          color: Colors.white.withOpacity(0.7),
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$duracionMinutos min',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -1264,77 +1383,172 @@ class _ConductorSearchingPassengersScreenState
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         
-                        // Tarjeta de ganancia destacada con animación
+                        // Ubicaciones: Conductor y Cliente
                         TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 800),
-                          curve: Curves.elasticOut,
+                          duration: const Duration(milliseconds: 700),
+                          curve: Curves.easeOut,
                           builder: (context, value, child) {
-                            return Transform.scale(
-                              scale: 0.8 + (0.2 * value),
-                              child: Opacity(
-                                opacity: value.clamp(0.0, 1.0),
+                            return Opacity(
+                              opacity: value.clamp(0.0, 1.0),
+                              child: Transform.translate(
+                                offset: Offset(0, 15 * (1 - value)),
                                 child: child,
                               ),
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFD700),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFFFD700).withOpacity(0.3),
-                                  blurRadius: 20,
-                                  spreadRadius: 3,
-                                ),
-                              ],
+                              color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                                width: 1,
+                              ),
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  Icons.attach_money,
-                                  color: Colors.black,
-                                  size: 32,
-                                ),
-                                const SizedBox(width: 8),
-                                TweenAnimationBuilder<double>(
-                                  tween: Tween(begin: 0.0, end: precioEstimado),
-                                  duration: const Duration(milliseconds: 1000),
-                                  curve: Curves.easeOut,
-                                  builder: (context, value, child) {
-                                    return Text(
-                                      '\$${value.toStringAsFixed(0)}',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 36,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: -1,
+                                // Tu ubicación (conductor)
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFD700).withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.navigation_rounded,
+                                          color: Color(0xFFFFD700),
+                                          size: 18,
+                                        ),
                                       ),
-                                    );
-                                  },
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Tu ubicación',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.6),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'Conductor',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.9),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'COP',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                // Separador con distancia
+                                Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: const Color(0xFF4CAF50).withOpacity(0.3),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              Icons.arrow_forward,
+                                              color: Color(0xFF4CAF50),
+                                              size: 12,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '${distanciaConductorCliente.toStringAsFixed(1)} km',
+                                              style: const TextStyle(
+                                                color: Color(0xFF4CAF50),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Ubicación del cliente
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF2196F3).withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.person_pin_circle,
+                                          color: Color(0xFF2196F3),
+                                          size: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Cliente',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.6),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'Recoger aquí',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.9),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         
                         // Temporizador de auto-rechazo
                         AnimatedBuilder(
@@ -1431,87 +1645,91 @@ class _ConductorSearchingPassengersScreenState
                         ),
                         const SizedBox(height: 20),
                         
-                        // Detalles del viaje con animación escalonada
-                        _buildAnimatedDetailRow(
-                          delay: 200,
-                          icon: Icons.straighten,
-                          label: 'Distancia',
-                          value: '${distanciaKm.toStringAsFixed(1)} km',
-                        ),
-                        const SizedBox(height: 12),
-                        _buildAnimatedDetailRow(
-                          delay: 300,
-                          icon: Icons.access_time,
-                          label: 'Tiempo estimado',
-                          value: '$duracionMinutos min',
-                        ),
-                        const SizedBox(height: 20),
+                        // Detalles del viaje (solo en expandido)
+                        if (_panelExpanded) ...[
+                          _buildAnimatedDetailRow(
+                            delay: 200,
+                            icon: Icons.straighten,
+                            label: 'Distancia',
+                            value: '${distanciaKm.toStringAsFixed(1)} km',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildAnimatedDetailRow(
+                            delay: 300,
+                            icon: Icons.access_time,
+                            label: 'Tiempo estimado',
+                            value: '$duracionMinutos min',
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         
-                        // Direcciones con animación
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 700),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value.clamp(0.0, 1.0),
-                              child: Transform.translate(
-                                offset: Offset(0, 20 * (1 - value)),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A).withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
-                                width: 1,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                _buildLocationInfo(
-                                  icon: Icons.my_location,
-                                  iconColor: const Color(0xFF4CAF50),
-                                  label: 'Recoger en',
-                                  value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
+                        // Direcciones (solo en expandido)
+                        if (_panelExpanded) ...[
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut,
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value.clamp(0.0, 1.0),
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)),
+                                  child: child,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 18),
-                                      Column(
-                                        children: List.generate(
-                                          3,
-                                          (index) => Container(
-                                            margin: const EdgeInsets.only(bottom: 3),
-                                            width: 3,
-                                            height: 3,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.3),
-                                              shape: BoxShape.circle,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  _buildLocationInfo(
+                                    icon: Icons.my_location,
+                                    iconColor: const Color(0xFF4CAF50),
+                                    label: 'Recoger en',
+                                    value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(width: 18),
+                                        Column(
+                                          children: List.generate(
+                                            3,
+                                            (index) => Container(
+                                              margin: const EdgeInsets.only(bottom: 3),
+                                              width: 3,
+                                              height: 3,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.3),
+                                                shape: BoxShape.circle,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                _buildLocationInfo(
-                                  icon: Icons.location_on,
-                                  iconColor: const Color(0xFFFFD700),
-                                  label: 'Dejar en',
-                                  value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
-                                ),
-                              ],
+                                  _buildLocationInfo(
+                                    icon: Icons.location_on,
+                                    iconColor: const Color(0xFFFFD700),
+                                    label: 'Dejar en',
+                                    value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                        ],
                         
                         // Botones de acción con animaciones
                         TweenAnimationBuilder<double>(
@@ -1621,6 +1839,7 @@ class _ConductorSearchingPassengersScreenState
             ),
           ),
         ),
+      ),
       ),
     );
   }
