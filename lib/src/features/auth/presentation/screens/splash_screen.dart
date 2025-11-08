@@ -5,6 +5,88 @@ import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/theme/app_colors.dart';
 import 'package:viax/src/features/auth/presentation/widgets/logo_transition.dart';
 
+/// Indicador de carga minimalista inspirado en TikTok
+class MinimalLoadingIndicator extends StatefulWidget {
+  const MinimalLoadingIndicator({super.key});
+
+  @override
+  State<MinimalLoadingIndicator> createState() => _MinimalLoadingIndicatorState();
+}
+
+class _MinimalLoadingIndicatorState extends State<MinimalLoadingIndicator>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _progressAnim;
+  late final Animation<double> _opacityAnim;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+
+    _progressAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _opacityAnim = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: 60,
+          height: 2,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.1),
+            borderRadius: BorderRadius.circular(1),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: _progressAnim.value,
+            child: Container(
+              height: 2,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(_opacityAnim.value * (isDark ? 1.0 : 0.7)),
+                borderRadius: BorderRadius.circular(1),
+                boxShadow: isDark ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.3 * _opacityAnim.value),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ] : null,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -23,6 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _pulseAnim;
   late final Animation<double> _slideAnim;
   late final Animation<double> _subtitleSlideAnim;
+  late final Animation<double> _textScaleAnim;
   late final Animation<double> _rotationAnim;
 
   @override
@@ -63,19 +146,27 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Efecto de slide desde abajo para el texto principal
-    _slideAnim = Tween<double>(begin: 30.0, end: 0.0).animate(
+    // Efecto de slide desde abajo para el texto principal (más natural)
+    _slideAnim = Tween<double>(begin: 40.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.4, 0.8, curve: Curves.easeOutCubic),
+        curve: const Interval(0.35, 0.75, curve: Curves.easeOutBack),
       ),
     );
 
     // Efecto de slide desde abajo para el subtítulo (más suave y retrasado)
-    _subtitleSlideAnim = Tween<double>(begin: 20.0, end: 0.0).animate(
+    _subtitleSlideAnim = Tween<double>(begin: 25.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeOutCubic),
+        curve: const Interval(0.55, 0.9, curve: Curves.easeOutBack),
+      ),
+    );
+
+    // Efecto de escala para el texto (efecto pop natural)
+    _textScaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.35, 0.65, curve: Curves.elasticOut),
       ),
     );
 
@@ -153,33 +244,36 @@ class _SplashScreenState extends State<SplashScreen>
 
                   const SizedBox(height: 12),
 
-                  // App name con animación de slide
+                  // App name con animación de slide y escala
                   Transform.translate(
                     offset: Offset(0, _slideAnim.value),
-                    child: Opacity(
-                      opacity: _fadeAnim.value,
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Viax',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.5,
-                                foreground: Paint()
-                                  ..shader = LinearGradient(
-                                    colors: [
-                                      AppColors.primary,
-                                      AppColors.primaryLight,
-                                      AppColors.accent,
+                    child: Transform.scale(
+                      scale: _textScaleAnim.value,
+                      child: Opacity(
+                        opacity: _fadeAnim.value,
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Viax',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                  foreground: Paint()
+                                    ..shader = LinearGradient(
+                                      colors: [
+                                        AppColors.primary,
+                                        AppColors.primaryLight,
+                                        AppColors.accent,
                                     ],
                                     stops: const [0.0, 0.5, 1.0],
                                   ).createShader(const Rect.fromLTWH(0, 0, 200, 0)),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
