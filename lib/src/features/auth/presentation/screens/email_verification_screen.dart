@@ -55,19 +55,20 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
     // Agregar listeners a los controladores para manejar el cambio de foco automáticamente
     for (int i = 0; i < _digitControllers.length; i++) {
-      _digitControllers[i].addListener(() {
+      final int idx = i; // capturar índice correctamente para evitar cierre tardío
+      _digitControllers[idx].addListener(() {
         if (!mounted || _isDisposed) return;
         
-        final text = _digitControllers[i].text;
+        final text = _digitControllers[idx].text;
         if (text.isNotEmpty && text.length == 1) {
           // Activar animación del pulso
-          _triggerPinPulse(i);
+          _triggerPinPulse(idx);
           // Si se ingresó un dígito y no es el último campo, pasar al siguiente
-          if (i < 3) {
+          if (idx < 3) {
             // Usar Timer con duración cero para cambiar foco después del frame actual
             Timer(Duration.zero, () {
               if (mounted && !_isDisposed) {
-                _focusNodes[i + 1].requestFocus();
+                _focusNodes[idx + 1].requestFocus();
               }
             });
           }
@@ -572,6 +573,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                                                 });
                                               } else if (value.isNotEmpty) {
                                                 _triggerPinPulse(index);
+                                                // Avanzar foco inmediatamente en ingreso normal
+                                                if (value.length == 1 && index < 3) {
+                                                  Timer(Duration.zero, () {
+                                                    if (mounted && !_isDisposed) {
+                                                      _focusNodes[index + 1].requestFocus();
+                                                    }
+                                                  });
+                                                }
                                               }
 
                                               final current = _enteredCode;
