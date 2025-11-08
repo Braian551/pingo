@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/widgets/entrance_fader.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -28,9 +29,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: SizedBox(
           height: size.height,
@@ -47,7 +49,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFFFFF00).withOpacity(0.15),
+                        AppColors.primary.withOpacity(0.15),
                         Colors.transparent,
                       ],
                       stops: const [0.1, 0.8],
@@ -59,8 +61,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFFFFFF00),
-                          Color(0xFFFFFF00),
+                          AppColors.primary,
+                          AppColors.primaryLight,
                         ],
                       ).createShader(bounds);
                     },
@@ -68,6 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       'assets/images/logo.png',
                       width: 85,
                       height: 85,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -77,12 +80,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
               EntranceFader(
                 delay: const Duration(milliseconds: 160),
-                child: const Text(
+                child: Text(
                   'Bienvenido a Ping-Go',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.displayMedium?.color,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -92,14 +95,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
               EntranceFader(
                 delay: const Duration(milliseconds: 240),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Movilidad y entregas rÃ¡pidas a tu alcance',
+                    'Movilidad y entregas rápidas a tu alcance',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.white70,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                       height: 1.4,
                     ),
                   ),
@@ -108,7 +111,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               
               SizedBox(height: size.height * 0.07),
               
-              // Botones de autenticaciÃ³n
+              // Botones de autenticación
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
@@ -139,15 +142,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     // Iniciar con Apple
                     _buildSocialButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.apple,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : Colors.black,
                         size: 24,
                       ),
                       text: 'Continuar con Apple',
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      borderColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+                      textColor: isDark ? Colors.white : Colors.black,
+                      borderColor: isDark 
+                          ? Colors.white.withOpacity(0.3) 
+                          : Colors.black.withOpacity(0.2),
                       onPressed: () {
                         // TODO: Integrar Apple Sign-In
                       },
@@ -155,16 +160,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     const SizedBox(height: 14),
                     
-                    // Iniciar con telÃ©fono
+                    // Iniciar con teléfono
                     _buildSocialButton(
                       icon: const Icon(
                         Icons.phone_iphone_outlined,
-                        color: Colors.black,
+                        color: Colors.white,
                         size: 24,
                       ),
-                      text: 'Continuar con telÃ©fono',
-                      backgroundColor: const Color(0xFFFFFF00),
-                      textColor: Colors.black,
+                      text: 'Continuar con teléfono',
+                      backgroundColor: AppColors.primary,
+                      textColor: Colors.white,
                       onPressed: () {
                         Navigator.pushNamed(context, RouteNames.phoneAuth);
                       },
@@ -176,13 +181,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     _buildSocialButton(
                       icon: const Icon(
                         Icons.email_outlined,
-                        color: Color(0xFFFFFF00),
+                        color: AppColors.primary,
                         size: 24,
                       ),
                       text: 'Continuar con correo',
                       backgroundColor: Colors.transparent,
-                      textColor: const Color(0xFFFFFF00),
-                      borderColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                      textColor: AppColors.primary,
+                      borderColor: AppColors.primary.withOpacity(0.5),
                       onPressed: () {
                         Navigator.pushNamed(context, RouteNames.emailAuth);
                       },
@@ -190,31 +195,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     const SizedBox(height: 28),
                     
-                    // TÃ©rminos y condiciones
+                    // Términos y condiciones
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           text: 'Al continuar, aceptas nuestros ',
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
                             fontSize: 12,
                             height: 1.5,
                           ),
                           children: [
                             TextSpan(
-                              text: 'TÃ©rminos de Servicio',
+                              text: 'Términos de Servicio',
                               style: TextStyle(
-                                color: const Color(0xFFFFFF00).withOpacity(0.8),
+                                color: AppColors.primary.withOpacity(0.9),
                                 decoration: TextDecoration.underline,
                               ),
                             ),
                             const TextSpan(text: ' y '),
                             TextSpan(
-                              text: 'PolÃ­tica de Privacidad',
+                              text: 'Política de Privacidad',
                               style: TextStyle(
-                                color: const Color(0xFFFFFF00).withOpacity(0.8),
+                                color: AppColors.primary.withOpacity(0.9),
                                 decoration: TextDecoration.underline,
                               ),
                             ),

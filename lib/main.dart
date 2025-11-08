@@ -11,6 +11,7 @@ import 'package:viax/src/features/conductor/providers/conductor_trips_provider.d
 import 'package:viax/src/features/conductor/providers/conductor_earnings_provider.dart';
 import 'package:viax/src/core/di/service_locator.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:viax/src/theme/theme_provider.dart';
 
 void main() async {
   // Configure robust global error handling as early as possible
@@ -86,6 +87,9 @@ void main() async {
     runApp(
       MultiProvider(
         providers: [
+        // Theme Provider (debe estar primero)
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        
         // Database Provider (legacy)
         ChangeNotifierProvider(create: (_) => DatabaseProvider()),
         
@@ -144,6 +148,9 @@ class MyApp extends StatelessWidget {
       context,
       listen: false,
     );
+    
+    // Obtener el theme provider
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     // Inicializar la base de datos en background cuando se carga la app
     if (enableDatabaseInit) {
@@ -159,17 +166,12 @@ class MyApp extends StatelessWidget {
     }
 
     return MaterialApp(
-  title: 'Viax',
+      title: 'Viax',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.standard,
-        scaffoldBackgroundColor: Colors.black, // Fondo negro para toda la app
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
-          elevation: 0,
-        ),
-      ),
+      // Usar los temas del ThemeProvider
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
+      themeMode: themeProvider.themeMode,
       onGenerateRoute: AppRouter.generateRoute,
       navigatorObservers: [RouteLogger()],
       initialRoute: '/',

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -57,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnim,
@@ -74,17 +75,13 @@ class _SplashScreenState extends State<SplashScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF2196F3).withOpacity(0.25),
+                        AppColors.primary.withOpacity(0.25),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.9],
                     ),
                     boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF2196F3).withOpacity(0.12),
-                        blurRadius: 30,
-                        spreadRadius: 8,
-                      ),
+                      AppColors.primaryGlow(opacity: 0.12, blur: 30, spread: 8),
                     ],
                   ),
                   child: Center(
@@ -93,13 +90,14 @@ class _SplashScreenState extends State<SplashScreen>
                         return const LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
+                          colors: [AppColors.primary, AppColors.primaryLight],
                         ).createShader(bounds);
                       },
                       child: Image.asset(
                         'assets/images/logo.png',
                         width: 86,
                         height: 86,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -119,8 +117,8 @@ class _SplashScreenState extends State<SplashScreen>
                           fontWeight: FontWeight.w800,
                           foreground: Paint()
                             ..shader = const LinearGradient(
-                              colors: [Color(0xFF2196F3), Color(0xFF2196F3)],
-                            ).createShader(Rect.fromLTWH(0, 0, 200, 0)),
+                              colors: [AppColors.primary, AppColors.primaryLight],
+                            ).createShader(const Rect.fromLTWH(0, 0, 200, 0)),
                         ),
                       ),
                     ],
@@ -129,9 +127,12 @@ class _SplashScreenState extends State<SplashScreen>
 
                 const SizedBox(height: 8),
 
-                const Text(
+                Text(
                   'Transporte y entregas rápidas',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class WelcomeSplashScreen extends StatefulWidget {
   const WelcomeSplashScreen({super.key});
@@ -45,19 +46,19 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF121212),
-              Color(0xFF1E1E1E),
-            ],
+            colors: isDark
+                ? [AppColors.darkBackground, AppColors.darkSurface]
+                : [AppColors.lightBackground, AppColors.lightSurface],
           ),
         ),
         child: SafeArea(
@@ -66,7 +67,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Logo y tÃ­tulo animados
+                // Logo y título animados
                 Expanded(
                   child: Center(
                     child: FadeTransition(
@@ -84,24 +85,20 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    const Color(0xFFFFFF00).withOpacity(0.25),
+                                    AppColors.primary.withOpacity(0.25),
                                     Colors.transparent,
                                   ],
                                   stops: const [0.0, 0.9],
                                 ),
                                 boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFFFF00).withOpacity(0.15),
-                                    blurRadius: 30,
-                                    spreadRadius: 8,
-                                  ),
+                                  AppColors.primaryGlow(opacity: 0.15, blur: 30, spread: 8),
                                 ],
                               ),
                               child: Center(
                                 child: ShaderMask(
                                   shaderCallback: (bounds) {
                                     return const LinearGradient(
-                                      colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
+                                      colors: [AppColors.primary, AppColors.primaryLight],
                                     ).createShader(bounds);
                                   },
                                   child: Image.asset(
@@ -114,34 +111,34 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                               ),
                             ),
                             const SizedBox(height: 40),
-                            // TÃ­tulo de bienvenida
-                            const Text(
-                              'Â¡Bienvenido a Ping Go!',
+                            // Título de bienvenida
+                            Text(
+                              '¡Bienvenido a Ping Go!',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).textTheme.displayLarge?.color,
                                 fontSize: 32,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.5,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // SubtÃ­tulo
+                            // Subtítulo
                             Text(
                               'Tu cuenta ha sido creada exitosamente',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'EstÃ¡s listo para comenzar tu experiencia',
+                              'Estás listo para comenzar tu experiencia',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
+                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -152,7 +149,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                     ),
                   ),
                 ),
-                // BotÃ³n de continuar
+                // Botón de continuar
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: SizedBox(
@@ -161,13 +158,13 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                     child: ElevatedButton(
                       onPressed: _goToHome,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFFF00),
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 0,
-                        shadowColor: const Color(0xFFFFFF00).withOpacity(0.3),
+                        shadowColor: AppColors.primary.withOpacity(0.3),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
