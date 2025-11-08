@@ -1,6 +1,6 @@
 ﻿// lib/src/features/auth/presentation/screens/email_verification_screen.dart
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:flutter/services.dart';
 import 'package:viax/src/global/services/email_service.dart';
 import 'package:viax/src/global/services/auth/user_service.dart'; // Importar UserService
 import 'package:viax/src/routes/route_names.dart';
@@ -24,8 +24,11 @@ class EmailVerificationScreen extends StatefulWidget {
   State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
 }
 
-class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-  TextEditingController? _codeController;
+class _EmailVerificationScreenState extends State<EmailVerificationScreen>
+    with TickerProviderStateMixin {
+  // Controladores y enfoque por dígito
+  late final List<TextEditingController> _digitControllers;
+  late final List<FocusNode> _focusNodes;
   String _verificationCode = '';
   bool _isLoading = false;
   bool _isResending = false;
@@ -34,19 +37,105 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? _countdownTimer;
   bool _isDisposed = false;
 
+  // Animaciones
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  // Animaciones para PIN fields
+  late List<AnimationController> _pinControllers;
+  late List<Animation<double>> _pinAnimations;
+  late List<bool> _pinPulsing;
+
   @override
   void initState() {
     super.initState();
-    _codeController = TextEditingController();
+    _digitControllers = List.generate(6, (_) => TextEditingController());
+    _focusNodes = List.generate(6, (_) => FocusNode());
+
+    // Inicializar animaciones
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Inicializar animaciones de PIN (más rápidas y sutiles)
+    _pinControllers = List.generate(6, (index) => AnimationController(
+      duration: const Duration(milliseconds: 180), // pulso rápido
+      vsync: this,
+    ));
+
+    _pinAnimations = _pinControllers.map((controller) => Tween<double>(
+      begin: 1.0,
+      end: 1.08, // menos agresivo que 1.2
+    ).animate(CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeOutCubic,
+    ))).toList();
+
+    _pinPulsing = List.generate(6, (index) => false);
+
+    // Iniciar animación de entrada
+    _animationController.forward();
+
     _sendVerificationCode();
     _startResendCountdown();
+
+    // Autofocus el primer dígito tras el primer frame para que el usuario pueda escribir inmediatamente
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_isDisposed) {
+        _focusNodes.first.requestFocus();
+      }
+    });
+  }
+
+  void _triggerPinPulse(int index) {
+    if (index >= 0 && index < _pinControllers.length) {
+      setState(() {
+        _pinPulsing[index] = true;
+      });
+      _pinControllers[index].forward().then((_) {
+        _pinControllers[index].reverse().then((_) {
+          if (mounted && !_isDisposed) {
+            setState(() {
+              _pinPulsing[index] = false;
+            });
+          }
+        });
+      });
+    }
   }
 
   @override
   void dispose() {
     _isDisposed = true;
     _countdownTimer?.cancel();
-    _codeController = null;
+    _animationController.dispose();
+    for (var controller in _pinControllers) {
+      controller.dispose();
+    }
+    for (final c in _digitControllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -120,9 +209,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   Future<void> _verifyCode() async {
-    if (!mounted || _isDisposed || _codeController == null) return;
-    
-    final inputCode = _codeController!.text.trim();
+    if (!mounted || _isDisposed) return;
+
+    final inputCode = _enteredCode;
     
     if (inputCode == _verificationCode) {
       // Cancelar el timer antes de verificar
@@ -221,6 +310,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     }
   }
 
+  String get _enteredCode => _digitControllers.map((c) => c.text).join();
+
   void _showErrorDialog(String message) {
     if (!mounted || _isDisposed) return;
     
@@ -268,166 +359,325 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: EntranceFader(
-          delay: const Duration(milliseconds: 120),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-
-              Text(
-                'Verifica tu correo',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.displayLarge?.color,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Hemos enviado un código de 6 dígitos a\n${widget.email}',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              if (_codeController != null)
-                PinCodeTextField(
-                  appContext: context,
-                  length: 6,
-                  controller: _codeController!,
-                  keyboardType: TextInputType.number,
-                  animationType: AnimationType.fade,
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(12),
-                    fieldHeight: 60,
-                    fieldWidth: 50,
-                    activeFillColor: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    inactiveFillColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-                    selectedFillColor: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    activeColor: AppColors.primary,
-                    inactiveColor: isDark ? AppColors.darkDivider : AppColors.lightDivider,
-                    selectedColor: AppColors.primary,
-                  ),
-                  enableActiveFill: true,
-                  textStyle: TextStyle(
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  onCompleted: (code) {
-                    if (mounted && !_isLoading && !_isDisposed && !_isVerifying) {
-                      _verifyCode();
-                    }
-                  },
-                  onChanged: (value) {},
-                ),
-
-              const SizedBox(height: 30),
-
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: (_isLoading || _isResending || _isVerifying) ? null : _verifyCode,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isVerifying
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        )
-                      : _isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            )
-                          : const Text(
-                              'Verificar',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                                color: Colors.white,
-                              ),
-                            ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              Center(
-                child: TextButton(
-                  onPressed: (_resendCountdown > 0 || _isResending || _isVerifying) ? null : _resendCode,
-                  child: _isResending
-                      ? const SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          _resendCountdown > 0
-                              ? 'Reenviar código en ${_resendCountdown}s'
-                              : 'Reenviar código',
-                          style: TextStyle(
-                            color: (_resendCountdown > 0 || _isVerifying)
-                                ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)
-                                : AppColors.primary,
-                            fontSize: 14,
-                          ),
-                        ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              if (_verificationCode.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.warning.withOpacity(0.3)),
-                  ),
+        child: AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _fadeAnimation.value,
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: EntranceFader(
+                  delay: const Duration(milliseconds: 120),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 40),
+
                       Text(
-                        'Para desarrollo:',
+                        'Verifica tu correo',
                         style: TextStyle(
-                          color: AppColors.warning,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          color: Theme.of(context).textTheme.displayLarge?.color,
                         ),
                       ),
+
                       const SizedBox(height: 8),
+
                       Text(
-                        'Código: $_verificationCode',
+                        'Hemos enviado un código de 6 dígitos a\n${widget.email}',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                          fontSize: 12,
+                          fontSize: 16,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                         ),
                       ),
+
+                      const SizedBox(height: 40),
+
+                      AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              const count = 6;
+                              double gap = 8;
+                              const double maxCellWidth = 54;
+                              const double minCellWidth = 44;
+                              final available = constraints.maxWidth;
+
+                              double cellWidth = (available - gap * (count - 1)) / count;
+                              if (cellWidth > maxCellWidth) {
+                                cellWidth = maxCellWidth;
+                              } else if (cellWidth < minCellWidth) {
+                                gap = 4;
+                                cellWidth = (available - gap * (count - 1)) / count;
+                                if (cellWidth < minCellWidth) {
+                                  gap = 2;
+                                  cellWidth = (available - gap * (count - 1)) / count;
+                                  if (cellWidth < minCellWidth) {
+                                    cellWidth = minCellWidth; // último recurso
+                                  }
+                                }
+                              }
+
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(count, (index) {
+                                  return AnimatedBuilder(
+                                animation: _pinControllers[index],
+                                builder: (context, child) {
+                                  final isFocused = _focusNodes[index].hasFocus; // ya no dispara animación
+                                  final isFilled = _digitControllers[index].text.isNotEmpty;
+                                  final isDarkMode = isDark;
+                                  // Perspectiva MUY sutil sólo si está lleno (se eliminó por focus)
+                                  final tilt = isFilled ? 0.01 : 0.0;
+                                  final transform = Matrix4.identity()
+                                    ..setEntry(3, 2, 0.0015)
+                                    ..rotateX(-tilt)
+                                    ..rotateY(tilt);
+
+                                  final box = Transform.scale(
+                                    scale: _pinAnimations[index].value,
+                                    child: Transform(
+                                      transform: transform,
+                                      alignment: Alignment.center,
+                                      child: Container(
+                                        width: cellWidth, // responsivo según ancho disponible
+                                        height: 64,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(14),
+                                          gradient: isDarkMode
+                                              ? LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    AppColors.darkSurface.withOpacity(0.95),
+                                                    AppColors.darkCard.withOpacity(0.9),
+                                                  ],
+                                                )
+                                              : const LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    Color(0xFFF7F8FA),
+                                                    Color(0xFFFFFFFF),
+                                                  ],
+                                                ),
+                                          border: Border.all(
+                                            color: isFilled
+                                                ? AppColors.primary
+                                                : (isDarkMode ? AppColors.darkDivider : AppColors.lightDivider),
+                                            width: 2.0, // ancho consistente para evitar brincos
+                                          ),
+                                          boxShadow: [
+                                            // Sombra principal (inferior derecha)
+                                            BoxShadow(
+                                              color: (isDarkMode
+                                                      ? Colors.black.withOpacity(isFocused ? 0.45 : 0.35)
+                                                      : Colors.black.withOpacity(isFocused ? 0.10 : 0.07)),
+                                              blurRadius: isFocused ? 18 : 12,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                            // Brillo superior izquierdo para efecto 3D sutil
+                                            BoxShadow(
+                                              color: (isDarkMode
+                                                      ? Colors.white.withOpacity(isFocused ? 0.06 : 0.04)
+                                                      : Colors.white.withOpacity(isFocused ? 0.9 : 0.7)),
+                                              blurRadius: isFocused ? 12 : 8,
+                                              offset: const Offset(-2, -2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Focus(
+                                          focusNode: _focusNodes[index],
+                                          onFocusChange: (hasFocus) {
+                                            // Se eliminó animación por focus para que sólo ocurra al ingresar dígitos
+                                          },
+                                          onKeyEvent: (node, event) {
+                                            if (event is KeyDownEvent &&
+                                                event.logicalKey == LogicalKeyboardKey.backspace &&
+                                                _digitControllers[index].text.isEmpty &&
+                                                index > 0) {
+                                              _focusNodes[index - 1].requestFocus();
+                                              _digitControllers[index - 1].text = '';
+                                              return KeyEventResult.handled;
+                                            }
+                                            return KeyEventResult.ignored;
+                                          },
+                                          child: TextField(
+                                            controller: _digitControllers[index],
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                            textAlign: TextAlign.center,
+                                            maxLength: 1,
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodyLarge?.color,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 1.0,
+                                            ),
+                                            cursorColor: AppColors.primary,
+                                            decoration: const InputDecoration(
+                                              counterText: '',
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.symmetric(vertical: 18),
+                                            ),
+                                            onChanged: (value) async {
+                                              if (!mounted || _isDisposed) return;
+                                              if (value.isNotEmpty) {
+                                                // Solo mantener el último dígito ingresado
+                                                _digitControllers[index].text = value[value.length - 1];
+                                                _digitControllers[index].selection = const TextSelection.collapsed(offset: 1);
+                                                _triggerPinPulse(index);
+                                                if (index < 5) {
+                                                  _focusNodes[index + 1].requestFocus();
+                                                } else {
+                                                  _focusNodes[index].unfocus();
+                                                  FocusScope.of(context).unfocus();
+                                                }
+                                              }
+
+                                              final current = _enteredCode;
+                                              if (current.length == 6 && !current.contains(RegExp(r'[^0-9]')) &&
+                                                  mounted && !_isLoading && !_isVerifying) {
+                                                await _verifyCode();
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  return index < count - 1
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [box, SizedBox(width: gap)],
+                                        )
+                                      : box;
+                                },
+                              );
+                                }),
+                              );
+                            },
+                          ),
+                        ),
+
+                      const SizedBox(height: 30),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: (_isLoading || _isResending || _isVerifying)
+                              ? null
+                              : () async {
+                                  if (_enteredCode.length < 6) {
+                                    await DialogHelper.showWarning(
+                                      context,
+                                      title: 'Código incompleto',
+                                      message: 'Ingresa los 6 dígitos para continuar.',
+                                      primaryButtonText: 'Entendido',
+                                    );
+                                    return;
+                                  }
+                                  await _verifyCode();
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _isVerifying
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                )
+                              : _isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    )
+                                  : const Text(
+                                      'Verificar',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.5,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Center(
+                        child: TextButton(
+                          onPressed: (_resendCountdown > 0 || _isResending || _isVerifying) ? null : _resendCode,
+                          child: _isResending
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  _resendCountdown > 0
+                                      ? 'Reenviar código en ${_resendCountdown}s'
+                                      : 'Reenviar código',
+                                  style: TextStyle(
+                                    color: (_resendCountdown > 0 || _isVerifying)
+                                        ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)
+                                        : AppColors.primary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      if (_verificationCode.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.darkCard : AppColors.lightCard,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Para desarrollo:',
+                                style: TextStyle(
+                                  color: AppColors.warning,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Código: $_verificationCode',
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
-            ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
