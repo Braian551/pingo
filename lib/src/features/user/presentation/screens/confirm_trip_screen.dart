@@ -1,15 +1,15 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ping_go/src/global/services/mapbox_service.dart';
-import 'package:ping_go/src/core/config/env_config.dart';
+import 'package:viax/src/global/services/mapbox_service.dart';
+import 'package:viax/src/core/config/env_config.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../../services/trip_request_service.dart';
 
-/// Pantalla de confirmación de viaje
-/// Muestra detalles del viaje, precio estimado y opciones de vehículo
+/// Pantalla de confirmaciÃ³n de viaje
+/// Muestra detalles del viaje, precio estimado y opciones de vehÃ­culo
 class ConfirmTripScreen extends StatefulWidget {
   const ConfirmTripScreen({super.key});
 
@@ -29,8 +29,8 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
 
   final Map<String, Map<String, dynamic>> _vehicleTypes = {
     'moto_standard': {
-      'name': 'Moto Estándar',
-      'description': 'Rápida y económica',
+      'name': 'Moto EstÃ¡ndar',
+      'description': 'RÃ¡pida y econÃ³mica',
       'icon': Icons.motorcycle,
       'multiplier': 1.0,
       'capacity': '1 pasajero',
@@ -44,7 +44,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
     },
     'moto_deluxe': {
       'name': 'Moto Deluxe',
-      'description': 'Máximo confort',
+      'description': 'MÃ¡ximo confort',
       'icon': Icons.two_wheeler,
       'multiplier': 1.5,
       'capacity': '1 pasajero',
@@ -82,7 +82,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
           _isLoadingRoute = false;
         });
       } else {
-        // Fallback a cálculo simulado
+        // Fallback a cÃ¡lculo simulado
         setState(() {
           _estimatedDistance = 5.2;
           _estimatedTime = 15;
@@ -199,7 +199,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
           },
         );
 
-        // Si volvió de la pantalla de espera, regresar al home
+        // Si volviÃ³ de la pantalla de espera, regresar al home
         if (mounted && resultWaiting != null) {
           Navigator.popUntil(context, (route) => route.isFirst);
         }
@@ -317,7 +317,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
             child: _buildBottomPanel(pickupAddress, destinationAddress),
           ),
 
-          // Botón de back
+          // BotÃ³n de back
           Positioned(
             top: 50,
             left: 20,
@@ -416,7 +416,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
                               ),
                             ),
                             Text(
-                              '$_estimatedTime min • ${_estimatedDistance.toStringAsFixed(1)} km',
+                              '$_estimatedTime min â€¢ ${_estimatedDistance.toStringAsFixed(1)} km',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.7),
                                 fontSize: 14,

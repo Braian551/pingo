@@ -1,4 +1,4 @@
-import 'package:latlong2/latlong.dart';
+﻿import 'package:latlong2/latlong.dart';
 
 class MapService {
   static const double defaultZoom = 15.0;

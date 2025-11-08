@@ -1,10 +1,10 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../repositories/conductor_repository.dart';
 
-/// Use Case: Actualizar Ubicación del Conductor
+/// Use Case: Actualizar UbicaciÃ³n del Conductor
 /// 
-/// Encapsula la lógica de negocio para actualizar ubicación en tiempo real.
+/// Encapsula la lÃ³gica de negocio para actualizar ubicaciÃ³n en tiempo real.
 class UpdateConductorLocation {
   final ConductorRepository repository;
 
@@ -21,7 +21,7 @@ class UpdateConductorLocation {
     required double longitud,
   }) async {
     if (conductorId <= 0) {
-      return Error(ValidationFailure('ID de conductor inválido'));
+      return Error(ValidationFailure('ID de conductor invÃ¡lido'));
     }
 
     // Validar coordenadas

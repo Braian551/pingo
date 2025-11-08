@@ -1,8 +1,8 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Pantalla de métodos de pago
-/// Permite al usuario agregar, editar y eliminar métodos de pago
+/// Pantalla de mÃ©todos de pago
+/// Permite al usuario agregar, editar y eliminar mÃ©todos de pago
 class PaymentMethodsScreen extends StatefulWidget {
   const PaymentMethodsScreen({super.key});
 
@@ -55,7 +55,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Método de pago predeterminado actualizado'),
+        content: Text('MÃ©todo de pago predeterminado actualizado'),
         backgroundColor: Colors.black87,
         behavior: SnackBarBehavior.floating,
       ),
@@ -71,11 +71,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         title: const Text(
-          'Eliminar método de pago',
+          'Eliminar mÃ©todo de pago',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          '¿Estás seguro de que quieres eliminar este método de pago?',
+          'Â¿EstÃ¡s seguro de que quieres eliminar este mÃ©todo de pago?',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -95,7 +95,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Método de pago eliminado'),
+                  content: Text('MÃ©todo de pago eliminado'),
                   backgroundColor: Colors.black87,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -132,7 +132,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         backgroundColor: const Color(0xFFFFFF00),
         icon: const Icon(Icons.add, color: Colors.black),
         label: const Text(
-          'Agregar método',
+          'Agregar mÃ©todo',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -153,7 +153,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           const Expanded(
             child: Text(
-              'Métodos de pago',
+              'MÃ©todos de pago',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -185,7 +185,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           const SizedBox(height: 24),
           const Text(
-            'No hay métodos de pago',
+            'No hay mÃ©todos de pago',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -194,7 +194,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Agrega un método de pago para continuar',
+            'Agrega un mÃ©todo de pago para continuar',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 14,
@@ -263,7 +263,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                       children: [
                         Text(
                           isCard
-                              ? '${method['cardType']} •••• ${method['lastFourDigits']}'
+                              ? '${method['cardType']} â€¢â€¢â€¢â€¢ ${method['lastFourDigits']}'
                               : method['walletName'] as String,
                           style: const TextStyle(
                             color: Colors.white,
@@ -392,7 +392,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Agregar método de pago',
+              'Agregar mÃ©todo de pago',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -408,7 +408,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 children: [
                   _buildPaymentOption(
                     icon: Icons.credit_card,
-                    title: 'Tarjeta de crédito/débito',
+                    title: 'Tarjeta de crÃ©dito/dÃ©bito',
                     subtitle: 'Visa, Mastercard, etc.',
                     onTap: () {
                       Navigator.pop(context);
@@ -424,7 +424,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Próximamente disponible'),
+                          content: Text('PrÃ³ximamente disponible'),
                           backgroundColor: Colors.black87,
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -538,7 +538,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             children: [
               _buildTextField(
                 controller: cardNumberController,
-                label: 'Número de tarjeta',
+                label: 'NÃºmero de tarjeta',
                 hint: '1234 5678 9012 3456',
                 keyboardType: TextInputType.number,
                 maxLength: 19,

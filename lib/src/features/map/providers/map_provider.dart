@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../global/services/nominatim_service.dart';
 import '../../../global/services/mapbox_service.dart';
@@ -15,14 +15,14 @@ class MapProvider with ChangeNotifier {
   String? _selectedCity;
   String? _selectedState;
   
-  // Nueva funcionalidad: Rutas y Tráfico
+  // Nueva funcionalidad: Rutas y TrÃ¡fico
   MapboxRoute? _currentRoute;
   List<LatLng> _routeWaypoints = [];
   TrafficFlow? _currentTraffic;
   List<TrafficIncident> _trafficIncidents = [];
   QuotaStatus? _quotaStatus;
 
-  // Protección contra llamadas concurrentes
+  // ProtecciÃ³n contra llamadas concurrentes
   bool _isSelectingLocation = false;
 
   // Getters
@@ -42,7 +42,7 @@ class MapProvider with ChangeNotifier {
   List<TrafficIncident> get trafficIncidents => _trafficIncidents;
   QuotaStatus? get quotaStatus => _quotaStatus;
 
-  /// Seleccionar ubicación desde el mapa
+  /// Seleccionar ubicaciÃ³n desde el mapa
   Future<void> selectLocation(LatLng location) async {
     // Prevenir llamadas concurrentes
     if (_isSelectingLocation) return;
@@ -77,11 +77,11 @@ class MapProvider with ChangeNotifier {
     }
   }
 
-  /// Buscar dirección por texto - Mejorado para Colombia
+  /// Buscar direcciÃ³n por texto - Mejorado para Colombia
   void searchAddress(String query) async {
     _searchQuery = query;
 
-    // Si la consulta está vacía, limpiar resultados y regresar inmediatamente
+    // Si la consulta estÃ¡ vacÃ­a, limpiar resultados y regresar inmediatamente
     if (query.trim().isEmpty) {
       _searchResults = [];
       _isLoading = false;
@@ -93,22 +93,22 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Usar la ubicación actual como proximidad si está disponible
+      // Usar la ubicaciÃ³n actual como proximidad si estÃ¡ disponible
       _searchResults = await NominatimService.searchAddress(
         query,
         proximity: _currentLocation ?? _selectedLocation,
-        limit: 10, // Más resultados para mejor cobertura
+        limit: 10, // MÃ¡s resultados para mejor cobertura
       );
     } catch (e) {
       _searchResults = [];
-      print('Error buscando dirección: $e');
+      print('Error buscando direcciÃ³n: $e');
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  /// Seleccionar resultado de búsqueda
+  /// Seleccionar resultado de bÃºsqueda
   void selectSearchResult(NominatimResult result) {
     _selectedLocation = LatLng(result.lat, result.lon);
     _selectedAddress = result.getFormattedAddress();
@@ -119,20 +119,20 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Establecer ubicación actual
+  /// Establecer ubicaciÃ³n actual
   void setCurrentLocation(LatLng? location) {
     _currentLocation = location;
     notifyListeners();
   }
 
-  /// Limpiar búsqueda
+  /// Limpiar bÃºsqueda
   void clearSearch() {
     _searchResults = [];
     _searchQuery = null;
     notifyListeners();
   }
 
-  /// Limpiar selección
+  /// Limpiar selecciÃ³n
   void clearSelection() {
     _selectedLocation = null;
     _selectedAddress = null;
@@ -143,13 +143,13 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Permite establecer la dirección seleccionada manualmente (por ejemplo, edición)
+  /// Permite establecer la direcciÃ³n seleccionada manualmente (por ejemplo, ediciÃ³n)
   void setSelectedAddress(String address) {
     _selectedAddress = address;
     notifyListeners();
   }
 
-  /// Geocodificar una dirección de texto y centrar el mapa en el primer resultado.
+  /// Geocodificar una direcciÃ³n de texto y centrar el mapa en el primer resultado.
   /// Geocode an address and select the first result. Returns true if a result
   /// was found and selected, false otherwise.
   Future<bool> geocodeAndSelect(String address) async {
@@ -187,7 +187,7 @@ class MapProvider with ChangeNotifier {
   }
 
   // ============================================
-  // NUEVAS FUNCIONALIDADES: RUTAS Y TRÁFICO
+  // NUEVAS FUNCIONALIDADES: RUTAS Y TRÃFICO
   // ============================================
 
   /// Calcular ruta entre origen y destino usando Mapbox
@@ -235,18 +235,18 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Obtener información de tráfico en una ubicación
+  /// Obtener informaciÃ³n de trÃ¡fico en una ubicaciÃ³n
   Future<void> fetchTrafficInfo(LatLng location) async {
     try {
       final traffic = await TrafficService.getTrafficFlow(location: location);
       _currentTraffic = traffic;
       notifyListeners();
     } catch (e) {
-      print('Error obteniendo tráfico: $e');
+      print('Error obteniendo trÃ¡fico: $e');
     }
   }
 
-  /// Obtener incidentes de tráfico cercanos
+  /// Obtener incidentes de trÃ¡fico cercanos
   Future<void> fetchTrafficIncidents(LatLng location, {double radiusKm = 5.0}) async {
     try {
       final incidents = await TrafficService.getTrafficIncidents(

@@ -21,7 +21,7 @@ ini_set('display_errors', '1');
 ini_set('log_errors', '1');
 
 // Crear conexión mysqli
-$conn = new mysqli('localhost', 'root', 'root', 'pingo');
+$conn = new mysqli('localhost', 'root', 'root', 'viax');
 if ($conn->connect_error) {
     http_response_code(500);
     echo json_encode([

@@ -1,5 +1,5 @@
-name: ping_go
-description: "Ping-Go - App de Transporte"
+name: viax
+description: "Viax - App de Transporte"
 publish_to: 'none'
 version: 0.1.0
 

@@ -1,4 +1,4 @@
-import '../../../../core/error/result.dart';
+﻿import '../../../../core/error/result.dart';
 import '../../../../core/error/failures.dart';
 import '../entities/conductor_profile.dart';
 import '../repositories/conductor_repository.dart';
@@ -16,7 +16,7 @@ class UpdateDriverLicense {
     // Validaciones de negocio
     if (license.isExpired) {
       return const Error(
-        ValidationFailure('La licencia está vencida'),
+        ValidationFailure('La licencia estÃ¡ vencida'),
       );
     }
 

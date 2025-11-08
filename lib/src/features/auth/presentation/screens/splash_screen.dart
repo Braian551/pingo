@@ -1,7 +1,7 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/routes/route_names.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -138,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 8),
 
                 const Text(
-                  'Movilidad y entregas rápidas',
+                  'Movilidad y entregas rÃ¡pidas',
                   style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ],

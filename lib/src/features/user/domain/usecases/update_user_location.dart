@@ -1,16 +1,16 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/user_repository.dart';
 
-/// Use Case: Actualizar Ubicación del Usuario
+/// Use Case: Actualizar UbicaciÃ³n del Usuario
 /// 
-/// Encapsula la lógica de negocio para actualizar la ubicación principal.
+/// Encapsula la lÃ³gica de negocio para actualizar la ubicaciÃ³n principal.
 /// 
 /// RESPONSABILIDADES:
-/// - Validar datos de ubicación
+/// - Validar datos de ubicaciÃ³n
 /// - Invocar el repositorio para actualizar
-/// - Retornar la ubicación actualizada o un error
+/// - Retornar la ubicaciÃ³n actualizada o un error
 class UpdateUserLocation {
   final UserRepository repository;
 
@@ -19,12 +19,12 @@ class UpdateUserLocation {
   /// Ejecutar el caso de uso
   /// 
   /// [userId] ID del usuario (requerido)
-  /// [direccion] Dirección (opcional)
+  /// [direccion] DirecciÃ³n (opcional)
   /// [latitud] Latitud (opcional pero recomendado con longitud)
   /// [longitud] Longitud (opcional pero recomendado con latitud)
   /// [ciudad] Ciudad (opcional)
   /// [departamento] Departamento (opcional)
-  /// [pais] País (opcional)
+  /// [pais] PaÃ­s (opcional)
   Future<Result<UserLocation>> call({
     required int userId,
     String? direccion,
@@ -34,12 +34,12 @@ class UpdateUserLocation {
     String? departamento,
     String? pais,
   }) async {
-    // Validación: userId debe ser positivo
+    // ValidaciÃ³n: userId debe ser positivo
     if (userId <= 0) {
-      return Error(ValidationFailure('ID de usuario inválido'));
+      return Error(ValidationFailure('ID de usuario invÃ¡lido'));
     }
 
-    // Si se proporciona latitud, longitud también es requerida (y viceversa)
+    // Si se proporciona latitud, longitud tambiÃ©n es requerida (y viceversa)
     if ((latitud != null && longitud == null) ||
         (latitud == null && longitud != null)) {
       return Error(

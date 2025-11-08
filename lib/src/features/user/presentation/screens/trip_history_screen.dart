@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -16,28 +16,28 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     {
       'id': '1',
       'date': DateTime.now().subtract(const Duration(days: 1)),
-      'origin': 'Calle 123, Bogotá',
-      'destination': 'Carrera 45, Bogotá',
+      'origin': 'Calle 123, BogotÃ¡',
+      'destination': 'Carrera 45, BogotÃ¡',
       'distance': 5.2,
       'duration': 15,
       'price': 12500,
       'status': 'completed',
       'vehicleType': 'Standard',
-      'driverName': 'Carlos Rodríguez',
+      'driverName': 'Carlos RodrÃ­guez',
       'driverRating': 4.9,
-      'paymentMethod': 'Tarjeta •••• 4242',
+      'paymentMethod': 'Tarjeta â€¢â€¢â€¢â€¢ 4242',
     },
     {
       'id': '2',
       'date': DateTime.now().subtract(const Duration(days: 3)),
-      'origin': 'Avenida 68, Bogotá',
-      'destination': 'Centro Comercial, Bogotá',
+      'origin': 'Avenida 68, BogotÃ¡',
+      'destination': 'Centro Comercial, BogotÃ¡',
       'distance': 8.5,
       'duration': 22,
       'price': 18000,
       'status': 'completed',
       'vehicleType': 'Premium',
-      'driverName': 'María González',
+      'driverName': 'MarÃ­a GonzÃ¡lez',
       'driverRating': 5.0,
       'paymentMethod': 'Efectivo',
     },
@@ -51,15 +51,15 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
       'price': 32000,
       'status': 'completed',
       'vehicleType': 'XL',
-      'driverName': 'Pedro Martínez',
+      'driverName': 'Pedro MartÃ­nez',
       'driverRating': 4.8,
-      'paymentMethod': 'Tarjeta •••• 8888',
+      'paymentMethod': 'Tarjeta â€¢â€¢â€¢â€¢ 8888',
     },
     {
       'id': '4',
       'date': DateTime.now().subtract(const Duration(days: 10)),
       'origin': 'Universidad Nacional',
-      'destination': 'Parque Simón Bolívar',
+      'destination': 'Parque SimÃ³n BolÃ­var',
       'distance': 3.2,
       'duration': 12,
       'price': 8500,
@@ -208,7 +208,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tus viajes aparecerán aquí',
+            'Tus viajes aparecerÃ¡n aquÃ­',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 14,
@@ -453,14 +453,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildDetailSection(
-                    'Información del viaje',
+                    'InformaciÃ³n del viaje',
                     [
                       _buildDetailRow('Origen', trip['origin']),
                       _buildDetailRow('Destino', trip['destination']),
                       if (isCompleted) ...[
                         _buildDetailRow('Distancia', '${trip['distance']} km'),
-                        _buildDetailRow('Duración', '${trip['duration']} min'),
-                        _buildDetailRow('Categoría', trip['vehicleType']),
+                        _buildDetailRow('DuraciÃ³n', '${trip['duration']} min'),
+                        _buildDetailRow('CategorÃ­a', trip['vehicleType']),
                       ],
                     ],
                   ),
@@ -471,8 +471,8 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                       [
                         _buildDetailRow('Nombre', trip['driverName']),
                         _buildDetailRow(
-                          'Calificación',
-                          '${trip['driverRating']} ⭐',
+                          'CalificaciÃ³n',
+                          '${trip['driverRating']} â­',
                         ),
                       ],
                     ),
@@ -480,7 +480,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     _buildDetailSection(
                       'Pago',
                       [
-                        _buildDetailRow('Método', trip['paymentMethod']),
+                        _buildDetailRow('MÃ©todo', trip['paymentMethod']),
                         _buildDetailRow('Total', '\$${trip['price']}', highlight: true),
                       ],
                     ),
@@ -630,7 +630,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          '¿Qué problema experimentaste con este viaje?',
+          'Â¿QuÃ© problema experimentaste con este viaje?',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [

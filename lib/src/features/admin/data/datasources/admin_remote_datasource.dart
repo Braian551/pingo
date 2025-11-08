@@ -1,7 +1,7 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ping_go/src/core/config/app_config.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+import 'package:viax/src/core/config/app_config.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../models/admin_model.dart';
 
 /// Interfaz abstracta para el datasource de admin
@@ -15,7 +15,7 @@ abstract class AdminRemoteDataSource {
   Future<void> activateUser(int userId);
 }
 
-/// Implementación del datasource de admin
+/// ImplementaciÃ³n del datasource de admin
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
   final http.Client client;
   final String baseUrl;
@@ -38,14 +38,14 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
         if (data['success'] == true) {
           return SystemStatsModel.fromJson(data['stats']);
         } else {
-          throw ServerException(data['message'] ?? 'Error al obtener estadísticas');
+          throw ServerException(data['message'] ?? 'Error al obtener estadÃ­sticas');
         }
       } else {
         throw ServerException('Error del servidor: ${response.statusCode}');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -69,7 +69,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -92,7 +92,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -118,7 +118,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -146,7 +146,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -169,7 +169,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -192,7 +192,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 }

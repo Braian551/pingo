@@ -1,4 +1,4 @@
-/// Modelo para información del vehículo
+﻿/// Modelo para informaciÃ³n del vehÃ­culo
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -93,7 +93,7 @@ class VehicleModel {
     };
   }
 
-  /// Verifica si el vehículo tiene todos los datos básicos
+  /// Verifica si el vehÃ­culo tiene todos los datos bÃ¡sicos
   bool get isBasicComplete {
     return placa.isNotEmpty &&
         marca != null &&
@@ -105,7 +105,7 @@ class VehicleModel {
         color!.isNotEmpty;
   }
 
-  /// Verifica si todos los documentos del vehículo están completos
+  /// Verifica si todos los documentos del vehÃ­culo estÃ¡n completos
   bool get isDocumentsComplete {
     return soatNumero != null &&
         soatNumero!.isNotEmpty &&
@@ -117,7 +117,7 @@ class VehicleModel {
         tarjetaPropiedadNumero!.isNotEmpty;
   }
 
-  /// Verifica si todas las fotos están cargadas
+  /// Verifica si todas las fotos estÃ¡n cargadas
   bool get isPhotosComplete {
     return fotoVehiculo != null &&
         fotoVehiculo!.isNotEmpty &&
@@ -129,7 +129,7 @@ class VehicleModel {
         fotoTecnomecanica!.isNotEmpty;
   }
 
-  /// Verifica si el registro del vehículo está completo
+  /// Verifica si el registro del vehÃ­culo estÃ¡ completo
   bool get isComplete {
     return isBasicComplete && isDocumentsComplete;
   }
@@ -177,12 +177,12 @@ class VehicleModel {
   }
 }
 
-/// Tipo de vehículo
+/// Tipo de vehÃ­culo
 enum VehicleType {
   motocicleta('motocicleta', 'Motocicleta', FontAwesomeIcons.motorcycle),
   carro('carro', 'Carro', FontAwesomeIcons.car),
   furgoneta('furgoneta', 'Furgoneta', FontAwesomeIcons.vanShuttle),
-  camion('camion', 'Camión', FontAwesomeIcons.truck);
+  camion('camion', 'CamiÃ³n', FontAwesomeIcons.truck);
 
   final String value;
   final String label;

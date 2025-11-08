@@ -1,13 +1,13 @@
-import 'package:ping_go/src/core/error/result.dart';
+﻿import 'package:viax/src/core/error/result.dart';
 import '../entities/trip.dart';
 
 /// Contrato abstracto del repositorio de viajes
 /// 
 /// Define las operaciones que se pueden realizar con los datos de viajes
-/// sin especificar CÓMO se implementan (BD local, API, cache, etc.)
+/// sin especificar CÃ“MO se implementan (BD local, API, cache, etc.)
 /// 
 /// Usa Result<T> para manejo de errores funcional:
-/// - Success(data): Cuando la operación es exitosa
+/// - Success(data): Cuando la operaciÃ³n es exitosa
 /// - Error(failure): Cuando hay un error
 abstract class TripRepository {
   /// Crear un nuevo viaje (solicitud)

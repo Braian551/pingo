@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -128,7 +128,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
     } catch (e) {
       setState(() {
         _driverLocation = const LatLng(4.6097, -74.0817);
-        _error = 'No se pudo obtener tu ubicación. Usando ubicación de prueba.';
+        _error = 'No se pudo obtener tu ubicaciÃ³n. Usando ubicaciÃ³n de prueba.';
       });
       await _loadRoute();
     }
@@ -160,7 +160,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
       _loadingRoute = false;
     });
 
-    // Ajustar cámara a la ruta con padding
+    // Ajustar cÃ¡mara a la ruta con padding
     if (_routePoints.length > 1) {
       double minLat = double.infinity, maxLat = -double.infinity;
       double minLng = double.infinity, maxLng = -double.infinity;
@@ -421,7 +421,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
                     elevation: 0,
                   ),
                   child: Text(
-                    _toPickup ? 'He llegado al origen' : 'Finalizar navegación',
+                    _toPickup ? 'He llegado al origen' : 'Finalizar navegaciÃ³n',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

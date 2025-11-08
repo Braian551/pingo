@@ -1,10 +1,10 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../services/trip_request_service.dart';
 
 /// Pantalla de espera mientras se busca un conductor
-/// Estilo Uber/DiDi con animación de búsqueda y polling de estado
+/// Estilo Uber/DiDi con animaciÃ³n de bÃºsqueda y polling de estado
 class WaitingForDriverScreen extends StatefulWidget {
   final int solicitudId;
   final int clienteId;
@@ -56,7 +56,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
   }
 
   void _setupAnimations() {
-    // Animación de pulso para el icono central
+    // AnimaciÃ³n de pulso para el icono central
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -70,7 +70,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
       curve: Curves.easeInOut,
     ));
 
-    // Animación de ondas expansivas
+    // AnimaciÃ³n de ondas expansivas
     _waveController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -116,7 +116,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
       final trip = result['trip'];
       final estado = trip['estado'];
 
-      // Si el conductor aceptó, navegar a pantalla de tracking
+      // Si el conductor aceptÃ³, navegar a pantalla de tracking
       if (estado == 'aceptada' || estado == 'conductor_asignado') {
         _statusTimer?.cancel();
         _durationTimer?.cancel();
@@ -126,7 +126,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
           _conductorInfo = trip['conductor'];
         });
 
-        // Navegar a pantalla de tracking después de mostrar info del conductor
+        // Navegar a pantalla de tracking despuÃ©s de mostrar info del conductor
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             Navigator.pushReplacementNamed(
@@ -256,7 +256,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    '¿Cancelar Solicitud?',
+                    'Â¿Cancelar Solicitud?',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -265,7 +265,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    '¿Estás seguro de que deseas cancelar tu solicitud de viaje?',
+                    'Â¿EstÃ¡s seguro de que deseas cancelar tu solicitud de viaje?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,
@@ -305,7 +305,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
                             ),
                           ),
                           child: const Text(
-                            'Sí, Cancelar',
+                            'SÃ­, Cancelar',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -335,7 +335,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
       final result = await TripRequestService.cancelTripRequestWithReason(
         solicitudId: widget.solicitudId,
         clienteId: widget.clienteId,
-        motivo: 'Cliente canceló durante búsqueda',
+        motivo: 'Cliente cancelÃ³ durante bÃºsqueda',
       );
 
       if (!mounted) return;
@@ -367,7 +367,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // Header con botón de cancelar
+            // Header con botÃ³n de cancelar
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -411,7 +411,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
               ),
             ),
 
-            // Área de animación central
+            // Ãrea de animaciÃ³n central
             Expanded(
               child: Center(
                 child: _isSearching
@@ -475,7 +475,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
                 );
               },
             ),
-            // Onda 3 (más desfasada)
+            // Onda 3 (mÃ¡s desfasada)
             AnimatedBuilder(
               animation: _waveAnimation,
               builder: (context, child) {
@@ -521,7 +521,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
           ],
         ),
         const SizedBox(height: 40),
-        // Texto de búsqueda
+        // Texto de bÃºsqueda
         const Text(
           'Buscando el conductor perfecto',
           style: TextStyle(
@@ -532,7 +532,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Tiempo de búsqueda: ${_formatDuration()}',
+          'Tiempo de bÃºsqueda: ${_formatDuration()}',
           style: const TextStyle(
             color: Colors.white54,
             fontSize: 14,
@@ -579,7 +579,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
         ),
         const SizedBox(height: 24),
         const Text(
-          '¡Conductor Encontrado!',
+          'Â¡Conductor Encontrado!',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -596,7 +596,7 @@ class _WaitingForDriverScreenState extends State<WaitingForDriverScreen>
           ),
         ),
         const SizedBox(height: 24),
-        // Info del vehículo
+        // Info del vehÃ­culo
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 40),
           padding: const EdgeInsets.all(20),

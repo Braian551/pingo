@@ -1,8 +1,8 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/features/map/presentation/screens/location_picker_screen.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -131,7 +131,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      email ?? 'No hay sesión',
+                      email ?? 'No hay sesiÃ³n',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
@@ -141,7 +141,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     Text(
                       _location != null && (_location!['direccion'] ?? '').toString().isNotEmpty
                           ? (_location!['direccion'] ?? '')
-                          : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : 'Sin dirección'),
+                          : (_profileData != null && (_profileData!['direccion'] ?? '').toString().isNotEmpty ? _profileData!['direccion'] : 'Sin direcciÃ³n'),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 12,
@@ -170,7 +170,7 @@ class _ProfileTabState extends State<ProfileTab> {
             );
             setState(() => _loading = true);
             await _loadSession();
-            if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
+            if (mounted) CustomSnackbar.showSuccess(context, message: 'DirecciÃ³n actualizada correctamente');
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
@@ -188,7 +188,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     const Icon(Icons.location_on, color: Colors.black, size: 24),
                     const SizedBox(width: 12),
                     const Text(
-                      'Editar dirección',
+                      'Editar direcciÃ³n',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -220,7 +220,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     const Icon(Icons.exit_to_app, color: Colors.white, size: 24),
                     const SizedBox(width: 12),
                     const Text(
-                      'Cerrar sesión',
+                      'Cerrar sesiÃ³n',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -373,7 +373,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  email ?? 'No hay sesión',
+                                  email ?? 'No hay sesiÃ³n',
                                   style: const TextStyle(color: Colors.white70),
                                 ),
                                 const SizedBox(height: 6),
@@ -395,24 +395,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      // Abrir LocationPicker para editar dirección; al volver recargar perfil
+                      // Abrir LocationPicker para editar direcciÃ³n; al volver recargar perfil
                       await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (ctx) => const LocationPickerScreen()),
                       );
                       setState(() => _loading = true);
                       await _loadSession();
-                      if (mounted) CustomSnackbar.showSuccess(context, message: 'Dirección actualizada correctamente');
+                      if (mounted) CustomSnackbar.showSuccess(context, message: 'DirecciÃ³n actualizada correctamente');
                     },
                     icon: const Icon(Icons.location_on),
-                    label: const Text('Editar dirección'),
+                    label: const Text('Editar direcciÃ³n'),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFFF00), foregroundColor: Colors.black),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
                     onPressed: _logout,
                     icon: const Icon(Icons.exit_to_app),
-                    label: const Text('Cerrar sesión'),
+                    label: const Text('Cerrar sesiÃ³n'),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
                   ),
                 ],

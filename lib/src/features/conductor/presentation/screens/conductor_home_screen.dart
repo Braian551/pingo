@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -86,7 +86,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
       if (profile != null) {
-        // Verificar si debe mostrar alerta de aprobación
+        // Verificar si debe mostrar alerta de aprobaciÃ³n
         final shouldShowApproval = await ApprovalNotificationService.shouldShowApprovalAlert(
           _conductorId!,
           profile.estadoVerificacion.value,
@@ -94,7 +94,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         );
 
         if (shouldShowApproval && mounted) {
-          // Esperar un poco antes de mostrar el diálogo
+          // Esperar un poco antes de mostrar el diÃ¡logo
           await Future.delayed(const Duration(milliseconds: 500));
           
           if (mounted) {
@@ -119,8 +119,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   context,
                   missingItems: profile.pendingTasks.isEmpty 
                     ? [
-                        'Registrar licencia de conducción',
-                        'Registrar vehículo',
+                        'Registrar licencia de conducciÃ³n',
+                        'Registrar vehÃ­culo',
                         'Completar documentos',
                       ]
                     : profile.pendingTasks,
@@ -194,7 +194,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case ProfileAction.inReview:
       case ProfileAction.awaitingApproval:
         // Navegar a la pantalla de perfil
-        // La pantalla detectará automáticamente si el conductor está aprobado
+        // La pantalla detectarÃ¡ automÃ¡ticamente si el conductor estÃ¡ aprobado
         final profileProvider = Provider.of<ConductorProfileProvider>(
           context,
           listen: false,
@@ -323,8 +323,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                         context,
                         missingItems: profile.pendingTasks.isEmpty 
                           ? [
-                              'Registrar licencia de conducción',
-                              'Registrar vehículo',
+                              'Registrar licencia de conducciÃ³n',
+                              'Registrar vehÃ­culo',
                               'Completar documentos',
                             ]
                           : profile.pendingTasks,
@@ -338,7 +338,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       return;
                     }
                     
-                    // Perfil completo - navegar a pantalla de búsqueda
+                    // Perfil completo - navegar a pantalla de bÃºsqueda
                     final nombre = provider.conductor?.nombre ?? widget.conductorUser['nombre'] ?? 'Conductor';
                     final tipoVehiculo = profile.vehiculo?.tipo.value ?? 'moto';
                     
@@ -353,7 +353,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       ),
                     );
                     
-                    // Si el conductor aceptó un viaje, recargar datos
+                    // Si el conductor aceptÃ³ un viaje, recargar datos
                     if (result == true && mounted) {
                       await provider.loadViajesActivos(_conductorId!);
                     }
@@ -489,7 +489,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       builder: (context, provider, child) {
         final nombre = provider.conductor?.nombre ?? widget.conductorUser['nombre'] ?? 'Conductor';
         final hora = DateTime.now().hour;
-        String saludo = 'Buenos días';
+        String saludo = 'Buenos dÃ­as';
         if (hora >= 12 && hora < 18) {
           saludo = 'Buenas tardes';
         } else if (hora >= 18) {
@@ -606,7 +606,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Estadísticas de hoy',
+              'EstadÃ­sticas de hoy',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -641,7 +641,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 Expanded(
                   child: ConductorStatsCard(
                     icon: Icons.star,
-                    title: 'Calificación',
+                    title: 'CalificaciÃ³n',
                     value: conductor?.calificacionPromedio.toStringAsFixed(1) ?? '0.0',
                     color: Colors.orange,
                   ),

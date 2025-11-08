@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ping_go/main.dart';
+import 'package:viax/main.dart';
 
 void main() {
   testWidgets('App smoke test builds without throwing', (WidgetTester tester) async {

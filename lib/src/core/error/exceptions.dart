@@ -1,12 +1,12 @@
-/// Excepciones para la capa de datos
+﻿/// Excepciones para la capa de datos
 /// 
 /// Estas excepciones se lanzan en datasources y se convierten
 /// en Failures en la capa de repositorio.
 /// 
-/// NOTA: Las excepciones son para errores técnicos/infraestructura,
-/// los Failures son para la lógica de negocio.
+/// NOTA: Las excepciones son para errores tÃ©cnicos/infraestructura,
+/// los Failures son para la lÃ³gica de negocio.
 
-/// Excepción base
+/// ExcepciÃ³n base
 abstract class AppException implements Exception {
   final String message;
   const AppException(this.message);
@@ -20,7 +20,7 @@ class ServerException extends AppException {
   const ServerException(String message) : super(message);
 }
 
-/// Error de conexión/red
+/// Error de conexiÃ³n/red
 class NetworkException extends AppException {
   const NetworkException(String message) : super(message);
 }
@@ -30,22 +30,22 @@ class NotFoundException extends AppException {
   const NotFoundException(String message) : super(message);
 }
 
-/// Error de caché/BD local
+/// Error de cachÃ©/BD local
 class CacheException extends AppException {
   const CacheException(String message) : super(message);
 }
 
-/// Error de autenticación (HTTP 401)
+/// Error de autenticaciÃ³n (HTTP 401)
 class AuthException extends AppException {
   const AuthException(String message) : super(message);
 }
 
-/// Error de autorización (HTTP 403)
+/// Error de autorizaciÃ³n (HTTP 403)
 class UnauthorizedException extends AppException {
   const UnauthorizedException(String message) : super(message);
 }
 
-/// Error de validación de datos
+/// Error de validaciÃ³n de datos
 class ValidationException extends AppException {
   const ValidationException(String message) : super(message);
 }

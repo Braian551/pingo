@@ -1,14 +1,14 @@
-// lib/src/core/constants/app_constants.dart
-import 'package:ping_go/src/core/config/app_config.dart';
+﻿// lib/src/core/constants/app_constants.dart
+import 'package:viax/src/core/config/app_config.dart';
 
 class AppConstants {
   // ============================================
-  // CONFIGURACIÓN DE MAPAS (MAPBOX)
+  // CONFIGURACIÃ“N DE MAPAS (MAPBOX)
   // ============================================
-  // La configuración de Mapbox ahora está en EnvConfig
+  // La configuraciÃ³n de Mapbox ahora estÃ¡ en EnvConfig
   // Ver: lib/src/core/config/env_config.dart
   
-  // Ubicación por defecto (Bogotá, Colombia)
+  // UbicaciÃ³n por defecto (BogotÃ¡, Colombia)
   static const double defaultLatitude = 4.6097;
   static const double defaultLongitude = -74.0817;
   static const double defaultZoom = 15.0;
@@ -21,7 +21,7 @@ class AppConstants {
   static const String mapStyleSatellite = 'satellite-streets-v12';
   
   // ============================================
-  // CONFIGURACIÓN DE EMAIL
+  // CONFIGURACIÃ“N DE EMAIL
   // ============================================
   // NOTA: email_service.php YA FUE MOVIDO a auth/ microservicio
   // Usar: AppConfig.authServiceUrl + '/email_service.php'
@@ -30,13 +30,13 @@ class AppConstants {
   static const bool useEmailMock = false;
   
   // ============================================
-  // CONFIGURACIÓN DE BASE DE DATOS
+  // CONFIGURACIÃ“N DE BASE DE DATOS
   // ============================================
-  // NOTA: La app ahora usa API REST, no conexión directa a MySQL
-  // La base de datos se maneja a través del backend de Railway
+  // NOTA: La app ahora usa API REST, no conexiÃ³n directa a MySQL
+  // La base de datos se maneja a travÃ©s del backend de Railway
   // Ver: lib/src/global/config/api_config.dart para URLs de API
 
-  // Configuración legacy (ya no se usa - mantener por compatibilidad)
+  // ConfiguraciÃ³n legacy (ya no se usa - mantener por compatibilidad)
   @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
   static const String databaseHost = 'sql10.freesqldatabase.com';
   @Deprecated('La app ahora usa API REST. Ver ApiConfig para URLs')
@@ -49,14 +49,14 @@ class AppConstants {
   static const String databasePassword = 'BVeitwKy1q';
   
   // ============================================
-  // CONFIGURACIÓN DE LA APLICACIÓN
+  // CONFIGURACIÃ“N DE LA APLICACIÃ“N
   // ============================================
   static const String appName = 'PingGo';
   static const String appVersion = '1.0.0';
   static const String baseApiUrl = 'https://api.pingo.com';
   
   // ============================================
-  // CONFIGURACIÓN DE VALIDACIÓN
+  // CONFIGURACIÃ“N DE VALIDACIÃ“N
   // ============================================
   static const int minPasswordLength = 6;
   static const int minPhoneLength = 10;
@@ -64,7 +64,7 @@ class AppConstants {
   static const int resendCodeDelaySeconds = 60;
   
   // ============================================
-  // CONFIGURACIÓN DE RUTAS Y NAVEGACIÓN
+  // CONFIGURACIÃ“N DE RUTAS Y NAVEGACIÃ“N
   // ============================================
   static const String defaultRoutingProfile = 'driving'; // driving, walking, cycling
   static const bool enableTrafficInfo = true;
@@ -72,7 +72,7 @@ class AppConstants {
   static const double trafficCheckRadiusKm = 5.0;
   
   // ============================================
-  // CONFIGURACIÓN DE NOTIFICACIONES
+  // CONFIGURACIÃ“N DE NOTIFICACIONES
   // ============================================
   static const bool enableQuotaNotifications = true;
   static const bool showQuotaInUI = true;

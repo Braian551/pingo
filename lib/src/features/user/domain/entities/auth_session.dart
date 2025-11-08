@@ -1,8 +1,8 @@
-import 'user.dart';
+﻿import 'user.dart';
 
 /// Entidad de Dominio: AuthSession
 /// 
-/// Representa una sesión de autenticación activa.
+/// Representa una sesiÃ³n de autenticaciÃ³n activa.
 /// Inmutable y sin dependencias de frameworks.
 class AuthSession {
   final User user;
@@ -17,20 +17,20 @@ class AuthSession {
     required this.loginAt,
   });
 
-  /// Validación: Sesión tiene token válido
+  /// ValidaciÃ³n: SesiÃ³n tiene token vÃ¡lido
   bool get hasToken => token != null && token!.isNotEmpty;
 
-  /// Validación: Token no ha expirado
+  /// ValidaciÃ³n: Token no ha expirado
   bool get isTokenValid {
     if (!hasToken) return false;
-    if (tokenExpiresAt == null) return true; // Sin expiración definida
+    if (tokenExpiresAt == null) return true; // Sin expiraciÃ³n definida
     return DateTime.now().isBefore(tokenExpiresAt!);
   }
 
-  /// Validación: Sesión es válida
+  /// ValidaciÃ³n: SesiÃ³n es vÃ¡lida
   bool get isValid => hasToken && isTokenValid;
 
-  /// Tiempo restante hasta expiración (null si no expira)
+  /// Tiempo restante hasta expiraciÃ³n (null si no expira)
   Duration? get timeUntilExpiration {
     if (tokenExpiresAt == null) return null;
     final now = DateTime.now();

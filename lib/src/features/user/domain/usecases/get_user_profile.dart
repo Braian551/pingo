@@ -1,14 +1,14 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/user_repository.dart';
 
 /// Use Case: Obtener Perfil de Usuario
 /// 
-/// Encapsula la lógica de negocio para obtener el perfil de un usuario.
+/// Encapsula la lÃ³gica de negocio para obtener el perfil de un usuario.
 /// 
 /// RESPONSABILIDADES:
-/// - Validar parámetros de entrada
+/// - Validar parÃ¡metros de entrada
 /// - Invocar el repositorio para obtener el perfil
 /// - Retornar el perfil o un error
 class GetUserProfile {
@@ -21,9 +21,9 @@ class GetUserProfile {
   /// [userId] ID del usuario (opcional si hay email)
   /// [email] Email del usuario (opcional si hay userId)
   /// 
-  /// Al menos uno de los dos parámetros debe ser proporcionado
+  /// Al menos uno de los dos parÃ¡metros debe ser proporcionado
   Future<Result<User>> call({int? userId, String? email}) async {
-    // Validación: al menos uno debe estar presente
+    // ValidaciÃ³n: al menos uno debe estar presente
     if (userId == null && (email == null || email.trim().isEmpty)) {
       return Error(
         ValidationFailure(
@@ -34,7 +34,7 @@ class GetUserProfile {
 
     // Validar email si se proporciona
     if (email != null && email.isNotEmpty && !_isValidEmail(email)) {
-      return Error(ValidationFailure('El email no es válido'));
+      return Error(ValidationFailure('El email no es vÃ¡lido'));
     }
 
     return await repository.getProfile(

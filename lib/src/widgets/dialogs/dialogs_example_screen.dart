@@ -1,5 +1,5 @@
-// lib/src/widgets/dialogs/dialogs_example_screen.dart
-// Esta pantalla es solo para demostración y pruebas
+﻿// lib/src/widgets/dialogs/dialogs_example_screen.dart
+// Esta pantalla es solo para demostraciÃ³n y pruebas
 // No es necesaria para el funcionamiento de la app
 
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ class DialogsExampleScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Diálogos',
+              'DiÃ¡logos',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -32,13 +32,13 @@ class DialogsExampleScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Diálogo de éxito
+            // DiÃ¡logo de Ã©xito
             ElevatedButton(
               onPressed: () {
                 DialogHelper.showSuccess(
                   context,
-                  title: '¡Registro Exitoso!',
-                  message: 'Tu cuenta ha sido creada correctamente y ya puedes comenzar a usar la aplicación.',
+                  title: 'Â¡Registro Exitoso!',
+                  message: 'Tu cuenta ha sido creada correctamente y ya puedes comenzar a usar la aplicaciÃ³n.',
                   primaryButtonText: 'Continuar',
                 );
               },
@@ -46,18 +46,18 @@ class DialogsExampleScreen extends StatelessWidget {
                 backgroundColor: const Color(0xFF4CAF50),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Diálogo de Éxito'),
+              child: const Text('Mostrar DiÃ¡logo de Ã‰xito'),
             ),
 
             const SizedBox(height: 12),
 
-            // Diálogo de error
+            // DiÃ¡logo de error
             ElevatedButton(
               onPressed: () {
                 DialogHelper.showError(
                   context,
-                  title: 'Código Incorrecto',
-                  message: 'El código de verificación que ingresaste no es válido. Por favor, verifica e intenta nuevamente.',
+                  title: 'CÃ³digo Incorrecto',
+                  message: 'El cÃ³digo de verificaciÃ³n que ingresaste no es vÃ¡lido. Por favor, verifica e intenta nuevamente.',
                   primaryButtonText: 'Reintentar',
                 );
               },
@@ -65,18 +65,18 @@ class DialogsExampleScreen extends StatelessWidget {
                 backgroundColor: const Color(0xFFFF5252),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Diálogo de Error'),
+              child: const Text('Mostrar DiÃ¡logo de Error'),
             ),
 
             const SizedBox(height: 12),
 
-            // Diálogo de advertencia
+            // DiÃ¡logo de advertencia
             ElevatedButton(
               onPressed: () {
                 DialogHelper.showWarning(
                   context,
-                  title: 'Acción Irreversible',
-                  message: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas continuar?',
+                  title: 'AcciÃ³n Irreversible',
+                  message: 'Esta acciÃ³n no se puede deshacer. Â¿EstÃ¡s seguro de que deseas continuar?',
                   primaryButtonText: 'Continuar',
                   secondaryButtonText: 'Cancelar',
                 );
@@ -85,18 +85,18 @@ class DialogsExampleScreen extends StatelessWidget {
                 backgroundColor: const Color(0xFFFFA726),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Diálogo de Advertencia'),
+              child: const Text('Mostrar DiÃ¡logo de Advertencia'),
             ),
 
             const SizedBox(height: 12),
 
-            // Diálogo informativo
+            // DiÃ¡logo informativo
             ElevatedButton(
               onPressed: () {
                 DialogHelper.showInfo(
                   context,
-                  title: 'Información Importante',
-                  message: 'Tu ubicación será utilizada para brindarte un mejor servicio y mostrarte las opciones más cercanas.',
+                  title: 'InformaciÃ³n Importante',
+                  message: 'Tu ubicaciÃ³n serÃ¡ utilizada para brindarte un mejor servicio y mostrarte las opciones mÃ¡s cercanas.',
                   primaryButtonText: 'Entendido',
                 );
               },
@@ -105,18 +105,18 @@ class DialogsExampleScreen extends StatelessWidget {
                 foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Diálogo Informativo'),
+              child: const Text('Mostrar DiÃ¡logo Informativo'),
             ),
 
             const SizedBox(height: 12),
 
-            // Diálogo de confirmación
+            // DiÃ¡logo de confirmaciÃ³n
             ElevatedButton(
               onPressed: () async {
                 final result = await DialogHelper.showConfirmation(
                   context,
-                  title: '¿Eliminar Cuenta?',
-                  message: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es permanente.',
+                  title: 'Â¿Eliminar Cuenta?',
+                  message: 'Â¿EstÃ¡s seguro de que deseas eliminar tu cuenta? Esta acciÃ³n es permanente.',
                   confirmText: 'Eliminar',
                   cancelText: 'Cancelar',
                 );
@@ -124,7 +124,7 @@ class DialogsExampleScreen extends StatelessWidget {
                 if (result == true && context.mounted) {
                   CustomSnackbar.showSuccess(
                     context,
-                    message: 'Acción confirmada',
+                    message: 'AcciÃ³n confirmada',
                   );
                 }
               },
@@ -132,7 +132,7 @@ class DialogsExampleScreen extends StatelessWidget {
                 backgroundColor: Colors.white24,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Diálogo de Confirmación'),
+              child: const Text('Mostrar DiÃ¡logo de ConfirmaciÃ³n'),
             ),
 
             const SizedBox(height: 32),
@@ -147,19 +147,19 @@ class DialogsExampleScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Snackbar de éxito
+            // Snackbar de Ã©xito
             ElevatedButton(
               onPressed: () {
                 CustomSnackbar.showSuccess(
                   context,
-                  message: '¡Correo verificado exitosamente!',
+                  message: 'Â¡Correo verificado exitosamente!',
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4CAF50),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Snackbar de Éxito'),
+              child: const Text('Mostrar Snackbar de Ã‰xito'),
             ),
 
             const SizedBox(height: 12),
@@ -203,7 +203,7 @@ class DialogsExampleScreen extends StatelessWidget {
               onPressed: () {
                 CustomSnackbar.showInfo(
                   context,
-                  message: 'Cargando información del perfil...',
+                  message: 'Cargando informaciÃ³n del perfil...',
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -216,7 +216,7 @@ class DialogsExampleScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Snackbar con acción
+            // Snackbar con acciÃ³n
             ElevatedButton(
               onPressed: () {
                 CustomSnackbar.showError(
@@ -235,7 +235,7 @@ class DialogsExampleScreen extends StatelessWidget {
                 backgroundColor: Colors.white24,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Mostrar Snackbar con Acción'),
+              child: const Text('Mostrar Snackbar con AcciÃ³n'),
             ),
 
             const SizedBox(height: 24),

@@ -1,4 +1,4 @@
-import 'package:http/http.dart' as http;
+﻿import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Conductor feature
@@ -66,20 +66,20 @@ import '../../features/admin/domain/usecases/approve_driver.dart';
 import '../../features/admin/domain/usecases/reject_driver.dart';
 import '../../features/admin/presentation/providers/admin_provider.dart';
 
-/// Service Locator - Contenedor de Inyección de Dependencias
+/// Service Locator - Contenedor de InyecciÃ³n de Dependencias
 /// 
-/// Maneja la creación e inyección de todas las dependencias.
-/// Usa el patrón Singleton para mantener instancias únicas.
+/// Maneja la creaciÃ³n e inyecciÃ³n de todas las dependencias.
+/// Usa el patrÃ³n Singleton para mantener instancias Ãºnicas.
 /// 
 /// VENTAJAS PARA MICROSERVICIOS:
-/// - Centraliza la configuración de datasources (URLs de servicios)
+/// - Centraliza la configuraciÃ³n de datasources (URLs de servicios)
 /// - Facilita cambiar entre implementaciones (mock, real, diferentes endpoints)
 /// - Permite testing con dependencias mockeadas
 /// 
 /// ALTERNATIVAS:
-/// - get_it package (más robusto para proyectos grandes)
+/// - get_it package (mÃ¡s robusto para proyectos grandes)
 /// - Provider con MultiProvider (usado actualmente en main.dart)
-/// - injectable + get_it (con generación de código)
+/// - injectable + get_it (con generaciÃ³n de cÃ³digo)
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();
   factory ServiceLocator() => _instance;
@@ -369,7 +369,7 @@ class ServiceLocator {
     );
   }
 
-  /// Crea un provider de administración configurado con todas las dependencias
+  /// Crea un provider de administraciÃ³n configurado con todas las dependencias
   AdminProvider createAdminProvider() {
     return AdminProvider(
       getSystemStatsUseCase: _getSystemStats,

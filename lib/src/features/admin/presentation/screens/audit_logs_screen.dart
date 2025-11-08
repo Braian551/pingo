@@ -1,7 +1,7 @@
-// lib/src/features/admin/presentation/screens/audit_logs_screen.dart
+﻿// lib/src/features/admin/presentation/screens/audit_logs_screen.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/global/services/admin/admin_service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 
@@ -141,7 +141,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Logs de Auditoría',
+                  'Logs de AuditorÃ­a',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -369,7 +369,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
             ),
             const SizedBox(height: 4),
             Text(
-              'Sistema de auditoría',
+              'Sistema de auditorÃ­a',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),
                 fontSize: 13,
@@ -436,7 +436,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
               ),
               const SizedBox(height: 8),
               Text(
-                'Los registros de actividad aparecerán aquí',
+                'Los registros de actividad aparecerÃ¡n aquÃ­',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.4),
                   fontSize: 13,
@@ -691,8 +691,8 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                   ],
                 ),
                 const SizedBox(height: 24),
-                _buildDetailRow('Acción', log['accion']),
-                _buildDetailRow('Descripción', log['descripcion']),
+                _buildDetailRow('AcciÃ³n', log['accion']),
+                _buildDetailRow('DescripciÃ³n', log['descripcion']),
                 _buildDetailRow('Usuario', '${log['nombre'] ?? ''} ${log['apellido'] ?? ''}'.trim()),
                 _buildDetailRow('Email', log['email']),
                 _buildDetailRow('IP', log['ip_address']),

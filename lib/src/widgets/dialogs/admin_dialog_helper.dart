@@ -1,10 +1,10 @@
-// lib/src/widgets/dialogs/admin_dialog_helper.dart
+﻿// lib/src/widgets/dialogs/admin_dialog_helper.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Helper específico para diálogos administrativos con diseños personalizados
+/// Helper especÃ­fico para diÃ¡logos administrativos con diseÃ±os personalizados
 class AdminDialogHelper {
-  /// Muestra un diálogo de confirmación para aprobar conductor
+  /// Muestra un diÃ¡logo de confirmaciÃ³n para aprobar conductor
   static Future<bool?> showApprovalConfirmation(
     BuildContext context, {
     required String conductorName,
@@ -15,7 +15,7 @@ class AdminDialogHelper {
       barrierColor: Colors.black.withOpacity(0.7),
       builder: (context) => _AdminConfirmationDialog(
         type: _AdminDialogType.approve,
-        title: '¿Aprobar Conductor?',
+        title: 'Â¿Aprobar Conductor?',
         conductorName: conductorName,
         subtitle: subtitle,
         confirmText: 'Aprobar',
@@ -24,7 +24,7 @@ class AdminDialogHelper {
     );
   }
 
-  /// Muestra un diálogo de confirmación para rechazar conductor
+  /// Muestra un diÃ¡logo de confirmaciÃ³n para rechazar conductor
   static Future<String?> showRejectionDialog(
     BuildContext context, {
     required String conductorName,
@@ -41,7 +41,7 @@ class AdminDialogHelper {
     );
   }
 
-  /// Muestra un diálogo informativo cuando no hay historial
+  /// Muestra un diÃ¡logo informativo cuando no hay historial
   static Future<void> showNoHistoryDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -49,13 +49,13 @@ class AdminDialogHelper {
       builder: (context) => _AdminInfoDialog(
         icon: Icons.folder_open_rounded,
         title: 'Sin Historial',
-        message: 'Este conductor aún no tiene historial de documentos registrado.',
+        message: 'Este conductor aÃºn no tiene historial de documentos registrado.',
         tip: 'El historial se genera cuando el conductor sube o actualiza sus documentos.',
       ),
     );
   }
 
-  /// Muestra un diálogo de carga
+  /// Muestra un diÃ¡logo de carga
   static void showLoading(BuildContext context, {String? message}) {
     showDialog(
       context: context,
@@ -99,7 +99,7 @@ enum _AdminDialogType {
   // reject, // No se usa actualmente pero se puede usar en el futuro
 }
 
-/// Diálogo de confirmación personalizado para acciones administrativas
+/// DiÃ¡logo de confirmaciÃ³n personalizado para acciones administrativas
 class _AdminConfirmationDialog extends StatelessWidget {
   final _AdminDialogType type;
   final String title;
@@ -175,7 +175,7 @@ class _AdminConfirmationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   
-                  // Título
+                  // TÃ­tulo
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
@@ -193,7 +193,7 @@ class _AdminConfirmationDialog extends StatelessWidget {
               ),
             ),
 
-            // Información del conductor
+            // InformaciÃ³n del conductor
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Container(
@@ -270,8 +270,8 @@ class _AdminConfirmationDialog extends StatelessWidget {
                     Expanded(
                       child: Text(
                         type == _AdminDialogType.approve
-                            ? 'Esta acción aprobará al conductor y le permitirá empezar a realizar viajes.'
-                            : 'Esta acción rechazará los documentos del conductor.',
+                            ? 'Esta acciÃ³n aprobarÃ¡ al conductor y le permitirÃ¡ empezar a realizar viajes.'
+                            : 'Esta acciÃ³n rechazarÃ¡ los documentos del conductor.',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.white.withOpacity(0.9),
@@ -291,7 +291,7 @@ class _AdminConfirmationDialog extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
               child: Column(
                 children: [
-                  // Botón confirmar
+                  // BotÃ³n confirmar
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -318,7 +318,7 @@ class _AdminConfirmationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Botón cancelar
+                  // BotÃ³n cancelar
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -355,7 +355,7 @@ class _AdminConfirmationDialog extends StatelessWidget {
   }
 }
 
-/// Diálogo para rechazar conductor con campo de texto
+/// DiÃ¡logo para rechazar conductor con campo de texto
 class _AdminRejectionDialog extends StatelessWidget {
   final String conductorName;
   final TextEditingController motivoController;
@@ -602,7 +602,7 @@ class _AdminRejectionDialog extends StatelessWidget {
   }
 }
 
-/// Diálogo informativo personalizado
+/// DiÃ¡logo informativo personalizado
 class _AdminInfoDialog extends StatelessWidget {
   final IconData icon;
   final String title;

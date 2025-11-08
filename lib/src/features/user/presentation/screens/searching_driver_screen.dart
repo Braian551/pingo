@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -63,7 +63,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
     _searchTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       _searchDrivers();
     });
-    // Búsqueda inicial
+    // BÃºsqueda inicial
     _searchDrivers();
   }
 
@@ -82,7 +82,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
         _nearbyDrivers = drivers;
       });
 
-      // Si no hay conductores después de 30 segundos, mostrar mensaje
+      // Si no hay conductores despuÃ©s de 30 segundos, mostrar mensaje
       if (_nearbyDrivers.isEmpty) {
         Future.delayed(const Duration(seconds: 30), () {
           if (mounted && _nearbyDrivers.isEmpty) {
@@ -102,7 +102,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
         iconColor: const Color(0xFFFFA726),
         title: 'No hay conductores disponibles',
         titleColor: const Color(0xFFFFA726),
-        message: 'Lo sentimos, no hay conductores disponibles en este momento. ¿Deseas seguir esperando?',
+        message: 'Lo sentimos, no hay conductores disponibles en este momento. Â¿Deseas seguir esperando?',
         primaryButtonText: 'Seguir esperando',
         primaryButtonColor: const Color(0xFFFFD700),
         secondaryButtonText: 'Cancelar viaje',
@@ -218,7 +218,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
             ],
           ),
 
-          // Overlay con información
+          // Overlay con informaciÃ³n
           SafeArea(
             child: Column(
               children: [
@@ -245,7 +245,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
 
                 const Spacer(),
 
-                // Panel de búsqueda
+                // Panel de bÃºsqueda
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -268,7 +268,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
                     children: [
                       const SizedBox(height: 32),
                       
-                      // Animación de búsqueda con ondas expansivas
+                      // AnimaciÃ³n de bÃºsqueda con ondas expansivas
                       SizedBox(
                         width: 140,
                         height: 140,
@@ -296,7 +296,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
                                 },
                               );
                             }),
-                            // Círculo central con pulso
+                            // CÃ­rculo central con pulso
                             AnimatedBuilder(
                               animation: _pulseController,
                               builder: (context, child) {
@@ -361,7 +361,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
                       ),
                       const SizedBox(height: 24),
 
-                      // Información del viaje
+                      // InformaciÃ³n del viaje
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Container(
@@ -393,7 +393,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
                       ),
                       const SizedBox(height: 24),
 
-                      // Botón cancelar
+                      // BotÃ³n cancelar
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: SizedBox(
@@ -424,7 +424,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
                                     ),
                                   )
                                 : const Text(
-                                    'Cancelar búsqueda',
+                                    'Cancelar bÃºsqueda',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -489,10 +489,10 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
       builder: (context) => _CustomAlertDialog(
         icon: Icons.cancel_outlined,
         iconColor: const Color(0xFFFF5252),
-        title: '¿Cancelar búsqueda?',
+        title: 'Â¿Cancelar bÃºsqueda?',
         titleColor: const Color(0xFFFF5252),
-        message: '¿Estás seguro de que deseas cancelar la búsqueda de conductor? Esta acción no se puede deshacer.',
-        primaryButtonText: 'Sí, cancelar',
+        message: 'Â¿EstÃ¡s seguro de que deseas cancelar la bÃºsqueda de conductor? Esta acciÃ³n no se puede deshacer.',
+        primaryButtonText: 'SÃ­, cancelar',
         primaryButtonColor: const Color(0xFFFF5252),
         secondaryButtonText: 'Seguir buscando',
         onPrimaryPressed: () {
@@ -575,7 +575,7 @@ class _CustomAlertDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   
-                  // Título
+                  // TÃ­tulo
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
@@ -626,7 +626,7 @@ class _CustomAlertDialog extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
               child: Column(
                 children: [
-                  // Botón primario
+                  // BotÃ³n primario
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -653,7 +653,7 @@ class _CustomAlertDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Botón secundario
+                  // BotÃ³n secundario
                   SizedBox(
                     width: double.infinity,
                     height: 52,

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../../domain/entities/conductor_profile.dart';
 import '../../domain/usecases/get_conductor_profile.dart';
 import '../../domain/usecases/update_conductor_profile.dart';
@@ -6,7 +6,7 @@ import '../../domain/usecases/update_driver_license.dart';
 import '../../domain/usecases/update_vehicle.dart';
 import '../../domain/usecases/submit_profile_for_approval.dart';
 
-/// Provider refactorizado para gestión del perfil del conductor
+/// Provider refactorizado para gestiÃ³n del perfil del conductor
 /// 
 /// RESPONSABILIDADES:
 /// - Gestionar estado de UI (loading, error, success)
@@ -14,14 +14,14 @@ import '../../domain/usecases/submit_profile_for_approval.dart';
 /// - Notificar cambios a la UI
 /// 
 /// NO HACE:
-/// - Lógica de negocio (está en use cases)
-/// - Llamadas directas a API (está en datasources)
-/// - Serialización (está en models)
+/// - LÃ³gica de negocio (estÃ¡ en use cases)
+/// - Llamadas directas a API (estÃ¡ en datasources)
+/// - SerializaciÃ³n (estÃ¡ en models)
 /// 
-/// PATRÓN: Presentation Layer
-/// - Separa completamente UI de lógica de negocio
+/// PATRÃ“N: Presentation Layer
+/// - Separa completamente UI de lÃ³gica de negocio
 /// - Facilita testing (mock use cases)
-/// - Facilita migración a BLoC o Riverpod si es necesario
+/// - Facilita migraciÃ³n a BLoC o Riverpod si es necesario
 class ConductorProfileProvider extends ChangeNotifier {
   final GetConductorProfile getConductorProfileUseCase;
   final UpdateConductorProfile updateProfileUseCase;
@@ -128,7 +128,7 @@ class ConductorProfileProvider extends ChangeNotifier {
     return success;
   }
 
-  /// Actualiza el vehículo
+  /// Actualiza el vehÃ­culo
   Future<bool> updateVehicle(
     int conductorId,
     Vehicle vehicle,
@@ -158,7 +158,7 @@ class ConductorProfileProvider extends ChangeNotifier {
     return success;
   }
 
-  /// Envía el perfil para aprobación
+  /// EnvÃ­a el perfil para aprobaciÃ³n
   Future<bool> submitForApproval(int conductorId) async {
     _isLoading = true;
     _errorMessage = null;

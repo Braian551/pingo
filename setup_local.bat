@@ -1,17 +1,17 @@
 @echo off
 REM Script para copiar el backend a Laragon
-REM Ejecutar desde la raíz del proyecto ping_go
+REM Ejecutar desde la raíz del proyecto viax
 
 color 0B
 echo ========================================
-echo    Configuracion Local de PinGo
+echo    Configuracion Local de Viax
 echo ========================================
 echo.
 
 REM Rutas
-set BACKEND_SOURCE=%~dp0backend-deploy
+set BACKEND_SOURCE=%~dp0backend
 set LARAGON_WWW=C:\laragon\www
-set BACKEND_DEST=%LARAGON_WWW%\ping_go\backend-deploy
+set BACKEND_DEST=%LARAGON_WWW%\viax\backend
 
 echo Verificando rutas...
 echo    Origen: %BACKEND_SOURCE%
@@ -21,7 +21,7 @@ echo.
 REM Verificar que existe el directorio source
 if not exist "%BACKEND_SOURCE%" (
     color 0C
-    echo ERROR: No se encuentra la carpeta backend-deploy
+    echo ERROR: No se encuentra la carpeta backend
     echo    Ruta buscada: %BACKEND_SOURCE%
     pause
     exit /b 1
@@ -42,9 +42,9 @@ echo Rutas verificadas correctamente
 echo.
 
 REM Crear directorio si no existe
-if not exist "%LARAGON_WWW%\ping_go" (
-    echo Creando directorio: %LARAGON_WWW%\ping_go
-    mkdir "%LARAGON_WWW%\ping_go"
+if not exist "%LARAGON_WWW%\viax" (
+    echo Creando directorio: %LARAGON_WWW%\viax
+    mkdir "%LARAGON_WWW%\viax"
 )
 
 REM Preguntar si desea sobrescribir si ya existe
@@ -96,14 +96,14 @@ color 0F
 echo 1. Asegurate de que Laragon este corriendo
 echo    (Apache y MySQL deben estar activos)
 echo.
-echo 2. Crea la base de datos 'pingo' en HeidiSQL o phpMyAdmin
+echo 2. Crea la base de datos 'viax' en HeidiSQL o phpMyAdmin
 echo.
 echo 3. Importa el archivo SQL:
-echo    %~dp0basededatos (2).sql
+echo    %~dp0basededatosfinal.sql
 echo.
 echo 4. Verifica que el backend funcione:
 color 0B
-echo    http://localhost/ping_go/backend-deploy/health.php
+echo    http://localhost/viax/backend/health.php
 echo.
 color 0F
 echo 5. Instala dependencias PHP (si es necesario):
@@ -122,7 +122,7 @@ REM Preguntar si desea abrir el navegador
 color 0F
 set /p ABRIR_NAV="Deseas abrir el navegador para verificar? (S/N): "
 if /i "%ABRIR_NAV%"=="S" (
-    start http://localhost/ping_go/backend-deploy/health.php
+    start http://localhost/viax/backend/health.php
 )
 
 echo.

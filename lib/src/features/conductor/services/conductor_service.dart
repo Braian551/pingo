@@ -1,17 +1,17 @@
-import 'package:http/http.dart' as http;
+﻿import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../core/config/app_config.dart';
 
 /// Servicio para operaciones de conductor
 /// 
 /// NOTA: Este servicio es redundante con ConductorRemoteDataSource.
-/// Se mantiene por compatibilidad, pero debería migrarse a usar
-/// el patrón de Clean Architecture (Repository -> DataSource)
+/// Se mantiene por compatibilidad, pero deberÃ­a migrarse a usar
+/// el patrÃ³n de Clean Architecture (Repository -> DataSource)
 class ConductorService {
   /// URL base del microservicio de conductores
   static String get baseUrl => AppConfig.conductorServiceUrl;
 
-  /// Obtener información completa del conductor
+  /// Obtener informaciÃ³n completa del conductor
   static Future<Map<String, dynamic>?> getConductorInfo(int conductorId) async {
     try {
       final response = await http.get(
@@ -29,7 +29,7 @@ class ConductorService {
       }
       return null;
     } catch (e) {
-      print('Error obteniendo información del conductor: $e');
+      print('Error obteniendo informaciÃ³n del conductor: $e');
       return null;
     }
   }
@@ -80,7 +80,7 @@ class ConductorService {
     }
   }
 
-  /// Obtener estadísticas del conductor
+  /// Obtener estadÃ­sticas del conductor
   static Future<Map<String, dynamic>> getEstadisticas(int conductorId) async {
     try {
       final response = await http.get(
@@ -96,7 +96,7 @@ class ConductorService {
       }
       return {};
     } catch (e) {
-      print('Error obteniendo estadísticas: $e');
+      print('Error obteniendo estadÃ­sticas: $e');
       return {};
     }
   }
@@ -130,7 +130,7 @@ class ConductorService {
         if (data['success'] == true) {
           return true;
         } else {
-          // Lanzar excepción con el mensaje del servidor
+          // Lanzar excepciÃ³n con el mensaje del servidor
           throw Exception(data['message'] ?? 'Error desconocido del servidor');
         }
       } else {
@@ -138,7 +138,7 @@ class ConductorService {
       }
     } catch (e) {
       print('Error actualizando disponibilidad: $e');
-      rethrow; // Re-lanzar la excepción para que el provider la maneje
+      rethrow; // Re-lanzar la excepciÃ³n para que el provider la maneje
     }
   }
 
@@ -170,7 +170,7 @@ class ConductorService {
     }
   }
 
-  /// Actualizar ubicación del conductor
+  /// Actualizar ubicaciÃ³n del conductor
   static Future<bool> actualizarUbicacion({
     required int conductorId,
     required double latitud,
@@ -196,7 +196,7 @@ class ConductorService {
       }
       return false;
     } catch (e) {
-      print('Error actualizando ubicación: $e');
+      print('Error actualizando ubicaciÃ³n: $e');
       return false;
     }
   }

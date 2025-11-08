@@ -1,22 +1,22 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'conductor_remote_datasource.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/config/app_config.dart';
 
-/// Implementación concreta del data source remoto
+/// ImplementaciÃ³n concreta del data source remoto
 /// 
 /// Se comunica con el backend via HTTP/REST.
-/// Lanza excepciones que serán capturadas por el repositorio.
+/// Lanza excepciones que serÃ¡n capturadas por el repositorio.
 /// 
-/// CONFIGURACIÓN PARA MICROSERVICIOS:
+/// CONFIGURACIÃ“N PARA MICROSERVICIOS:
 /// - Las URLs se gestionan centralizadamente en AppConfig
-/// - Fácil migración a microservicios cambiando solo AppConfig
+/// - FÃ¡cil migraciÃ³n a microservicios cambiando solo AppConfig
 class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
   final http.Client client;
   
   /// URL base del microservicio de conductores
-  /// Centralizada en AppConfig para fácil migración
+  /// Centralizada en AppConfig para fÃ¡cil migraciÃ³n
   String get baseUrl => AppConfig.conductorServiceUrl;
 
   ConductorRemoteDataSourceImpl({http.Client? client})
@@ -45,7 +45,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException || e is NotFoundException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -79,7 +79,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -113,7 +113,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -142,12 +142,12 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
         if (data['success'] == true) {
           return data;
         }
-        throw ServerException(data['message'] ?? 'Error al actualizar vehículo');
+        throw ServerException(data['message'] ?? 'Error al actualizar vehÃ­culo');
       }
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -170,12 +170,12 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
         if (data['success'] == true) {
           return data;
         }
-        throw ServerException(data['message'] ?? 'Error al enviar para aprobación');
+        throw ServerException(data['message'] ?? 'Error al enviar para aprobaciÃ³n');
       }
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -199,7 +199,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -218,12 +218,12 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
         if (data['success'] == true) {
           return data['statistics'] as Map<String, dynamic>;
         }
-        throw ServerException(data['message'] ?? 'Error al obtener estadísticas');
+        throw ServerException(data['message'] ?? 'Error al obtener estadÃ­sticas');
       }
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -247,7 +247,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -271,7 +271,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -295,7 +295,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -326,7 +326,7 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 
@@ -353,12 +353,12 @@ class ConductorRemoteDataSourceImpl implements ConductorRemoteDataSource {
         if (data['success'] == true) {
           return;
         }
-        throw ServerException(data['message'] ?? 'Error al actualizar ubicación');
+        throw ServerException(data['message'] ?? 'Error al actualizar ubicaciÃ³n');
       }
       throw ServerException('Error del servidor: ${response.statusCode}');
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: $e');
+      throw NetworkException('Error de conexiÃ³n: $e');
     }
   }
 }

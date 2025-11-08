@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
@@ -6,7 +6,7 @@ import '../../providers/map_provider.dart';
 import '../widgets/osm_map_widget.dart';
 // import '../widgets/location_search_widget.dart'; // not used here
 import '../../../../global/services/auth/user_service.dart';
-import 'package:ping_go/src/global/services/nominatim_service.dart';
+import 'package:viax/src/global/services/nominatim_service.dart';
 
 class LocationPickerScreen extends StatefulWidget {
   final String? initialAddress;
@@ -18,7 +18,7 @@ class LocationPickerScreen extends StatefulWidget {
     super.key,
     this.initialAddress,
     this.initialLocation,
-    this.screenTitle = 'Seleccionar ubicación',
+    this.screenTitle = 'Seleccionar ubicaciÃ³n',
     this.showConfirmButton = true,
   });
 
@@ -55,7 +55,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
   }
 
   void _setupAnimations() {
-    // Animación del pin al mover el mapa
+    // AnimaciÃ³n del pin al mover el mapa
     _pinAnimationController = AnimationController(
       duration: const Duration(milliseconds: 250),
       vsync: this,
@@ -69,7 +69,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
       curve: Curves.easeOutBack,
     ));
     
-    // Animación de pulso para el pin
+    // AnimaciÃ³n de pulso para el pin
     _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -195,7 +195,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
     final newAddress = _editableAddressController.text.trim();
     if (newAddress.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dirección vacía'))
+        const SnackBar(content: Text('DirecciÃ³n vacÃ­a'))
       );
       return;
     }
@@ -242,7 +242,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
             const SizedBox(width: 8),
             const Expanded(
               child: Text(
-                'Ubicación guardada exitosamente',
+                'UbicaciÃ³n guardada exitosamente',
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
@@ -322,7 +322,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
               ),
             ),
 
-            // Barra de búsqueda moderna con efecto glass y animaciones suaves
+            // Barra de bÃºsqueda moderna con efecto glass y animaciones suaves
             Positioned(
               top: 20,
               left: 20,
@@ -383,7 +383,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                               fontWeight: FontWeight.w400,
                             ),
                             decoration: InputDecoration(
-                              hintText: 'Buscar dirección...',
+                              hintText: 'Buscar direcciÃ³n...',
                               hintStyle: TextStyle(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 16,
@@ -429,7 +429,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
               ),
             ),
 
-            // Pin de ubicación profesional estilo Uber con animaciones suaves
+            // Pin de ubicaciÃ³n profesional estilo Uber con animaciones suaves
             Center(
               child: IgnorePointer(
                 ignoring: true,
@@ -593,7 +593,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Campo de dirección mejorado
+                    // Campo de direcciÃ³n mejorado
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       decoration: BoxDecoration(
@@ -626,7 +626,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                             minWidth: 44,
                             minHeight: 44,
                           ),
-                          hintText: 'Dirección seleccionada...',
+                          hintText: 'DirecciÃ³n seleccionada...',
                           hintStyle: TextStyle(
                             color: Colors.white.withOpacity(0.4),
                             fontSize: 15,
@@ -672,7 +672,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                             const SizedBox(width: 12),
                             const Expanded(
                               child: Text(
-                                'Ubicación confirmada',
+                                'UbicaciÃ³n confirmada',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -684,13 +684,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                         ),
                       ),
 
-                    // Botones de acción
+                    // Botones de acciÃ³n
                     if (!_confirmed)
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Row(
                           children: [
-                            // Botón de guardar (principal)
+                            // BotÃ³n de guardar (principal)
                             Expanded(
                               flex: 3,
                               child: AnimatedScale(
@@ -731,7 +731,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                             ),
                             const SizedBox(width: 12),
                             
-                            // Botón de limpiar
+                            // BotÃ³n de limpiar
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               width: 56,
@@ -772,7 +772,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
               ),
             ),
 
-            // Resultados de búsqueda con diseño profesional
+            // Resultados de bÃºsqueda con diseÃ±o profesional
             if (mapProvider.searchResults.isNotEmpty && _isSearchFocused)
               Positioned(
                 top: 84,
@@ -825,7 +825,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                                   ),
                                   child: Row(
                                     children: [
-                                      // Icono de ubicación
+                                      // Icono de ubicaciÃ³n
                                       Container(
                                         width: 40,
                                         height: 40,
@@ -841,7 +841,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen>
                                       ),
                                       const SizedBox(width: 12),
                                       
-                                      // Texto de la dirección
+                                      // Texto de la direcciÃ³n
                                       Expanded(
                                         child: Text(
                                           r.getFormattedAddress(),

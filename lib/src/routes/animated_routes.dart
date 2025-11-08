@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 /// A reusable page route that fades and slides the new page in from the bottom (or from the given offset).
 /// Use it in place of MaterialPageRoute for smoother entrance animations.

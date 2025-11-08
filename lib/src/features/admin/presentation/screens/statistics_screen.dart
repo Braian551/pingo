@@ -1,7 +1,7 @@
-// lib/src/features/admin/presentation/screens/statistics_screen.dart
+﻿// lib/src/features/admin/presentation/screens/statistics_screen.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/global/services/admin/admin_service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -138,7 +138,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Estadísticas',
+                  'EstadÃ­sticas',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -147,7 +147,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                   ),
                 ),
                 Text(
-                  'Métricas y análisis',
+                  'MÃ©tricas y anÃ¡lisis',
                   style: TextStyle(
                     color: Colors.white60,
                     fontSize: 12,
@@ -264,8 +264,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           ),
           child: Row(
             children: [
-              _buildPeriodButton('7 días', '7d'),
-              _buildPeriodButton('30 días', '30d'),
+              _buildPeriodButton('7 dÃ­as', '7d'),
+              _buildPeriodButton('30 dÃ­as', '30d'),
               _buildPeriodButton('Todo', 'all'),
             ],
           ),
@@ -353,7 +353,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                           ),
                         ),
                         Text(
-                          'Últimos 7 días',
+                          'Ãšltimos 7 dÃ­as',
                           style: TextStyle(
                             color: Colors.white60,
                             fontSize: 13,
@@ -535,7 +535,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
               ),
               const SizedBox(height: 8),
               Text(
-                'Las estadísticas aparecerán aquí',
+                'Las estadÃ­sticas aparecerÃ¡n aquÃ­',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.4),
                   fontSize: 13,
@@ -556,7 +556,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Métricas generales',
+          'MÃ©tricas generales',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -711,7 +711,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Distribución de Solicitudes',
+                          'DistribuciÃ³n de Solicitudes',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,

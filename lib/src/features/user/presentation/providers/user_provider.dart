@@ -1,21 +1,21 @@
-import 'package:flutter/foundation.dart';
-import 'package:ping_go/src/features/user/domain/entities/user.dart';
-import 'package:ping_go/src/features/user/domain/entities/auth_session.dart';
-import 'package:ping_go/src/features/user/domain/usecases/register_user.dart';
-import 'package:ping_go/src/features/user/domain/usecases/login_user.dart';
-import 'package:ping_go/src/features/user/domain/usecases/logout_user.dart';
-import 'package:ping_go/src/features/user/domain/usecases/get_user_profile.dart';
-import 'package:ping_go/src/features/user/domain/usecases/update_user_profile.dart';
-import 'package:ping_go/src/features/user/domain/usecases/update_user_location.dart';
-import 'package:ping_go/src/features/user/domain/usecases/get_saved_session.dart';
+﻿import 'package:flutter/foundation.dart';
+import 'package:viax/src/features/user/domain/entities/user.dart';
+import 'package:viax/src/features/user/domain/entities/auth_session.dart';
+import 'package:viax/src/features/user/domain/usecases/register_user.dart';
+import 'package:viax/src/features/user/domain/usecases/login_user.dart';
+import 'package:viax/src/features/user/domain/usecases/logout_user.dart';
+import 'package:viax/src/features/user/domain/usecases/get_user_profile.dart';
+import 'package:viax/src/features/user/domain/usecases/update_user_profile.dart';
+import 'package:viax/src/features/user/domain/usecases/update_user_location.dart';
+import 'package:viax/src/features/user/domain/usecases/get_saved_session.dart';
 
-/// Provider de Usuarios y Autenticación
+/// Provider de Usuarios y AutenticaciÃ³n
 /// 
-/// Gestiona el estado de autenticación y perfil del usuario.
+/// Gestiona el estado de autenticaciÃ³n y perfil del usuario.
 /// Invoca use cases del dominio y notifica cambios a la UI.
 /// 
 /// PRINCIPIOS:
-/// - Solo invoca use cases (no tiene lógica de negocio)
+/// - Solo invoca use cases (no tiene lÃ³gica de negocio)
 /// - Gestiona estado de la UI (loading, error, data)
 /// - Notifica cambios con notifyListeners()
 /// - Parte del microservicio de usuarios
@@ -38,7 +38,7 @@ class UserProvider extends ChangeNotifier {
     required this.getSavedSessionUseCase,
   });
 
-  // Estado de autenticación
+  // Estado de autenticaciÃ³n
   AuthSession? _session;
   bool _isAuthenticated = false;
 
@@ -104,7 +104,7 @@ class UserProvider extends ChangeNotifier {
     );
   }
 
-  /// Iniciar sesión
+  /// Iniciar sesiÃ³n
   Future<bool> login({
     required String email,
     required String password,
@@ -124,7 +124,7 @@ class UserProvider extends ChangeNotifier {
         _session = session;
         _isAuthenticated = true;
         _setLoading(false);
-        _successMessage = 'Inicio de sesión exitoso';
+        _successMessage = 'Inicio de sesiÃ³n exitoso';
         notifyListeners();
         return true;
       },
@@ -137,7 +137,7 @@ class UserProvider extends ChangeNotifier {
     );
   }
 
-  /// Cerrar sesión
+  /// Cerrar sesiÃ³n
   Future<bool> logout() async {
     _setLoading(true);
     _clearMessages();
@@ -149,7 +149,7 @@ class UserProvider extends ChangeNotifier {
         _session = null;
         _isAuthenticated = false;
         _setLoading(false);
-        _successMessage = 'Sesión cerrada';
+        _successMessage = 'SesiÃ³n cerrada';
         notifyListeners();
         return true;
       },
@@ -174,11 +174,11 @@ class UserProvider extends ChangeNotifier {
 
     return result.when(
       success: (user) {
-        // Actualizar el usuario en la sesión actual
+        // Actualizar el usuario en la sesiÃ³n actual
         if (_session != null) {
           _session = _session!.copyWith(user: user);
         } else {
-          // Crear sesión temporal si no existe
+          // Crear sesiÃ³n temporal si no existe
           _session = AuthSession(
             user: user,
             loginAt: DateTime.now(),
@@ -216,7 +216,7 @@ class UserProvider extends ChangeNotifier {
 
     return result.when(
       success: (user) {
-        // Actualizar el usuario en la sesión actual
+        // Actualizar el usuario en la sesiÃ³n actual
         if (_session != null) {
           _session = _session!.copyWith(user: user);
         }
@@ -234,7 +234,7 @@ class UserProvider extends ChangeNotifier {
     );
   }
 
-  /// Actualizar ubicación del usuario
+  /// Actualizar ubicaciÃ³n del usuario
   Future<bool> updateLocation({
     required int userId,
     String? direccion,
@@ -259,7 +259,7 @@ class UserProvider extends ChangeNotifier {
 
     return result.when(
       success: (location) {
-        // Actualizar la ubicación en el usuario de la sesión actual
+        // Actualizar la ubicaciÃ³n en el usuario de la sesiÃ³n actual
         if (_session != null) {
           final updatedUser = _session!.user.copyWith(
             ubicacionPrincipal: location,
@@ -267,7 +267,7 @@ class UserProvider extends ChangeNotifier {
           _session = _session!.copyWith(user: updatedUser);
         }
         _setLoading(false);
-        _successMessage = 'Ubicación actualizada correctamente';
+        _successMessage = 'UbicaciÃ³n actualizada correctamente';
         notifyListeners();
         return true;
       },
@@ -280,7 +280,7 @@ class UserProvider extends ChangeNotifier {
     );
   }
 
-  /// Cargar sesión guardada (útil para auto-login)
+  /// Cargar sesiÃ³n guardada (Ãºtil para auto-login)
   Future<bool> loadSavedSession() async {
     _setLoading(true);
 

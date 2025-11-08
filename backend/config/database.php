@@ -11,7 +11,7 @@ class Database {
     public function __construct() {
         // Configuración local Laragon
         $this->host = 'localhost';
-        $this->db_name = 'pingo';
+    $this->db_name = 'viax';
         $this->username = 'root';
         $this->password = 'root';
         

@@ -1,13 +1,13 @@
-/// Entidad de Dominio: User
+﻿/// Entidad de Dominio: User
 /// 
 /// Representa un usuario en el sistema (pasajero o conductor).
-/// Esta clase es inmutable y no depende de ningún framework.
+/// Esta clase es inmutable y no depende de ningÃºn framework.
 /// 
 /// PRINCIPIOS:
 /// - Inmutable (usar copyWith para "modificar")
 /// - Sin dependencias de Flutter/HTTP/BD
 /// - Validaciones simples de negocio
-/// - Parte del microservicio de autenticación/usuarios
+/// - Parte del microservicio de autenticaciÃ³n/usuarios
 class User {
   final int id;
   final String uuid;
@@ -36,16 +36,16 @@ class User {
   /// Nombre completo del usuario
   String get nombreCompleto => '$nombre $apellido';
 
-  /// Validación: Email tiene formato válido
+  /// ValidaciÃ³n: Email tiene formato vÃ¡lido
   bool get hasValidEmail => _emailRegex.hasMatch(email);
 
-  /// Validación: Teléfono no está vacío
+  /// ValidaciÃ³n: TelÃ©fono no estÃ¡ vacÃ­o
   bool get hasValidPhone => telefono.isNotEmpty;
 
-  /// Validación: Usuario tiene ubicación principal configurada
+  /// ValidaciÃ³n: Usuario tiene ubicaciÃ³n principal configurada
   bool get hasLocation => ubicacionPrincipal != null;
 
-  /// Validación: Perfil está completo
+  /// ValidaciÃ³n: Perfil estÃ¡ completo
   bool get isProfileComplete {
     return hasValidEmail &&
         hasValidPhone &&
@@ -141,7 +141,7 @@ enum UserType {
 
 /// Entidad de Dominio: UserLocation
 /// 
-/// Representa una ubicación del usuario (dirección guardada).
+/// Representa una ubicaciÃ³n del usuario (direcciÃ³n guardada).
 class UserLocation {
   final int id;
   final int usuarioId;
@@ -171,7 +171,7 @@ class UserLocation {
     this.actualizadoEn,
   });
 
-  /// Validación: Tiene coordenadas válidas
+  /// ValidaciÃ³n: Tiene coordenadas vÃ¡lidas
   bool get hasValidCoordinates =>
       latitud != null &&
       longitud != null &&
@@ -180,7 +180,7 @@ class UserLocation {
       longitud! >= -180 &&
       longitud! <= 180;
 
-  /// Dirección formateada para mostrar
+  /// DirecciÃ³n formateada para mostrar
   String get formattedAddress {
     final parts = <String>[];
     if (direccion != null && direccion!.isNotEmpty) parts.add(direccion!);
@@ -188,7 +188,7 @@ class UserLocation {
     if (departamento != null && departamento!.isNotEmpty) parts.add(departamento!);
     if (pais != null && pais!.isNotEmpty && pais != 'Colombia') parts.add(pais!);
 
-    return parts.isEmpty ? 'Sin dirección' : parts.join(', ');
+    return parts.isEmpty ? 'Sin direcciÃ³n' : parts.join(', ');
   }
 
   UserLocation copyWith({

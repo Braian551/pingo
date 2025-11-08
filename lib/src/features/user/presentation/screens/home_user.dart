@@ -1,6 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,13 +66,13 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         
         if (!mounted) return;
         
-        // Verificar servicios de ubicación
+        // Verificar servicios de ubicaciÃ³n
         final serviceEnabled = await Geolocator.isLocationServiceEnabled();
         if (!serviceEnabled) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Activa los servicios de ubicación para usar Ping Go'),
+                content: Text('Activa los servicios de ubicaciÃ³n para usar Ping Go'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -93,7 +93,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Necesitamos tu ubicación para ofrecerte viajes cerca de ti'),
+                content: Text('Necesitamos tu ubicaciÃ³n para ofrecerte viajes cerca de ti'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -104,7 +104,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('¡Ubicación activada! Ahora puedes solicitar viajes'),
+                content: Text('Â¡UbicaciÃ³n activada! Ahora puedes solicitar viajes'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
@@ -415,7 +415,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tus viajes aparecerán aquí',
+                        'Tus viajes aparecerÃ¡n aquÃ­',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 14,
@@ -442,7 +442,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           children: [
             const SizedBox(height: 20),
             const Text(
-              'Métodos de pago',
+              'MÃ©todos de pago',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
@@ -481,7 +481,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No hay métodos de pago',
+                        'No hay mÃ©todos de pago',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 18,
@@ -490,7 +490,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Agrega un método de pago para continuar',
+                        'Agrega un mÃ©todo de pago para continuar',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 14,
@@ -511,7 +511,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                           ),
                         ),
                         child: const Text(
-                          'Agregar método de pago',
+                          'Agregar mÃ©todo de pago',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -695,7 +695,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       children: [
         _buildProfileMenuItem(
           icon: Icons.settings,
-          title: 'Configuración',
+          title: 'ConfiguraciÃ³n',
           onTap: () => Navigator.pushNamed(context, '/settings'),
         ),
         const SizedBox(height: 12),
@@ -707,7 +707,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         const SizedBox(height: 12),
         _buildProfileMenuItem(
           icon: Icons.logout,
-          title: 'Cerrar sesión',
+          title: 'Cerrar sesiÃ³n',
           isLogout: true,
           onTap: () async {
             await UserService.clearSession();
@@ -823,7 +823,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
 
   Widget _buildWelcomeSection() {
     final hour = DateTime.now().hour;
-    String greeting = 'Buenos días';
+    String greeting = 'Buenos dÃ­as';
     if (hour >= 12 && hour < 18) {
       greeting = 'Buenas tardes';
     } else if (hour >= 18) {
@@ -894,7 +894,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    '¿A dónde vas?',
+                    'Â¿A dÃ³nde vas?',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
@@ -920,7 +920,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          '¿Qué necesitas hoy?',
+          'Â¿QuÃ© necesitas hoy?',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -935,7 +935,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               child: _ModernServiceCard(
                 icon: Icons.motorcycle,
                 title: 'Viaje',
-                subtitle: 'Rápido y seguro',
+                subtitle: 'RÃ¡pido y seguro',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
                 },
@@ -945,7 +945,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             Expanded(
               child: _ModernServiceCard(
                 icon: Icons.local_shipping_outlined,
-                title: 'Envío',
+                title: 'EnvÃ­o',
                 subtitle: 'Entrega express',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
@@ -963,7 +963,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Acceso rápido',
+          'Acceso rÃ¡pido',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -1040,7 +1040,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    '¡Obtén 20% OFF!',
+                    'Â¡ObtÃ©n 20% OFF!',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 24,
@@ -1139,7 +1139,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tus viajes y envíos aparecerán aquí',
+                    'Tus viajes y envÃ­os aparecerÃ¡n aquÃ­',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.4),
                       fontSize: 14,

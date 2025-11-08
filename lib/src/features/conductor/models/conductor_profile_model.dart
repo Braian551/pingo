@@ -1,4 +1,4 @@
-import 'driver_license_model.dart';
+﻿import 'driver_license_model.dart';
 import 'vehicle_model.dart';
 
 /// Modelo para el perfil completo del conductor
@@ -61,7 +61,7 @@ class ConductorProfileModel {
     };
   }
 
-  /// Verifica si el perfil está completo
+  /// Verifica si el perfil estÃ¡ completo
   bool get isProfileComplete {
     return licencia != null &&
         licencia!.isComplete &&
@@ -101,7 +101,7 @@ class ConductorProfileModel {
       completed += 20;
     }
 
-    // Vehículo (40%)
+    // VehÃ­culo (40%)
     total += 40;
     if (vehiculo != null && vehiculo!.isBasicComplete) {
       completed += 20;
@@ -110,7 +110,7 @@ class ConductorProfileModel {
       completed += 20;
     }
 
-    // Verificación (20%)
+    // VerificaciÃ³n (20%)
     total += 20;
     if (estadoVerificacion == VerificationStatus.aprobado) {
       completed += 20;
@@ -126,19 +126,19 @@ class ConductorProfileModel {
     List<String> tasks = [];
 
     if (licencia == null || !licencia!.isComplete) {
-      tasks.add('Registrar licencia de conducción');
+      tasks.add('Registrar licencia de conducciÃ³n');
     } else if (licencia!.isExpiringSoon) {
-      tasks.add('Renovar licencia de conducción (vence pronto)');
+      tasks.add('Renovar licencia de conducciÃ³n (vence pronto)');
     } else if (!licencia!.isValid) {
-      tasks.add('Renovar licencia de conducción (vencida)');
+      tasks.add('Renovar licencia de conducciÃ³n (vencida)');
     }
 
     if (vehiculo == null || !vehiculo!.isBasicComplete) {
-      tasks.add('Registrar información del vehículo');
+      tasks.add('Registrar informaciÃ³n del vehÃ­culo');
     }
 
     if (vehiculo != null && !vehiculo!.isDocumentsComplete) {
-      tasks.add('Completar documentos del vehículo');
+      tasks.add('Completar documentos del vehÃ­culo');
     }
 
     if (documentosPendientes.isNotEmpty) {
@@ -152,7 +152,7 @@ class ConductorProfileModel {
     }
 
     if (estadoVerificacion == VerificationStatus.pendiente && isProfileComplete) {
-      tasks.add('Esperar verificación de documentos');
+      tasks.add('Esperar verificaciÃ³n de documentos');
     }
 
     return tasks;
@@ -181,12 +181,12 @@ class ConductorProfileModel {
   }
 }
 
-/// Estado de verificación del perfil del conductor
+/// Estado de verificaciÃ³n del perfil del conductor
 enum VerificationStatus {
-  pendiente('pendiente', 'Pendiente', '⏳'),
-  enRevision('en_revision', 'En Revisión', '🔍'),
-  aprobado('aprobado', 'Aprobado', '✅'),
-  rechazado('rechazado', 'Rechazado', '❌');
+  pendiente('pendiente', 'Pendiente', 'â³'),
+  enRevision('en_revision', 'En RevisiÃ³n', 'ðŸ”'),
+  aprobado('aprobado', 'Aprobado', 'âœ…'),
+  rechazado('rechazado', 'Rechazado', 'âŒ');
 
   final String value;
   final String label;

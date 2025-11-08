@@ -1,20 +1,20 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
-import 'package:ping_go/src/features/user/domain/entities/user.dart';
-import 'package:ping_go/src/features/user/domain/entities/auth_session.dart';
-import 'package:ping_go/src/features/user/domain/repositories/user_repository.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
+import 'package:viax/src/core/error/exceptions.dart';
+import 'package:viax/src/features/user/domain/entities/user.dart';
+import 'package:viax/src/features/user/domain/entities/auth_session.dart';
+import 'package:viax/src/features/user/domain/repositories/user_repository.dart';
 import '../datasources/user_remote_datasource.dart';
 import '../datasources/user_local_datasource.dart';
 import '../models/user_model.dart';
 
-/// Implementación del Repositorio de Usuarios
+/// ImplementaciÃ³n del Repositorio de Usuarios
 /// 
 /// RESPONSABILIDADES:
 /// - Coordinar datasources (remoto y local)
 /// - Convertir Models -> Entities
 /// - Convertir Exceptions -> Failures
-/// - Implementar lógica de caché si es necesaria
+/// - Implementar lÃ³gica de cachÃ© si es necesaria
 /// - Manejar errores de forma funcional (Result<T>)
 class UserRepositoryImpl implements UserRepository {
   final UserRemoteDataSource remoteDataSource;
@@ -55,13 +55,13 @@ class UserRepositoryImpl implements UserRepository {
         pais: pais,
       );
 
-      // Extraer datos del usuario y ubicación de la respuesta
+      // Extraer datos del usuario y ubicaciÃ³n de la respuesta
       final userData = responseData['data']?['user'] ?? responseData['user'];
       final locationData = responseData['data']?['location'] ?? responseData['location'];
 
       if (userData == null) {
         return Error(
-          ServerFailure('Respuesta del servidor inválida: falta usuario'),
+          ServerFailure('Respuesta del servidor invÃ¡lida: falta usuario'),
         );
       }
 
@@ -73,13 +73,13 @@ class UserRepositoryImpl implements UserRepository {
 
       final userModel = UserModel.fromJson(userMap);
 
-      // Crear sesión
+      // Crear sesiÃ³n
       final session = AuthSession(
         user: userModel,
         loginAt: DateTime.now(),
       );
 
-      // Guardar sesión localmente
+      // Guardar sesiÃ³n localmente
       await _saveSessionToLocal(session);
 
       return Success(session);
@@ -111,14 +111,14 @@ class UserRepositoryImpl implements UserRepository {
 
       if (userData == null) {
         return Error(
-          ServerFailure('Respuesta del servidor inválida: falta usuario'),
+          ServerFailure('Respuesta del servidor invÃ¡lida: falta usuario'),
         );
       }
 
       // Convertir a modelo
       final userModel = UserModel.fromJson(userData as Map<String, dynamic>);
 
-      // Crear sesión (extraer token si existe)
+      // Crear sesiÃ³n (extraer token si existe)
       final token = responseData['data']?['token'] ?? responseData['token'];
 
       final session = AuthSession(
@@ -142,16 +142,16 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Result<void>> logout() async {
     try {
-      // Limpiar sesión local
+      // Limpiar sesiÃ³n local
       await localDataSource.clearSession();
 
-      // TODO: Notificar al servidor si se implementa invalidación de tokens
+      // TODO: Notificar al servidor si se implementa invalidaciÃ³n de tokens
 
       return Success(null);
     } on CacheException catch (e) {
       return Error(CacheFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al cerrar sesión: ${e.toString()}'));
+      return Error(UnknownFailure('Error al cerrar sesiÃ³n: ${e.toString()}'));
     }
   }
 
@@ -164,13 +164,13 @@ class UserRepositoryImpl implements UserRepository {
         email: email,
       );
 
-      // Extraer usuario y ubicación
+      // Extraer usuario y ubicaciÃ³n
       final userData = responseData['data']?['user'] ?? responseData['user'];
       final locationData = responseData['data']?['location'] ?? responseData['location'];
 
       if (userData == null) {
         return Error(
-          ServerFailure('Respuesta del servidor inválida: falta usuario'),
+          ServerFailure('Respuesta del servidor invÃ¡lida: falta usuario'),
         );
       }
 
@@ -215,7 +215,7 @@ class UserRepositoryImpl implements UserRepository {
 
       if (userData == null) {
         return Error(
-          ServerFailure('Respuesta del servidor inválida: falta usuario'),
+          ServerFailure('Respuesta del servidor invÃ¡lida: falta usuario'),
         );
       }
 
@@ -253,13 +253,13 @@ class UserRepositoryImpl implements UserRepository {
         pais: pais,
       );
 
-      // Extraer ubicación actualizada
+      // Extraer ubicaciÃ³n actualizada
       final locationData = responseData['data']?['location'] ?? 
                           responseData['location'];
 
       if (locationData == null) {
         return Error(
-          ServerFailure('Respuesta del servidor inválida: falta ubicación'),
+          ServerFailure('Respuesta del servidor invÃ¡lida: falta ubicaciÃ³n'),
         );
       }
 
@@ -305,7 +305,7 @@ class UserRepositoryImpl implements UserRepository {
     } on CacheException catch (e) {
       return Error(CacheFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al obtener sesión: ${e.toString()}'));
+      return Error(UnknownFailure('Error al obtener sesiÃ³n: ${e.toString()}'));
     }
   }
 
@@ -317,7 +317,7 @@ class UserRepositoryImpl implements UserRepository {
     } on CacheException catch (e) {
       return Error(CacheFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al guardar sesión: ${e.toString()}'));
+      return Error(UnknownFailure('Error al guardar sesiÃ³n: ${e.toString()}'));
     }
   }
 
@@ -326,7 +326,7 @@ class UserRepositoryImpl implements UserRepository {
     return await logout();
   }
 
-  /// Helper privado para guardar sesión
+  /// Helper privado para guardar sesiÃ³n
   Future<void> _saveSessionToLocal(AuthSession session) async {
     final sessionModel = AuthSessionModel.fromEntity(session);
     await localDataSource.saveSession(sessionModel.toJson());

@@ -1,7 +1,7 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Pantalla de configuración y ajustes del usuario
+/// Pantalla de configuraciÃ³n y ajustes del usuario
 /// Incluye notificaciones, privacidad, idioma, etc.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,7 +16,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _emailNotifications = true;
   bool _smsNotifications = false;
   bool _promotionalEmails = true;
-  String _selectedLanguage = 'Español';
+  String _selectedLanguage = 'EspaÃ±ol';
   String _selectedTheme = 'Oscuro';
 
   @override
@@ -76,8 +76,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildSection('Privacidad y seguridad', [
                       _buildSwitchTile(
                         icon: Icons.location_on_outlined,
-                        title: 'Ubicación siempre activa',
-                        subtitle: 'Permitir acceso continuo a ubicación',
+                        title: 'UbicaciÃ³n siempre activa',
+                        subtitle: 'Permitir acceso continuo a ubicaciÃ³n',
                         value: _locationAlwaysOn,
                         onChanged: (value) {
                           setState(() => _locationAlwaysOn = value);
@@ -85,18 +85,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       _buildNavigationTile(
                         icon: Icons.lock_outline,
-                        title: 'Cambiar contraseña',
-                        subtitle: 'Actualizar tu contraseña',
+                        title: 'Cambiar contraseÃ±a',
+                        subtitle: 'Actualizar tu contraseÃ±a',
                         onTap: () {
                           _showChangePasswordDialog();
                         },
                       ),
                       _buildNavigationTile(
                         icon: Icons.verified_user_outlined,
-                        title: 'Autenticación de dos factores',
+                        title: 'AutenticaciÃ³n de dos factores',
                         subtitle: 'Agregar capa adicional de seguridad',
                         onTap: () {
-                          _showComingSoon('Autenticación de dos factores');
+                          _showComingSoon('AutenticaciÃ³n de dos factores');
                         },
                       ),
                       _buildNavigationTile(
@@ -139,23 +139,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildSection('Legal', [
                       _buildNavigationTile(
                         icon: Icons.description_outlined,
-                        title: 'Términos y condiciones',
-                        subtitle: 'Leer los términos de uso',
+                        title: 'TÃ©rminos y condiciones',
+                        subtitle: 'Leer los tÃ©rminos de uso',
                         onTap: () {
                           Navigator.pushNamed(context, '/terms');
                         },
                       ),
                       _buildNavigationTile(
                         icon: Icons.privacy_tip_outlined,
-                        title: 'Política de privacidad',
-                        subtitle: 'Cómo usamos tu información',
+                        title: 'PolÃ­tica de privacidad',
+                        subtitle: 'CÃ³mo usamos tu informaciÃ³n',
                         onTap: () {
                           Navigator.pushNamed(context, '/privacy');
                         },
                       ),
                       _buildNavigationTile(
                         icon: Icons.gavel_outlined,
-                        title: 'Licencias de código abierto',
+                        title: 'Licencias de cÃ³digo abierto',
                         subtitle: 'Software de terceros',
                         onTap: () {
                           _showComingSoon('Licencias');
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildNavigationTile(
                         icon: Icons.bug_report_outlined,
                         title: 'Reportar un problema',
-                        subtitle: 'Ayúdanos a mejorar',
+                        subtitle: 'AyÃºdanos a mejorar',
                         onTap: () {
                           _showBugReportDialog();
                         },
@@ -194,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildNavigationTile(
                         icon: Icons.download_outlined,
                         title: 'Descargar mis datos',
-                        subtitle: 'Obtener copia de tu información',
+                        subtitle: 'Obtener copia de tu informaciÃ³n',
                         onTap: () {
                           _showComingSoon('Descarga de datos');
                         },
@@ -214,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'PingGo v1.0.0',
+                            'Viax v1.0.0',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.5),
                               fontSize: 13,
@@ -222,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '© 2024 PingGo. Todos los derechos reservados',
+                            'Â© 2024 Viax. Todos los derechos reservados',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.3),
                               fontSize: 11,
@@ -253,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Expanded(
             child: Text(
-              'Configuración',
+              'ConfiguraciÃ³n',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -466,9 +466,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildLanguageOption('Español'),
+            _buildLanguageOption('EspaÃ±ol'),
             _buildLanguageOption('English'),
-            _buildLanguageOption('Português'),
+            _buildLanguageOption('PortuguÃªs'),
           ],
         ),
       ),
@@ -601,11 +601,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         title: const Text(
-          'Cambiar contraseña',
+          'Cambiar contraseÃ±a',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'Esta funcionalidad estará disponible próximamente.',
+          'Esta funcionalidad estarÃ¡ disponible prÃ³ximamente.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -684,7 +684,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: TextStyle(color: Colors.red),
         ),
         content: const Text(
-          '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.',
+          'Â¿EstÃ¡s seguro de que quieres eliminar tu cuenta? Esta acciÃ³n no se puede deshacer.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -698,7 +698,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Implementar lógica de eliminación
+              // Implementar lÃ³gica de eliminaciÃ³n
             },
             child: const Text(
               'Eliminar',
@@ -713,7 +713,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature estará disponible próximamente'),
+        content: Text('$feature estarÃ¡ disponible prÃ³ximamente'),
         backgroundColor: Colors.black87,
         behavior: SnackBarBehavior.floating,
       ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/conductor_earnings_service.dart';
 
 enum EarningsPeriod { today, week, month }
@@ -16,7 +16,7 @@ class ConductorEarningsProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
   EarningsPeriod get selectedPeriod => _selectedPeriod;
 
-  /// Cargar ganancias según el período seleccionado
+  /// Cargar ganancias segÃºn el perÃ­odo seleccionado
   Future<void> loadEarnings(int conductorId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -56,7 +56,7 @@ class ConductorEarningsProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      _errorMessage = 'Error de conexión: $e';
+      _errorMessage = 'Error de conexiÃ³n: $e';
       _earnings = EarningsModel(
         total: 0,
         totalViajes: 0,
@@ -102,7 +102,7 @@ class ConductorEarningsProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      _errorMessage = 'Error de conexión: $e';
+      _errorMessage = 'Error de conexiÃ³n: $e';
       _earnings = EarningsModel(
         total: 0,
         totalViajes: 0,
@@ -116,7 +116,7 @@ class ConductorEarningsProvider with ChangeNotifier {
     }
   }
 
-  /// Cambiar período seleccionado
+  /// Cambiar perÃ­odo seleccionado
   void setPeriod(EarningsPeriod period, int conductorId) {
     if (_selectedPeriod != period) {
       _selectedPeriod = period;

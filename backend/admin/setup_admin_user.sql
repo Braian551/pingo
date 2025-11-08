@@ -1,7 +1,7 @@
 -- Script para configurar usuario administrador de prueba
 -- Ejecuta esto en tu base de datos MySQL
 
-USE pingo;
+USE viax;
 
 -- Verificar usuarios administradores existentes
 SELECT id, nombre, apellido, email, tipo_usuario, es_activo 

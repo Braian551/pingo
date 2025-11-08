@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ping_go/src/core/error/exceptions.dart';
-import 'package:ping_go/src/core/config/app_config.dart';
+import 'package:viax/src/core/error/exceptions.dart';
+import 'package:viax/src/core/config/app_config.dart';
 import 'user_remote_datasource.dart';
 
-/// Implementación del Datasource Remoto usando HTTP
+/// ImplementaciÃ³n del Datasource Remoto usando HTTP
 /// 
 /// RESPONSABILIDADES:
 /// - Hacer peticiones HTTP al backend
@@ -19,12 +19,12 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   /// URL base del microservicio de usuarios
   /// 
-  /// NOTA: En producción con microservicios reales, esto sería:
+  /// NOTA: En producciÃ³n con microservicios reales, esto serÃ­a:
   /// - Desarrollo: http://localhost:8001/v1
   /// - Staging: https://staging-api.pingo.com/user-service/v1
-  /// - Producción: https://api.pingo.com/user-service/v1
+  /// - ProducciÃ³n: https://api.pingo.com/user-service/v1
   /// 
-  /// Por ahora apunta al monolito pero la estructura ya está preparada
+  /// Por ahora apunta al monolito pero la estructura ya estÃ¡ preparada
   String get _baseUrl => '${AppConfig.authServiceUrl}';
 
   @override
@@ -227,7 +227,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-      // Si el backend responde con success: false, lanzar excepción
+      // Si el backend responde con success: false, lanzar excepciÃ³n
       if (data['success'] == false) {
         throw ServerException(
           data['message'] as String? ?? 'Error del servidor',

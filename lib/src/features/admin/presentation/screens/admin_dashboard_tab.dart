@@ -1,8 +1,8 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/admin/admin_service.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AdminDashboardTab extends StatefulWidget {
@@ -36,7 +36,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     setState(() => _isLoading = true);
 
     try {
-      // Debug: Verificar qué datos estamos recibiendo en adminUser
+      // Debug: Verificar quÃ© datos estamos recibiendo en adminUser
       print('AdminDashboardTab: adminUser completo: ${widget.adminUser}');
       
       final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
@@ -53,7 +53,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
           _isLoading = false;
         });
       } else {
-        final errorMsg = response['message'] ?? 'No se pudieron cargar las estadísticas';
+        final errorMsg = response['message'] ?? 'No se pudieron cargar las estadÃ­sticas';
         _showError(errorMsg);
         setState(() {
           _dashboardData = _getDefaultDashboardData();
@@ -189,7 +189,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
 
   Widget _buildWelcomeSection(String adminName) {
     final hour = DateTime.now().hour;
-    String greeting = 'Buenos días';
+    String greeting = 'Buenos dÃ­as';
     IconData greetingIcon = Icons.wb_sunny_rounded;
     
     if (hour >= 12 && hour < 18) {
@@ -304,7 +304,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 const Color(0xFF764ba2).withOpacity(0.8),
               ],
               onTap: () {
-                // Navegar a gestión de usuarios
+                // Navegar a gestiÃ³n de usuarios
                 final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
                 Navigator.pushNamed(
                   context,
@@ -323,7 +323,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 const Color(0xFF38ef7d).withOpacity(0.8),
               ],
               onTap: () {
-                // Navegar a la pestaña de estadísticas
+                // Navegar a la pestaÃ±a de estadÃ­sticas
                 widget.onNavigateToTab?.call(2);
               },
             ),
@@ -337,7 +337,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 const Color(0xFFffa726).withOpacity(0.8),
               ],
               onTap: () {
-                // Navegar a la pestaña de estadísticas
+                // Navegar a la pestaÃ±a de estadÃ­sticas
                 widget.onNavigateToTab?.call(2);
               },
             ),
@@ -351,7 +351,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 const Color(0xFFf5576c).withOpacity(0.8),
               ],
               onTap: () {
-                // Navegar a logs de auditoría
+                // Navegar a logs de auditorÃ­a
                 final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
                 Navigator.pushNamed(
                   context,
@@ -509,7 +509,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Las acciones del sistema aparecerán aquí',
+                      'Las acciones del sistema aparecerÃ¡n aquÃ­',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 14,
@@ -565,7 +565,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                         ),
                       ),
                       title: Text(
-                        actividad['descripcion'] ?? 'Sin descripción',
+                        actividad['descripcion'] ?? 'Sin descripciÃ³n',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -575,7 +575,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${actividad['nombre'] ?? ''} ${actividad['apellido'] ?? ''} • ${_formatDate(actividad['fecha_creacion'])}',
+                          '${actividad['nombre'] ?? ''} ${actividad['apellido'] ?? ''} â€¢ ${_formatDate(actividad['fecha_creacion'])}',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontSize: 12,

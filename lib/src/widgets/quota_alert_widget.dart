@@ -1,11 +1,11 @@
-// lib/src/widgets/quota_alert_widget.dart
+﻿// lib/src/widgets/quota_alert_widget.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../features/map/providers/map_provider.dart';
 import '../global/services/quota_monitor_service.dart';
 
 /// Widget que muestra alertas sobre el uso de las cuotas de las APIs
-/// Se actualiza automáticamente según el MapProvider
+/// Se actualiza automÃ¡ticamente segÃºn el MapProvider
 class QuotaAlertWidget extends StatelessWidget {
   final bool compact;
   
@@ -126,7 +126,7 @@ class QuotaAlertWidget extends StatelessWidget {
         
         // TomTom Traffic
         _buildQuotaBar(
-          'TomTom - Tráfico',
+          'TomTom - TrÃ¡fico',
           status.tomtomTrafficUsed,
           status.tomtomTrafficLimit,
           status.tomtomTrafficPercentage,
@@ -134,7 +134,7 @@ class QuotaAlertWidget extends StatelessWidget {
         
         const SizedBox(height: 12),
         Text(
-          'Toca para más detalles',
+          'Toca para mÃ¡s detalles',
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 12,
@@ -267,7 +267,7 @@ class QuotaAlertWidget extends StatelessWidget {
               
               _buildDetailedQuotaSection(
                 'Mapbox - Routing',
-                'Cálculo de rutas y direcciones (mensual)',
+                'CÃ¡lculo de rutas y direcciones (mensual)',
                 status.mapboxRoutingUsed,
                 status.mapboxRoutingLimit,
                 status.mapboxRoutingPercentage,
@@ -278,7 +278,7 @@ class QuotaAlertWidget extends StatelessWidget {
               
               _buildDetailedQuotaSection(
                 'TomTom - Traffic',
-                'Información de tráfico en tiempo real (diario)',
+                'InformaciÃ³n de trÃ¡fico en tiempo real (diario)',
                 status.tomtomTrafficUsed,
                 status.tomtomTrafficLimit,
                 status.tomtomTrafficPercentage,
@@ -301,7 +301,7 @@ class QuotaAlertWidget extends StatelessWidget {
                         Icon(Icons.info, color: Colors.blue.shade700, size: 20),
                         const SizedBox(width: 8),
                         Text(
-                          'Información',
+                          'InformaciÃ³n',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade900,
@@ -311,9 +311,9 @@ class QuotaAlertWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Los contadores se resetean automáticamente:\n'
-                      '• Mapbox: Cada mes\n'
-                      '• TomTom: Cada día\n\n'
+                      'Los contadores se resetean automÃ¡ticamente:\n'
+                      'â€¢ Mapbox: Cada mes\n'
+                      'â€¢ TomTom: Cada dÃ­a\n\n'
                       'Todas estas APIs tienen planes gratuitos generosos.',
                       style: TextStyle(
                         fontSize: 12,

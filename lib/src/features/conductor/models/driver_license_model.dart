@@ -1,4 +1,4 @@
-/// Modelo para información de la licencia de conducción
+﻿/// Modelo para informaciÃ³n de la licencia de conducciÃ³n
 class DriverLicenseModel {
   final String numero;
   final DateTime fechaExpedicion;
@@ -48,23 +48,23 @@ class DriverLicenseModel {
     };
   }
 
-  /// Verifica si la licencia está vigente
+  /// Verifica si la licencia estÃ¡ vigente
   bool get isValid {
     return fechaVencimiento.isAfter(DateTime.now());
   }
 
-  /// Verifica si la licencia está próxima a vencer (30 días)
+  /// Verifica si la licencia estÃ¡ prÃ³xima a vencer (30 dÃ­as)
   bool get isExpiringSoon {
     final daysUntilExpiry = fechaVencimiento.difference(DateTime.now()).inDays;
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   }
 
-  /// Días restantes hasta el vencimiento
+  /// DÃ­as restantes hasta el vencimiento
   int get daysUntilExpiry {
     return fechaVencimiento.difference(DateTime.now()).inDays;
   }
 
-  /// Verifica si todos los datos están completos
+  /// Verifica si todos los datos estÃ¡n completos
   bool get isComplete {
     return numero.isNotEmpty &&
         categoria != LicenseCategory.ninguna &&
@@ -92,17 +92,17 @@ class DriverLicenseModel {
   }
 }
 
-/// Categorías de licencia de conducción en Colombia
+/// CategorÃ­as de licencia de conducciÃ³n en Colombia
 enum LicenseCategory {
   ninguna('ninguna', 'Ninguna', ''),
   a1('A1', 'A1', 'Motocicletas hasta 125cc'),
   a2('A2', 'A2', 'Motocicletas superior a 125cc'),
-  b1('B1', 'B1', 'Automóviles, motocarros, cuatrimotor y camperos'),
+  b1('B1', 'B1', 'AutomÃ³viles, motocarros, cuatrimotor y camperos'),
   b2('B2', 'B2', 'Camionetas y microbuses'),
-  b3('B3', 'B3', 'Camiones rígidos, busetas y buses'),
-  c1('C1', 'C1', 'Automóviles, camperos (Servicio público)'),
-  c2('C2', 'C2', 'Camionetas, microbuses (Servicio público)'),
-  c3('C3', 'C3', 'Camiones, buses (Servicio público)');
+  b3('B3', 'B3', 'Camiones rÃ­gidos, busetas y buses'),
+  c1('C1', 'C1', 'AutomÃ³viles, camperos (Servicio pÃºblico)'),
+  c2('C2', 'C2', 'Camionetas, microbuses (Servicio pÃºblico)'),
+  c3('C3', 'C3', 'Camiones, buses (Servicio pÃºblico)');
 
   final String value;
   final String label;

@@ -1,12 +1,12 @@
-import 'package:ping_go/src/core/error/result.dart';
+﻿import 'package:viax/src/core/error/result.dart';
 import '../repositories/user_repository.dart';
 
 /// Use Case: Logout de Usuario
 /// 
-/// Encapsula la lógica de negocio para cerrar sesión.
+/// Encapsula la lÃ³gica de negocio para cerrar sesiÃ³n.
 /// 
 /// RESPONSABILIDADES:
-/// - Limpiar sesión local
+/// - Limpiar sesiÃ³n local
 /// - Notificar al servidor (si es necesario)
 class LogoutUser {
   final UserRepository repository;

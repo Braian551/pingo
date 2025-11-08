@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 /// A small helper to fade+slide widgets on first build. Useful for subtle entrance animations.
 class EntranceFader extends StatefulWidget {

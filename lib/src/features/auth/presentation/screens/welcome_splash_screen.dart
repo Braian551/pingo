@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:viax/src/routes/route_names.dart';
 
 class WelcomeSplashScreen extends StatefulWidget {
   const WelcomeSplashScreen({super.key});
@@ -66,7 +66,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Logo y título animados
+                // Logo y tÃ­tulo animados
                 Expanded(
                   child: Center(
                     child: FadeTransition(
@@ -114,9 +114,9 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                               ),
                             ),
                             const SizedBox(height: 40),
-                            // Título de bienvenida
+                            // TÃ­tulo de bienvenida
                             const Text(
-                              '¡Bienvenido a Ping Go!',
+                              'Â¡Bienvenido a Ping Go!',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
@@ -126,7 +126,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Subtítulo
+                            // SubtÃ­tulo
                             Text(
                               'Tu cuenta ha sido creada exitosamente',
                               textAlign: TextAlign.center,
@@ -138,7 +138,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Estás listo para comenzar tu experiencia',
+                              'EstÃ¡s listo para comenzar tu experiencia',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.6),
@@ -152,7 +152,7 @@ class _WelcomeSplashScreenState extends State<WelcomeSplashScreen>
                     ),
                   ),
                 ),
-                // Botón de continuar
+                // BotÃ³n de continuar
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: SizedBox(

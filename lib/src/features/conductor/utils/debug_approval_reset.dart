@@ -1,9 +1,9 @@
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:shared_preferences/shared_preferences.dart';
 
-/// Script de utilidad para resetear el estado de notificaciones de aprobación
-/// Útil durante el desarrollo y testing
+/// Script de utilidad para resetear el estado de notificaciones de aprobaciÃ³n
+/// Ãštil durante el desarrollo y testing
 class DebugApprovalReset {
-  /// Resetea el estado de notificación para un conductor específico
+  /// Resetea el estado de notificaciÃ³n para un conductor especÃ­fico
   static Future<void> resetForConductor(int conductorId) async {
     final prefs = await SharedPreferences.getInstance();
     
@@ -13,11 +13,11 @@ class DebugApprovalReset {
     await prefs.remove(shownKey);
     await prefs.remove(statusKey);
     
-    print('✅ Estado reseteado para conductor $conductorId');
+    print('âœ… Estado reseteado para conductor $conductorId');
     print('   - $shownKey: eliminado');
     print('   - $statusKey: eliminado');
     print('');
-    print('💡 Reinicia la app o recarga el home para ver la alerta nuevamente.');
+    print('ðŸ’¡ Reinicia la app o recarga el home para ver la alerta nuevamente.');
   }
 
   /// Resetea el estado para todos los conductores
@@ -36,8 +36,8 @@ class DebugApprovalReset {
     }
     
     print('');
-    print('✅ $removedCount claves eliminadas');
-    print('💡 Reinicia la app para ver las alertas nuevamente.');
+    print('âœ… $removedCount claves eliminadas');
+    print('ðŸ’¡ Reinicia la app para ver las alertas nuevamente.');
   }
 
   /// Muestra el estado actual de notificaciones
@@ -50,8 +50,8 @@ class DebugApprovalReset {
     final hasShown = prefs.getBool(shownKey) ?? false;
     final lastStatus = prefs.getString(statusKey);
     
-    print('📊 Estado actual para conductor $conductorId:');
+    print('ðŸ“Š Estado actual para conductor $conductorId:');
     print('   - Alerta ya mostrada: $hasShown');
-    print('   - Último estado guardado: ${lastStatus ?? "ninguno"}');
+    print('   - Ãšltimo estado guardado: ${lastStatus ?? "ninguno"}');
   }
 }

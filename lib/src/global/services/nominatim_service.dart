@@ -1,30 +1,30 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 /// Servicio de geocoding GRATUITO usando Nominatim (OpenStreetMap)
 /// No requiere API key y es completamente gratuito
-/// Optimizado para búsquedas en Colombia
-/// Límite recomendado: 1 request por segundo
+/// Optimizado para bÃºsquedas en Colombia
+/// LÃ­mite recomendado: 1 request por segundo
 class NominatimService {
   static const String _baseUrl = 'https://nominatim.openstreetmap.org';
-  static const String _userAgent = 'PingGo/1.0 (contact@pinggo.app)';
+  static const String _userAgent = 'Viax/1.0 (contact@viax.app)';
   
-  /// Buscar dirección por texto - MEJORADO para Colombia
+  /// Buscar direcciÃ³n por texto - MEJORADO para Colombia
   static Future<List<NominatimResult>> searchAddress(
     String query, {
     LatLng? proximity,
     int limit = 10,
   }) async {
     try {
-      // Construir parámetros de búsqueda
+      // Construir parÃ¡metros de bÃºsqueda
       final params = {
         'format': 'json',
         'q': query,
         'addressdetails': '1',
         'limit': limit.toString(),
-        'countrycodes': 'co', // ⭐ LIMITAR A COLOMBIA
-        'accept-language': 'es', // ⭐ ESPAÑOL
+        'countrycodes': 'co', // â­ LIMITAR A COLOMBIA
+        'accept-language': 'es', // â­ ESPAÃ‘OL
       };
 
       // Si hay proximidad, agregar viewbox para priorizar resultados cercanos
@@ -39,7 +39,7 @@ class NominatimService {
 
       final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
 
-      print('🔍 Buscando en Nominatim: ${uri.toString().replaceAll(_baseUrl, '...')}');
+      print('ðŸ” Buscando en Nominatim: ${uri.toString().replaceAll(_baseUrl, '...')}');
 
       final response = await http
           .get(
@@ -55,19 +55,19 @@ class NominatimService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final results = data.map((item) => NominatimResult.fromJson(item)).toList();
-        print('✅ Encontrados ${results.length} lugares en Colombia');
+        print('âœ… Encontrados ${results.length} lugares en Colombia');
         return results;
       } else {
-        print('❌ Error en la búsqueda: ${response.statusCode}');
-        throw Exception('Error en la búsqueda: ${response.statusCode}');
+        print('âŒ Error en la bÃºsqueda: ${response.statusCode}');
+        throw Exception('Error en la bÃºsqueda: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Error de conexión: $e');
-      throw Exception('Error de conexión o timeout: $e');
+      print('âŒ Error de conexiÃ³n: $e');
+      throw Exception('Error de conexiÃ³n o timeout: $e');
     }
   }
 
-  /// Reverse geocoding - obtener dirección desde coordenadas
+  /// Reverse geocoding - obtener direcciÃ³n desde coordenadas
   static Future<NominatimResult?> reverseGeocode(double lat, double lon) async {
     try {
       final params = {
@@ -80,7 +80,7 @@ class NominatimService {
 
       final uri = Uri.parse('$_baseUrl/reverse').replace(queryParameters: params);
 
-      print('📍 Geocodificación inversa: $lat, $lon');
+      print('ðŸ“ GeocodificaciÃ³n inversa: $lat, $lon');
 
       final response = await http
           .get(
@@ -96,19 +96,19 @@ class NominatimService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final result = NominatimResult.fromJson(data);
-        print('✅ Dirección encontrada: ${result.getFormattedAddress()}');
+        print('âœ… DirecciÃ³n encontrada: ${result.getFormattedAddress()}');
         return result;
       } else {
-        print('❌ Error en geocodificación inversa: ${response.statusCode}');
+        print('âŒ Error en geocodificaciÃ³n inversa: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('❌ Error en geocodificación inversa: $e');
+      print('âŒ Error en geocodificaciÃ³n inversa: $e');
       return null;
     }
   }
 
-  /// Buscar lugares cercanos por categoría (restaurantes, hospitales, etc.)
+  /// Buscar lugares cercanos por categorÃ­a (restaurantes, hospitales, etc.)
   static Future<List<NominatimResult>> searchByCategory({
     required String category,
     required LatLng center,
@@ -121,7 +121,7 @@ class NominatimService {
     );
   }
 
-  /// Buscar una dirección específica en una ciudad
+  /// Buscar una direcciÃ³n especÃ­fica en una ciudad
   static Future<List<NominatimResult>> searchInCity({
     required String query,
     required String city,
@@ -149,7 +149,7 @@ class NominatimResult {
     this.type,
   });
 
-  // Método para obtener coordenadas como LatLng
+  // MÃ©todo para obtener coordenadas como LatLng
   LatLng get coordinates => LatLng(lat, lon);
 
   factory NominatimResult.fromJson(Map<String, dynamic> json) {
@@ -162,12 +162,12 @@ class NominatimResult {
     );
   }
 
-  /// Obtener dirección formateada de manera clara
+  /// Obtener direcciÃ³n formateada de manera clara
   String getFormattedAddress() {
     final addr = address;
     final components = <String>[];
     
-    // Priorizar información relevante para Colombia
+    // Priorizar informaciÃ³n relevante para Colombia
     if (addr['road'] != null) {
       String road = addr['road'];
       if (addr['house_number'] != null) {
@@ -194,7 +194,7 @@ class NominatimResult {
   String getShortName() {
     final addr = address;
     
-    // Intentar obtener el nombre más específico
+    // Intentar obtener el nombre mÃ¡s especÃ­fico
     if (addr['road'] != null) {
       return addr['road'];
     }

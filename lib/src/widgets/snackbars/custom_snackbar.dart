@@ -1,4 +1,4 @@
-// lib/src/widgets/snackbars/custom_snackbar.dart
+﻿// lib/src/widgets/snackbars/custom_snackbar.dart
 import 'package:flutter/material.dart';
 
 enum SnackbarType {
@@ -77,7 +77,7 @@ class CustomSnackbar {
     );
   }
 
-  /// Muestra un snackbar de éxito
+  /// Muestra un snackbar de Ã©xito
   static void showSuccess(
     BuildContext context, {
     required String message,

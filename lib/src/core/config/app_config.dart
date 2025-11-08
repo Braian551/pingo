@@ -1,14 +1,14 @@
-/// Configuración centralizada de la aplicación
+﻿/// ConfiguraciÃ³n centralizada de la aplicaciÃ³n
 /// 
 /// Contiene constantes y configuraciones que pueden variar
-/// según el entorno (dev, staging, production).
+/// segÃºn el entorno (dev, staging, production).
 /// 
-/// MIGRACIÓN A MICROSERVICIOS:
-/// - Estas URLs cambiarían a endpoints de diferentes servicios
+/// MIGRACIÃ“N A MICROSERVICIOS:
+/// - Estas URLs cambiarÃ­an a endpoints de diferentes servicios
 /// - Usa variables de entorno para diferentes ambientes
 /// - Considera usar un API Gateway que enrute a los servicios
 /// 
-/// EJEMPLO CONFIGURACIÓN MICROSERVICIOS:
+/// EJEMPLO CONFIGURACIÃ“N MICROSERVICIOS:
 /// ```dart
 /// // Desarrollo local
 /// static const apiGateway = 'http://localhost:8080';
@@ -16,27 +16,27 @@
 /// static const authServiceUrl = '$apiGateway/auth-service/v1';
 /// static const paymentServiceUrl = '$apiGateway/payment-service/v1';
 /// 
-/// // Producción
+/// // ProducciÃ³n
 /// static const apiGateway = 'https://api.pingo.com';
 /// static const conductorServiceUrl = '$apiGateway/conductor/v1';
 /// ```
 class AppConfig {
-  // Ambiente actual - CAMBIAR AQUÍ PARA ALTERNAR ENTRE LOCAL Y PRODUCCIÓN
+  // Ambiente actual - CAMBIAR AQUÃ PARA ALTERNAR ENTRE LOCAL Y PRODUCCIÃ“N
   static const Environment environment = Environment.development;
 
-  // URLs base según ambiente
+  // URLs base segÃºn ambiente
   static String get baseUrl {
     switch (environment) {
-      case Environment.development:
+  case Environment.development:
         // DESARROLLO LOCAL CON LARAGON
-        // Para navegador web o depuración desde VS Code: localhost
+        // Para navegador web o depuraciÃ³n desde VS Code: localhost
         // Para emulador Android: 10.0.2.2 (IMPORTANTE: usar esta para emulador)
-        // Para dispositivo físico: usar IP de tu máquina (ej: 192.168.1.X)
-        return 'http://10.0.2.2/ping_go/backend-deploy'; // Laragon local desde emulador
+        // Para dispositivo fÃ­sico: usar IP de tu mÃ¡quina (ej: 192.168.1.X)
+  return 'http://10.0.2.2/viax/backend'; // Laragon local desde emulador
       case Environment.staging:
         return 'https://staging-api.pingo.com';
       case Environment.production:
-        // Railway backend URL - PRODUCCIÓN
+        // Railway backend URL - PRODUCCIÃ“N
         return 'https://pinggo-backend-production.up.railway.app';
     }
   }
@@ -45,12 +45,12 @@ class AppConfig {
   // MICROSERVICIOS
   // ============================================
   // Cada servicio tiene su propia URL modular
-  // En producción con servidores separados, cambiar a:
+  // En producciÃ³n con servidores separados, cambiar a:
   //   - authServiceUrl: 'https://auth.pingo.com/v1'
   //   - conductorServiceUrl: 'https://conductors.pingo.com/v1'
   //   - adminServiceUrl: 'https://admin.pingo.com/v1'
   
-  /// Microservicio de Autenticación y Usuarios
+  /// Microservicio de AutenticaciÃ³n y Usuarios
   /// Endpoints: login, register, profile, email_service, etc.
   static String get authServiceUrl => '$baseUrl/auth';
   
@@ -58,7 +58,7 @@ class AppConfig {
   /// Endpoints: profile, license, vehicle, trips, earnings, etc.
   static String get conductorServiceUrl => '$baseUrl/conductor';
   
-  /// Microservicio de Administración
+  /// Microservicio de AdministraciÃ³n
   /// Endpoints: dashboard, user_management, audit_logs, etc.
   static String get adminServiceUrl => '$baseUrl/admin';
   
@@ -68,15 +68,15 @@ class AppConfig {
   /// Microservicio de Mapas (futuro)
   static String get mapServiceUrl => '$baseUrl/map';
   
-  // Alias para compatibilidad con código legacy
+  // Alias para compatibilidad con cÃ³digo legacy
   @Deprecated('Usar authServiceUrl en su lugar')
   static String get userServiceUrl => authServiceUrl;
 
-  // Configuración de red
+  // ConfiguraciÃ³n de red
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
-  // Configuración de caché
+  // ConfiguraciÃ³n de cachÃ©
   static const Duration cacheExpiration = Duration(hours: 1);
   static const int maxCacheSize = 50 * 1024 * 1024; // 50MB
 
@@ -85,29 +85,29 @@ class AppConfig {
   static const bool enableAnalytics = true;
   static const bool enableCrashReporting = true;
 
-  // Configuración de mapas
+  // ConfiguraciÃ³n de mapas
   static const String mapboxAccessToken = 'YOUR_MAPBOX_TOKEN'; // Desde env
   static const double defaultLatitude = -34.603722;
   static const double defaultLongitude = -58.381592;
 
-  // Versión de la app
+  // VersiÃ³n de la app
   static const String appVersion = '1.0.0';
   static const String apiVersion = 'v1';
 }
 
-/// Enumeración de ambientes
+/// EnumeraciÃ³n de ambientes
 enum Environment {
   development,
   staging,
   production,
 }
 
-/// Configuración por feature (para microservicios)
+/// ConfiguraciÃ³n por feature (para microservicios)
 /// 
-/// Permite configurar cada módulo/servicio independientemente.
-/// Preparado para migración a arquitectura de microservicios.
+/// Permite configurar cada mÃ³dulo/servicio independientemente.
+/// Preparado para migraciÃ³n a arquitectura de microservicios.
 class FeatureConfig {
-  // Configuración del Microservicio de Usuarios
+  // ConfiguraciÃ³n del Microservicio de Usuarios
   static const userServiceConfig = {
     'endpoint': '/auth',
     'version': 'v1',
@@ -116,7 +116,7 @@ class FeatureConfig {
     'enableCache': false,
   };
 
-  // Configuración del módulo Conductor
+  // ConfiguraciÃ³n del mÃ³dulo Conductor
   static const conductorConfig = {
     'endpoint': '/conductor',
     'version': 'v1',
@@ -124,7 +124,7 @@ class FeatureConfig {
     'retryAttempts': 3,
   };
 
-  // Configuración del módulo Auth (alias de userService para retrocompatibilidad)
+  // ConfiguraciÃ³n del mÃ³dulo Auth (alias de userService para retrocompatibilidad)
   static const authConfig = {
     'endpoint': '/auth',
     'version': 'v1',
@@ -132,7 +132,7 @@ class FeatureConfig {
     'tokenExpiration': Duration(hours: 24),
   };
 
-  // Configuración del módulo Map
+  // ConfiguraciÃ³n del mÃ³dulo Map
   static const mapConfig = {
     'endpoint': '/map',
     'version': 'v1',

@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../../domain/entities/location.dart';
 import '../../domain/repositories/map_repository.dart';
 import '../datasources/map_remote_datasource.dart';
 
-/// Implementación del repositorio de mapas
+/// ImplementaciÃ³n del repositorio de mapas
 class MapRepositoryImpl implements MapRepository {
   final MapRemoteDataSource remoteDataSource;
 
@@ -35,7 +35,7 @@ class MapRepositoryImpl implements MapRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al obtener dirección: $e'));
+      return Error(UnknownFailure('Error al obtener direcciÃ³n: $e'));
     }
   }
 

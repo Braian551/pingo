@@ -1,17 +1,17 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/auth_session.dart';
 import '../repositories/user_repository.dart';
 
 /// Use Case: Login de Usuario
 /// 
-/// Encapsula la lógica de negocio para autenticar un usuario.
+/// Encapsula la lÃ³gica de negocio para autenticar un usuario.
 /// 
 /// RESPONSABILIDADES:
 /// - Validar credenciales de entrada
 /// - Invocar el repositorio para autenticar
-/// - Guardar la sesión localmente
-/// - Retornar la sesión activa o un error
+/// - Guardar la sesiÃ³n localmente
+/// - Retornar la sesiÃ³n activa o un error
 class LoginUser {
   final UserRepository repository;
 
@@ -20,8 +20,8 @@ class LoginUser {
   /// Ejecutar el caso de uso
   /// 
   /// [email] Email del usuario
-  /// [password] Contraseña del usuario
-  /// [saveSession] Si debe guardar la sesión localmente (default: true)
+  /// [password] ContraseÃ±a del usuario
+  /// [saveSession] Si debe guardar la sesiÃ³n localmente (default: true)
   Future<Result<AuthSession>> call({
     required String email,
     required String password,
@@ -33,11 +33,11 @@ class LoginUser {
     }
 
     if (!_isValidEmail(email)) {
-      return Error(ValidationFailure('El email no es válido'));
+      return Error(ValidationFailure('El email no es vÃ¡lido'));
     }
 
     if (password.isEmpty) {
-      return Error(ValidationFailure('La contraseña es requerida'));
+      return Error(ValidationFailure('La contraseÃ±a es requerida'));
     }
 
     // Invocar repositorio para autenticar
@@ -46,7 +46,7 @@ class LoginUser {
       password: password,
     );
 
-    // Si el login fue exitoso y se debe guardar la sesión
+    // Si el login fue exitoso y se debe guardar la sesiÃ³n
     if (result is Success<AuthSession> && saveSession) {
       await repository.saveSession(result.data);
     }

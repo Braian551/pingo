@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/conductor_profile_model.dart';
 import '../models/driver_license_model.dart';
@@ -30,7 +30,7 @@ class ConductorProfileProvider with ChangeNotifier {
         _errorMessage = null;
       } else {
         _errorMessage = 'No se pudo cargar el perfil';
-        // Inicializar perfil vacío
+        // Inicializar perfil vacÃ­o
         _profile = ConductorProfileModel();
       }
     } catch (e) {
@@ -42,7 +42,7 @@ class ConductorProfileProvider with ChangeNotifier {
     }
   }
 
-  /// Actualizar licencia de conducción
+  /// Actualizar licencia de conducciÃ³n
   Future<bool> updateLicense({
     required int conductorId,
     required DriverLicenseModel license,
@@ -79,7 +79,7 @@ class ConductorProfileProvider with ChangeNotifier {
     }
   }
 
-  /// Actualizar vehículo
+  /// Actualizar vehÃ­culo
   Future<bool> updateVehicle({
     required int conductorId,
     required VehicleModel vehicle,
@@ -103,13 +103,13 @@ class ConductorProfileProvider with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _errorMessage = response['message'] ?? 'Error al actualizar vehículo';
+        _errorMessage = response['message'] ?? 'Error al actualizar vehÃ­culo';
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Error al actualizar vehículo: $e';
+      _errorMessage = 'Error al actualizar vehÃ­culo: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -184,7 +184,7 @@ class ConductorProfileProvider with ChangeNotifier {
     }
   }
 
-  /// Enviar perfil para verificación
+  /// Enviar perfil para verificaciÃ³n
   Future<bool> submitForVerification(int conductorId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -196,7 +196,7 @@ class ConductorProfileProvider with ChangeNotifier {
       );
 
       if (response['success'] == true) {
-        // Actualizar estado de verificación
+        // Actualizar estado de verificaciÃ³n
         _profile = _profile?.copyWith(
           estadoVerificacion: VerificationStatus.enRevision,
         );
@@ -205,20 +205,20 @@ class ConductorProfileProvider with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _errorMessage = response['message'] ?? 'Error al enviar verificación';
+        _errorMessage = response['message'] ?? 'Error al enviar verificaciÃ³n';
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Error al enviar verificación: $e';
+      _errorMessage = 'Error al enviar verificaciÃ³n: $e';
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  /// Obtener estado de verificación
+  /// Obtener estado de verificaciÃ³n
   Future<void> refreshVerificationStatus(int conductorId) async {
     try {
       final response = await ConductorProfileService.getVerificationStatus(
@@ -245,11 +245,11 @@ class ConductorProfileProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error refrescando estado de verificación: $e');
+      print('Error refrescando estado de verificaciÃ³n: $e');
     }
   }
 
-  /// Subir múltiples documentos del vehículo
+  /// Subir mÃºltiples documentos del vehÃ­culo
   Future<Map<String, String?>> uploadVehicleDocuments({
     required int conductorId,
     String? soatFotoPath,
@@ -289,7 +289,7 @@ class ConductorProfileProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
-      // Recargar perfil si algún upload fue exitoso
+      // Recargar perfil si algÃºn upload fue exitoso
       final hasSuccessfulUpload = results.values.any((url) => url != null);
       if (hasSuccessfulUpload) {
         await loadProfile(conductorId);

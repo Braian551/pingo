@@ -1,16 +1,16 @@
 # Script para copiar el backend a Laragon
-# Ejecutar desde la raíz del proyecto ping_go
+# Ejecutar desde la raíz del proyecto viax
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   Configuración Local de PinGo" -ForegroundColor Cyan
+Write-Host "   Configuración Local de Viax" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Rutas
 $proyectoActual = $PSScriptRoot
-$backendSource = Join-Path $proyectoActual "backend-deploy"
+$backendSource = Join-Path $proyectoActual "backend"
 $laragonWww = "C:\laragon\www"
-$backendDest = Join-Path $laragonWww "ping_go\backend-deploy"
+$backendDest = Join-Path $laragonWww "viax\backend"
 
 Write-Host "📂 Verificando rutas..." -ForegroundColor Yellow
 Write-Host "   Origen: $backendSource"
@@ -19,7 +19,7 @@ Write-Host ""
 
 # Verificar que existe el directorio source
 if (-not (Test-Path $backendSource)) {
-    Write-Host "❌ Error: No se encuentra la carpeta backend-deploy" -ForegroundColor Red
+    Write-Host "❌ Error: No se encuentra la carpeta backend" -ForegroundColor Red
     Write-Host "   Ruta buscada: $backendSource" -ForegroundColor Red
     exit 1
 }
@@ -80,13 +80,13 @@ Write-Host ""
 Write-Host "1. Asegúrate de que Laragon esté corriendo" -ForegroundColor White
 Write-Host "   (Apache y MySQL deben estar activos)" -ForegroundColor Gray
 Write-Host ""
-Write-Host "2. Crea la base de datos 'pingo' en HeidiSQL o phpMyAdmin" -ForegroundColor White
+Write-Host "2. Crea la base de datos 'viax' en HeidiSQL o phpMyAdmin" -ForegroundColor White
 Write-Host ""
 Write-Host "3. Importa el archivo SQL:" -ForegroundColor White
-Write-Host "   $proyectoActual\basededatos (2).sql" -ForegroundColor Gray
+Write-Host "   $proyectoActual\basededatosfinal.sql" -ForegroundColor Gray
 Write-Host ""
 Write-Host "4. Verifica que el backend funcione:" -ForegroundColor White
-Write-Host "   http://localhost/ping_go/backend-deploy/health.php" -ForegroundColor Cyan
+Write-Host "   http://localhost/viax/backend/health.php" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "5. Instala dependencias PHP (si es necesario):" -ForegroundColor White
 Write-Host "   cd $backendDest" -ForegroundColor Gray
@@ -101,7 +101,7 @@ Write-Host ""
 # Preguntar si desea abrir el navegador
 $abrirNavegador = Read-Host "¿Deseas abrir el navegador para verificar? (S/N)"
 if ($abrirNavegador -eq "S" -or $abrirNavegador -eq "s") {
-    Start-Process "http://localhost/ping_go/backend-deploy/health.php"
+    Start-Process "http://localhost/viax/backend/health.php"
 }
 
 Write-Host ""

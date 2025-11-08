@@ -1,33 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:ping_go/src/features/user/presentation/screens/home_user.dart';
-import 'package:ping_go/src/features/user/presentation/screens/confirm_trip_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/request_trip_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/user_profile_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/payment_methods_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/trip_history_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/settings_screen.dart';
-import 'package:ping_go/src/features/user/presentation/screens/waiting_for_driver_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/login_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/register_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/phone_auth_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/email_auth_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/email_verification_screen.dart';
-import 'package:ping_go/src/features/onboarding/presentation/screens/onboarding_screen.dart';
-// import 'package:ping_go/src/features/map/presentation/screens/location_selection_screen.dart'; // COMENTADO - YA NO SE USA
-import 'package:ping_go/src/features/map/presentation/screens/location_picker_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/welcome_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/welcome_splash_screen.dart';
-import 'package:ping_go/src/features/auth/presentation/screens/splash_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/admin_home_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/users_management_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/statistics_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/audit_logs_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/conductores_documentos_screen.dart';
-import 'package:ping_go/src/features/admin/presentation/screens/pricing_management_screen.dart';
-import 'package:ping_go/src/features/conductor/presentation/screens/conductor_home_screen.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/routes/animated_routes.dart';
-import 'package:ping_go/src/widgets/auth_wrapper.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:viax/src/features/user/presentation/screens/home_user.dart';
+import 'package:viax/src/features/user/presentation/screens/confirm_trip_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/request_trip_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/user_profile_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/payment_methods_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/trip_history_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/settings_screen.dart';
+import 'package:viax/src/features/user/presentation/screens/waiting_for_driver_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/login_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/register_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/phone_auth_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/email_auth_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/email_verification_screen.dart';
+import 'package:viax/src/features/onboarding/presentation/screens/onboarding_screen.dart';
+// import 'package:viax/src/features/map/presentation/screens/location_selection_screen.dart'; // COMENTADO - YA NO SE USA
+import 'package:viax/src/features/map/presentation/screens/location_picker_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/welcome_splash_screen.dart';
+import 'package:viax/src/features/auth/presentation/screens/splash_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/admin_home_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/users_management_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/statistics_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/audit_logs_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/conductores_documentos_screen.dart';
+import 'package:viax/src/features/admin/presentation/screens/pricing_management_screen.dart';
+import 'package:viax/src/features/conductor/presentation/screens/conductor_home_screen.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/routes/animated_routes.dart';
+import 'package:viax/src/widgets/auth_wrapper.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -89,7 +89,7 @@ class AppRouter {
             builder: (_) => LocationPickerScreen(
               initialAddress: args?['initialAddress'],
               initialLocation: args?['initialLocation'],
-              screenTitle: args?['screenTitle'] ?? 'Seleccionar ubicación',
+              screenTitle: args?['screenTitle'] ?? 'Seleccionar ubicaciÃ³n',
               showConfirmButton: args?['showConfirmButton'] ?? true,
             ),
           );
@@ -140,7 +140,7 @@ class AppRouter {
             backgroundColor: Colors.black,
             appBar: AppBar(
               backgroundColor: Colors.black,
-              title: const Text('Próximamente', style: TextStyle(color: Colors.white)),
+              title: const Text('PrÃ³ximamente', style: TextStyle(color: Colors.white)),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.of(context).pop(),
@@ -148,7 +148,7 @@ class AppRouter {
             ),
             body: const Center(
               child: Text(
-                'Esta función estará disponible pronto',
+                'Esta funciÃ³n estarÃ¡ disponible pronto',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
@@ -224,7 +224,7 @@ class AppRouter {
           );
         }
       
-      // Agregar más rutas aquí
+      // Agregar mÃ¡s rutas aquÃ­
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

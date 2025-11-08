@@ -1,13 +1,13 @@
-import 'package:ping_go/src/features/user/domain/entities/user.dart';
-import 'package:ping_go/src/features/user/domain/entities/auth_session.dart';
+﻿import 'package:viax/src/features/user/domain/entities/user.dart';
+import 'package:viax/src/features/user/domain/entities/auth_session.dart';
 
 /// Modelo de Datos: UserModel
 /// 
 /// DTO (Data Transfer Object) que extiende la entidad User.
-/// Sabe cómo serializar/deserializar desde JSON.
+/// Sabe cÃ³mo serializar/deserializar desde JSON.
 /// 
 /// RESPONSABILIDADES:
-/// - Conversión JSON <-> Objeto Dart
+/// - ConversiÃ³n JSON <-> Objeto Dart
 /// - Mapeo entre datos del backend y entidad de dominio
 class UserModel extends User {
   const UserModel({

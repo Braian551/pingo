@@ -1,7 +1,7 @@
-/// Entidad de Dominio: Trip (Viaje)
+﻿/// Entidad de Dominio: Trip (Viaje)
 /// 
-/// Representa un viaje dentro de la aplicación Ping Go.
-/// Esta es una entidad inmutable del dominio (PURA lógica de negocio).
+/// Representa un viaje dentro de la aplicaciÃ³n Ping Go.
+/// Esta es una entidad inmutable del dominio (PURA lÃ³gica de negocio).
 class Trip {
   final int id;
   final int usuarioId;
@@ -47,33 +47,33 @@ class Trip {
     this.motivoCancelacion,
   });
 
-  /// Lógica de negocio: ¿El viaje está activo?
+  /// LÃ³gica de negocio: Â¿El viaje estÃ¡ activo?
   bool get isActive =>
       estado == TripStatus.pendiente ||
       estado == TripStatus.aceptado ||
       estado == TripStatus.enCurso;
 
-  /// Lógica de negocio: ¿El viaje está completado?
+  /// LÃ³gica de negocio: Â¿El viaje estÃ¡ completado?
   bool get isCompleted => estado == TripStatus.completado;
 
-  /// Lógica de negocio: ¿El viaje está cancelado?
+  /// LÃ³gica de negocio: Â¿El viaje estÃ¡ cancelado?
   bool get isCancelled => estado == TripStatus.cancelado;
 
-  /// Lógica de negocio: ¿Tiene conductor asignado?
+  /// LÃ³gica de negocio: Â¿Tiene conductor asignado?
   bool get hasConductor => conductorId != null && conductorId! > 0;
 
-  /// Lógica de negocio: Duración real del viaje
+  /// LÃ³gica de negocio: DuraciÃ³n real del viaje
   int? get duracionRealMinutos {
     if (fechaInicio == null || fechaFin == null) return null;
     return fechaFin!.difference(fechaInicio!).inMinutes;
   }
 
-  /// Lógica de negocio: ¿Puede ser cancelado?
+  /// LÃ³gica de negocio: Â¿Puede ser cancelado?
   bool get canBeCancelled =>
       estado == TripStatus.pendiente ||
       estado == TripStatus.aceptado;
 
-  /// Lógica de negocio: ¿Puede ser calificado?
+  /// LÃ³gica de negocio: Â¿Puede ser calificado?
   bool get canBeRated => estado == TripStatus.completado;
 
   /// CopyWith para inmutabilidad
@@ -172,7 +172,7 @@ enum TripStatus {
   }
 }
 
-/// Ubicación del viaje (origen/destino)
+/// UbicaciÃ³n del viaje (origen/destino)
 class TripLocation {
   final String direccion;
   final double latitud;

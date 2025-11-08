@@ -1,4 +1,4 @@
-import '../../domain/entities/location.dart';
+﻿import '../../domain/entities/location.dart';
 
 /// Modelo de Datos para Location
 class LocationModel extends Location {

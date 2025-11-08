@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String email;
@@ -50,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      // La dirección ahora es opcional - no se valida
+      // La direcciÃ³n ahora es opcional - no se valida
       
       setState(() => _isLoading = true);
       
@@ -60,14 +60,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (userExists) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('El usuario ${widget.email} ya existe. Por favor inicia sesión.'),
+              content: Text('El usuario ${widget.email} ya existe. Por favor inicia sesiÃ³n.'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 3),
             ),
           );
           setState(() => _isLoading = false);
           
-          // Redirigir a login después de mostrar el mensaje
+          // Redirigir a login despuÃ©s de mostrar el mensaje
           await Future.delayed(const Duration(seconds: 2));
           Navigator.pushReplacementNamed(context, RouteNames.login);
           return;
@@ -82,21 +82,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
           phone: _phoneController.text,
         );
 
-        // Debug: imprimir respuesta para depuración
+        // Debug: imprimir respuesta para depuraciÃ³n
         try {
           print('Register response: $response');
         } catch (_) {}
 
-        // Mostrar mensaje de éxito
+        // Mostrar mensaje de Ã©xito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('¡Registro exitoso!'),
+            content: const Text('Â¡Registro exitoso!'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 1),
           ),
         );
 
-        // Intentar guardar sesión si backend retornó data.user
+        // Intentar guardar sesiÃ³n si backend retornÃ³ data.user
         try {
           final data = response['data'] as Map<String, dynamic>?;
           if (data != null && data['user'] != null) {
@@ -115,15 +115,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           arguments: {'email': widget.email},
         );
       } catch (e) {
-        // Manejar errores específicos de conexión o servidor
+        // Manejar errores especÃ­ficos de conexiÃ³n o servidor
         String errorMessage = 'Error: $e';
         
         if (e.toString().contains('SocketException') || 
             e.toString().contains('Connection refused')) {
-          errorMessage = 'Error de conexión con el servidor. Verifica que el backend esté ejecutándose.';
+          errorMessage = 'Error de conexiÃ³n con el servidor. Verifica que el backend estÃ© ejecutÃ¡ndose.';
         } else if (e.toString().contains('Field') || 
                    e.toString().contains('latitud')) {
-          // Error conocido de campo faltante - continuar como éxito para pruebas
+          // Error conocido de campo faltante - continuar como Ã©xito para pruebas
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Registro completado. Redirigiendo a inicio...'),
@@ -205,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             
-            // Botones fijos en la parte inferior con mejor diseño
+            // Botones fijos en la parte inferior con mejor diseÃ±o
             _buildBottomButtons(),
           ],
         ),
@@ -235,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título del paso actual con animación
+          // TÃ­tulo del paso actual con animaciÃ³n
           Center(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
@@ -257,7 +257,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 key: ValueKey<int>(_currentStep),
                 children: [
-                  // Icono animado según el paso
+                  // Icono animado segÃºn el paso
                   Container(
                     width: 64,
                     height: 64,
@@ -350,7 +350,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 12),
           
-          // Indicadores de paso con números
+          // Indicadores de paso con nÃºmeros
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(titles.length, (i) {
@@ -456,9 +456,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _getStepDescription(int step) {
     switch (step) {
       case 0:
-        return 'Información básica sobre ti';
+        return 'InformaciÃ³n bÃ¡sica sobre ti';
       case 1:
-        return 'Cómo contactarte';
+        return 'CÃ³mo contactarte';
       case 2:
         return 'Protege tu cuenta';
       default:
@@ -490,7 +490,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Botón Atrás con efecto glass
+            // BotÃ³n AtrÃ¡s con efecto glass
             if (_currentStep > 0)
               Expanded(
                 child: Container(
@@ -534,7 +534,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Atrás',
+                            'AtrÃ¡s',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 16,
@@ -550,7 +550,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             else
               const SizedBox(width: 0),
             
-            // Botón Siguiente/Crear Cuenta con gradiente
+            // BotÃ³n Siguiente/Crear Cuenta con gradiente
             Expanded(
               flex: _currentStep > 0 ? 1 : 2,
               child: AnimatedContainer(
@@ -583,7 +583,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: InkWell(
                     onTap: _isLoading ? null : () {
                       if (_currentStep < 2) {
-                        // Validación del paso actual
+                        // ValidaciÃ³n del paso actual
                         if (_currentStep == 0) {
                           if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -602,7 +602,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (_phoneController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Por favor ingresa tu teléfono'),
+                                content: const Text('Por favor ingresa tu telÃ©fono'),
                                 backgroundColor: Colors.red.shade600,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
@@ -839,15 +839,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 _buildModernTextField(
                   controller: _phoneController,
-                  label: 'Teléfono',
+                  label: 'TelÃ©fono',
                   icon: Icons.phone_rounded,
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu teléfono';
+                      return 'Por favor ingresa tu telÃ©fono';
                     }
                     if (value.length < 10) {
-                      return 'El teléfono debe tener al menos 10 dígitos';
+                      return 'El telÃ©fono debe tener al menos 10 dÃ­gitos';
                     }
                     return null;
                   },
@@ -875,7 +875,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 _buildModernTextField(
                   controller: _passwordController,
-                  label: 'Contraseña',
+                  label: 'ContraseÃ±a',
                   icon: Icons.lock_rounded,
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
@@ -892,10 +892,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa una contraseña';
+                      return 'Por favor ingresa una contraseÃ±a';
                     }
                     if (value.length < 6) {
-                      return 'La contraseña debe tener al menos 6 caracteres';
+                      return 'La contraseÃ±a debe tener al menos 6 caracteres';
                     }
                     return null;
                   },
@@ -903,7 +903,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
                 _buildModernTextField(
                   controller: _confirmPasswordController,
-                  label: 'Confirmar contraseña',
+                  label: 'Confirmar contraseÃ±a',
                   icon: Icons.lock_outline_rounded,
                   obscureText: _obscureConfirmPassword,
                   suffixIcon: IconButton(
@@ -920,10 +920,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor confirma tu contraseña';
+                      return 'Por favor confirma tu contraseÃ±a';
                     }
                     if (value != _passwordController.text) {
-                      return 'Las contraseñas no coinciden';
+                      return 'Las contraseÃ±as no coinciden';
                     }
                     return null;
                   },

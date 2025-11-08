@@ -1,8 +1,8 @@
-// lib/src/features/admin/presentation/screens/users_management_screen.dart
+﻿// lib/src/features/admin/presentation/screens/users_management_screen.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/admin/admin_service.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UsersManagementScreen extends StatefulWidget {
@@ -56,7 +56,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
 
     try {
       print('UsersManagement: Cargando usuarios para adminId: ${widget.adminId}');
-      print('UsersManagement: Filtro: $_selectedFilter, Búsqueda: ${_searchController.text}');
+      print('UsersManagement: Filtro: $_selectedFilter, BÃºsqueda: ${_searchController.text}');
       
       final response = await AdminService.getUsers(
         adminId: widget.adminId,
@@ -83,7 +83,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
       }
     } catch (e) {
       print('UsersManagement Error: $e');
-      CustomSnackbar.showError(context, message: 'Error de conexión: $e');
+      CustomSnackbar.showError(context, message: 'Error de conexiÃ³n: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -155,7 +155,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Gestión de Usuarios',
+                  'GestiÃ³n de Usuarios',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -297,7 +297,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
             controller: _searchController,
             style: const TextStyle(color: Colors.white, fontSize: 15),
             decoration: InputDecoration(
-              hintText: 'Buscar por nombre, email o teléfono...',
+              hintText: 'Buscar por nombre, email o telÃ©fono...',
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14),
               prefixIcon: Container(
                 padding: const EdgeInsets.all(12),
@@ -433,7 +433,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
               ),
               const SizedBox(height: 8),
               Text(
-                'Intenta cambiar los filtros de búsqueda',
+                'Intenta cambiar los filtros de bÃºsqueda',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.4),
                   fontSize: 14,
@@ -870,10 +870,10 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                 const SizedBox(height: 20),
                 _buildDetailRow('Nombre', '${user['nombre']} ${user['apellido']}'),
                 _buildDetailRow('Email', user['email']),
-                _buildDetailRow('Teléfono', user['telefono']),
+                _buildDetailRow('TelÃ©fono', user['telefono']),
                 _buildDetailRow('Tipo', user['tipo_usuario']),
                 _buildDetailRow('Estado', user['es_activo'] == 1 ? 'Activo' : 'Inactivo'),
-                _buildDetailRow('Verificado', user['es_verificado'] == 1 ? 'Sí' : 'No'),
+                _buildDetailRow('Verificado', user['es_verificado'] == 1 ? 'SÃ­' : 'No'),
                 _buildDetailRow('Registro', user['fecha_registro'] ?? 'N/A'),
                 const SizedBox(height: 20),
               ],
@@ -1039,10 +1039,10 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                     ),
                     const SizedBox(height: 16),
                     
-                    // Teléfono
+                    // TelÃ©fono
                     _buildEditTextField(
                       controller: telefonoController,
-                      label: 'Teléfono',
+                      label: 'TelÃ©fono',
                       icon: Icons.phone_rounded,
                       keyboardType: TextInputType.phone,
                     ),
@@ -1155,7 +1155,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                           ),
                         ),
                         subtitle: Text(
-                          isActive ? 'El usuario puede iniciar sesión' : 'El usuario no puede iniciar sesión',
+                          isActive ? 'El usuario puede iniciar sesiÃ³n' : 'El usuario no puede iniciar sesiÃ³n',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 13,
@@ -1231,7 +1231,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                                   return;
                                 }
                                 if (telefonoController.text.trim().isEmpty) {
-                                  CustomSnackbar.showError(context, message: 'El teléfono es requerido');
+                                  CustomSnackbar.showError(context, message: 'El telÃ©fono es requerido');
                                   return;
                                 }
 

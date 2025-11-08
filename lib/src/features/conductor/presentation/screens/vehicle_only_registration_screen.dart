@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/vehicle_model.dart';
@@ -86,7 +86,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
     }
     // Las URLs relativas vienen como 'uploads/documentos/...'
     // Necesitamos construir la URL base sin el '/backend' del path
-    final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/pingo/backend', '');
+  final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/viax/backend', '');
     return '$baseUrlWithoutPath/$relativeUrl';
   }
 
@@ -155,7 +155,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         onPressed: () => Navigator.pop(context),
       ),
       title: Text(
-        isEditing ? 'Editar Vehículo' : 'Registrar Vehículo',
+        isEditing ? 'Editar VehÃ­culo' : 'Registrar VehÃ­culo',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -170,7 +170,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          _buildStepCircle(0, 'Vehículo'),
+          _buildStepCircle(0, 'VehÃ­culo'),
           _buildStepLine(0),
           _buildStepCircle(1, 'Documentos'),
         ],
@@ -262,7 +262,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       children: [
         const SizedBox(height: 20),
         _buildSectionHeader(
-          'Información del Vehículo',
+          'InformaciÃ³n del VehÃ­culo',
           Icons.directions_car_rounded,
         ),
         const SizedBox(height: 24),
@@ -324,7 +324,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
             Expanded(
               child: _buildTextField(
                 controller: _anioController,
-                label: 'Año',
+                label: 'AÃ±o',
                 hint: '2020',
                 icon: Icons.calendar_today_rounded,
                 keyboardType: TextInputType.number,
@@ -334,7 +334,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                   }
                   final year = int.tryParse(value);
                   if (year == null || year < 1900 || year > DateTime.now().year + 1) {
-                    return 'Año inválido';
+                    return 'AÃ±o invÃ¡lido';
                   }
                   return null;
                 },
@@ -367,7 +367,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       children: [
         const SizedBox(height: 20),
         _buildSectionHeader(
-          'Documentos del Vehículo',
+          'Documentos del VehÃ­culo',
           Icons.description_rounded,
         ),
         const SizedBox(height: 24),
@@ -375,12 +375,12 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         // SOAT
         _buildTextField(
           controller: _soatNumberController,
-          label: 'Número SOAT',
-          hint: 'Número de póliza SOAT',
+          label: 'NÃºmero SOAT',
+          hint: 'NÃºmero de pÃ³liza SOAT',
           icon: Icons.shield_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el número SOAT';
+              return 'Por favor ingresa el nÃºmero SOAT';
             }
             return null;
           },
@@ -421,28 +421,28 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         const Divider(color: Colors.white24, thickness: 1),
         const SizedBox(height: 24),
         
-        // Tecnomecánica
+        // TecnomecÃ¡nica
         _buildTextField(
           controller: _tecnomecanicaNumberController,
-          label: 'Número Tecnomecánica',
-          hint: 'Número de certificado',
+          label: 'NÃºmero TecnomecÃ¡nica',
+          hint: 'NÃºmero de certificado',
           icon: Icons.build_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el número de tecnomecánica';
+              return 'Por favor ingresa el nÃºmero de tecnomecÃ¡nica';
             }
             return null;
           },
         ),
         const SizedBox(height: 16),
         _buildDateField(
-          label: 'Vencimiento Tecnomecánica',
+          label: 'Vencimiento TecnomecÃ¡nica',
           selectedDate: _tecnomecanicaVencimiento,
           onTap: () => _selectTecnomecanicaDate(context),
         ),
         const SizedBox(height: 16),
         DocumentUploadWidget(
-          label: 'Certificado Tecnomecánica',
+          label: 'Certificado TecnomecÃ¡nica',
           subtitle: 'Foto o PDF del certificado',
           filePath: _tecnomecanicaFotoPath,
           icon: Icons.build_rounded,
@@ -474,11 +474,11 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         _buildTextField(
           controller: _tarjetaPropiedadController,
           label: 'Tarjeta de Propiedad',
-          hint: 'Número de tarjeta',
+          hint: 'NÃºmero de tarjeta',
           icon: Icons.credit_card_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el número de tarjeta de propiedad';
+              return 'Por favor ingresa el nÃºmero de tarjeta de propiedad';
             }
             return null;
           },
@@ -602,7 +602,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Tipo de Vehículo',
+                'Tipo de VehÃ­culo',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
@@ -759,7 +759,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                         ),
                       ),
                       child: const Text(
-                        'Atrás',
+                        'AtrÃ¡s',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
@@ -903,7 +903,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
     if (_tecnomecanicaVencimiento == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor selecciona la fecha de vencimiento de la tecnomecánica'),
+          content: Text('Por favor selecciona la fecha de vencimiento de la tecnomecÃ¡nica'),
           backgroundColor: Colors.red,
         ),
       );
@@ -934,7 +934,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           tarjetaPropiedadFotoPath: documentsToUpload['tarjeta_propiedad'],
         );
 
-        // Verificar si algún upload falló
+        // Verificar si algÃºn upload fallÃ³
         final failedUploads = uploadResults.entries.where((e) => e.value == null).toList();
         if (failedUploads.isNotEmpty && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -974,27 +974,27 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           SnackBar(
             content: Text(
               widget.existingVehicle != null 
-                  ? 'Vehículo actualizado exitosamente' 
-                  : 'Vehículo guardado exitosamente',
+                  ? 'VehÃ­culo actualizado exitosamente' 
+                  : 'VehÃ­culo guardado exitosamente',
             ),
             backgroundColor: Colors.green,
           ),
         );
         
-        // Si es registro nuevo (no edición), verificar si falta la licencia
+        // Si es registro nuevo (no ediciÃ³n), verificar si falta la licencia
         final isEditing = widget.existingVehicle != null;
         if (!isEditing && provider.profile != null) {
           final hasLicense = provider.profile!.licencia != null && 
                              provider.profile!.licencia!.isComplete;
           
           if (!hasLicense) {
-            // Mostrar diálogo para ir a registrar licencia
+            // Mostrar diÃ¡logo para ir a registrar licencia
             final goToLicense = await showDialog<bool>(
               context: context,
               builder: (context) => _buildNavigationDialog(
                 icon: Icons.badge_rounded,
                 title: 'Registrar Licencia',
-                message: '¡Vehículo guardado! ¿Deseas continuar registrando tu licencia de conducción ahora?',
+                message: 'Â¡VehÃ­culo guardado! Â¿Deseas continuar registrando tu licencia de conducciÃ³n ahora?',
               ),
             );
 
@@ -1008,7 +1008,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                   ),
                 ),
               );
-              // Si guardó la licencia, retornar true
+              // Si guardÃ³ la licencia, retornar true
               if (licenseResult == true) {
                 return;
               }
@@ -1020,7 +1020,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(provider.errorMessage ?? 'Error al guardar vehículo'),
+            content: Text(provider.errorMessage ?? 'Error al guardar vehÃ­culo'),
             backgroundColor: Colors.red,
           ),
         );
@@ -1096,7 +1096,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                           ),
                         ),
                         child: const Text(
-                          'Después',
+                          'DespuÃ©s',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 15,

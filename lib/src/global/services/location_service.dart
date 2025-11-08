@@ -1,11 +1,11 @@
-// lib/src/global/services/location_service.dart
+﻿// lib/src/global/services/location_service.dart
 // SERVICIO COMENTADO - YA NO SE USA GOOGLE MAPS
 /*
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationService {
-  /// Solicita permisos de ubicación
+  /// Solicita permisos de ubicaciÃ³n
   static Future<bool> requestLocationPermission() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -13,37 +13,37 @@ class LocationService {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          print('Permisos de ubicación denegados por el usuario');
+          print('Permisos de ubicaciÃ³n denegados por el usuario');
           return false;
         }
       }
       
       if (permission == LocationPermission.deniedForever) {
-        print('Permisos de ubicación denegados permanentemente');
+        print('Permisos de ubicaciÃ³n denegados permanentemente');
         return false;
       }
       
       return true;
     } catch (e) {
-      print('Error solicitando permisos de ubicación: $e');
+      print('Error solicitando permisos de ubicaciÃ³n: $e');
       return false;
     }
   }
 
-  /// Obtiene la ubicación actual del usuario
+  /// Obtiene la ubicaciÃ³n actual del usuario
   static Future<Position?> getCurrentPosition() async {
     try {
       bool hasPermission = await requestLocationPermission();
       if (!hasPermission) return null;
 
-      // Verificar si el servicio de ubicación está habilitado
+      // Verificar si el servicio de ubicaciÃ³n estÃ¡ habilitado
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('Servicio de ubicación deshabilitado');
+        print('Servicio de ubicaciÃ³n deshabilitado');
         return null;
       }
 
-      // Usar timeout más largo para emuladores que pueden ser lentos
+      // Usar timeout mÃ¡s largo para emuladores que pueden ser lentos
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: Duration(seconds: 30), // Aumentado para emuladores
@@ -51,12 +51,12 @@ class LocationService {
       
       return position;
     } catch (e) {
-      print('Error obteniendo ubicación: $e');
+      print('Error obteniendo ubicaciÃ³n: $e');
       return null;
     }
   }
 
-  /// Convierte coordenadas a dirección legible
+  /// Convierte coordenadas a direcciÃ³n legible
   static Future<String?> getAddressFromCoordinates({
     required double latitude,
     required double longitude,
@@ -64,7 +64,7 @@ class LocationService {
     try {
       // Validar coordenadas
       if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-        print('Coordenadas inválidas: lat=$latitude, lng=$longitude');
+        print('Coordenadas invÃ¡lidas: lat=$latitude, lng=$longitude');
         return null;
       }
 
@@ -87,20 +87,20 @@ class LocationService {
           address += address.isNotEmpty ? ', ${place.administrativeArea}' : place.administrativeArea!;
         }
         
-        return address.isNotEmpty ? address : 'Dirección no disponible';
+        return address.isNotEmpty ? address : 'DirecciÃ³n no disponible';
       }
       return null;
     } catch (e) {
-      print('Error obteniendo dirección: $e');
+      print('Error obteniendo direcciÃ³n: $e');
       return null;
     }
   }
 
-  /// Convierte dirección a coordenadas
+  /// Convierte direcciÃ³n a coordenadas
   static Future<Position?> getCoordinatesFromAddress(String address) async {
     try {
       if (address.trim().isEmpty) {
-        print('Dirección vacía proporcionada');
+        print('DirecciÃ³n vacÃ­a proporcionada');
         return null;
       }
 
@@ -120,7 +120,7 @@ class LocationService {
           speedAccuracy: 0,
         );
       }
-      print('No se encontraron coordenadas para la dirección: $address');
+      print('No se encontraron coordenadas para la direcciÃ³n: $address');
       return null;
     } catch (e) {
       print('Error obteniendo coordenadas: $e');

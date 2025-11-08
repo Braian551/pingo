@@ -1,7 +1,7 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/routes/route_names.dart';
 import 'admin_dashboard_tab.dart';
 import 'admin_management_tab.dart';
 import 'admin_statistics_wrapper.dart';

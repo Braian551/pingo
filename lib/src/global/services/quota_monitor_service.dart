@@ -1,9 +1,9 @@
-// lib/src/global/services/quota_monitor_service.dart
+﻿// lib/src/global/services/quota_monitor_service.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/config/env_config.dart';
 
 /// Servicio para monitorear el uso de cuotas de las APIs
-/// y alertar cuando se acerquen a los límites
+/// y alertar cuando se acerquen a los lÃ­mites
 class QuotaMonitorService {
   static const String _mapboxTilesKey = 'mapbox_tiles_count';
   static const String _mapboxRoutingKey = 'mapbox_routing_count';
@@ -33,7 +33,7 @@ class QuotaMonitorService {
     await prefs.setInt(_mapboxRoutingKey, current + count);
   }
 
-  /// Incrementar contador de tráfico de TomTom
+  /// Incrementar contador de trÃ¡fico de TomTom
   static Future<void> incrementTomTomTraffic({int count = 1}) async {
     if (!EnvConfig.enableQuotaMonitoring) return;
     
@@ -97,7 +97,7 @@ class QuotaMonitorService {
     
     final lastResetDate = DateTime.parse(lastReset);
     
-    // Resetear si ha pasado un día
+    // Resetear si ha pasado un dÃ­a
     if (now.day != lastResetDate.day || 
         now.month != lastResetDate.month || 
         now.year != lastResetDate.year) {
@@ -143,7 +143,7 @@ class QuotaStatus {
   double get mapboxRoutingPercentage => 
       mapboxRoutingLimit > 0 ? mapboxRoutingUsed / mapboxRoutingLimit : 0.0;
 
-  /// Porcentaje de uso de tráfico de TomTom (0.0 a 1.0)
+  /// Porcentaje de uso de trÃ¡fico de TomTom (0.0 a 1.0)
   double get tomtomTrafficPercentage => 
       tomtomTrafficLimit > 0 ? tomtomTrafficUsed / tomtomTrafficLimit : 0.0;
 
@@ -183,7 +183,7 @@ class QuotaStatus {
     return QuotaAlertLevel.normal;
   }
 
-  /// Nivel de alerta general (el más alto de todos)
+  /// Nivel de alerta general (el mÃ¡s alto de todos)
   QuotaAlertLevel get overallAlertLevel {
     final levels = [
       mapboxTilesAlertLevel,
@@ -204,11 +204,11 @@ class QuotaStatus {
   String get alertMessage {
     switch (overallAlertLevel) {
       case QuotaAlertLevel.critical:
-        return '⚠️ CRÍTICO: Has superado el 90% de tus solicitudes gratuitas';
+        return 'âš ï¸ CRÃTICO: Has superado el 90% de tus solicitudes gratuitas';
       case QuotaAlertLevel.danger:
-        return '⚠️ ALERTA: Has superado el 75% de tus solicitudes gratuitas';
+        return 'âš ï¸ ALERTA: Has superado el 75% de tus solicitudes gratuitas';
       case QuotaAlertLevel.warning:
-        return '⚠️ ADVERTENCIA: Has superado el 50% de tus solicitudes gratuitas';
+        return 'âš ï¸ ADVERTENCIA: Has superado el 50% de tus solicitudes gratuitas';
       default:
         return '';
     }

@@ -1,6 +1,6 @@
-// lib/src/features/onboarding/presentation/screens/onboarding_screen.dart
+﻿// lib/src/features/onboarding/presentation/screens/onboarding_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/routes/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,9 +17,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       icon: Icons.motorcycle,
-      title: 'Transporte Rápido y Seguro',
+      title: 'Transporte RÃ¡pido y Seguro',
       description:
-          'Viaja con conductores verificados en motos. Llega a tu destino rápido evitando el tráfico.',
+          'Viaja con conductores verificados en motos. Llega a tu destino rÃ¡pido evitando el trÃ¡fico.',
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -28,9 +28,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPage(
       icon: Icons.local_shipping_outlined,
-      title: 'Envíos Express',
+      title: 'EnvÃ­os Express',
       description:
-          'Envía y recibe paquetes de forma rápida y segura. Seguimiento en tiempo real de tus envíos.',
+          'EnvÃ­a y recibe paquetes de forma rÃ¡pida y segura. Seguimiento en tiempo real de tus envÃ­os.',
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -116,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Logo pequeño
+                  // Logo pequeÃ±o
                   Row(
                     children: [
                       ShaderMask(
@@ -133,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       const SizedBox(width: 8),
                       const Text(
-                        'PingGo',
+                        'Viax',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -211,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         child: const Text(
-                          'Atrás',
+                          'AtrÃ¡s',
                           style: TextStyle(
                             color: Color(0xFFFFFF00),
                             fontSize: 16,

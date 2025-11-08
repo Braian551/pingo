@@ -1,19 +1,24 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import 'user_local_datasource.dart';
 
-/// Implementación del Datasource Local usando SharedPreferences
+/// ImplementaciÃ³n del Datasource Local usando SharedPreferences
 /// 
 /// RESPONSABILIDADES:
 /// - Guardar/recuperar sesiones usando SharedPreferences
 /// - Serializar/deserializar JSON
 /// - Manejar errores de almacenamiento local
 class UserLocalDataSourceImpl implements UserLocalDataSource {
-  static const String _sessionKey = 'pingo_user_session';
-  static const String _userEmailKey = 'pingo_user_email';
-  static const String _userIdKey = 'pingo_user_id';
-  static const String _userTypeKey = 'pingo_user_type';
+  static const String _legacySessionKey = 'pingo_user_session';
+  static const String _legacyUserEmailKey = 'pingo_user_email';
+  static const String _legacyUserIdKey = 'pingo_user_id';
+  static const String _legacyUserTypeKey = 'pingo_user_type';
+
+  static const String _sessionKey = 'viax_user_session';
+  static const String _userEmailKey = 'viax_user_email';
+  static const String _userIdKey = 'viax_user_id';
+  static const String _userTypeKey = 'viax_user_type';
 
   final SharedPreferences sharedPreferences;
 
@@ -22,12 +27,12 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
   @override
   Future<void> saveSession(Map<String, dynamic> sessionData) async {
     try {
-      // Guardar sesión completa como JSON
+      // Guardar sesiÃ³n completa como JSON
       final sessionJson = jsonEncode(sessionData);
       await sharedPreferences.setString(_sessionKey, sessionJson);
 
-      // También guardar campos individuales para compatibilidad
-      // con código legacy (UserService)
+      // TambiÃ©n guardar campos individuales para compatibilidad
+      // con cÃ³digo legacy (UserService)
       if (sessionData.containsKey('user')) {
         final user = sessionData['user'] as Map<String, dynamic>;
         
@@ -53,24 +58,59 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
         }
       }
     } catch (e) {
-      throw CacheException('Error al guardar sesión: ${e.toString()}');
+      throw CacheException('Error al guardar sesiÃ³n: ${e.toString()}');
     }
   }
 
   @override
   Future<Map<String, dynamic>?> getSavedSession() async {
     try {
-      final sessionJson = sharedPreferences.getString(_sessionKey);
+      String? sessionJson = sharedPreferences.getString(_sessionKey);
+
+      // MigraciÃ³n automÃ¡tica desde legacy si no existe nueva clave
+      if (sessionJson == null || sessionJson.isEmpty) {
+        final legacySession = sharedPreferences.getString(_legacySessionKey);
+        if (legacySession != null && legacySession.isNotEmpty) {
+          // Guardar bajo nueva clave y eliminar legacy
+          await sharedPreferences.setString(_sessionKey, legacySession);
+          await sharedPreferences.remove(_legacySessionKey);
+          sessionJson = legacySession;
+        }
+      }
       
       if (sessionJson != null && sessionJson.isNotEmpty) {
         return jsonDecode(sessionJson) as Map<String, dynamic>;
       }
 
-      // Si no hay sesión completa, intentar reconstruir desde campos individuales
-      // (para compatibilidad con código legacy)
-      final email = sharedPreferences.getString(_userEmailKey);
-      final id = sharedPreferences.getInt(_userIdKey);
-      final tipoUsuario = sharedPreferences.getString(_userTypeKey);
+      // Reconstruir desde campos individuales (con migraciÃ³n)
+      String? email = sharedPreferences.getString(_userEmailKey);
+      int? id = sharedPreferences.getInt(_userIdKey);
+      String? tipoUsuario = sharedPreferences.getString(_userTypeKey);
+
+      if (email == null && id == null) {
+        final legacyEmail = sharedPreferences.getString(_legacyUserEmailKey);
+        final legacyId = sharedPreferences.getInt(_legacyUserIdKey);
+        final legacyTipo = sharedPreferences.getString(_legacyUserTypeKey);
+
+        if (legacyEmail != null || legacyId != null || legacyTipo != null) {
+          if (legacyEmail != null) {
+            await sharedPreferences.setString(_userEmailKey, legacyEmail);
+            email = legacyEmail;
+          }
+          if (legacyId != null) {
+            await sharedPreferences.setInt(_userIdKey, legacyId);
+            id = legacyId;
+          }
+          if (legacyTipo != null) {
+            await sharedPreferences.setString(_userTypeKey, legacyTipo);
+            tipoUsuario = legacyTipo;
+          }
+
+          await sharedPreferences.remove(_legacyUserEmailKey);
+          await sharedPreferences.remove(_legacyUserIdKey);
+          await sharedPreferences.remove(_legacyUserTypeKey);
+        }
+      }
 
       if (email != null || id != null) {
         return {
@@ -80,12 +120,13 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
             if (tipoUsuario != null) 'tipo_usuario': tipoUsuario,
           },
           'login_at': DateTime.now().toIso8601String(),
+          'migrated': true,
         };
       }
 
       return null;
     } catch (e) {
-      throw CacheException('Error al obtener sesión: ${e.toString()}');
+      throw CacheException('Error al obtener sesiÃ³n: ${e.toString()}');
     }
   }
 
@@ -97,9 +138,14 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
         sharedPreferences.remove(_userEmailKey),
         sharedPreferences.remove(_userIdKey),
         sharedPreferences.remove(_userTypeKey),
+        // TambiÃ©n eliminar claves legacy
+        sharedPreferences.remove(_legacySessionKey),
+        sharedPreferences.remove(_legacyUserEmailKey),
+        sharedPreferences.remove(_legacyUserIdKey),
+        sharedPreferences.remove(_legacyUserTypeKey),
       ]);
     } catch (e) {
-      throw CacheException('Error al limpiar sesión: ${e.toString()}');
+      throw CacheException('Error al limpiar sesiÃ³n: ${e.toString()}');
     }
   }
 }

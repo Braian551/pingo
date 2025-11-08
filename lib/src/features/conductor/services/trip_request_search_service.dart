@@ -1,25 +1,25 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/config/app_config.dart';
 
-/// Servicio para buscar y gestionar solicitudes de viaje (lógica Uber/DiDi)
+/// Servicio para buscar y gestionar solicitudes de viaje (lÃ³gica Uber/DiDi)
 /// 
-/// Este servicio implementa la lógica de búsqueda continua de solicitudes
-/// cuando el conductor está disponible, similar a Uber/DiDi
+/// Este servicio implementa la lÃ³gica de bÃºsqueda continua de solicitudes
+/// cuando el conductor estÃ¡ disponible, similar a Uber/DiDi
 class TripRequestSearchService {
   static Timer? _searchTimer;
   static bool _isSearching = false;
   
-  /// Radio de búsqueda en kilómetros
+  /// Radio de bÃºsqueda en kilÃ³metros
   static const double searchRadiusKm = 5.0;
   
-  /// Intervalo de búsqueda en segundos
+  /// Intervalo de bÃºsqueda en segundos
   static const int searchIntervalSeconds = 5;
 
-  /// Inicia la búsqueda continua de solicitudes
+  /// Inicia la bÃºsqueda continua de solicitudes
   /// 
-  /// Busca solicitudes cada X segundos mientras el conductor esté disponible
+  /// Busca solicitudes cada X segundos mientras el conductor estÃ© disponible
   static void startSearching({
     required int conductorId,
     required double currentLat,
@@ -28,11 +28,11 @@ class TripRequestSearchService {
     required Function(String) onError,
   }) {
     if (_isSearching) {
-      print('⚠️ Ya hay una búsqueda activa');
+      print('âš ï¸ Ya hay una bÃºsqueda activa');
       return;
     }
 
-    print('🔍 Iniciando búsqueda de solicitudes...');
+    print('ðŸ” Iniciando bÃºsqueda de solicitudes...');
     _isSearching = true;
 
     // Buscar inmediatamente
@@ -59,9 +59,9 @@ class TripRequestSearchService {
     );
   }
 
-  /// Detiene la búsqueda continua
+  /// Detiene la bÃºsqueda continua
   static void stopSearching() {
-    print('🛑 Deteniendo búsqueda de solicitudes');
+    print('ðŸ›‘ Deteniendo bÃºsqueda de solicitudes');
     _searchTimer?.cancel();
     _searchTimer = null;
     _isSearching = false;
@@ -99,22 +99,22 @@ class TripRequestSearchService {
             data['solicitudes'] ?? [],
           );
           
-          print('✅ Encontradas ${solicitudes.length} solicitudes');
+          print('âœ… Encontradas ${solicitudes.length} solicitudes');
           onRequestsFound(solicitudes);
         } else {
-          print('⚠️ Sin solicitudes: ${data['message']}');
+          print('âš ï¸ Sin solicitudes: ${data['message']}');
           onRequestsFound([]);
         }
       } else {
         throw Exception('Error del servidor: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Error buscando solicitudes: $e');
+      print('âŒ Error buscando solicitudes: $e');
       onError(e.toString());
     }
   }
 
-  /// Actualiza la ubicación del conductor (para búsquedas más precisas)
+  /// Actualiza la ubicaciÃ³n del conductor (para bÃºsquedas mÃ¡s precisas)
   static Future<void> updateLocation({
     required int conductorId,
     required double latitude,
@@ -135,7 +135,7 @@ class TripRequestSearchService {
         }),
       ).timeout(const Duration(seconds: 5));
     } catch (e) {
-      print('Error actualizando ubicación: $e');
+      print('Error actualizando ubicaciÃ³n: $e');
     }
   }
 
@@ -205,6 +205,6 @@ class TripRequestSearchService {
     }
   }
 
-  /// Verifica si hay una búsqueda activa
+  /// Verifica si hay una bÃºsqueda activa
   static bool get isSearching => _isSearching;
 }

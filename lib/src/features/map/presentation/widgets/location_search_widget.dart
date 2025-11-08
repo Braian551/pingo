@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:async';
 
 class LocationSearchWidget extends StatefulWidget {
@@ -12,7 +12,7 @@ class LocationSearchWidget extends StatefulWidget {
     required this.controller,
     required this.onSearch,
     this.onSubmit,
-    this.hintText = 'Buscar dirección...',
+    this.hintText = 'Buscar direcciÃ³n...',
   });
 
   @override

@@ -1,16 +1,16 @@
-import 'package:http/http.dart' as http;
+﻿import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:ping_go/src/core/config/app_config.dart';
+import 'package:viax/src/core/config/app_config.dart';
 
 class AdminService {
   static String get _baseUrl => AppConfig.adminServiceUrl;
 
-  /// Obtiene estadísticas del dashboard
+  /// Obtiene estadÃ­sticas del dashboard
   static Future<Map<String, dynamic>> getDashboardStats({
     required int adminId,
   }) async {
     try {
-      print('AdminService: Obteniendo estadísticas para admin_id: $adminId');
+      print('AdminService: Obteniendo estadÃ­sticas para admin_id: $adminId');
       
       final uri = Uri.parse('$_baseUrl/dashboard_stats.php').replace(
         queryParameters: {'admin_id': adminId.toString()},
@@ -45,7 +45,7 @@ class AdminService {
       } else if (response.statusCode == 400) {
         return {
           'success': false,
-          'message': 'Solicitud inválida'
+          'message': 'Solicitud invÃ¡lida'
         };
       }
 
@@ -57,12 +57,12 @@ class AdminService {
       print('AdminService Error en getDashboardStats: $e');
       return {
         'success': false,
-        'message': 'Error de conexión: ${e.toString()}'
+        'message': 'Error de conexiÃ³n: ${e.toString()}'
       };
     }
   }
 
-  /// Obtiene lista de usuarios con filtros y paginación
+  /// Obtiene lista de usuarios con filtros y paginaciÃ³n
   static Future<Map<String, dynamic>> getUsers({
     required int adminId,
     int page = 1,
@@ -123,7 +123,7 @@ class AdminService {
       } else if (response.statusCode == 400) {
         return {
           'success': false,
-          'message': 'Solicitud inválida'
+          'message': 'Solicitud invÃ¡lida'
         };
       }
 
@@ -136,7 +136,7 @@ class AdminService {
       print('AdminService.getUsers - StackTrace: $stackTrace');
       return {
         'success': false,
-        'message': 'Error de conexión: ${e.toString()}'
+        'message': 'Error de conexiÃ³n: ${e.toString()}'
       };
     }
   }
@@ -216,7 +216,7 @@ class AdminService {
     }
   }
 
-  /// Obtiene logs de auditoría
+  /// Obtiene logs de auditorÃ­a
   static Future<Map<String, dynamic>> getAuditLogs({
     required int adminId,
     int page = 1,
@@ -291,14 +291,14 @@ class AdminService {
         return data;
       }
 
-      return {'success': false, 'message': 'Error al obtener configuración'};
+      return {'success': false, 'message': 'Error al obtener configuraciÃ³n'};
     } catch (e) {
       print('Error en getAppConfig: $e');
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  /// Actualiza una configuración de la app
+  /// Actualiza una configuraciÃ³n de la app
   static Future<Map<String, dynamic>> updateAppConfig({
     required int adminId,
     required String clave,
@@ -334,7 +334,7 @@ class AdminService {
         return data;
       }
 
-      return {'success': false, 'message': 'Error al actualizar configuración'};
+      return {'success': false, 'message': 'Error al actualizar configuraciÃ³n'};
     } catch (e) {
       print('Error en updateAppConfig: $e');
       return {'success': false, 'message': e.toString()};

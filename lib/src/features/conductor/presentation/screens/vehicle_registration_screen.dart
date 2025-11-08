@@ -90,7 +90,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     }
     // Las URLs relativas vienen como 'uploads/documentos/...'
     // Necesitamos construir la URL base sin el '/backend' del path
-    final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/pingo/backend', '');
+  final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/viax/backend', '');
     return '$baseUrlWithoutPath/$relativeUrl';
   }
 

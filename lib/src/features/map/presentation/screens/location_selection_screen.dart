@@ -1,11 +1,11 @@
-// lib/src/features/map/presentation/screens/location_selection_screen.dart
+﻿// lib/src/features/map/presentation/screens/location_selection_screen.dart
 // PANTALLA COMENTADA - YA NO SE USA GOOGLE MAPS
 /*
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ping_go/src/global/services/location_service.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/global/services/location_service.dart';
+import 'package:viax/src/routes/route_names.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
   final String email;
@@ -28,7 +28,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   bool _isLoading = true;
   bool _isGettingAddress = false;
 
-  // Ubicación por defecto (Bogotá, Colombia)
+  // UbicaciÃ³n por defecto (BogotÃ¡, Colombia)
   static const LatLng _defaultLocation = LatLng(4.6097, -74.0817);
 
   @override
@@ -62,7 +62,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
     );
     
     setState(() {
-      _selectedAddress = address ?? 'Dirección no encontrada';
+      _selectedAddress = address ?? 'DirecciÃ³n no encontrada';
       _isGettingAddress = false;
     });
   }
@@ -106,7 +106,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Selecciona tu ubicación',
+          'Selecciona tu ubicaciÃ³n',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -145,7 +145,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
               ),
             ),
           
-          // Panel inferior con información
+          // Panel inferior con informaciÃ³n
           Positioned(
             bottom: 0,
             left: 0,
@@ -174,9 +174,9 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   
                   const SizedBox(height: 20),
                   
-                  // Título
+                  // TÃ­tulo
                   const Text(
-                    'Confirma tu ubicación',
+                    'Confirma tu ubicaciÃ³n',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -186,7 +186,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   
                   const SizedBox(height: 12),
                   
-                  // Dirección seleccionada
+                  // DirecciÃ³n seleccionada
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -207,7 +207,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                               ),
                               const SizedBox(width: 8),
                               const Text(
-                                'Dirección:',
+                                'DirecciÃ³n:',
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
@@ -229,7 +229,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Obteniendo dirección...',
+                                  'Obteniendo direcciÃ³n...',
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
@@ -251,7 +251,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   
                   const SizedBox(height: 20),
                   
-                  // Botón de confirmar
+                  // BotÃ³n de confirmar
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -266,7 +266,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                         elevation: 0,
                       ),
                       child: const Text(
-                        'Confirmar ubicación',
+                        'Confirmar ubicaciÃ³n',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -279,7 +279,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   
                   // Instrucciones
                   const Text(
-                    'Toca el mapa para seleccionar tu ubicación exacta',
+                    'Toca el mapa para seleccionar tu ubicaciÃ³n exacta',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,

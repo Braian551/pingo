@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../../domain/entities/location.dart';
 import '../../domain/usecases/geocode_address.dart';
 import '../../domain/usecases/calculate_route.dart';
@@ -23,7 +23,7 @@ class MapProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  /// Geocodificar dirección
+  /// Geocodificar direcciÃ³n
   Future<Location?> geocodeAddress(String address) async {
     _setLoading(true);
 

@@ -1,4 +1,4 @@
-import '../../domain/entities/admin.dart';
+﻿import '../../domain/entities/admin.dart';
 
 /// Modelo de Datos para SystemStats
 class SystemStatsModel extends SystemStats {

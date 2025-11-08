@@ -1,18 +1,18 @@
-/// Contrato para el Datasource Remoto de Usuarios
+﻿/// Contrato para el Datasource Remoto de Usuarios
 /// 
-/// Define las operaciones de comunicación con el backend (API).
-/// Esta es una interfaz abstracta que será implementada con HTTP.
+/// Define las operaciones de comunicaciÃ³n con el backend (API).
+/// Esta es una interfaz abstracta que serÃ¡ implementada con HTTP.
 /// 
 /// RESPONSABILIDADES:
-/// - Definir firma de métodos para comunicación con API
-/// - No contiene lógica de negocio
+/// - Definir firma de mÃ©todos para comunicaciÃ³n con API
+/// - No contiene lÃ³gica de negocio
 /// - Trabaja con Map<String, dynamic> (JSON crudo)
 abstract class UserRemoteDataSource {
   /// Registrar usuario en el backend
   /// 
-  /// Retorna JSON con datos del usuario creado y ubicación
+  /// Retorna JSON con datos del usuario creado y ubicaciÃ³n
   /// Lanza [ServerException] si hay error del servidor
-  /// Lanza [NetworkException] si no hay conexión
+  /// Lanza [NetworkException] si no hay conexiÃ³n
   Future<Map<String, dynamic>> register({
     required String nombre,
     required String apellido,
@@ -30,8 +30,8 @@ abstract class UserRemoteDataSource {
   /// Login en el backend
   /// 
   /// Retorna JSON con datos del usuario y token (si aplica)
-  /// Lanza [ServerException] si credenciales son inválidas
-  /// Lanza [NetworkException] si no hay conexión
+  /// Lanza [ServerException] si credenciales son invÃ¡lidas
+  /// Lanza [NetworkException] si no hay conexiÃ³n
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
@@ -39,9 +39,9 @@ abstract class UserRemoteDataSource {
 
   /// Obtener perfil del usuario
   /// 
-  /// Retorna JSON con datos del usuario y ubicación principal
+  /// Retorna JSON con datos del usuario y ubicaciÃ³n principal
   /// Lanza [ServerException] si el usuario no existe
-  /// Lanza [NetworkException] si no hay conexión
+  /// Lanza [NetworkException] si no hay conexiÃ³n
   Future<Map<String, dynamic>> getProfile({int? userId, String? email});
 
   /// Actualizar perfil del usuario
@@ -55,9 +55,9 @@ abstract class UserRemoteDataSource {
     String? telefono,
   });
 
-  /// Actualizar ubicación del usuario
+  /// Actualizar ubicaciÃ³n del usuario
   /// 
-  /// Retorna JSON con la ubicación actualizada
+  /// Retorna JSON con la ubicaciÃ³n actualizada
   /// Lanza [ServerException] si hay error al actualizar
   Future<Map<String, dynamic>> updateLocation({
     required int userId,

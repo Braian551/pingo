@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../../domain/entities/trip.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../datasources/trip_remote_datasource.dart';
 
-/// Implementación concreta del repositorio de viajes
+/// ImplementaciÃ³n concreta del repositorio de viajes
 class TripRepositoryImpl implements TripRepository {
   final TripRemoteDataSource remoteDataSource;
 

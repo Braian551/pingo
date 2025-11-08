@@ -3,7 +3,7 @@
  * Script de prueba para verificar la cancelación de viajes
  */
 
-$baseUrl = 'http://localhost/pingo/backend';
+$baseUrl = 'http://localhost/viax/backend';
 
 echo "🧪 Prueba de Cancelación de Viaje\n";
 echo "==================================\n\n";

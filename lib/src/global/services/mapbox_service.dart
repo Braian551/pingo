@@ -1,4 +1,4 @@
-// lib/src/global/services/mapbox_service.dart
+﻿// lib/src/global/services/mapbox_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -6,22 +6,22 @@ import '../../core/config/env_config.dart';
 import 'quota_monitor_service.dart';
 
 /// Servicio para interactuar con la API de Mapbox
-/// Maneja mapas, rutas, geocoding y optimización de rutas
+/// Maneja mapas, rutas, geocoding y optimizaciÃ³n de rutas
 class MapboxService {
   static const String _baseUrl = 'https://api.mapbox.com';
   
   // ============================================
-  // DIRECTIONS API (Rutas y Navegación)
+  // DIRECTIONS API (Rutas y NavegaciÃ³n)
   // ============================================
   
-  /// Obtener ruta entre dos o más puntos usando Mapbox Directions API
+  /// Obtener ruta entre dos o mÃ¡s puntos usando Mapbox Directions API
   /// 
-  /// [waypoints] - Lista de coordenadas (mínimo 2)
+  /// [waypoints] - Lista de coordenadas (mÃ­nimo 2)
   /// [profile] - Tipo de transporte: driving, walking, cycling
   /// [alternatives] - Si es true, devuelve rutas alternativas
   /// [steps] - Si es true, incluye instrucciones paso a paso
   /// 
-  /// Retorna [MapboxRoute] con la información de la ruta
+  /// Retorna [MapboxRoute] con la informaciÃ³n de la ruta
   static Future<MapboxRoute?> getRoute({
     required List<LatLng> waypoints,
     String profile = 'driving', // driving, walking, cycling, driving-traffic
@@ -71,8 +71,8 @@ class MapboxService {
     }
   }
 
-  /// Optimizar orden de múltiples waypoints para la ruta más eficiente
-  /// Útil para delivery o múltiples paradas
+  /// Optimizar orden de mÃºltiples waypoints para la ruta mÃ¡s eficiente
+  /// Ãštil para delivery o mÃºltiples paradas
   static Future<MapboxRoute?> getOptimizedRoute({
     required LatLng origin,
     required LatLng destination,
@@ -88,11 +88,11 @@ class MapboxService {
           .map((point) => '${point.longitude},${point.latitude}')
           .join(';');
 
-      // El endpoint de optimización requiere indicar qué puntos son fijos
+      // El endpoint de optimizaciÃ³n requiere indicar quÃ© puntos son fijos
       final url = Uri.parse(
         '$_baseUrl/optimized-trips/v1/mapbox/$profile/$coordinates'
         '?source=first'      // Origen es el primer punto
-        '&destination=last'  // Destino es el último punto
+        '&destination=last'  // Destino es el Ãºltimo punto
         '&roundtrip=false'   // No es un viaje circular
         '&steps=true'
         '&geometries=geojson'
@@ -123,8 +123,8 @@ class MapboxService {
   // STATIC IMAGES API
   // ============================================
   
-  /// Obtener URL de imagen estática del mapa
-  /// Útil para previsualizaciones o miniaturas
+  /// Obtener URL de imagen estÃ¡tica del mapa
+  /// Ãštil para previsualizaciones o miniaturas
   static String getStaticMapUrl({
     required LatLng center,
     double zoom = 14,
@@ -138,12 +138,12 @@ class MapboxService {
     
     String overlays = '';
     
-    // Añadir marcadores si existen
+    // AÃ±adir marcadores si existen
     if (markers != null && markers.isNotEmpty) {
       for (var marker in markers) {
         overlays += 'pin-s-${marker.label}+${marker.color}(${marker.position.longitude},${marker.position.latitude}),';
       }
-      // Remover última coma
+      // Remover Ãºltima coma
       if (overlays.isNotEmpty) {
         overlays = overlays.substring(0, overlays.length - 1);
       }
@@ -153,13 +153,13 @@ class MapboxService {
   }
 
   // ============================================
-  // GEOCODING API (Búsqueda de lugares)
+  // GEOCODING API (BÃºsqueda de lugares)
   // ============================================
   
   /// Buscar lugares por texto
-  /// [query] - Texto de búsqueda (dirección, nombre de lugar, etc.)
+  /// [query] - Texto de bÃºsqueda (direcciÃ³n, nombre de lugar, etc.)
   /// [proximity] - Coordenadas para priorizar resultados cercanos
-  /// [limit] - Número máximo de resultados (1-10)
+  /// [limit] - NÃºmero mÃ¡ximo de resultados (1-10)
   /// [types] - Tipos de resultados: address, poi, place, etc.
   static Future<List<MapboxPlace>> searchPlaces({
     required String query,
@@ -209,7 +209,7 @@ class MapboxService {
     }
   }
 
-  /// Geocodificación inversa: obtener dirección desde coordenadas
+  /// GeocodificaciÃ³n inversa: obtener direcciÃ³n desde coordenadas
   static Future<MapboxPlace?> reverseGeocode({
     required LatLng position,
   }) async {
@@ -233,7 +233,7 @@ class MapboxService {
       
       return null;
     } catch (e) {
-      print('Error en geocodificación inversa: $e');
+      print('Error en geocodificaciÃ³n inversa: $e');
       return null;
     }
   }
@@ -251,8 +251,8 @@ class MapboxService {
   // MATRIX API (Distances y Tiempos)
   // ============================================
   
-  /// Calcular matriz de distancias y tiempos entre múltiples puntos
-  /// Útil para encontrar el punto más cercano o comparar múltiples destinos
+  /// Calcular matriz de distancias y tiempos entre mÃºltiples puntos
+  /// Ãštil para encontrar el punto mÃ¡s cercano o comparar mÃºltiples destinos
   static Future<MapboxMatrix?> getMatrix({
     required List<LatLng> origins,
     required List<LatLng> destinations,
@@ -266,7 +266,7 @@ class MapboxService {
           .map((point) => '${point.longitude},${point.latitude}')
           .join(';');
 
-      // Indicar cuáles son orígenes y cuáles destinos
+      // Indicar cuÃ¡les son orÃ­genes y cuÃ¡les destinos
       final sources = List.generate(origins.length, (i) => i).join(';');
       final destinationsIdx = List.generate(
         destinations.length, 
@@ -320,7 +320,7 @@ class MapboxRoute {
   factory MapboxRoute.fromJson(Map<String, dynamic> json) {
     List<LatLng> geometry = [];
     
-    // Parsear geometría GeoJSON
+    // Parsear geometrÃ­a GeoJSON
     if (json['geometry'] != null && json['geometry']['coordinates'] != null) {
       final coords = json['geometry']['coordinates'] as List;
       geometry = coords.map((coord) {
@@ -347,10 +347,10 @@ class MapboxRoute {
     );
   }
 
-  /// Distancia en kilómetros
+  /// Distancia en kilÃ³metros
   double get distanceKm => distance / 1000;
 
-  /// Duración en minutos
+  /// DuraciÃ³n en minutos
   double get durationMinutes => duration / 60;
 
   /// Formato legible de distancia
@@ -361,7 +361,7 @@ class MapboxRoute {
     return '${distanceKm.toStringAsFixed(1)} km';
   }
 
-  /// Formato legible de duración
+  /// Formato legible de duraciÃ³n
   String get formattedDuration {
     if (durationMinutes < 60) {
       return '${durationMinutes.toStringAsFixed(0)} min';
@@ -372,7 +372,7 @@ class MapboxRoute {
   }
 }
 
-/// Paso de instrucción de ruta
+/// Paso de instrucciÃ³n de ruta
 class MapboxStep {
   final double distance;
   final double duration;
@@ -421,7 +421,7 @@ class MapboxMatrix {
   }
 }
 
-/// Marcador para mapas estáticos
+/// Marcador para mapas estÃ¡ticos
 class MapMarker {
   final LatLng position;
   final String label; // 'a', 'b', 'c', etc. o 'star', 'circle'
@@ -442,7 +442,7 @@ class MapboxPlace {
   final LatLng coordinates;
   final String? address;
   final String? placeType; // poi, address, place, etc.
-  final Map<String, dynamic>? context; // Información de contexto (ciudad, país, etc.)
+  final Map<String, dynamic>? context; // InformaciÃ³n de contexto (ciudad, paÃ­s, etc.)
 
   MapboxPlace({
     required this.id,
@@ -468,7 +468,7 @@ class MapboxPlace {
     );
   }
 
-  /// Obtener información del contexto (ciudad, región, país)
+  /// Obtener informaciÃ³n del contexto (ciudad, regiÃ³n, paÃ­s)
   String get contextInfo {
     if (context == null) return '';
     

@@ -1,8 +1,8 @@
-import 'package:ping_go/src/core/error/result.dart';
+﻿import 'package:viax/src/core/error/result.dart';
 import '../entities/admin.dart';
 import '../repositories/admin_repository.dart';
 
-/// Use Case: Obtener Estadísticas del Sistema
+/// Use Case: Obtener EstadÃ­sticas del Sistema
 class GetSystemStats {
   final AdminRepository repository;
 

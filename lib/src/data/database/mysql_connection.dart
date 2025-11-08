@@ -1,4 +1,4 @@
-import 'package:mysql1/mysql1.dart';
+﻿import 'package:mysql1/mysql1.dart';
 import '../../core/constants/app_constants.dart';
 
 class MySQLConnection {
@@ -11,7 +11,7 @@ class MySQLConnection {
   
   MySQLConnection._internal();
   
-  // Getter para verificar si la conexión está disponible
+  // Getter para verificar si la conexiÃ³n estÃ¡ disponible
   bool get isConnected => _connection != null;
   
   Future<void> connect() async {
@@ -26,7 +26,7 @@ class MySQLConnection {
       );
       
       _connection = await MySqlConnection.connect(settings);
-      print('Conexión a MySQL establecida correctamente');
+      print('ConexiÃ³n a MySQL establecida correctamente');
     } catch (e) {
       print('Error al conectar con MySQL: $e');
       _connection = null;
@@ -40,11 +40,11 @@ class MySQLConnection {
         await connect();
       }
       if (_connection == null) {
-        throw Exception('No se pudo establecer conexión con la base de datos');
+        throw Exception('No se pudo establecer conexiÃ³n con la base de datos');
       }
       return _connection!;
     } catch (e) {
-      print('Error en conexión: $e');
+      print('Error en conexiÃ³n: $e');
       rethrow;
     }
   }
@@ -53,14 +53,14 @@ class MySQLConnection {
     try {
       if (_connection != null) {
         await _connection!.close();
-        print('Conexión a MySQL cerrada');
+        print('ConexiÃ³n a MySQL cerrada');
       }
     } catch (e) {
-      print('Error al cerrar conexión: $e');
+      print('Error al cerrar conexiÃ³n: $e');
     }
   }
   
-  // Método para ejecutar consultas
+  // MÃ©todo para ejecutar consultas
   Future<Results> query(String sql, [List<dynamic>? values]) async {
     try {
       final conn = await connection;
@@ -71,7 +71,7 @@ class MySQLConnection {
     }
   }
   
-  // Método para ejecutar inserciones, updates, deletes
+  // MÃ©todo para ejecutar inserciones, updates, deletes
   Future<void> execute(String sql, [List<dynamic>? values]) async {
     try {
       final conn = await connection;

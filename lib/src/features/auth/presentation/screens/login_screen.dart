@@ -1,9 +1,9 @@
-// lib/src/features/auth/presentation/screens/login_screen.dart
+﻿// lib/src/features/auth/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -53,20 +53,20 @@ class _LoginScreenState extends State<LoginScreen> {
           if (sess != null && sess['email'] != null) {
             emailToUse = sess['email'] as String;
           } else {
-            _showError('No se pudo determinar el email. Por favor, intenta iniciar sesión nuevamente.');
+            _showError('No se pudo determinar el email. Por favor, intenta iniciar sesiÃ³n nuevamente.');
             return;
           }
         }
 
         if (emailToUse.isEmpty) {
-          _showError('El email es requerido para iniciar sesión.');
+          _showError('El email es requerido para iniciar sesiÃ³n.');
           return;
         }
 
         final resp = await UserService.login(email: emailToUse, password: _passwordController.text);
 
         if (resp['success'] == true) {
-          _showSuccess('¡Bienvenido de nuevo!');
+          _showSuccess('Â¡Bienvenido de nuevo!');
           await Future.delayed(const Duration(milliseconds: 500));
           
           // El backend siempre devuelve 'user', independientemente del tipo
@@ -77,18 +77,18 @@ class _LoginScreenState extends State<LoginScreen> {
           print('LoginScreen: Usuario recibido: ${user?['id']}, tipo: $tipoUsuario');
           
           try {
-            // Guardar sesión con los datos del usuario
+            // Guardar sesiÃ³n con los datos del usuario
             if (user != null) {
               await UserService.saveSession(user);
             } else {
               await UserService.saveSession({'email': emailToUse});
             }
           } catch (e) {
-            print('Error guardando sesión: $e');
+            print('Error guardando sesiÃ³n: $e');
           }
 
           if (mounted) {
-            // Redirigir según el tipo de usuario
+            // Redirigir segÃºn el tipo de usuario
             if (tipoUsuario == 'administrador') {
               Navigator.pushReplacementNamed(
                 context,
@@ -111,22 +111,22 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           }
         } else {
-          final message = resp['message'] ?? 'Credenciales inválidas';
+          final message = resp['message'] ?? 'Credenciales invÃ¡lidas';
 
-          // Mostrar mensaje específico según el error del backend
+          // Mostrar mensaje especÃ­fico segÃºn el error del backend
           if (message.contains('Email y password son requeridos')) {
             _showError('Por favor, completa todos los campos.');
           } else if (message.contains('Usuario no encontrado')) {
-            _showError('No se encontró una cuenta con este email. Verifica que el email sea correcto.');
-          } else if (message.contains('Contraseña incorrecta')) {
-            _showError('La contraseña es incorrecta. Inténtalo de nuevo.');
+            _showError('No se encontrÃ³ una cuenta con este email. Verifica que el email sea correcto.');
+          } else if (message.contains('ContraseÃ±a incorrecta')) {
+            _showError('La contraseÃ±a es incorrecta. IntÃ©ntalo de nuevo.');
           } else {
             _showError(message);
           }
         }
       } catch (e) {
         print('Error en login: $e');
-        _showError('Error al iniciar sesión. Verifica tu conexión a internet.');
+        _showError('Error al iniciar sesiÃ³n. Verifica tu conexiÃ³n a internet.');
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
 
               const Text(
-                'Ingresa tu contraseña',
+                'Ingresa tu contraseÃ±a',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -206,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Campo de contraseña con estilo consistente
+                    // Campo de contraseÃ±a con estilo consistente
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           letterSpacing: 0.3,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Contraseña',
+                          labelText: 'ContraseÃ±a',
                           labelStyle: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 15,
@@ -282,10 +282,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingresa tu contraseña';
+                          return 'Por favor ingresa tu contraseÃ±a';
                         }
                         if (value.length < 6) {
-                          return 'La contraseña debe tener al menos 6 caracteres';
+                          return 'La contraseÃ±a debe tener al menos 6 caracteres';
                         }
                         return null;
                       },
@@ -298,10 +298,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          _showError('Función en desarrollo');
+                          _showError('FunciÃ³n en desarrollo');
                         },
                         child: const Text(
-                          '¿Olvidaste tu contraseña?',
+                          'Â¿Olvidaste tu contraseÃ±a?',
                           style: TextStyle(
                             color: Color(0xFFFFFF00),
                             fontSize: 14,

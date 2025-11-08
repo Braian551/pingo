@@ -1,6 +1,6 @@
-// lib/src/features/auth/presentation/screens/phone_auth_screen.dart
+﻿// lib/src/features/auth/presentation/screens/phone_auth_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({super.key});
@@ -40,9 +40,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             children: [
               const SizedBox(height: 40),
 
-              // Título
+              // TÃ­tulo
               const Text(
-                'Ingresa tu número',
+                'Ingresa tu nÃºmero',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -52,9 +52,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
               const SizedBox(height: 8),
 
-              // Subtítulo
+              // SubtÃ­tulo
               const Text(
-                'Te enviaremos un código de verificación',
+                'Te enviaremos un cÃ³digo de verificaciÃ³n',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -68,13 +68,13 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Campo de teléfono
+                    // Campo de telÃ©fono
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        labelText: 'Número de teléfono',
+                        labelText: 'NÃºmero de telÃ©fono',
                         labelStyle: const TextStyle(color: Colors.white70),
                         prefixIcon: const Icon(Icons.phone, color: Color(0xFFFFFF00)),
                         border: OutlineInputBorder(
@@ -92,10 +92,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingresa tu número de teléfono';
+                          return 'Por favor ingresa tu nÃºmero de telÃ©fono';
                         }
                         if (value.length < 10) {
-                          return 'El número debe tener al menos 10 dígitos';
+                          return 'El nÃºmero debe tener al menos 10 dÃ­gitos';
                         }
                         return null;
                       },
@@ -103,14 +103,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
                     const SizedBox(height: 30),
 
-                    // Botón de continuar
+                    // BotÃ³n de continuar
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Lógica para enviar código de verificación
+                            // LÃ³gica para enviar cÃ³digo de verificaciÃ³n
                             _showVerificationDialog();
                           }
                         },
@@ -147,11 +147,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'Código enviado',
+          'CÃ³digo enviado',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'Hemos enviado un código de verificación a tu número de teléfono.',
+          'Hemos enviado un cÃ³digo de verificaciÃ³n a tu nÃºmero de telÃ©fono.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [

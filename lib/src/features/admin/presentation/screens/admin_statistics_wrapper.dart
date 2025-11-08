@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'statistics_screen.dart';
 
-/// Wrapper para la pantalla de estadísticas para uso con el tab de admin
+/// Wrapper para la pantalla de estadÃ­sticas para uso con el tab de admin
 class AdminStatisticsScreen extends StatelessWidget {
   final Map<String, dynamic> adminUser;
 

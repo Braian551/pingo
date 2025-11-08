@@ -1,4 +1,4 @@
-// lib/src/global/services/traffic_service.dart
+﻿// lib/src/global/services/traffic_service.dart
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -6,9 +6,9 @@ import 'package:latlong2/latlong.dart';
 import '../../core/config/env_config.dart';
 import 'quota_monitor_service.dart';
 
-/// Servicio de información de tráfico usando TomTom API
-/// Plan gratuito: 2,500 solicitudes por día
-/// Documentación: https://developer.tomtom.com/traffic-api/documentation
+/// Servicio de informaciÃ³n de trÃ¡fico usando TomTom API
+/// Plan gratuito: 2,500 solicitudes por dÃ­a
+/// DocumentaciÃ³n: https://developer.tomtom.com/traffic-api/documentation
 class TrafficService {
   static const String _baseUrl = 'https://api.tomtom.com';
 
@@ -16,15 +16,15 @@ class TrafficService {
   // TRAFFIC FLOW API
   // ============================================
   
-  /// Obtener datos de flujo de tráfico en una ubicación
+  /// Obtener datos de flujo de trÃ¡fico en una ubicaciÃ³n
   /// 
-  /// Retorna información sobre:
+  /// Retorna informaciÃ³n sobre:
   /// - Velocidad actual vs velocidad libre de flujo
-  /// - Nivel de congestión
+  /// - Nivel de congestiÃ³n
   /// - Confiabilidad de los datos
   static Future<TrafficFlow?> getTrafficFlow({
     required LatLng location,
-    int zoom = 15, // 0-22, mayor = más detalle
+    int zoom = 15, // 0-22, mayor = mÃ¡s detalle
   }) async {
     try {
       if (EnvConfig.tomtomApiKey == 'YOUR_TOMTOM_API_KEY_HERE' || 
@@ -53,7 +53,7 @@ class TrafficService {
       
       return null;
     } catch (e) {
-      print('Error obteniendo tráfico: $e');
+      print('Error obteniendo trÃ¡fico: $e');
       return null;
     }
   }
@@ -62,9 +62,9 @@ class TrafficService {
   // TRAFFIC INCIDENTS API
   // ============================================
   
-  /// Obtener incidentes de tráfico en un área (accidentes, obras, etc.)
+  /// Obtener incidentes de trÃ¡fico en un Ã¡rea (accidentes, obras, etc.)
   /// 
-  /// [boundingBox] - Área de búsqueda: [minLat, minLng, maxLat, maxLng]
+  /// [boundingBox] - Ãrea de bÃºsqueda: [minLat, minLng, maxLat, maxLng]
   static Future<List<TrafficIncident>> getTrafficIncidents({
     required LatLng location,
     double radiusKm = 5.0,
@@ -77,7 +77,7 @@ class TrafficService {
       }
 
       // Calcular bounding box aproximado
-      // 1 grado lat ≈ 111km, ajustar por radio
+      // 1 grado lat â‰ˆ 111km, ajustar por radio
       final latDelta = radiusKm / 111.0;
       final lngDelta = radiusKm / (111.0 * cos(location.latitude * pi / 180));
       
@@ -118,7 +118,7 @@ class TrafficService {
   // HELPER METHODS
   // ============================================
   
-  /// Obtener color según nivel de tráfico (para visualización)
+  /// Obtener color segÃºn nivel de trÃ¡fico (para visualizaciÃ³n)
   static String getTrafficColor(double freeFlowSpeed, double currentSpeed) {
     if (currentSpeed >= freeFlowSpeed * 0.8) {
       return '#00FF00'; // Verde - fluido
@@ -136,10 +136,10 @@ class TrafficService {
 // MODELOS DE DATOS
 // ============================================
 
-/// Información de flujo de tráfico
+/// InformaciÃ³n de flujo de trÃ¡fico
 class TrafficFlow {
   final double currentSpeed; // km/h
-  final double freeFlowSpeed; // km/h velocidad sin tráfico
+  final double freeFlowSpeed; // km/h velocidad sin trÃ¡fico
   final double confidence; // 0.0 - 1.0
   final String roadName;
 
@@ -165,7 +165,7 @@ class TrafficFlow {
   double get speedRatio => 
       freeFlowSpeed > 0 ? currentSpeed / freeFlowSpeed : 1.0;
 
-  /// Nivel de congestión
+  /// Nivel de congestiÃ³n
   TrafficLevel get trafficLevel {
     if (speedRatio >= 0.8) return TrafficLevel.free;
     if (speedRatio >= 0.5) return TrafficLevel.moderate;
@@ -173,21 +173,21 @@ class TrafficFlow {
     return TrafficLevel.congested;
   }
 
-  /// Descripción del tráfico
+  /// DescripciÃ³n del trÃ¡fico
   String get description {
     switch (trafficLevel) {
       case TrafficLevel.free:
-        return 'Tráfico fluido';
+        return 'TrÃ¡fico fluido';
       case TrafficLevel.moderate:
-        return 'Tráfico moderado';
+        return 'TrÃ¡fico moderado';
       case TrafficLevel.slow:
-        return 'Tráfico lento';
+        return 'TrÃ¡fico lento';
       case TrafficLevel.congested:
-        return 'Tráfico congestionado';
+        return 'TrÃ¡fico congestionado';
     }
   }
 
-  /// Color para visualización
+  /// Color para visualizaciÃ³n
   String get color {
     switch (trafficLevel) {
       case TrafficLevel.free:
@@ -202,7 +202,7 @@ class TrafficFlow {
   }
 }
 
-/// Incidente de tráfico
+/// Incidente de trÃ¡fico
 class TrafficIncident {
   final String id;
   final String type; // accident, congestion, roadWork, etc.
@@ -241,7 +241,7 @@ class TrafficIncident {
     return TrafficIncident(
       id: json['id'] ?? '',
       type: properties?['iconCategory'] ?? 'unknown',
-      description: properties?['description'] ?? 'Sin descripción',
+      description: properties?['description'] ?? 'Sin descripciÃ³n',
       location: LatLng(lat, lng),
       severity: properties?['magnitudeOfDelay'] ?? 0,
       from: properties?['from'] != null 
@@ -253,19 +253,19 @@ class TrafficIncident {
     );
   }
 
-  /// Icono según tipo de incidente
+  /// Icono segÃºn tipo de incidente
   String get icon {
     switch (type.toLowerCase()) {
       case 'accident':
-        return '🚨';
+        return 'ðŸš¨';
       case 'roadwork':
-        return '🚧';
+        return 'ðŸš§';
       case 'congestion':
-        return '🚗';
+        return 'ðŸš—';
       case 'roadclosure':
-        return '⛔';
+        return 'â›”';
       default:
-        return '⚠️';
+        return 'âš ï¸';
     }
   }
 
@@ -281,14 +281,14 @@ class TrafficIncident {
       case 3:
         return 'Mayor';
       case 4:
-        return 'Crítico';
+        return 'CrÃ­tico';
       default:
         return 'Desconocido';
     }
   }
 }
 
-/// Niveles de tráfico
+/// Niveles de trÃ¡fico
 enum TrafficLevel {
   free,        // Verde - fluido (>80%)
   moderate,    // Amarillo - moderado (50-80%)

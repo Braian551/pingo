@@ -1,6 +1,6 @@
-# 🚀 PingGo - App de Transporte
+# 🚀 Viax - Plataforma de Movilidad
 
-Aplicación Flutter completa para servicios de transporte con backend PHP/MySQL, mapas interactivos y sistema de verificación por email.
+Aplicación Flutter (anteriormente "PingGo") ahora renombrada a **Viax**, para servicios de movilidad y envíos rápidos, con backend PHP/MySQL, mapas interactivos y sistema de verificación por email.
 
 ## ✅ Estado del Proyecto
 
@@ -50,18 +50,18 @@ Backend (PHP + MySQL - Railway)
 ```
 
 O manualmente:
-1. Copia `backend-deploy` a `C:\laragon\www\ping_go\`
-2. Crea base de datos `pingo` en MySQL
-3. Importa `basededatos (2).sql`
-4. Verifica: `http://localhost/ping_go/backend-deploy/health.php`
+1. Copia `backend` a `C:\laragon\www\viax\`
+2. Crea base de datos `viax` en MySQL
+3. Importa `basededatosfinal.sql`
+4. Verifica: `http://localhost/viax/backend/health.php`
 
 **Documentación completa**: [`docs/SETUP_LARAGON.md`](docs/SETUP_LARAGON.md)
 
 #### 2. **Configuración de Entorno**
 Los archivos ya están configurados para desarrollo local:
-- `backend-deploy/config/database.php` → localhost/root/root/pingo
+- `backend/config/database.php` → localhost/root/root/viax
 - `lib/src/core/config/app_config.dart` → Environment.development
-- `lib/src/global/config/api_config.dart` → http://localhost/ping_go/backend-deploy
+- `lib/src/global/config/api_config.dart` → http://10.0.2.2/viax/backend
 
 #### 3. **Ejecutar la App**
 ```bash
@@ -108,11 +108,11 @@ flutter run
 static const Environment environment = Environment.development;
 
 // lib/src/global/config/api_config.dart
-static const String baseUrl = 'http://localhost/ping_go/backend-deploy';
+static const String baseUrl = 'http://10.0.2.2/viax/backend';
 
-// backend-deploy/config/database.php
+// backend/config/database.php
 $this->host = 'localhost';
-$this->db_name = 'pingo';
+$this->db_name = 'viax';
 $this->username = 'root';
 $this->password = 'root';
 ```
@@ -125,7 +125,7 @@ static const Environment environment = Environment.production;
 // lib/src/global/config/api_config.dart
 static const String baseUrl = 'https://pinggo-backend-production.up.railway.app';
 
-// backend-deploy/config/database.php
+// backend/config/database.php
 $this->host = 'sql10.freesqldatabase.com';
 $this->db_name = 'sql10805022';
 $this->username = 'sql10805022';
@@ -175,7 +175,7 @@ lib/
 ├── main.dart               # Punto de entrada
 └── ...
 
-backend-deploy/             # Backend PHP (Railway)
+backend/                    # Backend PHP (Railway)
 ├── auth/                   # Endpoints de autenticación
 ├── config/                 # Configuración de BD
 ├── conductor/              # Gestión de conductores
@@ -357,7 +357,7 @@ Este proyecto está bajo la Licencia MIT.
 
 ---
 
-## 🎉 **Proyecto PingGo**
+## 🎉 **Proyecto Viax** (Antes PingGo)
 
 **🚀 Completamente funcional y listo para producción**
 

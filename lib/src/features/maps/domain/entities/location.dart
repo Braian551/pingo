@@ -1,6 +1,6 @@
-/// Entidad de Dominio: Location
+﻿/// Entidad de Dominio: Location
 /// 
-/// Representa una ubicación geográfica con coordenadas y dirección.
+/// Representa una ubicaciÃ³n geogrÃ¡fica con coordenadas y direcciÃ³n.
 class Location {
   final double latitud;
   final double longitud;

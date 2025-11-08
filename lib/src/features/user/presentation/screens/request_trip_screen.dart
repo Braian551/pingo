@@ -1,9 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ping_go/src/global/services/nominatim_service.dart';
+import 'package:viax/src/global/services/nominatim_service.dart';
 import 'trip_preview_screen.dart';
 import 'select_destination_screen.dart';
 
@@ -14,7 +14,7 @@ class RequestTripScreen extends StatefulWidget {
   State<RequestTripScreen> createState() => _RequestTripScreenState();
 }
 
-// Efecto de pulsación suave
+// Efecto de pulsaciÃ³n suave
 class PulseAnimation extends StatefulWidget {
   final Widget child;
   
@@ -77,7 +77,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
   List<NominatimResult> _searchResults = [];
   Timer? _debounceTimer;
   
-  // Estado de selección: 'pickup' o 'destination'
+  // Estado de selecciÃ³n: 'pickup' o 'destination'
   String? _selectingFor;
 
   @override
@@ -163,10 +163,10 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
         _isLoadingLocation = false;
       });
 
-      // Establecer automáticamente la ubicación actual como punto de origen
+      // Establecer automÃ¡ticamente la ubicaciÃ³n actual como punto de origen
       _getReverseGeocode(_pickupLocation!, true);
     } catch (e) {
-      print('Error obteniendo ubicación: $e');
+      print('Error obteniendo ubicaciÃ³n: $e');
       setState(() => _isLoadingLocation = false);
     }
   }
@@ -188,7 +188,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
         });
       }
     } catch (e) {
-      print('Error en geocodificación inversa: $e');
+      print('Error en geocodificaciÃ³n inversa: $e');
     }
   }
 
@@ -234,7 +234,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             longitude: _destinationLocation!.longitude,
             address: _destinationAddress ?? 'Destino',
           ),
-          vehicleType: 'moto', // Por defecto moto, luego podrás agregar selección
+          vehicleType: 'moto', // Por defecto moto, luego podrÃ¡s agregar selecciÃ³n
         ),
       ),
     );
@@ -279,7 +279,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Obteniendo ubicación actual...',
+                  'Obteniendo ubicaciÃ³n actual...',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -293,7 +293,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
       );
     }
 
-    // Si está seleccionando un lugar, mostrar la vista de búsqueda
+    // Si estÃ¡ seleccionando un lugar, mostrar la vista de bÃºsqueda
     if (_selectingFor != null) {
       return _buildSearchView();
     }
@@ -320,7 +320,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
           ),
         ),
         title: const Text(
-          '¿A dónde vamos?',
+          'Â¿A dÃ³nde vamos?',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -337,7 +337,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                // Campo de origen con animación - EDITABLE
+                // Campo de origen con animaciÃ³n - EDITABLE
                 TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 400),
@@ -373,7 +373,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Campo de destino con animación
+                // Campo de destino con animaciÃ³n
                 TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 500),
@@ -390,7 +390,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                   child: _buildLocationField(
                     icon: Icons.location_on,
                     iconColor: const Color(0xFFFFD700),
-                    label: '¿A dónde vamos?',
+                    label: 'Â¿A dÃ³nde vamos?',
                     value: _destinationAddress,
                     isSelected: false,
                     onTap: () {
@@ -413,7 +413,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
           ),
           const SizedBox(height: 24),
           const SizedBox(height: 24),
-          // Accesos rápidos
+          // Accesos rÃ¡pidos
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -427,7 +427,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          // Lugares sugeridos (aquí podrías agregar historial)
+          // Lugares sugeridos (aquÃ­ podrÃ­as agregar historial)
           Expanded(
             child: _buildSuggestedPlaces(),
           ),
@@ -622,7 +622,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                       const SizedBox(height: 16),
                     ],
                   ),
-                // Campo de búsqueda activo
+                // Campo de bÃºsqueda activo
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: BackdropFilter(
@@ -660,8 +660,8 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                               ),
                               decoration: InputDecoration(
                                 hintText: _selectingFor == 'pickup' 
-                                    ? '¿Desde dónde?' 
-                                    : '¿A dónde vamos?',
+                                    ? 'Â¿Desde dÃ³nde?' 
+                                    : 'Â¿A dÃ³nde vamos?',
                                 hintStyle: TextStyle(
                                   color: Colors.white.withOpacity(0.4),
                                   fontSize: 15,
@@ -701,7 +701,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          // Resultados de búsqueda
+          // Resultados de bÃºsqueda
           if (_searchResults.isNotEmpty)
             Expanded(
               child: ListView.builder(
@@ -803,7 +803,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
-        // Opción para usar ubicación actual (solo cuando se selecciona origen)
+        // OpciÃ³n para usar ubicaciÃ³n actual (solo cuando se selecciona origen)
         if (_selectingFor == 'pickup' && _currentPosition != null) ...[
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
@@ -856,7 +856,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                         const SizedBox(width: 16),
                         const Expanded(
                           child: Text(
-                            'Usar mi ubicación actual',
+                            'Usar mi ubicaciÃ³n actual',
                             style: TextStyle(
                               color: Color(0xFFFFD700),
                               fontSize: 15,
@@ -887,7 +887,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // TODO: Implementar selección en mapa
+                  // TODO: Implementar selecciÃ³n en mapa
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
@@ -918,7 +918,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                       const SizedBox(width: 16),
                       const Expanded(
                         child: Text(
-                          'Señalar la ubicación en el mapa',
+                          'SeÃ±alar la ubicaciÃ³n en el mapa',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -948,7 +948,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // TODO: Implementar agregar ubicación favorita
+                  // TODO: Implementar agregar ubicaciÃ³n favorita
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
@@ -979,7 +979,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
                       const SizedBox(width: 16),
                       const Expanded(
                         child: Text(
-                          'Agregar ubicación',
+                          'Agregar ubicaciÃ³n',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -1014,7 +1014,7 @@ class _RequestTripScreenState extends State<RequestTripScreen> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                // TODO: Implementar accesos rápidos
+                // TODO: Implementar accesos rÃ¡pidos
               },
               borderRadius: BorderRadius.circular(16),
               child: Container(

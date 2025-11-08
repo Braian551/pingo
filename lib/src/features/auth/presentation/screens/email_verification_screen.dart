@@ -1,12 +1,12 @@
-// lib/src/features/auth/presentation/screens/email_verification_screen.dart
+﻿// lib/src/features/auth/presentation/screens/email_verification_screen.dart
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:ping_go/src/global/services/email_service.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart'; // Importar UserService
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
-import 'package:ping_go/src/widgets/dialogs/dialog_helper.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/global/services/email_service.dart';
+import 'package:viax/src/global/services/auth/user_service.dart'; // Importar UserService
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
+import 'package:viax/src/widgets/dialogs/dialog_helper.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 import 'dart:async';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   String _verificationCode = '';
   bool _isLoading = false;
   bool _isResending = false;
-  bool _isVerifying = false; // Nuevo estado para verificación de usuario
+  bool _isVerifying = false; // Nuevo estado para verificaciÃ³n de usuario
   int _resendCountdown = 60;
   Timer? _countdownTimer;
   bool _isDisposed = false;
@@ -87,12 +87,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       setState(() => _isLoading = false);
 
       if (!success && mounted && !_isDisposed) {
-        _showErrorDialog('Error al enviar el código de verificación');
+        _showErrorDialog('Error al enviar el cÃ³digo de verificaciÃ³n');
       }
     } catch (e) {
       if (!mounted || _isDisposed) return;
       setState(() => _isLoading = false);
-      _showErrorDialog('Error al enviar el código de verificación');
+      _showErrorDialog('Error al enviar el cÃ³digo de verificaciÃ³n');
     }
   }
 
@@ -142,7 +142,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
-              message: '¡Correo verificado! Ya tienes una cuenta',
+              message: 'Â¡Correo verificado! Ya tienes una cuenta',
               duration: const Duration(milliseconds: 1200),
             );
             await Future.delayed(const Duration(milliseconds: 1200));
@@ -166,7 +166,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
-              message: '¡Código verificado! Completa tu registro',
+              message: 'Â¡CÃ³digo verificado! Completa tu registro',
               duration: const Duration(milliseconds: 1200),
             );
             await Future.delayed(const Duration(milliseconds: 1200));
@@ -210,11 +210,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         setState(() => _isVerifying = false);
       }
     } else {
-      // Código incorrecto
+      // CÃ³digo incorrecto
       await DialogHelper.showError(
         context,
-        title: 'Código Incorrecto',
-        message: 'El código de verificación que ingresaste no es válido. Por favor, verifica e intenta nuevamente.',
+        title: 'CÃ³digo Incorrecto',
+        message: 'El cÃ³digo de verificaciÃ³n que ingresaste no es vÃ¡lido. Por favor, verifica e intenta nuevamente.',
         primaryButtonText: 'Reintentar',
       );
     }
@@ -280,7 +280,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               const SizedBox(height: 8),
 
               Text(
-                'Hemos enviado un código de 6 dígitos a\n${widget.email}',
+                'Hemos enviado un cÃ³digo de 6 dÃ­gitos a\n${widget.email}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,
@@ -375,8 +375,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         )
                       : Text(
                           _resendCountdown > 0
-                              ? 'Reenviar código en ${_resendCountdown}s'
-                              : 'Reenviar código',
+                              ? 'Reenviar cÃ³digo en ${_resendCountdown}s'
+                              : 'Reenviar cÃ³digo',
                           style: TextStyle(
                             color: (_resendCountdown > 0 || _isVerifying)
                                 ? Colors.white54
@@ -410,7 +410,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Código: $_verificationCode',
+                        'CÃ³digo: $_verificationCode',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,

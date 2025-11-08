@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/conductor_model.dart';
 import '../services/conductor_service.dart';
 
@@ -17,7 +17,7 @@ class ConductorProvider with ChangeNotifier {
   Map<String, dynamic> get estadisticas => _estadisticas;
   List<Map<String, dynamic>> get viajesActivos => _viajesActivos;
 
-  /// Cargar información del conductor
+  /// Cargar informaciÃ³n del conductor
   Future<void> loadConductorInfo(int conductorId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -40,11 +40,11 @@ class ConductorProvider with ChangeNotifier {
           print('ConductorProvider: conductorData is null');
         }
       } else {
-        _errorMessage = 'No se pudo cargar la información del conductor';
+        _errorMessage = 'No se pudo cargar la informaciÃ³n del conductor';
         print('ConductorProvider: Response unsuccessful or null');
       }
     } catch (e, stackTrace) {
-      _errorMessage = 'Error al cargar información: $e';
+      _errorMessage = 'Error al cargar informaciÃ³n: $e';
       print('Error en loadConductorInfo: $e');
       print('Stack trace: $stackTrace');
     } finally {
@@ -53,14 +53,14 @@ class ConductorProvider with ChangeNotifier {
     }
   }
 
-  /// Cargar estadísticas del conductor
+  /// Cargar estadÃ­sticas del conductor
   Future<void> loadEstadisticas(int conductorId) async {
     try {
       final stats = await ConductorService.getEstadisticas(conductorId);
       _estadisticas = stats;
       notifyListeners();
     } catch (e) {
-      print('Error cargando estadísticas: $e');
+      print('Error cargando estadÃ­sticas: $e');
     }
   }
 
@@ -94,7 +94,7 @@ class ConductorProvider with ChangeNotifier {
       if (success) {
         _disponible = nuevaDisponibilidad;
         if (_conductor != null) {
-          // Actualizar el modelo también
+          // Actualizar el modelo tambiÃ©n
           _conductor = ConductorModel(
             id: _conductor!.id,
             nombre: _conductor!.nombre,
@@ -120,9 +120,9 @@ class ConductorProvider with ChangeNotifier {
       return false;
     } catch (e) {
       print('Error cambiando disponibilidad: $e');
-      // Si el error indica que el perfil no está completo, mantener el estado anterior
+      // Si el error indica que el perfil no estÃ¡ completo, mantener el estado anterior
       if (e.toString().contains('completar su perfil') || e.toString().contains('perfil')) {
-        _errorMessage = 'Debes completar tu perfil de conductor antes de poder activar la disponibilidad. Incluye tu licencia, vehículo y documentos requeridos.';
+        _errorMessage = 'Debes completar tu perfil de conductor antes de poder activar la disponibilidad. Incluye tu licencia, vehÃ­culo y documentos requeridos.';
       } else {
         _errorMessage = 'Error al cambiar disponibilidad: $e';
       }
@@ -131,7 +131,7 @@ class ConductorProvider with ChangeNotifier {
     }
   }
 
-  /// Actualizar ubicación del conductor
+  /// Actualizar ubicaciÃ³n del conductor
   Future<bool> updateUbicacion({
     required int conductorId,
     required double latitud,
@@ -168,7 +168,7 @@ class ConductorProvider with ChangeNotifier {
 
       return success;
     } catch (e) {
-      print('Error actualizando ubicación: $e');
+      print('Error actualizando ubicaciÃ³n: $e');
       return false;
     }
   }

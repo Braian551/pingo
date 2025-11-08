@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/trip.dart';
 import '../repositories/trip_repository.dart';
 
 /// Use Case: Crear Nuevo Viaje (Solicitud)
 /// 
-/// Encapsula la lógica de negocio para solicitar un nuevo viaje.
+/// Encapsula la lÃ³gica de negocio para solicitar un nuevo viaje.
 class CreateTrip {
   final TripRepository repository;
 
@@ -20,7 +20,7 @@ class CreateTrip {
   }) async {
     // Validaciones de negocio
     if (usuarioId <= 0) {
-      return Error(ValidationFailure('ID de usuario inválido'));
+      return Error(ValidationFailure('ID de usuario invÃ¡lido'));
     }
 
     // Validar coordenadas de origen

@@ -1,7 +1,7 @@
-import 'package:http/http.dart' as http;
+﻿import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ping_go/src/core/config/app_config.dart';
+import 'package:viax/src/core/config/app_config.dart';
 
 class UserService {
   static Future<Map<String, dynamic>> registerUser({
@@ -25,12 +25,12 @@ class UserService {
         'phone': phone,
       };
 
-      // Agregar dirección si está disponible
+      // Agregar direcciÃ³n si estÃ¡ disponible
       if (address != null && address.isNotEmpty) {
         requestData['address'] = address;
       }
 
-      // Agregar datos de ubicación si están disponibles
+      // Agregar datos de ubicaciÃ³n si estÃ¡n disponibles
       if (latitude != null && longitude != null) {
         // Enviar ambas variantes por compatibilidad con el backend
         requestData['latitude'] = latitude;
@@ -58,8 +58,8 @@ class UserService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         
-        // SOLUCIÓN TEMPORAL PARA FASE DE PRUEBAS:
-        // Si hay error de BD pero el usuario se creó exitosamente, ignoramos el error
+        // SOLUCIÃ“N TEMPORAL PARA FASE DE PRUEBAS:
+        // Si hay error de BD pero el usuario se creÃ³ exitosamente, ignoramos el error
         if (responseData['success'] == true) {
           return responseData;
         } else if (responseData['message']?.contains('usuario creado') ?? false) {
@@ -69,20 +69,20 @@ class UserService {
             'message': 'Usuario registrado exitosamente (con advertencias de BD)'
           };
         } else if (responseData['message']?.contains('Field') ?? false) {
-          // Si es error de campo faltante pero probablemente el usuario se creó
+          // Si es error de campo faltante pero probablemente el usuario se creÃ³
           return {
             'success': true,
-            'message': 'Registro completado con advertencias técnicas',
+            'message': 'Registro completado con advertencias tÃ©cnicas',
             'warning': responseData['message']
           };
         }
         
         return responseData;
       } else if (response.statusCode == 500) {
-        // Error interno del servidor - posiblemente el usuario se creó pero hay error secundario
+        // Error interno del servidor - posiblemente el usuario se creÃ³ pero hay error secundario
         final responseData = jsonDecode(response.body);
         
-        // SOLUCIÓN TEMPORAL: Asumimos que el registro fue exitoso a pesar del error 500
+        // SOLUCIÃ“N TEMPORAL: Asumimos que el registro fue exitoso a pesar del error 500
         // Esto es solo para fase de pruebas
         print('Error 500 detectado, pero continuando para pruebas: ${responseData['message']}');
         
@@ -97,7 +97,7 @@ class UserService {
     } catch (e) {
       print('Error en registro: $e');
       
-      // SOLUCIÓN TEMPORAL: Para pruebas, podríamos intentar asumir éxito
+      // SOLUCIÃ“N TEMPORAL: Para pruebas, podrÃ­amos intentar asumir Ã©xito
       // en ciertos tipos de errores conocidos
       if (e.toString().contains('Field') || e.toString().contains('latitud')) {
         print('Error de campo ignorado para pruebas - asumiendo registro exitoso');
@@ -112,7 +112,7 @@ class UserService {
     }
   }
 
-  // Método adicional para verificar si un usuario existe (útil para debugging)
+  // MÃ©todo adicional para verificar si un usuario existe (Ãºtil para debugging)
   static Future<bool> checkUserExists(String email) async {
     try {
       final response = await http.post(
@@ -250,17 +250,23 @@ class UserService {
     }
   }
 
-  // Session helpers using SharedPreferences
-  static const String _kUserEmail = 'pingo_user_email';
-  static const String _kUserId = 'pingo_user_id';
-  static const String _kUserType = 'pingo_user_type';
-  static const String _kUserName = 'pingo_user_name';
-  static const String _kUserPhone = 'pingo_user_phone';
+  // Session helpers using SharedPreferences (legacy keys migrated to Viax)
+  static const String _legacyUserEmail = 'pingo_user_email';
+  static const String _legacyUserId = 'pingo_user_id';
+  static const String _legacyUserType = 'pingo_user_type';
+  static const String _legacyUserName = 'pingo_user_name';
+  static const String _legacyUserPhone = 'pingo_user_phone';
+
+  static const String _kUserEmail = 'viax_user_email';
+  static const String _kUserId = 'viax_user_id';
+  static const String _kUserType = 'viax_user_type';
+  static const String _kUserName = 'viax_user_name';
+  static const String _kUserPhone = 'viax_user_phone';
 
   static Future<void> saveSession(Map<String, dynamic> user) async {
     final prefs = await SharedPreferences.getInstance();
     
-    // Debug: verificar qué estamos guardando
+    // Debug: verificar quÃ© estamos guardando
     print('UserService.saveSession: Guardando usuario: $user');
     
     if (user.containsKey('email') && user['email'] != null) {
@@ -274,11 +280,11 @@ class UserService {
     if (user.containsKey('tipo_usuario') && user['tipo_usuario'] != null) {
       await prefs.setString(_kUserType, user['tipo_usuario'].toString());
     }
-    // Guardar nombre si está disponible (especialmente para administradores)
+    // Guardar nombre si estÃ¡ disponible (especialmente para administradores)
     if (user.containsKey('nombre') && user['nombre'] != null) {
       await prefs.setString(_kUserName, user['nombre'].toString());
     }
-    // Guardar teléfono si está disponible
+    // Guardar telÃ©fono si estÃ¡ disponible
     if (user.containsKey('telefono') && user['telefono'] != null) {
       await prefs.setString(_kUserPhone, user['telefono'].toString());
     }
@@ -286,11 +292,52 @@ class UserService {
 
   static Future<Map<String, dynamic>?> getSavedSession() async {
     final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString(_kUserEmail);
-    final id = prefs.getInt(_kUserId);
-    final tipoUsuario = prefs.getString(_kUserType);
-    final nombre = prefs.getString(_kUserName);
-    final telefono = prefs.getString(_kUserPhone);
+    String? email = prefs.getString(_kUserEmail);
+    int? id = prefs.getInt(_kUserId);
+    String? tipoUsuario = prefs.getString(_kUserType);
+    String? nombre = prefs.getString(_kUserName);
+    String? telefono = prefs.getString(_kUserPhone);
+
+    // MigraciÃ³n automÃ¡tica desde claves legacy (pingo_*) si no existen las nuevas
+    if (email == null && id == null &&
+        !prefs.containsKey(_kUserEmail) && !prefs.containsKey(_kUserId)) {
+      final legacyEmail = prefs.getString(_legacyUserEmail);
+      final legacyId = prefs.getInt(_legacyUserId);
+      final legacyTipo = prefs.getString(_legacyUserType);
+      final legacyNombre = prefs.getString(_legacyUserName);
+      final legacyTelefono = prefs.getString(_legacyUserPhone);
+
+      if (legacyEmail != null || legacyId != null || legacyTipo != null || legacyNombre != null || legacyTelefono != null) {
+        // Guardar en nuevas claves
+        if (legacyEmail != null) {
+          await prefs.setString(_kUserEmail, legacyEmail);
+          email = legacyEmail;
+        }
+        if (legacyId != null) {
+          await prefs.setInt(_kUserId, legacyId);
+          id = legacyId;
+        }
+        if (legacyTipo != null) {
+          await prefs.setString(_kUserType, legacyTipo);
+          tipoUsuario = legacyTipo;
+        }
+        if (legacyNombre != null) {
+          await prefs.setString(_kUserName, legacyNombre);
+          nombre = legacyNombre;
+        }
+        if (legacyTelefono != null) {
+          await prefs.setString(_kUserPhone, legacyTelefono);
+          telefono = legacyTelefono;
+        }
+
+        // Limpiar claves legacy
+        await prefs.remove(_legacyUserEmail);
+        await prefs.remove(_legacyUserId);
+        await prefs.remove(_legacyUserType);
+        await prefs.remove(_legacyUserName);
+        await prefs.remove(_legacyUserPhone);
+      }
+    }
     
     if (email == null && id == null) return null;
     
@@ -302,8 +349,8 @@ class UserService {
       if (telefono != null) 'telefono': telefono,
     };
     
-    // Debug: verificar qué estamos recuperando
-    print('UserService.getSavedSession: Sesión recuperada: $session');
+    // Debug: verificar quÃ© estamos recuperando
+    print('UserService.getSavedSession: SesiÃ³n recuperada: $session');
     
     return session;
   }
@@ -315,6 +362,12 @@ class UserService {
     await prefs.remove(_kUserType);
     await prefs.remove(_kUserName);
     await prefs.remove(_kUserPhone);
+    // TambiÃ©n eliminar claves legacy
+    await prefs.remove(_legacyUserEmail);
+    await prefs.remove(_legacyUserId);
+    await prefs.remove(_legacyUserType);
+    await prefs.remove(_legacyUserName);
+    await prefs.remove(_legacyUserPhone);
   }
 
   static Future<Map<String, dynamic>> login({

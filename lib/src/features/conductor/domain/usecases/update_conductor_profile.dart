@@ -1,10 +1,10 @@
-import '../../../../core/error/result.dart';
+﻿import '../../../../core/error/result.dart';
 import '../entities/conductor_profile.dart';
 import '../repositories/conductor_repository.dart';
 
 /// Caso de uso: Actualizar perfil del conductor
 /// 
-/// Encapsula la lógica de negocio para actualizar el perfil.
+/// Encapsula la lÃ³gica de negocio para actualizar el perfil.
 /// Puede incluir validaciones de negocio antes de persistir.
 class UpdateConductorProfile {
   final ConductorRepository repository;
@@ -13,16 +13,16 @@ class UpdateConductorProfile {
 
   /// Ejecuta el caso de uso
   /// 
-  /// Validaciones de negocio que podrían agregarse:
+  /// Validaciones de negocio que podrÃ­an agregarse:
   /// - Verificar que el conductor tiene permisos
-  /// - Validar formato de teléfono
-  /// - Validar que la dirección sea válida
+  /// - Validar formato de telÃ©fono
+  /// - Validar que la direcciÃ³n sea vÃ¡lida
   Future<Result<ConductorProfile>> call(
     int conductorId,
     Map<String, dynamic> profileData,
   ) async {
-    // Aquí podrías agregar validaciones de negocio
-    // Por ejemplo: validar formato de teléfono, etc.
+    // AquÃ­ podrÃ­as agregar validaciones de negocio
+    // Por ejemplo: validar formato de telÃ©fono, etc.
     
     return await repository.updateProfile(conductorId, profileData);
   }

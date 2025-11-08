@@ -1,4 +1,4 @@
-// lib/src/features/map/presentation/screens/map_example_screen.dart
+﻿// lib/src/features/map/presentation/screens/map_example_screen.dart
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +7,7 @@ import '../widgets/osm_map_widget.dart';
 import '../../../../widgets/quota_alert_widget.dart';
 import '../../../../global/services/traffic_service.dart';
 
-/// Pantalla de ejemplo que muestra cómo usar todas las funcionalidades
+/// Pantalla de ejemplo que muestra cÃ³mo usar todas las funcionalidades
 /// de Mapbox, Nominatim y TomTom integradas
 class MapExampleScreen extends StatefulWidget {
   const MapExampleScreen({super.key});
@@ -68,7 +68,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
                 
                 const SizedBox(height: 16),
 
-                // Panel de búsqueda y rutas
+                // Panel de bÃºsqueda y rutas
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -122,7 +122,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Botones de acción
+                      // Botones de acciÃ³n
                       Row(
                         children: [
                           Expanded(
@@ -144,7 +144,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
                           ElevatedButton.icon(
                             onPressed: _checkTraffic,
                             icon: const Icon(Icons.traffic),
-                            label: const Text('Tráfico'),
+                            label: const Text('TrÃ¡fico'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
                               padding: const EdgeInsets.symmetric(
@@ -165,7 +165,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
             ),
           ),
 
-          // Información de la ruta
+          // InformaciÃ³n de la ruta
           if (mapProvider.currentRoute != null)
             Positioned(
               bottom: 16,
@@ -174,7 +174,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
               child: _buildRouteInfo(mapProvider.currentRoute!),
             ),
 
-          // Información de tráfico
+          // InformaciÃ³n de trÃ¡fico
           if (mapProvider.currentTraffic != null)
             Positioned(
               bottom: mapProvider.currentRoute != null ? 140 : 16,
@@ -188,7 +188,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Botón para actualizar cuotas
+          // BotÃ³n para actualizar cuotas
           FloatingActionButton(
             heroTag: 'quota',
             onPressed: () async {
@@ -202,7 +202,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
           ),
           const SizedBox(height: 12),
           
-          // Botón para limpiar ruta
+          // BotÃ³n para limpiar ruta
           if (mapProvider.currentRoute != null)
             FloatingActionButton(
               heroTag: 'clear',
@@ -234,7 +234,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '🗺️ Información de la Ruta',
+            'ðŸ—ºï¸ InformaciÃ³n de la Ruta',
             style: TextStyle(
               color: Color(0xFFFFFF00),
               fontSize: 16,
@@ -252,7 +252,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
               ),
               _buildInfoChip(
                 Icons.access_time,
-                'Duración',
+                'DuraciÃ³n',
                 route.formattedDuration,
               ),
             ],
@@ -354,7 +354,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
     final originSuccess = await mapProvider.geocodeAndSelect(origin);
     if (!originSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se encontró el origen')),
+        const SnackBar(content: Text('No se encontrÃ³ el origen')),
       );
       return;
     }
@@ -364,7 +364,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
     final destinationSuccess = await mapProvider.geocodeAndSelect(destination);
     if (!destinationSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se encontró el destino')),
+        const SnackBar(content: Text('No se encontrÃ³ el destino')),
       );
       return;
     }
@@ -379,14 +379,14 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
 
     if (routeSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Ruta calculada con Mapbox')),
+        const SnackBar(content: Text('âœ… Ruta calculada con Mapbox')),
       );
       
       // Actualizar cuotas
       await mapProvider.updateQuotaStatus();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ Error calculando la ruta')),
+        const SnackBar(content: Text('âŒ Error calculando la ruta')),
       );
     }
   }
@@ -401,7 +401,7 @@ class _MapExampleScreenState extends State<MapExampleScreen> {
 
     if (mapProvider.currentTraffic != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Información de tráfico actualizada')),
+        const SnackBar(content: Text('âœ… InformaciÃ³n de trÃ¡fico actualizada')),
       );
     }
 

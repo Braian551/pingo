@@ -1,4 +1,4 @@
-/// Entidad de Dominio: Admin
+﻿/// Entidad de Dominio: Admin
 class Admin {
   final int id;
   final String nombre;
@@ -24,7 +24,7 @@ enum AdminRole {
   const AdminRole(this.displayName);
 }
 
-/// Estadísticas del sistema
+/// EstadÃ­sticas del sistema
 class SystemStats {
   final int totalUsuarios;
   final int totalConductores;

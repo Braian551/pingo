@@ -20,7 +20,7 @@ $path = ltrim($path, '/');
 if ($path === '') {
     // Health check for root path
     http_response_code(200);
-    echo json_encode(['status' => 'healthy', 'message' => 'PingGo API Backend is running']);
+    echo json_encode(['status' => 'healthy', 'message' => 'Viax API Backend is running']);
 } elseif (strpos($path, 'user/') === 0) {
     $endpoint = substr($path, 5); // Remove 'user/'
     require_once __DIR__ . '/user/' . $endpoint . '.php';

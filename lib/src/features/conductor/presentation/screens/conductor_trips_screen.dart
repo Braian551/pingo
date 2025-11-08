@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -35,7 +35,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
       print('ConductorTripsScreen: didChangeDependencies - initializing');
       _isInitialized = true;
       _provider = Provider.of<ConductorTripsProvider>(context, listen: false);
-      // Usar Future.microtask para evitar problemas de sincronización
+      // Usar Future.microtask para evitar problemas de sincronizaciÃ³n
       Future.microtask(() => _loadTrips());
     }
   }
@@ -245,7 +245,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'No hay viajes en esta categoría',
+              'No hay viajes en esta categorÃ­a',
               style: TextStyle(
                 color: Colors.white54,
                 fontSize: 16,
@@ -619,7 +619,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
                         ),
                       if (trip.duracionEstimada != null)
                         _buildDetailItem(
-                          'Duración',
+                          'DuraciÃ³n',
                           '${trip.duracionEstimada} minutos',
                           Icons.access_time_rounded,
                         ),

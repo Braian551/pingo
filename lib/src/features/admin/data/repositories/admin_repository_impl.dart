@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../../domain/entities/admin.dart';
 import '../../domain/repositories/admin_repository.dart';
 import '../datasources/admin_remote_datasource.dart';
 
-/// Implementación del repositorio de administración
+/// ImplementaciÃ³n del repositorio de administraciÃ³n
 class AdminRepositoryImpl implements AdminRepository {
   final AdminRemoteDataSource remoteDataSource;
 
@@ -21,7 +21,7 @@ class AdminRepositoryImpl implements AdminRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al obtener estadísticas: $e'));
+      return Error(UnknownFailure('Error al obtener estadÃ­sticas: $e'));
     }
   }
 

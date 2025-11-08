@@ -1,7 +1,7 @@
-// lib/src/features/auth/presentation/screens/email_auth_screen.dart
+﻿// lib/src/features/auth/presentation/screens/email_auth_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
 
 class EmailAuthScreen extends StatefulWidget {
   const EmailAuthScreen({super.key});
@@ -52,7 +52,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
             children: [
               const SizedBox(height: 20),
 
-              // Título
+              // TÃ­tulo
               const Text(
                 'Ingresa tu correo',
                 style: TextStyle(
@@ -64,9 +64,9 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
 
               const SizedBox(height: 8),
 
-              // Subtítulo
+              // SubtÃ­tulo
               const Text(
-                'Te enviaremos un enlace de verificación',
+                'Te enviaremos un enlace de verificaciÃ³n',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
@@ -114,7 +114,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                           letterSpacing: 0.3,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Correo electrónico',
+                          labelText: 'Correo electrÃ³nico',
                           labelStyle: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 15,
@@ -144,11 +144,11 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                         ),
                         validator: (value) {
                         final email = value?.trim() ?? '';
-                        if (email.isEmpty) return 'Por favor ingresa tu correo electrónico';
+                        if (email.isEmpty) return 'Por favor ingresa tu correo electrÃ³nico';
 
                         // A forgiving but safe regex for common email addresses
                         final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
-                        if (!emailRegex.hasMatch(email)) return 'Por favor ingresa un correo válido';
+                        if (!emailRegex.hasMatch(email)) return 'Por favor ingresa un correo vÃ¡lido';
 
                           return null;
                         },
@@ -157,7 +157,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
 
                     const SizedBox(height: 30),
 
-                    // Botón de continuar
+                    // BotÃ³n de continuar
                     SizedBox(
                       width: double.infinity,
                       height: 56,

@@ -1,7 +1,7 @@
-// lib/src/widgets/auth_wrapper.dart
+﻿// lib/src/widgets/auth_wrapper.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/routes/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -43,7 +43,7 @@ class _AuthWrapperState extends State<AuthWrapper>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    // Iniciar animación
+    // Iniciar animaciÃ³n
     _controller.repeat(reverse: true);
 
     _checkSession();
@@ -63,7 +63,7 @@ class _AuthWrapperState extends State<AuthWrapper>
         return;
       }
 
-      // Verificar si hay una sesión guardada
+      // Verificar si hay una sesiÃ³n guardada
       final session = await UserService.getSavedSession();
 
       if (!mounted) return;
@@ -73,12 +73,12 @@ class _AuthWrapperState extends State<AuthWrapper>
         final tipoUsuarioGuardado = session['tipo_usuario'];
 
         if (tipoUsuarioGuardado != null) {
-          // Usar el tipo guardado directamente para navegación más rápida
+          // Usar el tipo guardado directamente para navegaciÃ³n mÃ¡s rÃ¡pida
           if (tipoUsuarioGuardado == 'administrador') {
             // Debug: verificar ID del administrador
-            print('AuthWrapper: Admin ID desde sesión: ${session['id']}');
+            print('AuthWrapper: Admin ID desde sesiÃ³n: ${session['id']}');
             
-            // Para administradores, siempre usar los datos de la sesión que ya incluyen el ID
+            // Para administradores, siempre usar los datos de la sesiÃ³n que ya incluyen el ID
             Navigator.of(context).pushReplacementNamed(
               RouteNames.adminHome,
               arguments: {'admin_user': session},
@@ -108,10 +108,10 @@ class _AuthWrapperState extends State<AuthWrapper>
             final user = profile['user'];
             final tipoUsuario = user?['tipo_usuario'] ?? 'cliente';
 
-            // Actualizar la sesión con el tipo obtenido
+            // Actualizar la sesiÃ³n con el tipo obtenido
             await UserService.saveSession(user);
 
-            // Redirigir según el tipo de usuario
+            // Redirigir segÃºn el tipo de usuario
             if (tipoUsuario == 'administrador') {
               // Debug: verificar ID del administrador
               print('AuthWrapper: Admin ID desde perfil: ${user?['id']}');
@@ -133,13 +133,13 @@ class _AuthWrapperState extends State<AuthWrapper>
               );
             }
           } else {
-            // Si no se pudo obtener el perfil, limpiar sesión y mostrar welcome
+            // Si no se pudo obtener el perfil, limpiar sesiÃ³n y mostrar welcome
             await UserService.clearSession();
             Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
           }
         }
       } else {
-        // No hay sesión, mostrar welcome
+        // No hay sesiÃ³n, mostrar welcome
         Navigator.of(context).pushReplacementNamed(RouteNames.welcome);
       }
     } catch (e) {
@@ -197,7 +197,7 @@ class _AuthWrapperState extends State<AuthWrapper>
                             ),
                           ),
                         ),
-                        // Círculo de fondo con sombra
+                        // CÃ­rculo de fondo con sombra
                         Container(
                           width: size.width * 0.28,
                           height: size.width * 0.28,
@@ -243,14 +243,14 @@ class _AuthWrapperState extends State<AuthWrapper>
 
                     const SizedBox(height: 32),
 
-                    // Indicador de carga con diseño moderno
+                    // Indicador de carga con diseÃ±o moderno
                     SizedBox(
                       width: 40,
                       height: 40,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Círculo exterior
+                          // CÃ­rculo exterior
                           SizedBox(
                             width: 40,
                             height: 40,
@@ -262,7 +262,7 @@ class _AuthWrapperState extends State<AuthWrapper>
                               value: null,
                             ),
                           ),
-                          // Círculo interior
+                          // CÃ­rculo interior
                           SizedBox(
                             width: 28,
                             height: 28,

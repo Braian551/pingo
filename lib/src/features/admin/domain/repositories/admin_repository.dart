@@ -1,12 +1,12 @@
-import 'package:ping_go/src/core/error/result.dart';
+﻿import 'package:viax/src/core/error/result.dart';
 import '../entities/admin.dart';
 
-/// Contrato abstracto del repositorio de administración
+/// Contrato abstracto del repositorio de administraciÃ³n
 abstract class AdminRepository {
-  /// Obtener estadísticas del sistema
+  /// Obtener estadÃ­sticas del sistema
   Future<Result<SystemStats>> getSystemStats();
 
-  /// Obtener conductores pendientes de verificación
+  /// Obtener conductores pendientes de verificaciÃ³n
   Future<Result<List<Map<String, dynamic>>>> getPendingDrivers();
 
   /// Aprobar conductor

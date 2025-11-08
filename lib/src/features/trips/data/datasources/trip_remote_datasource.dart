@@ -1,7 +1,7 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ping_go/src/core/config/app_config.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+import 'package:viax/src/core/config/app_config.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../models/trip_model.dart';
 
 /// Interfaz abstracta para el datasource remoto de viajes
@@ -27,7 +27,7 @@ abstract class TripRemoteDataSource {
   Future<List<Map<String, dynamic>>> findNearbyDrivers(double lat, double lng, String tipo, double radius);
 }
 
-/// Implementación del datasource remoto usando HTTP
+/// ImplementaciÃ³n del datasource remoto usando HTTP
 class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   final http.Client client;
   final String baseUrl;
@@ -68,7 +68,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -94,7 +94,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException || e is NotFoundException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -119,7 +119,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -144,7 +144,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -169,7 +169,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -194,7 +194,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -222,7 +222,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -247,7 +247,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -276,7 +276,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -304,7 +304,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -331,7 +331,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -358,7 +358,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -389,7 +389,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 }

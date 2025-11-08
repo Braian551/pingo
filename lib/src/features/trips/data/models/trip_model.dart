@@ -1,8 +1,8 @@
-import '../../domain/entities/trip.dart';
+﻿import '../../domain/entities/trip.dart';
 
 /// Modelo de Datos (DTO) para Trip
 /// 
-/// Extiende la entidad de dominio y añade métodos de serialización.
+/// Extiende la entidad de dominio y aÃ±ade mÃ©todos de serializaciÃ³n.
 class TripModel extends Trip {
   const TripModel({
     required super.id,

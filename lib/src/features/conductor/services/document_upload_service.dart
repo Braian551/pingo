@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -29,9 +29,9 @@ class DocumentUploadService {
         return null;
       }
 
-      // Validar tamaño (max 5MB)
+      // Validar tamaÃ±o (max 5MB)
       final fileSize = await file.length();
-      debugPrint('Tamaño del archivo: ${fileSize} bytes (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)');
+      debugPrint('TamaÃ±o del archivo: ${fileSize} bytes (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)');
 
       if (fileSize > 5 * 1024 * 1024) {
         debugPrint('Error: El archivo excede 5MB');
@@ -54,7 +54,7 @@ class DocumentUploadService {
 
       // Verificar nuevamente que el archivo existe justo antes de subirlo
       if (!await file.exists()) {
-        debugPrint('El archivo dejó de existir antes de subirlo: $imagePath');
+        debugPrint('El archivo dejÃ³ de existir antes de subirlo: $imagePath');
         return null;
       }
 
@@ -95,7 +95,7 @@ class DocumentUploadService {
     }
   }
 
-  /// Sube múltiples documentos en lote
+  /// Sube mÃºltiples documentos en lote
   /// 
   /// Retorna un Map con el tipo de documento y su URL
   static Future<Map<String, String?>> uploadMultipleDocuments({
@@ -120,7 +120,7 @@ class DocumentUploadService {
 
       results[tipoDocumento] = url;
       
-      // Pequeña pausa entre uploads para no saturar el servidor
+      // PequeÃ±a pausa entre uploads para no saturar el servidor
       await Future.delayed(const Duration(milliseconds: 300));
     }
 
@@ -135,7 +135,7 @@ class DocumentUploadService {
     return '${AppConfig.baseUrl}/$relativeUrl';
   }
 
-  /// Valida que el tipo de documento sea válido
+  /// Valida que el tipo de documento sea vÃ¡lido
   static bool isValidDocumentType(String tipo) {
     const validTypes = [
       'licencia',

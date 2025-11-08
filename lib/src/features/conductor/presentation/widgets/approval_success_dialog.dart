@@ -1,7 +1,7 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Diálogo de éxito cuando el conductor es aprobado
+/// DiÃ¡logo de Ã©xito cuando el conductor es aprobado
 class ApprovalSuccessDialog extends StatefulWidget {
   const ApprovalSuccessDialog({super.key});
 
@@ -139,7 +139,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
       ),
       child: Column(
         children: [
-          // Animación de éxito con efecto de pulso
+          // AnimaciÃ³n de Ã©xito con efecto de pulso
           TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 1000),
             tween: Tween(begin: 0.0, end: 1.0),
@@ -182,7 +182,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           ),
           SizedBox(height: isSmallScreen ? 20 : 28),
           
-          // Título animado
+          // TÃ­tulo animado
           TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 700),
             tween: Tween(begin: 0.0, end: 1.0),
@@ -204,7 +204,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                 ],
               ).createShader(bounds),
               child: Text(
-                '¡Felicidades!',
+                'Â¡Felicidades!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isSmallScreen ? 28 : 36,
@@ -248,7 +248,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           // Cards informativos
           _buildInfoCard(
             icon: Icons.verified_user_rounded,
-            title: 'Verificación completa',
+            title: 'VerificaciÃ³n completa',
             description: 'Tu perfil ha sido verificado exitosamente',
             color: const Color(0xFF11998e),
             isSmallScreen: isSmallScreen,
@@ -257,7 +257,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           
           _buildInfoCard(
             icon: Icons.local_taxi_rounded,
-            title: '¡Ya puedes comenzar!',
+            title: 'Â¡Ya puedes comenzar!',
             description: 'Activa tu disponibilidad para recibir viajes',
             color: const Color(0xFFFFFF00),
             isSmallScreen: isSmallScreen,
@@ -265,7 +265,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           
           SizedBox(height: isSmallScreen ? 24 : 32),
 
-          // Botón principal mejorado
+          // BotÃ³n principal mejorado
           SizedBox(
             width: double.infinity,
             height: isSmallScreen ? 52 : 58,

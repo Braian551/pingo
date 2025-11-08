@@ -1,12 +1,12 @@
-/// Entidad de dominio: Perfil del Conductor
+﻿/// Entidad de dominio: Perfil del Conductor
 /// 
 /// Esta clase representa el concepto de negocio puro, sin dependencias
-/// de frameworks o detalles de implementación. Es inmutable y contiene
-/// solo la lógica de negocio esencial.
+/// de frameworks o detalles de implementaciÃ³n. Es inmutable y contiene
+/// solo la lÃ³gica de negocio esencial.
 /// 
-/// NOTA PARA MIGRACIÓN A MICROSERVICIOS:
-/// - Esta entidad podría ser parte de un "Conductor Service"
-/// - Puede ser fácilmente serializada para comunicación entre servicios
+/// NOTA PARA MIGRACIÃ“N A MICROSERVICIOS:
+/// - Esta entidad podrÃ­a ser parte de un "Conductor Service"
+/// - Puede ser fÃ¡cilmente serializada para comunicaciÃ³n entre servicios
 class ConductorProfile {
   final int id;
   final int conductorId;
@@ -36,7 +36,7 @@ class ConductorProfile {
     this.fechaActualizacion,
   });
 
-  /// Verifica si el perfil está completo
+  /// Verifica si el perfil estÃ¡ completo
   bool get isProfileComplete {
     return nombreCompleto != null &&
         nombreCompleto!.isNotEmpty &&
@@ -53,7 +53,7 @@ class ConductorProfile {
   /// Calcula el porcentaje de completitud del perfil
   int get completionPercentage {
     int completed = 0;
-    const int total = 5; // nombre, teléfono, dirección, licencia, vehículo
+    const int total = 5; // nombre, telÃ©fono, direcciÃ³n, licencia, vehÃ­culo
 
     if (nombreCompleto != null && nombreCompleto!.isNotEmpty) completed++;
     if (telefono != null && telefono!.isNotEmpty) completed++;
@@ -146,7 +146,7 @@ class DriverLicense {
   }
 }
 
-/// Entidad de dominio: Vehículo
+/// Entidad de dominio: VehÃ­culo
 class Vehicle {
   final String? marca;
   final String? modelo;

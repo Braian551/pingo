@@ -1,7 +1,7 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ping_go/src/core/config/app_config.dart';
-import 'package:ping_go/src/core/error/exceptions.dart';
+import 'package:viax/src/core/config/app_config.dart';
+import 'package:viax/src/core/error/exceptions.dart';
 import '../models/location_model.dart';
 
 /// Interfaz abstracta para el datasource de mapas
@@ -13,7 +13,7 @@ abstract class MapRemoteDataSource {
   Future<List<LocationModel>> searchNearbyPlaces(double lat, double lng, String query, double radius);
 }
 
-/// Implementación del datasource de mapas
+/// ImplementaciÃ³n del datasource de mapas
 class MapRemoteDataSourceImpl implements MapRemoteDataSource {
   final http.Client client;
   final String baseUrl;
@@ -43,7 +43,7 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -60,14 +60,14 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
         if (data['success'] == true) {
           return LocationModel.fromJson(data['location']);
         } else {
-          throw ServerException(data['message'] ?? 'Error al obtener dirección');
+          throw ServerException(data['message'] ?? 'Error al obtener direcciÃ³n');
         }
       } else {
         throw ServerException('Error del servidor: ${response.statusCode}');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -98,7 +98,7 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -129,7 +129,7 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 
@@ -161,7 +161,7 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw NetworkException('Error de conexión: ${e.toString()}');
+      throw NetworkException('Error de conexiÃ³n: ${e.toString()}');
     }
   }
 }

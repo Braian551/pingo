@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -59,11 +59,11 @@ class DocumentUploadWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    // Previsualización o icono
+                    // PrevisualizaciÃ³n o icono
                     _buildPreview(hasFile, isPdf),
                     const SizedBox(width: 16),
                     
-                    // Información del documento
+                    // InformaciÃ³n del documento
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class DocumentUploadWidget extends StatelessWidget {
                       ),
                     ),
                     
-                    // Icono de acción
+                    // Icono de acciÃ³n
                     if (hasFile && onRemove != null)
                       IconButton(
                         icon: const Icon(
@@ -143,7 +143,7 @@ class DocumentUploadWidget extends StatelessWidget {
                   ],
                 ),
                 
-                // Botón de vista previa ampliada (solo para imágenes)
+                // BotÃ³n de vista previa ampliada (solo para imÃ¡genes)
                 if (hasFile && !isPdf)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -435,7 +435,7 @@ class DocumentUploadWidget extends StatelessWidget {
                 ),
               ),
               
-              // Botón cerrar
+              // BotÃ³n cerrar
               Positioned(
                 top: 16,
                 right: 16,
@@ -504,7 +504,7 @@ class DocumentUploadWidget extends StatelessWidget {
   }
 }
 
-/// Helper para mostrar bottom sheet de selección de documento
+/// Helper para mostrar bottom sheet de selecciÃ³n de documento
 class DocumentPickerHelper {
   static Future<String?> showPickerOptions({
     required BuildContext context,
@@ -532,11 +532,11 @@ class DocumentPickerHelper {
       );
 
       if (action == null) {
-        debugPrint('Usuario canceló la selección de documento');
+        debugPrint('Usuario cancelÃ³ la selecciÃ³n de documento');
         return null;
       }
 
-      debugPrint('Acción seleccionada: $action');
+      debugPrint('AcciÃ³n seleccionada: $action');
 
       if (action == 'pdf') {
         // Seleccionar PDF
@@ -551,11 +551,11 @@ class DocumentPickerHelper {
           debugPrint('PDF seleccionado: $path');
           return path;
         } else {
-          debugPrint('No se seleccionó ningún PDF');
+          debugPrint('No se seleccionÃ³ ningÃºn PDF');
         }
       } else {
         // Seleccionar imagen directamente sin verificar permisos manualmente
-        // ImagePicker maneja los permisos automáticamente
+        // ImagePicker maneja los permisos automÃ¡ticamente
         debugPrint('Seleccionando imagen desde: $action');
         final ImageSource source = action == 'camera'
             ? ImageSource.camera
@@ -571,7 +571,7 @@ class DocumentPickerHelper {
 
         if (image != null) {
           debugPrint('Imagen seleccionada: ${image.path}');
-          debugPrint('Tamaño original: ${await image.length()} bytes');
+          debugPrint('TamaÃ±o original: ${await image.length()} bytes');
 
           // Verificar que el archivo existe
           final file = File(image.path);
@@ -582,11 +582,11 @@ class DocumentPickerHelper {
             // ImagePicker ya guarda el archivo en cache y es estable
             return image.path;
           } else {
-            debugPrint('Archivo no existe después de ser seleccionado');
+            debugPrint('Archivo no existe despuÃ©s de ser seleccionado');
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Error: La imagen no se guardó correctamente'),
+                  content: Text('Error: La imagen no se guardÃ³ correctamente'),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -594,7 +594,7 @@ class DocumentPickerHelper {
             return null;
           }
         } else {
-          debugPrint('No se seleccionó ninguna imagen');
+          debugPrint('No se seleccionÃ³ ninguna imagen');
         }
       }
     } catch (e) {
@@ -655,20 +655,20 @@ class _DocumentPickerBottomSheet extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               
-              // Opciones según el tipo de documento aceptado
+              // Opciones segÃºn el tipo de documento aceptado
               if (documentType == DocumentType.image ||
                   documentType == DocumentType.any) ...[
                 _buildOption(
                   context: context,
                   icon: Icons.camera_alt_rounded,
                   title: 'Tomar foto',
-                  subtitle: 'Usa la cámara',
+                  subtitle: 'Usa la cÃ¡mara',
                   onTap: () => Navigator.pop(context, 'camera'),
                 ),
                 _buildOption(
                   context: context,
                   icon: Icons.photo_library_rounded,
-                  title: 'Galería de fotos',
+                  title: 'GalerÃ­a de fotos',
                   subtitle: 'Selecciona una imagen',
                   onTap: () => Navigator.pop(context, 'gallery'),
                 ),

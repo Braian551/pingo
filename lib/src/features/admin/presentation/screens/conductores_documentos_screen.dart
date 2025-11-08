@@ -1,10 +1,10 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/admin/admin_service.dart';
-import 'package:ping_go/src/widgets/snackbars/custom_snackbar.dart';
-import 'package:ping_go/src/widgets/dialogs/admin_dialog_helper.dart';
+import 'package:viax/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/widgets/dialogs/admin_dialog_helper.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:ping_go/src/core/config/app_config.dart';
+import 'package:viax/src/core/config/app_config.dart';
 
 class ConductoresDocumentosScreen extends StatefulWidget {
   final int adminId;
@@ -29,7 +29,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   final Map<String, String> _estadosLabels = {
     'todos': 'Todos',
     'pendiente': 'Pendientes',
-    'en_revision': 'En Revisión',
+    'en_revision': 'En RevisiÃ³n',
     'aprobado': 'Aprobados',
     'rechazado': 'Rechazados',
   };
@@ -343,7 +343,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
               ),
               const SizedBox(height: 16),
               Text(
-                'No hay conductores en esta categoría',
+                'No hay conductores en esta categorÃ­a',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.6),
                   fontSize: 16,
@@ -464,7 +464,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     Expanded(
                       child: _buildInfoItem(
                         Icons.star_rounded,
-                        'Calificación',
+                        'CalificaciÃ³n',
                         '${conductor['calificacion_promedio'] ?? 0.0} (${conductor['total_calificaciones'] ?? 0})',
                       ),
                     ),
@@ -530,7 +530,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   Widget _buildEstadoBadge(String estado, Color color) {
     final Map<String, String> estadosTexto = {
       'pendiente': 'Pendiente',
-      'en_revision': 'En Revisión',
+      'en_revision': 'En RevisiÃ³n',
       'aprobado': 'Aprobado',
       'rechazado': 'Rechazado',
     };
@@ -631,18 +631,18 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildDetailSection('Información Personal', [
+                          _buildDetailSection('InformaciÃ³n Personal', [
                             _buildDetailRow('Nombre completo', conductor['nombre_completo']),
                             _buildDetailRow('Email', conductor['email']),
-                            _buildDetailRow('Teléfono', conductor['telefono']),
-                            _buildDetailRow('Usuario activo', conductor['es_activo'] == 1 ? 'Sí' : 'No'),
-                            _buildDetailRow('Verificado', conductor['es_verificado'] == 1 ? 'Sí' : 'No'),
+                            _buildDetailRow('TelÃ©fono', conductor['telefono']),
+                            _buildDetailRow('Usuario activo', conductor['es_activo'] == 1 ? 'SÃ­' : 'No'),
+                            _buildDetailRow('Verificado', conductor['es_verificado'] == 1 ? 'SÃ­' : 'No'),
                           ]),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Licencia de Conducción', [
-                            _buildDetailRow('Número', conductor['licencia_conduccion']),
-                            _buildDetailRow('Categoría', conductor['licencia_categoria']),
-                            _buildDetailRow('Expedición', _formatDate(conductor['licencia_expedicion'])),
+                          _buildDetailSection('Licencia de ConducciÃ³n', [
+                            _buildDetailRow('NÃºmero', conductor['licencia_conduccion']),
+                            _buildDetailRow('CategorÃ­a', conductor['licencia_categoria']),
+                            _buildDetailRow('ExpediciÃ³n', _formatDate(conductor['licencia_expedicion'])),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['licencia_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
@@ -653,17 +653,17 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Vehículo', [
+                          _buildDetailSection('VehÃ­culo', [
                             _buildDetailRow('Tipo', conductor['vehiculo_tipo']),
                             _buildDetailRow('Placa', conductor['vehiculo_placa']),
                             _buildDetailRow('Marca', conductor['vehiculo_marca']),
                             _buildDetailRow('Modelo', conductor['vehiculo_modelo']),
-                            _buildDetailRow('Año', conductor['vehiculo_anio']?.toString()),
+                            _buildDetailRow('AÃ±o', conductor['vehiculo_anio']?.toString()),
                             _buildDetailRow('Color', conductor['vehiculo_color']),
                           ]),
                           const SizedBox(height: 24),
                           _buildDetailSection('SOAT', [
-                            _buildDetailRow('Número', conductor['soat_numero']),
+                            _buildDetailRow('NÃºmero', conductor['soat_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['soat_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
@@ -674,21 +674,21 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Tecnomecánica', [
-                            _buildDetailRow('Número', conductor['tecnomecanica_numero']),
+                          _buildDetailSection('TecnomecÃ¡nica', [
+                            _buildDetailRow('NÃºmero', conductor['tecnomecanica_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['tecnomecanica_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
                           if (conductor['tecnomecanica_foto_url'] != null)
                             _buildDocumentButton(
-                              label: 'Ver Foto de Tecnomecánica',
+                              label: 'Ver Foto de TecnomecÃ¡nica',
                               documentUrl: conductor['tecnomecanica_foto_url'],
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Seguro', [
                             _buildDetailRow('Aseguradora', conductor['aseguradora']),
-                            _buildDetailRow('Póliza', conductor['numero_poliza_seguro']),
+                            _buildDetailRow('PÃ³liza', conductor['numero_poliza_seguro']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['vencimiento_seguro'])),
                           ]),
                           const SizedBox(height: 16),
@@ -710,10 +710,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Estado de Verificación', [
+                          _buildDetailSection('Estado de VerificaciÃ³n', [
                             _buildDetailRow('Estado', conductor['estado_verificacion']),
-                            _buildDetailRow('Aprobado', conductor['aprobado'] == 1 ? 'Sí' : 'No'),
-                            _buildDetailRow('Última verificación', _formatDate(conductor['fecha_ultima_verificacion'])),
+                            _buildDetailRow('Aprobado', conductor['aprobado'] == 1 ? 'SÃ­' : 'No'),
+                            _buildDetailRow('Ãšltima verificaciÃ³n', _formatDate(conductor['fecha_ultima_verificacion'])),
                           ]),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
@@ -1028,7 +1028,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       // Cerrar loading primero
       if (mounted) Navigator.pop(context);
 
-      // Esperar un poco para que el diálogo se cierre completamente
+      // Esperar un poco para que el diÃ¡logo se cierre completamente
       await Future.delayed(const Duration(milliseconds: 100));
 
       if (!mounted) return;
@@ -1158,9 +1158,9 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             : const Color(0xFFffa726);
 
     final Map<String, String> tiposDocumento = {
-      'licencia': 'Licencia de Conducción',
+      'licencia': 'Licencia de ConducciÃ³n',
       'soat': 'SOAT',
-      'tecnomecanica': 'Tecnomecánica',
+      'tecnomecanica': 'TecnomecÃ¡nica',
       'tarjeta_propiedad': 'Tarjeta de Propiedad',
       'seguro': 'Seguro',
     };
@@ -1282,11 +1282,11 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Información adicional del documento
+                      // InformaciÃ³n adicional del documento
                       if (doc['numero_documento'] != null && doc['numero_documento'].toString().isNotEmpty)
                         _buildHistorialInfoRow(
                           Icons.numbers_rounded,
-                          'Número',
+                          'NÃºmero',
                           doc['numero_documento'],
                         ),
                       
@@ -1347,7 +1347,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                         ),
                       ],
                       
-                      // Botón para ver documento
+                      // BotÃ³n para ver documento
                       if (hasArchivo) ...[
                         const SizedBox(height: 12),
                         SizedBox(
@@ -1383,7 +1383,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     );
   }
 
-  /// Helper para construir una fila de información en el historial
+  /// Helper para construir una fila de informaciÃ³n en el historial
   Widget _buildHistorialInfoRow(IconData icon, String label, dynamic value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1415,7 +1415,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     );
   }
 
-  /// Helper para obtener el icono según el tipo de documento
+  /// Helper para obtener el icono segÃºn el tipo de documento
   IconData _getDocumentIcon(String? tipo) {
     switch (tipo) {
       case 'licencia':
@@ -1433,7 +1433,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     }
   }
 
-  /// Helper para obtener el icono según el estado
+  /// Helper para obtener el icono segÃºn el estado
   IconData _getEstadoIcon(String estado) {
     switch (estado) {
       case 'aprobado':
@@ -1456,7 +1456,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       case 'rechazado':
         return 'Rechazado';
       case 'en_revision':
-        return 'En Revisión';
+        return 'En RevisiÃ³n';
       case 'pendiente':
       default:
         return 'Pendiente';
@@ -1486,7 +1486,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     );
   }
 
-  /// Widget para mostrar botón de documento con preview
+  /// Widget para mostrar botÃ³n de documento con preview
   Widget _buildDocumentButton({
     required String label,
     required String? documentUrl,
@@ -1626,7 +1626,7 @@ class _DocumentViewerScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.download_rounded, color: Color(0xFFFFFF00)),
             onPressed: () => _showDownloadInfo(context),
-            tooltip: 'Información de descarga',
+            tooltip: 'InformaciÃ³n de descarga',
           ),
         ],
       ),

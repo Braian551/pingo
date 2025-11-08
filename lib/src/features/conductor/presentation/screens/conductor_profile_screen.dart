@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -7,7 +7,7 @@ import '../../models/conductor_profile_model.dart';
 import 'license_registration_screen.dart';
 import 'vehicle_only_registration_screen.dart';
 import 'verification_status_screen.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
 
 class ConductorProfileScreen extends StatefulWidget {
   final int conductorId;
@@ -75,13 +75,13 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
             );
           }
 
-          // Si el conductor está aprobado, mostrar vista de perfil aprobado
+          // Si el conductor estÃ¡ aprobado, mostrar vista de perfil aprobado
           if (profile.aprobado &&
               profile.estadoVerificacion == VerificationStatus.aprobado) {
             return _buildApprovedProfileView(profile);
           }
 
-          // Si no está aprobado, mostrar vista de verificación
+          // Si no estÃ¡ aprobado, mostrar vista de verificaciÃ³n
           return SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -205,7 +205,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               const SizedBox(height: 12),
               Text(
                 profile.isProfileComplete
-                    ? '¡Perfil completo!'
+                    ? 'Â¡Perfil completo!'
                     : 'Completa tu perfil para recibir viajes',
                 style: TextStyle(
                   color: profile.isProfileComplete
@@ -230,17 +230,17 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
       case VerificationStatus.pendiente:
         statusColor = Colors.orange;
         statusIcon = Icons.hourglass_empty_rounded;
-        statusMessage = 'Pendiente de verificación';
+        statusMessage = 'Pendiente de verificaciÃ³n';
         break;
       case VerificationStatus.enRevision:
         statusColor = Colors.blue;
         statusIcon = Icons.search_rounded;
-        statusMessage = 'En revisión por el equipo';
+        statusMessage = 'En revisiÃ³n por el equipo';
         break;
       case VerificationStatus.aprobado:
         statusColor = Colors.green;
         statusIcon = Icons.check_circle_rounded;
-        statusMessage = '¡Perfil aprobado!';
+        statusMessage = 'Â¡Perfil aprobado!';
         break;
       case VerificationStatus.rechazado:
         statusColor = Colors.red;
@@ -325,7 +325,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
     final hasLicense = license != null && license.isComplete;
 
     return _buildSection(
-      title: 'Licencia de Conducción',
+      title: 'Licencia de ConducciÃ³n',
       icon: Icons.badge_rounded,
       isComplete: hasLicense,
       onTap: () async {
@@ -348,8 +348,8 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
       child: hasLicense
           ? Column(
               children: [
-                _buildDetailRow('Número', license.numero),
-                _buildDetailRow('Categoría', license.categoria.label),
+                _buildDetailRow('NÃºmero', license.numero),
+                _buildDetailRow('CategorÃ­a', license.categoria.label),
                 _buildDetailRow(
                   'Vencimiento',
                   '${license.fechaVencimiento.day}/${license.fechaVencimiento.month}/${license.fechaVencimiento.year}',
@@ -396,7 +396,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
     final hasVehicle = vehicle != null && vehicle.isBasicComplete;
 
     return _buildSection(
-      title: 'Información del Vehículo',
+      title: 'InformaciÃ³n del VehÃ­culo',
       icon: Icons.directions_car_rounded,
       isComplete: hasVehicle,
       onTap: () async {
@@ -423,14 +423,14 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                 _buildDetailRow('Tipo', vehicle.tipo.label),
                 _buildDetailRow('Marca', vehicle.marca ?? 'N/A'),
                 _buildDetailRow('Modelo', vehicle.modelo ?? 'N/A'),
-                _buildDetailRow('Año', vehicle.anio?.toString() ?? 'N/A'),
+                _buildDetailRow('AÃ±o', vehicle.anio?.toString() ?? 'N/A'),
                 _buildDetailRow('Color', vehicle.color ?? 'N/A'),
               ],
             )
           : const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                'No has registrado tu vehículo',
+                'No has registrado tu vehÃ­culo',
                 style: TextStyle(color: Colors.white54, fontSize: 14),
               ),
             ),
@@ -621,7 +621,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                          '¡Perfil enviado para verificación exitosamente!',
+                          'Â¡Perfil enviado para verificaciÃ³n exitosamente!',
                         ),
                         backgroundColor: Colors.green,
                         duration: Duration(seconds: 3),
@@ -659,7 +659,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                 ),
               )
             : const Text(
-                'Enviar para Verificación',
+                'Enviar para VerificaciÃ³n',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,
@@ -698,7 +698,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Verificación en Revisión',
+                'VerificaciÃ³n en RevisiÃ³n',
                 style: TextStyle(
                   color: Colors.blue,
                   fontSize: 22,
@@ -708,7 +708,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Tu perfil ha sido enviado y está siendo revisado por nuestro equipo. Te notificaremos cuando el proceso haya finalizado.',
+                'Tu perfil ha sido enviado y estÃ¡ siendo revisado por nuestro equipo. Te notificaremos cuando el proceso haya finalizado.',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.8),
                   fontSize: 15,
@@ -872,7 +872,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '¡Conductor Verificado!',
+                      'Â¡Conductor Verificado!',
                       style: TextStyle(
                         color: Colors.green,
                         fontSize: 20,
@@ -896,7 +896,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
 
   Widget _buildApprovedPersonalInfoSection(ConductorProfileModel profile) {
     return _buildApprovedSection(
-      title: 'Información Personal',
+      title: 'InformaciÃ³n Personal',
       icon: Icons.person_rounded,
       children: [
         _buildApprovedInfoTile(
@@ -927,7 +927,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
     final hasLicense = license != null && license.isComplete;
 
     return _buildApprovedSection(
-      title: 'Licencia de Conducción',
+      title: 'Licencia de ConducciÃ³n',
       icon: Icons.credit_card_rounded,
       trailing: hasLicense
           ? IconButton(
@@ -939,13 +939,13 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
           ? [
               _buildApprovedInfoTile(
                 icon: Icons.numbers_rounded,
-                label: 'Número',
+                label: 'NÃºmero',
                 value: license.numero,
               ),
               const Divider(color: Colors.white12),
               _buildApprovedInfoTile(
                 icon: Icons.category_rounded,
-                label: 'Categoría',
+                label: 'CategorÃ­a',
                 value: license.categoria.label,
               ),
               const Divider(color: Colors.white12),
@@ -979,7 +979,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                         child: Text(
                           license.isValid
                               ? 'Tu licencia vence pronto. Considera renovarla.'
-                              : 'Tu licencia está vencida. Renuévala urgentemente.',
+                              : 'Tu licencia estÃ¡ vencida. RenuÃ©vala urgentemente.',
                           style: TextStyle(
                             color: license.isValid ? Colors.orange : Colors.red,
                             fontSize: 13,
@@ -1009,7 +1009,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
     final hasVehicle = vehicle != null && vehicle.isBasicComplete;
 
     return _buildApprovedSection(
-      title: 'Información del Vehículo',
+      title: 'InformaciÃ³n del VehÃ­culo',
       icon: Icons.directions_car_rounded,
       trailing: hasVehicle
           ? IconButton(
@@ -1045,7 +1045,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               const Divider(color: Colors.white12),
               _buildApprovedInfoTile(
                 icon: Icons.calendar_today_rounded,
-                label: 'Año',
+                label: 'AÃ±o',
                 value: vehicle.anio?.toString() ?? 'N/A',
               ),
               const Divider(color: Colors.white12),
@@ -1059,7 +1059,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
-                  'No has registrado tu vehículo',
+                  'No has registrado tu vehÃ­culo',
                   style: TextStyle(color: Colors.white54),
                 ),
               ),
@@ -1073,7 +1073,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
       icon: Icons.folder_rounded,
       children: [
         _buildDocumentItem(
-          'Licencia de Conducción',
+          'Licencia de ConducciÃ³n',
           Icons.badge_rounded,
           verified: profile.licencia != null,
         ),
@@ -1091,7 +1091,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         ),
         const Divider(color: Colors.white12),
         _buildDocumentItem(
-          'Tecnomecánica',
+          'TecnomecÃ¡nica',
           Icons.build_rounded,
           verified: profile.vehiculo?.fotoTecnomecanica != null,
         ),
@@ -1143,7 +1143,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
 
   Widget _buildApprovedSettingsSection() {
     return _buildApprovedSection(
-      title: 'Configuración',
+      title: 'ConfiguraciÃ³n',
       icon: Icons.settings_rounded,
       children: [
         _buildSettingItem(
@@ -1161,7 +1161,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         _buildSettingItem(
           'Idioma',
           Icons.language_rounded,
-          trailing: 'Español',
+          trailing: 'EspaÃ±ol',
           onTap: () => _showComingSoon('Idioma'),
         ),
         const Divider(color: Colors.white12),
@@ -1187,9 +1187,9 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
         ),
         const Divider(color: Colors.white12),
         _buildSettingItem(
-          'Términos y Condiciones',
+          'TÃ©rminos y Condiciones',
           Icons.article_rounded,
-          onTap: () => _showComingSoon('Términos y Condiciones'),
+          onTap: () => _showComingSoon('TÃ©rminos y Condiciones'),
         ),
       ],
     );
@@ -1378,7 +1378,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature estará disponible próximamente'),
+        content: Text('$feature estarÃ¡ disponible prÃ³ximamente'),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
@@ -1425,7 +1425,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                 Icon(Icons.logout_rounded, color: Color(0xFFf5576c), size: 24),
                 SizedBox(width: 12),
                 Text(
-                  'Cerrar sesión',
+                  'Cerrar sesiÃ³n',
                   style: TextStyle(
                     color: Color(0xFFf5576c),
                     fontSize: 18,
@@ -1474,7 +1474,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  '¿Cerrar sesión?',
+                  'Â¿Cerrar sesiÃ³n?',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -1483,7 +1483,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '¿Estás seguro de que deseas cerrar sesión?',
+                  'Â¿EstÃ¡s seguro de que deseas cerrar sesiÃ³n?',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.6),
                     fontSize: 14,
@@ -1525,7 +1525,7 @@ class _ConductorProfileScreenState extends State<ConductorProfileScreen> {
                           ),
                         ),
                         child: const Text(
-                          'Cerrar sesión',
+                          'Cerrar sesiÃ³n',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,

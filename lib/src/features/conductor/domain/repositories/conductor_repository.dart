@@ -1,19 +1,19 @@
-import '../entities/conductor_profile.dart';
+﻿import '../entities/conductor_profile.dart';
 import '../../../../core/error/result.dart';
 
 /// Contrato abstracto del repositorio de conductores
 /// 
 /// Define las operaciones que se pueden realizar con los datos del conductor
-/// sin especificar CÓMO se implementan (BD local, API, cache, etc.)
+/// sin especificar CÃ“MO se implementan (BD local, API, cache, etc.)
 /// 
 /// Usa Result<T> para manejo de errores funcional:
-/// - Success(data): Cuando la operación es exitosa
+/// - Success(data): Cuando la operaciÃ³n es exitosa
 /// - Error(failure): Cuando hay un error
 /// 
-/// NOTA PARA MIGRACIÓN A MICROSERVICIOS:
-/// - Este contrato permite cambiar fácilmente de una implementación
+/// NOTA PARA MIGRACIÃ“N A MICROSERVICIOS:
+/// - Este contrato permite cambiar fÃ¡cilmente de una implementaciÃ³n
 ///   local (SQLite) a una remota (API REST de un microservicio)
-/// - Solo necesitas crear una nueva implementación sin tocar la capa de dominio
+/// - Solo necesitas crear una nueva implementaciÃ³n sin tocar la capa de dominio
 /// - Ejemplo: ConductorRepositoryImpl (API) vs ConductorRepositoryLocal (SQLite)
 abstract class ConductorRepository {
   /// Obtiene el perfil completo de un conductor por su ID
@@ -31,24 +31,24 @@ abstract class ConductorRepository {
     DriverLicense license,
   );
 
-  /// Actualiza el vehículo del conductor
+  /// Actualiza el vehÃ­culo del conductor
   Future<Result<Vehicle>> updateVehicle(
     int conductorId,
     Vehicle vehicle,
   );
 
-  /// Envía el perfil para aprobación
+  /// EnvÃ­a el perfil para aprobaciÃ³n
   Future<Result<bool>> submitForApproval(int conductorId);
 
-  /// Obtiene el estado de verificación del conductor
+  /// Obtiene el estado de verificaciÃ³n del conductor
   Future<Result<Map<String, dynamic>>> getVerificationStatus(
     int conductorId,
   );
 
-  /// Obtiene estadísticas del conductor
+  /// Obtiene estadÃ­sticas del conductor
   Future<Result<Map<String, dynamic>>> getStatistics(int conductorId);
 
-  /// Obtiene ganancias del conductor por período
+  /// Obtiene ganancias del conductor por perÃ­odo
   Future<Result<Map<String, dynamic>>> getEarnings({
     required int conductorId,
     required String periodo,
@@ -66,7 +66,7 @@ abstract class ConductorRepository {
     required bool disponible,
   });
 
-  /// Actualiza ubicación del conductor en tiempo real
+  /// Actualiza ubicaciÃ³n del conductor en tiempo real
   Future<Result<void>> updateLocation({
     required int conductorId,
     required double latitud,

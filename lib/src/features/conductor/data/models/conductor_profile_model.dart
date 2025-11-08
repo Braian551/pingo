@@ -1,11 +1,11 @@
-import '../../domain/entities/conductor_profile.dart';
+﻿import '../../domain/entities/conductor_profile.dart';
 
 /// Modelo de datos para ConductorProfile
 /// 
-/// Extiende la entidad del dominio y agrega capacidades de serialización.
-/// Separa la lógica de negocio (entity) de los detalles de persistencia (model).
+/// Extiende la entidad del dominio y agrega capacidades de serializaciÃ³n.
+/// Separa la lÃ³gica de negocio (entity) de los detalles de persistencia (model).
 /// 
-/// PATRÓN: Data Transfer Object (DTO)
+/// PATRÃ“N: Data Transfer Object (DTO)
 /// - Convierte entre JSON (API/BD) y objetos Dart
 /// - La entidad pura no conoce de JSON, HTTP, etc.
 class ConductorProfileModel extends ConductorProfile {

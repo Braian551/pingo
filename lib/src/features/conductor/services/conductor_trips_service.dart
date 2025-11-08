@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/config/app_config.dart';
 
@@ -111,7 +111,7 @@ class TripModel {
   double get calificacionDouble => (calificacion ?? 0).toDouble();
 }
 
-/// Modelo para paginación
+/// Modelo para paginaciÃ³n
 class PaginationModel {
   final int page;
   final int limit;
@@ -254,12 +254,12 @@ class ConductorTripsService {
       return {
         'success': false,
         'viajes': <TripModel>[],
-        'message': 'Error de conexión: $e',
+        'message': 'Error de conexiÃ³n: $e',
       };
     }
   }
 
-  /// Obtener detalles de un viaje específico
+  /// Obtener detalles de un viaje especÃ­fico
   static Future<Map<String, dynamic>> getTripDetails({
     required int conductorId,
     required int tripId,
@@ -289,7 +289,7 @@ class ConductorTripsService {
         } else {
           return {
             'success': false,
-            'message': data['message'] ?? 'No se encontró el viaje',
+            'message': data['message'] ?? 'No se encontrÃ³ el viaje',
           };
         }
       } else {
@@ -302,7 +302,7 @@ class ConductorTripsService {
       print('Error en getTripDetails: $e');
       return {
         'success': false,
-        'message': 'Error de conexión: $e',
+        'message': 'Error de conexiÃ³n: $e',
       };
     }
   }

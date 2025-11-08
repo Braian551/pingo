@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -67,7 +67,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
-        initialCenter: _currentCenter ?? const LatLng(4.6097, -74.0817), // Bogotá por defecto
+        initialCenter: _currentCenter ?? const LatLng(4.6097, -74.0817), // BogotÃ¡ por defecto
         initialZoom: 13.0,
         maxZoom: 18.0,
         minZoom: 3.0,
@@ -163,7 +163,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
             }).toList(),
           ),
         
-        // Marcadores opcionales (puedes ocultarlos para mostrar sólo el pin centrado)
+        // Marcadores opcionales (puedes ocultarlos para mostrar sÃ³lo el pin centrado)
         if (widget.showMarkers) ...[
           if (mapProvider.selectedLocation != null)
             MarkerLayer(
@@ -198,7 +198,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
             ),
         ],
 
-        // Marcadores de incidentes de tráfico
+        // Marcadores de incidentes de trÃ¡fico
         if (mapProvider.trafficIncidents.isNotEmpty)
           MarkerLayer(
             markers: mapProvider.trafficIncidents.map((incident) {
@@ -247,7 +247,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
           children: [
             Text(incident.icon),
             const SizedBox(width: 8),
-            const Expanded(child: Text('Incidente de Tráfico')),
+            const Expanded(child: Text('Incidente de TrÃ¡fico')),
           ],
         ),
         content: Column(

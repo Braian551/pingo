@@ -3,11 +3,11 @@ import 'package:http/http.dart' as http;
 
 void main() async {
   // Cambiar según el entorno:
-  // LOCAL: 'http://localhost/ping_go/backend-deploy'
+  // LOCAL: 'http://localhost/viax/backend'
   // PRODUCCIÓN: 'https://pinggo-backend-production.up.railway.app'
-  const String baseUrl = 'http://localhost/ping_go/backend-deploy';
+  const String baseUrl = 'http://localhost/viax/backend';
 
-  print('🧪 Testing PingGo Backend API');
+  print('🧪 Testing Viax Backend API');
   print('=' * 50);
 
   // Test 1: Health Check

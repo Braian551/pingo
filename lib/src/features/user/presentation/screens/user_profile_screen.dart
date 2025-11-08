@@ -1,9 +1,9 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
 
 /// Pantalla completa de perfil del usuario
-/// Incluye información personal, foto, ajustes y opciones
+/// Incluye informaciÃ³n personal, foto, ajustes y opciones
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
 
@@ -320,7 +320,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(height: 12),
           _buildMenuItem(
             icon: Icons.credit_card,
-            title: 'Métodos de pago',
+            title: 'MÃ©todos de pago',
             subtitle: 'Administrar tus pagos',
             onTap: () => Navigator.pushNamed(context, '/payment_methods'),
           ),
@@ -341,7 +341,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(height: 12),
           _buildMenuItem(
             icon: Icons.settings,
-            title: 'Configuración',
+            title: 'ConfiguraciÃ³n',
             subtitle: 'Ajustes y preferencias',
             onTap: () => Navigator.pushNamed(context, '/settings'),
           ),
@@ -349,14 +349,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _buildMenuItem(
             icon: Icons.help_outline,
             title: 'Ayuda y soporte',
-            subtitle: 'Contáctanos o consulta FAQ',
+            subtitle: 'ContÃ¡ctanos o consulta FAQ',
             onTap: () => Navigator.pushNamed(context, '/help'),
           ),
           const SizedBox(height: 12),
           _buildMenuItem(
             icon: Icons.info_outline,
             title: 'Acerca de',
-            subtitle: 'Versión y términos legales',
+            subtitle: 'VersiÃ³n y tÃ©rminos legales',
             onTap: () => Navigator.pushNamed(context, '/about'),
           ),
           const SizedBox(height: 20),
@@ -451,7 +451,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Icon(Icons.logout, color: Colors.red, size: 20),
               SizedBox(width: 8),
               Text(
-                'Cerrar sesión',
+                'Cerrar sesiÃ³n',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 16,

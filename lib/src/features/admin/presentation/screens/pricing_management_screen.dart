@@ -1,10 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:ping_go/src/core/config/app_config.dart';
+import 'package:viax/src/core/config/app_config.dart';
 
 class PricingManagementScreen extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -56,7 +56,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
         if (data['success'] == true) {
           final allConfigs = List<Map<String, dynamic>>.from(data['data'] ?? []);
           
-          // Filtrar para obtener solo la última configuración activa por tipo de vehículo
+          // Filtrar para obtener solo la Ãºltima configuraciÃ³n activa por tipo de vehÃ­culo
           final Map<String, Map<String, dynamic>> uniqueConfigs = {};
           
           for (var config in allConfigs) {
@@ -65,7 +65,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
             
             // Solo tomar configuraciones activas
             if (isActive) {
-              // Si no existe o si el ID es mayor (más reciente), actualizar
+              // Si no existe o si el ID es mayor (mÃ¡s reciente), actualizar
               if (!uniqueConfigs.containsKey(tipo) || 
                   (int.tryParse(config['id'].toString()) ?? 0) > 
                   (int.tryParse(uniqueConfigs[tipo]!['id'].toString()) ?? 0)) {
@@ -92,7 +92,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error de conexión: $e';
+        _errorMessage = 'Error de conexiÃ³n: $e';
         _isLoading = false;
       });
     }
@@ -363,8 +363,8 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                       // Tarifas Base
                       _buildSectionTitle('Tarifas Base', Icons.attach_money_rounded),
                       _buildInfoRow('Tarifa Base', '\$${_formatNumber(config['tarifa_base'])}', Colors.white),
-                      _buildInfoRow('Tarifa Mínima', '\$${_formatNumber(config['tarifa_minima'])}', Colors.white),
-                      _buildInfoRow('Tarifa Máxima', config['tarifa_maxima'] != null ? '\$${_formatNumber(config['tarifa_maxima'])}' : 'Sin límite', Colors.white70),
+                      _buildInfoRow('Tarifa MÃ­nima', '\$${_formatNumber(config['tarifa_minima'])}', Colors.white),
+                      _buildInfoRow('Tarifa MÃ¡xima', config['tarifa_maxima'] != null ? '\$${_formatNumber(config['tarifa_maxima'])}' : 'Sin lÃ­mite', Colors.white70),
                       const Divider(color: Colors.white12, height: 28, thickness: 1),
                       
                       // Costos por Distancia y Tiempo
@@ -389,13 +389,13 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                       // Comisiones
                       _buildSectionTitle('Comisiones', Icons.credit_card_rounded),
                       _buildInfoRow('Plataforma', '${config['comision_plataforma']}%', const Color(0xFFFFD60A)),
-                      _buildInfoRow('Método de Pago', '${config['comision_metodo_pago']}%', const Color(0xFFFF9F0A)),
+                      _buildInfoRow('MÃ©todo de Pago', '${config['comision_metodo_pago']}%', const Color(0xFFFF9F0A)),
                       const Divider(color: Colors.white12, height: 28, thickness: 1),
                       
-                      // Límites de Distancia
-                      _buildSectionTitle('Límites de Distancia', Icons.route_rounded),
-                      _buildInfoRow('Distancia Mínima', '${_formatNumber(config['distancia_minima'])} km', Colors.white70),
-                      _buildInfoRow('Distancia Máxima', '${_formatNumber(config['distancia_maxima'])} km', Colors.white70),
+                      // LÃ­mites de Distancia
+                      _buildSectionTitle('LÃ­mites de Distancia', Icons.route_rounded),
+                      _buildInfoRow('Distancia MÃ­nima', '${_formatNumber(config['distancia_minima'])} km', Colors.white70),
+                      _buildInfoRow('Distancia MÃ¡xima', '${_formatNumber(config['distancia_maxima'])} km', Colors.white70),
                       const Divider(color: Colors.white12, height: 28, thickness: 1),
                       
                       // Tiempo de Espera
@@ -501,7 +501,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
       'comision_plataforma': TextEditingController(text: config['comision_plataforma']?.toString() ?? '0'),
       'comision_metodo_pago': TextEditingController(text: config['comision_metodo_pago']?.toString() ?? '0'),
       
-      // Límites
+      // LÃ­mites
       'distancia_minima': TextEditingController(text: config['distancia_minima']?.toString() ?? '0'),
       'distancia_maxima': TextEditingController(text: config['distancia_maxima']?.toString() ?? '0'),
       
@@ -614,7 +614,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
       addField('comision_plataforma', 'comision_plataforma');
       addField('comision_metodo_pago', 'comision_metodo_pago');
 
-      // Límites
+      // LÃ­mites
       addField('distancia_minima', 'distancia_minima');
       addField('distancia_maxima', 'distancia_maxima');
 
@@ -644,7 +644,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
           if (data['success'] == true) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Configuración actualizada exitosamente'),
+                content: const Text('ConfiguraciÃ³n actualizada exitosamente'),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -658,7 +658,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
           _showError('Error del servidor: ${response.statusCode}');
         }
       } on TimeoutException {
-        _showError('Tiempo de espera agotado. Verifica la conexión al servidor.');
+        _showError('Tiempo de espera agotado. Verifica la conexiÃ³n al servidor.');
       } catch (e) {
         _showError('Error: $e');
       } finally {
@@ -777,8 +777,8 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                       children: [
                         _buildFormSectionTitle('Tarifas Base', Icons.attach_money_rounded),
                         _buildTextField('Tarifa Base (\$)', widget.controllers['tarifa_base']!),
-                        _buildTextField('Tarifa Mínima (\$)', widget.controllers['tarifa_minima']!),
-                        _buildTextField('Tarifa Máxima (\$) - Opcional', widget.controllers['tarifa_maxima']!, optional: true),
+                        _buildTextField('Tarifa MÃ­nima (\$)', widget.controllers['tarifa_minima']!),
+                        _buildTextField('Tarifa MÃ¡xima (\$) - Opcional', widget.controllers['tarifa_maxima']!, optional: true),
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('Costos por Distancia y Tiempo', Icons.straighten_rounded),
@@ -798,13 +798,13 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('Comisiones (%)', Icons.credit_card_rounded),
-                        _buildTextField('Comisión Plataforma (%)', widget.controllers['comision_plataforma']!),
-                        _buildTextField('Comisión Método Pago (%)', widget.controllers['comision_metodo_pago']!),
+                        _buildTextField('ComisiÃ³n Plataforma (%)', widget.controllers['comision_plataforma']!),
+                        _buildTextField('ComisiÃ³n MÃ©todo Pago (%)', widget.controllers['comision_metodo_pago']!),
                         
                         const SizedBox(height: 24),
-                        _buildFormSectionTitle('Límites de Distancia', Icons.route_rounded),
-                        _buildTextField('Distancia Mínima (km)', widget.controllers['distancia_minima']!),
-                        _buildTextField('Distancia Máxima (km)', widget.controllers['distancia_maxima']!),
+                        _buildFormSectionTitle('LÃ­mites de Distancia', Icons.route_rounded),
+                        _buildTextField('Distancia MÃ­nima (km)', widget.controllers['distancia_minima']!),
+                        _buildTextField('Distancia MÃ¡xima (km)', widget.controllers['distancia_maxima']!),
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('Tiempo de Espera', Icons.timer_rounded),

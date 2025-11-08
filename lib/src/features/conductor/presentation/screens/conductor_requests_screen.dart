@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -83,7 +83,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
         if (data['success'] == true && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('¡Viaje aceptado! Dirígete al punto de origen'),
+              content: Text('Â¡Viaje aceptado! DirÃ­gete al punto de origen'),
               backgroundColor: Colors.green,
             ),
           );
@@ -188,7 +188,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
           ),
           const SizedBox(height: 8),
           Text(
-            'Las solicitudes de viaje aparecerán aquí',
+            'Las solicitudes de viaje aparecerÃ¡n aquÃ­',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 14,
@@ -217,7 +217,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
       ),
       child: Column(
         children: [
-          // Header con información del usuario
+          // Header con informaciÃ³n del usuario
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -316,7 +316,7 @@ class _ConductorRequestsScreenState extends State<ConductorRequestsScreen> with 
                 ),
                 const SizedBox(height: 16),
 
-                // Botón de aceptar
+                // BotÃ³n de aceptar
                 SizedBox(
                   width: double.infinity,
                   height: 50,

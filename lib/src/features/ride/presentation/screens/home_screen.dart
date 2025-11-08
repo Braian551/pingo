@@ -1,4 +1,4 @@
-// lib/src/features/ride/presentation/screens/home_screen.dart
+﻿// lib/src/features/ride/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -83,7 +83,7 @@ class TransportScreen extends StatelessWidget {
           children: [
             // Saludo
             const Text(
-              '¡Hola! ¿A dónde vamos?',
+              'Â¡Hola! Â¿A dÃ³nde vamos?',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -110,10 +110,10 @@ class TransportScreen extends StatelessWidget {
                 Expanded(
                   child: _ServiceCard(
                     icon: Icons.local_shipping,
-                    title: 'Envío',
-                    subtitle: 'Envía paquetes',
+                    title: 'EnvÃ­o',
+                    subtitle: 'EnvÃ­a paquetes',
                     onTap: () {
-                      // Navegar a solicitud de envío
+                      // Navegar a solicitud de envÃ­o
                     },
                   ),
                 ),
@@ -122,7 +122,7 @@ class TransportScreen extends StatelessWidget {
             
             const SizedBox(height: 30),
             
-            // Ubicación actual
+            // UbicaciÃ³n actual
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -139,7 +139,7 @@ class TransportScreen extends StatelessWidget {
                       Icon(Icons.location_on, color: Color(0xFFFFFF00), size: 24),
                       SizedBox(width: 12),
                       Text(
-                        'Ubicación actual',
+                        'UbicaciÃ³n actual',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -150,7 +150,7 @@ class TransportScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Calle 123 #45-67, Bogotá, Colombia',
+                    'Calle 123 #45-67, BogotÃ¡, Colombia',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -161,10 +161,10 @@ class TransportScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Actualizar ubicación
+                        // Actualizar ubicaciÃ³n
                       },
                       icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('Actualizar ubicación'),
+                      label: const Text('Actualizar ubicaciÃ³n'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFFF00),
                         foregroundColor: Colors.black,
@@ -192,7 +192,7 @@ class TransportScreen extends StatelessWidget {
             
             const SizedBox(height: 16),
             
-            // Lista de viajes recientes (vacía por ahora)
+            // Lista de viajes recientes (vacÃ­a por ahora)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),

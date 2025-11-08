@@ -1,10 +1,10 @@
-import 'failures.dart';
+﻿import 'failures.dart';
 
 /// Tipo Result para manejo funcional de errores sin dependencias externas
 /// 
-/// Inspirado en el patrón Either de programación funcional:
-/// - Success<T>: Operación exitosa con resultado de tipo T
-/// - Error: Operación fallida con un Failure
+/// Inspirado en el patrÃ³n Either de programaciÃ³n funcional:
+/// - Success<T>: OperaciÃ³n exitosa con resultado de tipo T
+/// - Error: OperaciÃ³n fallida con un Failure
 /// 
 /// USO:
 /// ```dart
@@ -15,13 +15,13 @@ import 'failures.dart';
 /// );
 /// ```
 /// 
-/// NOTA PARA MIGRACIÓN A MICROSERVICIOS:
-/// - Este patrón facilita el manejo de respuestas HTTP de APIs
+/// NOTA PARA MIGRACIÃ“N A MICROSERVICIOS:
+/// - Este patrÃ³n facilita el manejo de respuestas HTTP de APIs
 /// - Permite propagar errores sin excepciones
 sealed class Result<T> {
   const Result();
 
-  /// Ejecuta una función según el resultado
+  /// Ejecuta una funciÃ³n segÃºn el resultado
   R when<R>({
     required R Function(T data) success,
     required R Function(Failure failure) error,
@@ -33,7 +33,7 @@ sealed class Result<T> {
     }
   }
 
-  /// Ejecuta una función solo si es exitoso
+  /// Ejecuta una funciÃ³n solo si es exitoso
   Result<R> map<R>(R Function(T data) transform) {
     return when(
       success: (data) => Success(transform(data)),
@@ -41,7 +41,7 @@ sealed class Result<T> {
     );
   }
 
-  /// Ejecuta una función asíncrona solo si es exitoso
+  /// Ejecuta una funciÃ³n asÃ­ncrona solo si es exitoso
   Future<Result<R>> mapAsync<R>(Future<R> Function(T data) transform) async {
     return when(
       success: (data) async => Success(await transform(data)),

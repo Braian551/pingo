@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../../domain/entities/admin.dart';
 import '../../domain/usecases/get_system_stats.dart';
 import '../../domain/usecases/approve_driver.dart';
 import '../../domain/usecases/reject_driver.dart';
 
-/// Provider para gestionar el estado de administración
+/// Provider para gestionar el estado de administraciÃ³n
 class AdminProvider with ChangeNotifier {
   final GetSystemStats getSystemStatsUseCase;
   final ApproveDriver approveDriverUseCase;
@@ -26,7 +26,7 @@ class AdminProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  /// Cargar estadísticas
+  /// Cargar estadÃ­sticas
   Future<void> loadStats() async {
     _setLoading(true);
 

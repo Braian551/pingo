@@ -1,5 +1,5 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../repositories/admin_repository.dart';
 
 /// Use Case: Rechazar Conductor
@@ -10,7 +10,7 @@ class RejectDriver {
 
   Future<Result<void>> call(int conductorId, String motivo) async {
     if (conductorId <= 0) {
-      return Error(ValidationFailure('ID de conductor inválido'));
+      return Error(ValidationFailure('ID de conductor invÃ¡lido'));
     }
 
     if (motivo.trim().isEmpty) {

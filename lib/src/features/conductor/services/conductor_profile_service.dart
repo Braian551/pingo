@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/conductor_profile_model.dart';
@@ -6,10 +6,10 @@ import '../models/driver_license_model.dart';
 import '../models/vehicle_model.dart';
 import '../../../core/config/app_config.dart';
 
-/// Servicio para gestión de perfil de conductor
+/// Servicio para gestiÃ³n de perfil de conductor
 /// 
 /// NOTA: Este servicio es redundante con ConductorRemoteDataSource.
-/// Se mantiene por compatibilidad con código legacy.
+/// Se mantiene por compatibilidad con cÃ³digo legacy.
 class ConductorProfileService {
   /// URL base del microservicio de conductores
   static String get baseUrl => AppConfig.conductorServiceUrl;
@@ -61,7 +61,7 @@ class ConductorProfileService {
     }
   }
 
-  /// Registrar o actualizar licencia de conducción
+  /// Registrar o actualizar licencia de conducciÃ³n
   static Future<Map<String, dynamic>> updateLicense({
     required int conductorId,
     required DriverLicenseModel license,
@@ -91,7 +91,7 @@ class ConductorProfileService {
     }
   }
 
-  /// Registrar o actualizar vehículo
+  /// Registrar o actualizar vehÃ­culo
   static Future<Map<String, dynamic>> updateVehicle({
     required int conductorId,
     required VehicleModel vehicle,
@@ -116,7 +116,7 @@ class ConductorProfileService {
       }
       return {'success': false, 'message': 'Error del servidor'};
     } catch (e) {
-      print('Error actualizando vehículo: $e');
+      print('Error actualizando vehÃ­culo: $e');
       return {'success': false, 'message': e.toString()};
     }
   }
@@ -158,7 +158,7 @@ class ConductorProfileService {
     }
   }
 
-  /// Enviar perfil para verificación
+  /// Enviar perfil para verificaciÃ³n
   static Future<Map<String, dynamic>> submitForVerification(int conductorId) async {
     try {
       final response = await http.post(
@@ -179,12 +179,12 @@ class ConductorProfileService {
       }
       return {'success': false, 'message': 'Error del servidor'};
     } catch (e) {
-      print('Error enviando para verificación: $e');
+      print('Error enviando para verificaciÃ³n: $e');
       return {'success': false, 'message': e.toString()};
     }
   }
 
-  /// Obtener estado de verificación
+  /// Obtener estado de verificaciÃ³n
   static Future<Map<String, dynamic>> getVerificationStatus(int conductorId) async {
     try {
       final response = await http.get(
@@ -202,7 +202,7 @@ class ConductorProfileService {
       }
       return {'success': false};
     } catch (e) {
-      print('Error obteniendo estado de verificación: $e');
+      print('Error obteniendo estado de verificaciÃ³n: $e');
       return {'success': false};
     }
   }

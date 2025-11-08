@@ -1,10 +1,10 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../repositories/trip_repository.dart';
 
 /// Use Case: Calificar Conductor
 /// 
-/// Encapsula la lógica de negocio para que un usuario califique al conductor.
+/// Encapsula la lÃ³gica de negocio para que un usuario califique al conductor.
 class RateConductor {
   final TripRepository repository;
 
@@ -17,12 +17,12 @@ class RateConductor {
     String? comentario,
   }) async {
     if (tripId <= 0) {
-      return Error(ValidationFailure('ID de viaje inválido'));
+      return Error(ValidationFailure('ID de viaje invÃ¡lido'));
     }
 
     if (calificacion < 1 || calificacion > 5) {
       return Error(
-        ValidationFailure('La calificación debe estar entre 1 y 5'),
+        ValidationFailure('La calificaciÃ³n debe estar entre 1 y 5'),
       );
     }
 

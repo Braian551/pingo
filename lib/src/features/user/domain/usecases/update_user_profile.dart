@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/user_repository.dart';
 
 /// Use Case: Actualizar Perfil de Usuario
 /// 
-/// Encapsula la lógica de negocio para actualizar el perfil.
+/// Encapsula la lÃ³gica de negocio para actualizar el perfil.
 /// 
 /// RESPONSABILIDADES:
 /// - Validar datos de entrada
@@ -21,7 +21,7 @@ class UpdateUserProfile {
   /// [userId] ID del usuario (requerido)
   /// [nombre] Nuevo nombre (opcional)
   /// [apellido] Nuevo apellido (opcional)
-  /// [telefono] Nuevo teléfono (opcional)
+  /// [telefono] Nuevo telÃ©fono (opcional)
   /// 
   /// Al menos un campo debe ser proporcionado para actualizar
   Future<Result<User>> call({
@@ -30,12 +30,12 @@ class UpdateUserProfile {
     String? apellido,
     String? telefono,
   }) async {
-    // Validación: userId debe ser positivo
+    // ValidaciÃ³n: userId debe ser positivo
     if (userId <= 0) {
-      return Error(ValidationFailure('ID de usuario inválido'));
+      return Error(ValidationFailure('ID de usuario invÃ¡lido'));
     }
 
-    // Validación: al menos un campo debe ser proporcionado
+    // ValidaciÃ³n: al menos un campo debe ser proporcionado
     if (nombre == null && apellido == null && telefono == null) {
       return Error(
         ValidationFailure(
@@ -44,17 +44,17 @@ class UpdateUserProfile {
       );
     }
 
-    // Validar que los campos no estén vacíos si se proporcionan
+    // Validar que los campos no estÃ©n vacÃ­os si se proporcionan
     if (nombre != null && nombre.trim().isEmpty) {
-      return Error(ValidationFailure('El nombre no puede estar vacío'));
+      return Error(ValidationFailure('El nombre no puede estar vacÃ­o'));
     }
 
     if (apellido != null && apellido.trim().isEmpty) {
-      return Error(ValidationFailure('El apellido no puede estar vacío'));
+      return Error(ValidationFailure('El apellido no puede estar vacÃ­o'));
     }
 
     if (telefono != null && telefono.trim().isEmpty) {
-      return Error(ValidationFailure('El teléfono no puede estar vacío'));
+      return Error(ValidationFailure('El telÃ©fono no puede estar vacÃ­o'));
     }
 
     return await repository.updateProfile(

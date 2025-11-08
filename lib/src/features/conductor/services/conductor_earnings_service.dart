@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/config/app_config.dart';
 
@@ -28,7 +28,7 @@ class EarningsModel {
   }
 }
 
-/// Modelo para las ganancias por día
+/// Modelo para las ganancias por dÃ­a
 class EarningsDayModel {
   final String fecha;
   final double ganancias;
@@ -136,7 +136,7 @@ class ConductorEarningsService {
           promedioPorViaje: 0,
           desgloseDiario: [],
         ),
-        'message': 'Error de conexión: $e',
+        'message': 'Error de conexiÃ³n: $e',
       };
     }
   }

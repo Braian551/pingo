@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/nominatim_service.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:viax/src/global/services/nominatim_service.dart';
 import 'package:latlong2/latlong.dart';
 
-/// Script de prueba para verificar búsquedas en Nominatim
-/// Ejecuta este widget para probar diferentes búsquedas
+/// Script de prueba para verificar bÃºsquedas en Nominatim
+/// Ejecuta este widget para probar diferentes bÃºsquedas
 class NominatimTestScreen extends StatefulWidget {
   const NominatimTestScreen({super.key});
 
@@ -20,21 +20,21 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
   // Ubicaciones de prueba
   final Map<String, LatLng> _testLocations = {
     'San Gil, Santander': LatLng(6.5561, -73.1339),
-    'Medellín': LatLng(6.2442, -75.5812),
-    'Bogotá': LatLng(4.6097, -74.0817),
+    'MedellÃ­n': LatLng(6.2442, -75.5812),
+    'BogotÃ¡': LatLng(4.6097, -74.0817),
   };
 
   LatLng? _selectedProximity;
 
   final List<String> _testQueries = [
-    'Colegio La Primavera Medellín',
+    'Colegio La Primavera MedellÃ­n',
     'Parque El Gallineral',
     'Hospital San Gil',
-    'Plaza Botero Medellín',
-    'Parque Simón Bolívar',
+    'Plaza Botero MedellÃ­n',
+    'Parque SimÃ³n BolÃ­var',
     'Terminal de Transportes San Gil',
-    'Universidad Nacional Bogotá',
-    'Jardín Botánico Medellín',
+    'Universidad Nacional BogotÃ¡',
+    'JardÃ­n BotÃ¡nico MedellÃ­n',
   ];
 
   Future<void> _search() async {
@@ -98,7 +98,7 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Campo de búsqueda
+                // Campo de bÃºsqueda
                 Row(
                   children: [
                     Expanded(
@@ -150,7 +150,7 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Selector de ubicación de prueba
+                // Selector de ubicaciÃ³n de prueba
                 const Text(
                   'Proximidad (opcional):',
                   style: TextStyle(
@@ -183,9 +183,9 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Búsquedas rápidas
+                // BÃºsquedas rÃ¡pidas
                 const Text(
-                  'Búsquedas de prueba:',
+                  'BÃºsquedas de prueba:',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
@@ -262,7 +262,7 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'Realiza una búsqueda para probar',
+                                    'Realiza una bÃºsqueda para probar',
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.5),
                                       fontSize: 16,
@@ -352,18 +352,18 @@ class _NominatimTestScreenState extends State<NominatimTestScreen> {
                                     Row(
                                       children: [
                                         _buildInfoChip(
-                                          '📍 ${result.lat.toStringAsFixed(4)}, ${result.lon.toStringAsFixed(4)}',
+                                          'ðŸ“ ${result.lat.toStringAsFixed(4)}, ${result.lon.toStringAsFixed(4)}',
                                         ),
                                         if (result.type != null) ...[
                                           const SizedBox(width: 8),
-                                          _buildInfoChip('🏷️ ${result.type}'),
+                                          _buildInfoChip('ðŸ·ï¸ ${result.type}'),
                                         ],
                                       ],
                                     ),
                                     if (result.getCity() != null) ...[
                                       const SizedBox(height: 8),
                                       _buildInfoChip(
-                                        '🏙️ ${result.getCity()}',
+                                        'ðŸ™ï¸ ${result.getCity()}',
                                       ),
                                     ],
                                   ],

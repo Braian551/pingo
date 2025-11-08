@@ -1,6 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/routes/route_names.dart';
 
 class AdminManagementTab extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -32,7 +32,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
         children: [
           const SizedBox(height: 20),
           const Text(
-            'Gestión del sistema',
+            'GestiÃ³n del sistema',
             style: TextStyle(
               color: Colors.white,
               fontSize: 28,
@@ -53,7 +53,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
             title: 'Usuarios',
             items: [
               _ManagementItem(
-                title: 'Gestión de Usuarios',
+                title: 'GestiÃ³n de Usuarios',
                 subtitle: 'Ver, editar y administrar todos los usuarios',
                 icon: Icons.people_outline_rounded,
                 accentColor: const Color(0xFF667eea),
@@ -80,7 +80,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
               ),
               _ManagementItem(
                 title: 'Conductores',
-                subtitle: 'Administrar conductores y sus vehículos',
+                subtitle: 'Administrar conductores y sus vehÃ­culos',
                 icon: Icons.drive_eta_rounded,
                 accentColor: const Color(0xFF11998e),
                 onTap: () {
@@ -116,10 +116,10 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           ),
           const SizedBox(height: 24),
           _buildSection(
-            title: 'Reportes y Auditoría',
+            title: 'Reportes y AuditorÃ­a',
             items: [
               _ManagementItem(
-                title: 'Logs de Auditoría',
+                title: 'Logs de AuditorÃ­a',
                 subtitle: 'Historial completo de acciones del sistema',
                 icon: Icons.history_rounded,
                 accentColor: const Color(0xFFf093fb),
@@ -153,11 +153,11 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           ),
           const SizedBox(height: 24),
           _buildSection(
-            title: 'Configuración',
+            title: 'ConfiguraciÃ³n',
             items: [
               _ManagementItem(
                 title: 'Ajustes Generales',
-                subtitle: 'Configuración de la aplicación',
+                subtitle: 'ConfiguraciÃ³n de la aplicaciÃ³n',
                 icon: Icons.settings_rounded,
                 accentColor: const Color(0xFF667eea),
                 onTap: () {
@@ -310,7 +310,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Función en desarrollo'),
+        content: const Text('FunciÃ³n en desarrollo'),
         backgroundColor: const Color(0xFF1A1A1A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

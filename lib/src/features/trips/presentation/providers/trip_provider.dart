@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../../domain/entities/trip.dart';
 import '../../domain/usecases/create_trip.dart';
 import '../../domain/usecases/accept_trip.dart';

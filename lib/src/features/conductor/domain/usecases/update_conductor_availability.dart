@@ -1,10 +1,10 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../repositories/conductor_repository.dart';
 
 /// Use Case: Actualizar Disponibilidad del Conductor
 /// 
-/// Encapsula la lógica de negocio para cambiar disponibilidad.
+/// Encapsula la lÃ³gica de negocio para cambiar disponibilidad.
 class UpdateConductorAvailability {
   final ConductorRepository repository;
 
@@ -19,7 +19,7 @@ class UpdateConductorAvailability {
     required bool disponible,
   }) async {
     if (conductorId <= 0) {
-      return Error(ValidationFailure('ID de conductor inválido'));
+      return Error(ValidationFailure('ID de conductor invÃ¡lido'));
     }
 
     return await repository.updateAvailability(

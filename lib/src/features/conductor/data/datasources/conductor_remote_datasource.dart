@@ -1,12 +1,12 @@
-/// Fuente de datos abstracta para operaciones con la API del conductor
+﻿/// Fuente de datos abstracta para operaciones con la API del conductor
 /// 
 /// Define el contrato para comunicarse con el backend (API REST).
-/// Puede tener múltiples implementaciones:
-/// - ConductorRemoteDataSourceImpl: Implementación real con HTTP
+/// Puede tener mÃºltiples implementaciones:
+/// - ConductorRemoteDataSourceImpl: ImplementaciÃ³n real con HTTP
 /// - ConductorRemoteDataSourceMock: Mock para testing
 /// 
-/// NOTA PARA MIGRACIÓN A MICROSERVICIOS:
-/// - Esta interfaz representa la comunicación con un microservicio específico
+/// NOTA PARA MIGRACIÃ“N A MICROSERVICIOS:
+/// - Esta interfaz representa la comunicaciÃ³n con un microservicio especÃ­fico
 /// - Cuando migres a microservicios, solo cambias la URL base
 /// - Ejemplo: http://localhost:8080/conductor-service/api/v1/profile
 abstract class ConductorRemoteDataSource {
@@ -25,22 +25,22 @@ abstract class ConductorRemoteDataSource {
     Map<String, dynamic> licenseData,
   );
 
-  /// Actualiza el vehículo en la API
+  /// Actualiza el vehÃ­culo en la API
   Future<Map<String, dynamic>> updateVehicle(
     int conductorId,
     Map<String, dynamic> vehicleData,
   );
 
-  /// Envía el perfil para aprobación
+  /// EnvÃ­a el perfil para aprobaciÃ³n
   Future<Map<String, dynamic>> submitForApproval(int conductorId);
 
-  /// Obtiene el estado de verificación
+  /// Obtiene el estado de verificaciÃ³n
   Future<Map<String, dynamic>> getVerificationStatus(int conductorId);
 
-  /// Obtiene estadísticas del conductor
+  /// Obtiene estadÃ­sticas del conductor
   Future<Map<String, dynamic>> getStatistics(int conductorId);
 
-  /// Obtiene ganancias por período
+  /// Obtiene ganancias por perÃ­odo
   Future<Map<String, dynamic>> getEarnings(int conductorId, String periodo);
 
   /// Obtiene historial de viajes
@@ -52,6 +52,6 @@ abstract class ConductorRemoteDataSource {
   /// Actualiza disponibilidad
   Future<void> updateAvailability(int conductorId, bool disponible);
 
-  /// Actualiza ubicación en tiempo real
+  /// Actualiza ubicaciÃ³n en tiempo real
   Future<void> updateLocation(int conductorId, double latitud, double longitud);
 }

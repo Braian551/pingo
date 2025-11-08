@@ -1,8 +1,8 @@
-// lib/src/features/auth/presentation/screens/welcome_screen.dart
+﻿// lib/src/features/auth/presentation/screens/welcome_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/routes/route_names.dart';
-import 'package:ping_go/src/widgets/entrance_fader.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
+import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/widgets/entrance_fader.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -95,7 +95,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Movilidad y entregas rápidas a tu alcance',
+                    'Movilidad y entregas rÃ¡pidas a tu alcance',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -108,7 +108,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               
               SizedBox(height: size.height * 0.07),
               
-              // Botones de autenticación
+              // Botones de autenticaciÃ³n
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
@@ -155,14 +155,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     const SizedBox(height: 14),
                     
-                    // Iniciar con teléfono
+                    // Iniciar con telÃ©fono
                     _buildSocialButton(
                       icon: const Icon(
                         Icons.phone_iphone_outlined,
                         color: Colors.black,
                         size: 24,
                       ),
-                      text: 'Continuar con teléfono',
+                      text: 'Continuar con telÃ©fono',
                       backgroundColor: const Color(0xFFFFFF00),
                       textColor: Colors.black,
                       onPressed: () {
@@ -190,7 +190,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     const SizedBox(height: 28),
                     
-                    // Términos y condiciones
+                    // TÃ©rminos y condiciones
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: RichText(
@@ -204,7 +204,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Términos de Servicio',
+                              text: 'TÃ©rminos de Servicio',
                               style: TextStyle(
                                 color: const Color(0xFFFFFF00).withOpacity(0.8),
                                 decoration: TextDecoration.underline,
@@ -212,7 +212,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                             const TextSpan(text: ' y '),
                             TextSpan(
-                              text: 'Política de Privacidad',
+                              text: 'PolÃ­tica de Privacidad',
                               style: TextStyle(
                                 color: const Color(0xFFFFFF00).withOpacity(0.8),
                                 decoration: TextDecoration.underline,

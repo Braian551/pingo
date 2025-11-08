@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../global/services/mapbox_service.dart';
@@ -19,7 +19,7 @@ class SimpleLocation {
   LatLng toLatLng() => LatLng(latitude, longitude);
 }
 
-/// Pantalla de selección de destino - Primera pantalla del flujo
+/// Pantalla de selecciÃ³n de destino - Primera pantalla del flujo
 /// Similar a DiDi: permite seleccionar origen y destino antes de ver el mapa
 class SelectDestinationScreen extends StatefulWidget {
   const SelectDestinationScreen({super.key});
@@ -47,21 +47,21 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
       'type': 'moto',
       'name': 'Moto',
       'icon': Icons.two_wheeler,
-      'description': 'Rápido y económico',
+      'description': 'RÃ¡pido y econÃ³mico',
       'capacity': '1 pasajero',
     },
     {
       'type': 'carro',
       'name': 'Carro',
       'icon': Icons.directions_car,
-      'description': 'Cómodo y espacioso',
+      'description': 'CÃ³modo y espacioso',
       'capacity': '4 pasajeros',
     },
     {
       'type': 'moto_carga',
       'name': 'Moto Carga',
       'icon': Icons.delivery_dining,
-      'description': 'Para paquetes pequeños',
+      'description': 'Para paquetes pequeÃ±os',
       'capacity': 'Hasta 20kg',
     },
     {
@@ -95,11 +95,11 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception('Permisos de ubicación denegados');
+          throw Exception('Permisos de ubicaciÃ³n denegados');
         }
       }
       
-      // Obtener posición actual
+      // Obtener posiciÃ³n actual
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -109,7 +109,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
         position: LatLng(position.latitude, position.longitude),
       );
       
-      final address = place?.placeName ?? 'Ubicación actual';
+      final address = place?.placeName ?? 'UbicaciÃ³n actual';
       
       setState(() {
         _currentPosition = position;
@@ -125,7 +125,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
       setState(() => _isLoadingCurrentLocation = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al obtener ubicación: $e')),
+          SnackBar(content: Text('Error al obtener ubicaciÃ³n: $e')),
         );
       }
     }
@@ -189,7 +189,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error en búsqueda: $e')),
+          SnackBar(content: Text('Error en bÃºsqueda: $e')),
         );
       }
     } finally {
@@ -226,7 +226,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Selecciona una ubicación',
+                'Selecciona una ubicaciÃ³n',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -299,7 +299,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          '¿A dónde vamos?',
+          'Â¿A dÃ³nde vamos?',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
@@ -311,24 +311,24 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Sección de ubicaciones
+                  // SecciÃ³n de ubicaciones
                   _buildLocationSection(),
                   
                   const SizedBox(height: 32),
                   
-                  // Sección de tipo de vehículo
+                  // SecciÃ³n de tipo de vehÃ­culo
                   _buildVehicleTypeSection(),
                   
                   const SizedBox(height: 24),
                   
-                  // Información adicional
+                  // InformaciÃ³n adicional
                   _buildInfoCards(),
                 ],
               ),
             ),
           ),
           
-          // Botón de continuar
+          // BotÃ³n de continuar
           _buildContinueButton(),
         ],
       ),
@@ -415,7 +415,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
                   child: TextField(
                     controller: _destinationController,
                     decoration: InputDecoration(
-                      hintText: '¿A dónde vas?',
+                      hintText: 'Â¿A dÃ³nde vas?',
                       border: InputBorder.none,
                       suffixIcon: _isSearchingDestination
                           ? const SizedBox(
@@ -444,7 +444,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Selecciona tu vehículo',
+          'Selecciona tu vehÃ­culo',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -529,7 +529,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
         _buildInfoCard(
           icon: Icons.verified_user,
           title: 'Viaja seguro',
-          description: 'Todos nuestros conductores están verificados',
+          description: 'Todos nuestros conductores estÃ¡n verificados',
           color: Colors.green,
         ),
         const SizedBox(height: 12),
@@ -630,7 +630,7 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
               elevation: 0,
             ),
             child: Text(
-              'Ver Cotización',
+              'Ver CotizaciÃ³n',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

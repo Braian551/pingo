@@ -1,11 +1,11 @@
-import 'package:ping_go/src/core/error/result.dart';
-import 'package:ping_go/src/core/error/failures.dart';
+﻿import 'package:viax/src/core/error/result.dart';
+import 'package:viax/src/core/error/failures.dart';
 import '../entities/trip.dart';
 import '../repositories/trip_repository.dart';
 
 /// Use Case: Completar Viaje
 /// 
-/// Encapsula la lógica de negocio para finalizar un viaje.
+/// Encapsula la lÃ³gica de negocio para finalizar un viaje.
 class CompleteTrip {
   final TripRepository repository;
 
@@ -18,7 +18,7 @@ class CompleteTrip {
     double? distanciaReal,
   }) async {
     if (tripId <= 0) {
-      return Error(ValidationFailure('ID de viaje inválido'));
+      return Error(ValidationFailure('ID de viaje invÃ¡lido'));
     }
 
     if (precioFinal < 0) {

@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -11,9 +11,9 @@ import '../../services/trip_request_search_service.dart';
 import '../../services/conductor_service.dart';
 import 'conductor_active_trip_screen.dart';
 
-/// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
+/// Pantalla de bÃºsqueda de pasajeros (lÃ³gica Uber/DiDi)
 /// 
-/// Muestra el mapa con la ubicación del conductor y busca solicitudes cercanas
+/// Muestra el mapa con la ubicaciÃ³n del conductor y busca solicitudes cercanas
 /// Cuando encuentra solicitudes, muestra un panel para aceptar o rechazar
 class ConductorSearchingPassengersScreen extends StatefulWidget {
   final int conductorId;
@@ -43,7 +43,7 @@ class _ConductorSearchingPassengersScreenState
   List<Map<String, dynamic>> _pendingRequests = [];
   Map<String, dynamic>? _selectedRequest;
   
-  // IDs de solicitudes ya mostradas para evitar reproducir sonido múltiples veces
+  // IDs de solicitudes ya mostradas para evitar reproducir sonido mÃºltiples veces
   final Set<int> _notifiedRequestIds = {};
   
   String _searchMessage = 'Buscando solicitudes cercanas...';
@@ -108,7 +108,7 @@ class _ConductorSearchingPassengersScreenState
   }
 
   void _setupAnimations() {
-    // Animación de pulso para el marcador del conductor (más suave)
+    // AnimaciÃ³n de pulso para el marcador del conductor (mÃ¡s suave)
     _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -122,7 +122,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeInOut,
     ));
 
-    // Animación del panel de solicitud (más fluida)
+    // AnimaciÃ³n del panel de solicitud (mÃ¡s fluida)
     _requestPanelController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -144,7 +144,7 @@ class _ConductorSearchingPassengersScreenState
       curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
     ));
 
-    // Animación del botón de aceptar (efecto de pulso)
+    // AnimaciÃ³n del botÃ³n de aceptar (efecto de pulso)
     _acceptButtonController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -158,7 +158,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeInOut,
     ));
 
-    // Animación del panel superior (entrada)
+    // AnimaciÃ³n del panel superior (entrada)
     _topPanelController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -180,7 +180,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeOut,
     ));
 
-    // Iniciar animación del panel superior
+    // Iniciar animaciÃ³n del panel superior
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
         _topPanelController.forward();
@@ -204,18 +204,18 @@ class _ConductorSearchingPassengersScreenState
 
   Future<void> _startLocationTracking() async {
     try {
-      print('📍 Iniciando tracking de ubicación...');
+      print('ðŸ“ Iniciando tracking de ubicaciÃ³n...');
       
-      // Verificar si el servicio de ubicación está habilitado
+      // Verificar si el servicio de ubicaciÃ³n estÃ¡ habilitado
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('❌ Servicio de ubicación deshabilitado');
+        print('âŒ Servicio de ubicaciÃ³n deshabilitado');
         _showError('Por favor activa el GPS en tu dispositivo');
-        // Usar ubicación por defecto para pruebas
+        // Usar ubicaciÃ³n por defecto para pruebas
         setState(() {
-          _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
+          _currentLocation = const LatLng(4.6097, -74.0817); // BogotÃ¡
         });
-        // Mover mapa después de que se haya construido
+        // Mover mapa despuÃ©s de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -227,22 +227,22 @@ class _ConductorSearchingPassengersScreenState
 
       // Verificar permisos
       LocationPermission permission = await Geolocator.checkPermission();
-      print('📍 Permiso actual: $permission');
+      print('ðŸ“ Permiso actual: $permission');
       
       if (permission == LocationPermission.denied) {
-        print('📍 Solicitando permisos...');
+        print('ðŸ“ Solicitando permisos...');
         permission = await Geolocator.requestPermission();
-        print('📍 Permiso otorgado: $permission');
+        print('ðŸ“ Permiso otorgado: $permission');
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print('❌ Permisos denegados permanentemente');
-        _showError('Permisos de ubicación denegados. Habilítalos en configuración.');
-        // Usar ubicación por defecto
+        print('âŒ Permisos denegados permanentemente');
+        _showError('Permisos de ubicaciÃ³n denegados. HabilÃ­talos en configuraciÃ³n.');
+        // Usar ubicaciÃ³n por defecto
         setState(() {
           _currentLocation = const LatLng(4.6097, -74.0817);
         });
-        // Mover mapa después de que se haya construido
+        // Mover mapa despuÃ©s de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -253,13 +253,13 @@ class _ConductorSearchingPassengersScreenState
       }
 
       if (permission == LocationPermission.denied) {
-        print('❌ Permisos denegados');
-        _showError('Se necesitan permisos de ubicación');
-        // Usar ubicación por defecto
+        print('âŒ Permisos denegados');
+        _showError('Se necesitan permisos de ubicaciÃ³n');
+        // Usar ubicaciÃ³n por defecto
         setState(() {
           _currentLocation = const LatLng(4.6097, -74.0817);
         });
-        // Mover mapa después de que se haya construido
+        // Mover mapa despuÃ©s de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -269,27 +269,27 @@ class _ConductorSearchingPassengersScreenState
         return;
       }
 
-      print('✅ Obteniendo ubicación actual...');
-      // Obtener ubicación actual con timeout más largo para emuladores
+      print('âœ… Obteniendo ubicaciÃ³n actual...');
+      // Obtener ubicaciÃ³n actual con timeout mÃ¡s largo para emuladores
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 30), // Timeout más largo
+        timeLimit: const Duration(seconds: 30), // Timeout mÃ¡s largo
       );
 
-      print('✅ Ubicación obtenida: ${position.latitude}, ${position.longitude}');
+      print('âœ… UbicaciÃ³n obtenida: ${position.latitude}, ${position.longitude}');
       
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
       });
 
-      // Centrar mapa en ubicación actual después de que se haya construido
+      // Centrar mapa en ubicaciÃ³n actual despuÃ©s de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _mapController.move(_currentLocation!, 15);
         }
       });
 
-      // Escuchar cambios de ubicación
+      // Escuchar cambios de ubicaciÃ³n
       _positionStream = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -298,12 +298,12 @@ class _ConductorSearchingPassengersScreenState
         ),
       ).listen(
         (Position position) {
-          print('📍 Ubicación actualizada: ${position.latitude}, ${position.longitude}');
+          print('ðŸ“ UbicaciÃ³n actualizada: ${position.latitude}, ${position.longitude}');
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
           });
 
-          // Actualizar ubicación en el servidor
+          // Actualizar ubicaciÃ³n en el servidor
           TripRequestSearchService.updateLocation(
             conductorId: widget.conductorId,
             latitude: position.latitude,
@@ -311,17 +311,17 @@ class _ConductorSearchingPassengersScreenState
           );
         },
         onError: (error) {
-          print('❌ Error en stream de ubicación: $error');
+          print('âŒ Error en stream de ubicaciÃ³n: $error');
         },
       );
     } catch (e) {
-      print('❌ Error crítico obteniendo ubicación: $e');
-      _showError('Error obteniendo ubicación. Usando ubicación de prueba.');
-      // Usar ubicación por defecto para que la app siga funcionando
+      print('âŒ Error crÃ­tico obteniendo ubicaciÃ³n: $e');
+      _showError('Error obteniendo ubicaciÃ³n. Usando ubicaciÃ³n de prueba.');
+      // Usar ubicaciÃ³n por defecto para que la app siga funcionando
       setState(() {
-        _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
+        _currentLocation = const LatLng(4.6097, -74.0817); // BogotÃ¡
       });
-      // Mover mapa después de que se haya construido
+      // Mover mapa despuÃ©s de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _mapController.move(_currentLocation!, 15);
@@ -333,13 +333,13 @@ class _ConductorSearchingPassengersScreenState
 
   Future<void> _startSearching() async {
     if (_currentLocation == null) {
-      print('⚠️ Ubicación aún no disponible, reintentando en 1 segundo...');
+      print('âš ï¸ UbicaciÃ³n aÃºn no disponible, reintentando en 1 segundo...');
       Future.delayed(const Duration(seconds: 1), _startSearching);
       return;
     }
 
-    print('🔍 Iniciando búsqueda de solicitudes...');
-    print('📍 Ubicación: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+    print('ðŸ” Iniciando bÃºsqueda de solicitudes...');
+    print('ðŸ“ UbicaciÃ³n: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
     
     // Activar disponibilidad del conductor primero
     try {
@@ -347,9 +347,9 @@ class _ConductorSearchingPassengersScreenState
         conductorId: widget.conductorId,
         disponible: true,
       );
-      print('✅ Disponibilidad activada');
+      print('âœ… Disponibilidad activada');
     } catch (e) {
-      print('❌ Error activando disponibilidad: $e');
+      print('âŒ Error activando disponibilidad: $e');
     }
     
     TripRequestSearchService.startSearching(
@@ -359,7 +359,7 @@ class _ConductorSearchingPassengersScreenState
       onRequestsFound: (requests) {
         if (!mounted) return;
         
-        print('✅ [DEBUG] Solicitudes encontradas: ${requests.length}');
+        print('âœ… [DEBUG] Solicitudes encontradas: ${requests.length}');
         
         setState(() {
           _pendingRequests = requests;
@@ -376,13 +376,13 @@ class _ConductorSearchingPassengersScreenState
             
             // Mostrar la primera solicitud si no hay una seleccionada
             if (_selectedRequest == null && !_showingRequest) {
-              print('🎯 [DEBUG] Mostrando nueva solicitud al conductor');
+              print('ðŸŽ¯ [DEBUG] Mostrando nueva solicitud al conductor');
               _selectedRequest = requests.first;
               _showingRequest = true;
               _panelExpanded = false;
               _requestPanelController.forward();
               
-              // Ajustar cámara para mostrar conductor y cliente
+              // Ajustar cÃ¡mara para mostrar conductor y cliente
               if (_currentLocation != null) {
                 final origin = LatLng(
                   double.parse(requests.first['latitud_origen'].toString()),
@@ -393,7 +393,7 @@ class _ConductorSearchingPassengersScreenState
                 final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
                 final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
                 
-                // Validar que los bounds tengan área suficiente (no sean un solo punto)
+                // Validar que los bounds tengan Ã¡rea suficiente (no sean un solo punto)
                 final latDiff = (maxLat - minLat).abs();
                 final lngDiff = (maxLng - minLng).abs();
                 
@@ -407,20 +407,20 @@ class _ConductorSearchingPassengersScreenState
                     ),
                   );
                 } else {
-                  // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
+                  // Si estÃ¡n muy cerca, solo centrarse en el punto origen con zoom fijo
                   _mapController.move(origin, 15);
                 }
               }
               
-              // 🔊 Reproducir sonido de notificación si es una solicitud nueva
+              // ðŸ”Š Reproducir sonido de notificaciÃ³n si es una solicitud nueva
               final requestId = requests.first['id'] as int;
-              print('🔊 [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
+              print('ðŸ”Š [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
               if (!_notifiedRequestIds.contains(requestId)) {
                 _notifiedRequestIds.add(requestId);
-                print('🔊 [DEBUG] Reproduciendo sonido para solicitud #$requestId');
+                print('ðŸ”Š [DEBUG] Reproduciendo sonido para solicitud #$requestId');
                 SoundService.playRequestNotification();
               } else {
-                print('🔊 [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
+                print('ðŸ”Š [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
               }
               
               // Iniciar temporizador de auto-rechazo
@@ -430,7 +430,7 @@ class _ConductorSearchingPassengersScreenState
               _autoRejectTimer?.cancel();
               _autoRejectTimer = Timer(const Duration(seconds: 30), () {
                 if (mounted && _selectedRequest != null) {
-                  print('⏰ [DEBUG] Auto-rechazando solicitud por timeout');
+                  print('â° [DEBUG] Auto-rechazando solicitud por timeout');
                   _rejectRequest();
                 }
               });
@@ -440,7 +440,7 @@ class _ConductorSearchingPassengersScreenState
       },
       onError: (error) {
         if (!mounted) return;
-        print('❌ Error en búsqueda: $error');
+        print('âŒ Error en bÃºsqueda: $error');
         _showError(error);
       },
     );
@@ -472,7 +472,7 @@ class _ConductorSearchingPassengersScreenState
     // Detener el loop de sonido continuo
     SoundService.stopSound();
     
-    // 🔊 Reproducir sonido de confirmación
+    // ðŸ”Š Reproducir sonido de confirmaciÃ³n
     SoundService.playAcceptSound();
 
     // Mostrar loading
@@ -493,19 +493,19 @@ class _ConductorSearchingPassengersScreenState
     Navigator.pop(context); // Cerrar loading
 
     if (result['success'] == true) {
-      // Detener búsqueda
+      // Detener bÃºsqueda
       _stopSearching();
       
-      // Mostrar éxito y navegar a pantalla de viaje activo
+      // Mostrar Ã©xito y navegar a pantalla de viaje activo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('¡Viaje aceptado! Dirígete al punto de recogida'),
+          content: Text('Â¡Viaje aceptado! DirÃ­gete al punto de recogida'),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ),
       );
       
-      // Navegar a la pantalla de navegación activa (ruta)
+      // Navegar a la pantalla de navegaciÃ³n activa (ruta)
       final origenLat = double.tryParse(_selectedRequest!['latitud_origen']?.toString() ?? '0') ?? 0;
       final origenLng = double.tryParse(_selectedRequest!['longitud_origen']?.toString() ?? '0') ?? 0;
       final destinoLat = double.tryParse(_selectedRequest!['latitud_destino']?.toString() ?? '0') ?? 0;
@@ -544,13 +544,13 @@ class _ConductorSearchingPassengersScreenState
     _autoRejectTimer?.cancel();
     _timerController.stop();
     
-    // Detener cualquier sonido que se esté reproduciendo
+    // Detener cualquier sonido que se estÃ© reproduciendo
     SoundService.stopSound();
 
     final result = await TripRequestSearchService.rejectRequest(
       solicitudId: _selectedRequest!['id'],
       conductorId: widget.conductorId,
-      motivo: 'Conductor rechazó',
+      motivo: 'Conductor rechazÃ³',
     );
 
     if (!mounted) return;
@@ -589,7 +589,7 @@ class _ConductorSearchingPassengersScreenState
           // Mapa
           _buildMap(),
           
-          // Panel superior con estado (solo cuando está buscando sin solicitudes)
+          // Panel superior con estado (solo cuando estÃ¡ buscando sin solicitudes)
           if (_pendingRequests.isEmpty) _buildTopPanel(),
           
           // Panel inferior con solicitud (si hay)
@@ -671,7 +671,7 @@ class _ConductorSearchingPassengersScreenState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Ícono
+                // Ãcono
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -685,9 +685,9 @@ class _ConductorSearchingPassengersScreenState
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Título
+                // TÃ­tulo
                 const Text(
-                  '¿Salir del modo en línea?',
+                  'Â¿Salir del modo en lÃ­nea?',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -697,9 +697,9 @@ class _ConductorSearchingPassengersScreenState
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Descripción
+                // DescripciÃ³n
                 Text(
-                  'Dejarás de recibir solicitudes de viaje hasta que vuelvas a conectarte',
+                  'DejarÃ¡s de recibir solicitudes de viaje hasta que vuelvas a conectarte',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 14,
@@ -756,7 +756,7 @@ class _ConductorSearchingPassengersScreenState
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Cerrar diálogo
+                            Navigator.pop(context); // Cerrar diÃ¡logo
                             Navigator.pop(context, false); // Salir de la pantalla
                           },
                           style: ElevatedButton.styleFrom(
@@ -861,7 +861,7 @@ class _ConductorSearchingPassengersScreenState
                           ],
                         ),
                       ),
-                      // Círculo principal con borde
+                      // CÃ­rculo principal con borde
                       Container(
                         width: 48,
                         height: 48,
@@ -874,7 +874,7 @@ class _ConductorSearchingPassengersScreenState
                           ),
                         ),
                       ),
-                      // Ícono del conductor
+                      // Ãcono del conductor
                       Container(
                         width: 48,
                         height: 48,
@@ -895,7 +895,7 @@ class _ConductorSearchingPassengersScreenState
           ],
         ),
         
-        // Marcadores de solicitudes pendientes con animación mejorada
+        // Marcadores de solicitudes pendientes con animaciÃ³n mejorada
         if (_pendingRequests.isNotEmpty)
           MarkerLayer(
             markers: _pendingRequests.map((request) {
@@ -927,7 +927,7 @@ class _ConductorSearchingPassengersScreenState
                         }
                       });
 
-                      // Ajustar cámara para mostrar conductor y cliente
+                      // Ajustar cÃ¡mara para mostrar conductor y cliente
                       if (_currentLocation != null) {
                         final origin = LatLng(
                           double.parse(request['latitud_origen'].toString()),
@@ -938,7 +938,7 @@ class _ConductorSearchingPassengersScreenState
                         final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
                         final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
                         
-                        // Validar que los bounds tengan área suficiente (no sean un solo punto)
+                        // Validar que los bounds tengan Ã¡rea suficiente (no sean un solo punto)
                         final latDiff = (maxLat - minLat).abs();
                         final lngDiff = (maxLng - minLng).abs();
                         
@@ -952,7 +952,7 @@ class _ConductorSearchingPassengersScreenState
                             ),
                           );
                         } else {
-                          // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
+                          // Si estÃ¡n muy cerca, solo centrarse en el punto origen con zoom fijo
                           _mapController.move(origin, 15);
                         }
                       }
@@ -960,7 +960,7 @@ class _ConductorSearchingPassengersScreenState
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Pulso de fondo si está seleccionado
+                        // Pulso de fondo si estÃ¡ seleccionado
                         if (isSelected)
                           AnimatedBuilder(
                             animation: _pulseAnimation,
@@ -1098,7 +1098,7 @@ class _ConductorSearchingPassengersScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                '🟢 En línea',
+                                'ðŸŸ¢ En lÃ­nea',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -1128,7 +1128,7 @@ class _ConductorSearchingPassengersScreenState
                             ],
                           ),
                         ),
-                        // Indicador de búsqueda
+                        // Indicador de bÃºsqueda
                         if (_pendingRequests.isEmpty)
                           SizedBox(
                             width: 24,
@@ -1140,17 +1140,17 @@ class _ConductorSearchingPassengersScreenState
                               ),
                             ),
                           ),
-                        // 🔊 BOTÓN DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
+                        // ðŸ”Š BOTÃ“N DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
                         if (_pendingRequests.isEmpty)
                           Padding(
                             padding: const EdgeInsets.only(left: 12),
                             child: GestureDetector(
                               onTap: () {
-                                print('🧪 Probando sonido de notificación...');
+                                print('ðŸ§ª Probando sonido de notificaciÃ³n...');
                                 SoundService.playRequestNotification();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('🔊 Reproduciendo sonido de prueba'),
+                                    content: Text('ðŸ”Š Reproduciendo sonido de prueba'),
                                     backgroundColor: Colors.blue,
                                     duration: Duration(seconds: 2),
                                   ),
@@ -1307,7 +1307,7 @@ class _ConductorSearchingPassengersScreenState
                           ),
                         ),
                         
-                        // Contenido contraído (SIEMPRE VISIBLE)
+                        // Contenido contraÃ­do (SIEMPRE VISIBLE)
                         AnimatedOpacity(
                           duration: const Duration(milliseconds: 300),
                           opacity: 1.0,
@@ -1365,7 +1365,7 @@ class _ConductorSearchingPassengersScreenState
                                         ),
                                       ],
                                     ),
-                                    // Info rápida: distancia y tiempo
+                                    // Info rÃ¡pida: distancia y tiempo
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
@@ -1413,10 +1413,10 @@ class _ConductorSearchingPassengersScreenState
                               ),
                               const SizedBox(height: 16),
                               
-                              // Botones de acción (siempre visibles)
+                              // Botones de acciÃ³n (siempre visibles)
                               Row(
                                 children: [
-                                  // Botón de rechazar compacto
+                                  // BotÃ³n de rechazar compacto
                                   Container(
                                     width: 56,
                                     height: 56,
@@ -1442,7 +1442,7 @@ class _ConductorSearchingPassengersScreenState
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  // Botón de aceptar expandido con animación
+                                  // BotÃ³n de aceptar expandido con animaciÃ³n
                                   Expanded(
                                     child: AnimatedBuilder(
                                       animation: _acceptButtonScaleAnimation,
@@ -1527,7 +1527,7 @@ class _ConductorSearchingPassengersScreenState
                                 ),
                                 child: Row(
                                   children: [
-                                    // Tu ubicación (conductor)
+                                    // Tu ubicaciÃ³n (conductor)
                                     Expanded(
                                       child: Row(
                                         children: [
@@ -1549,7 +1549,7 @@ class _ConductorSearchingPassengersScreenState
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Tu ubicación',
+                                                  'Tu ubicaciÃ³n',
                                                   style: TextStyle(
                                                     color: Colors.white.withOpacity(0.6),
                                                     fontSize: 11,
@@ -1614,7 +1614,7 @@ class _ConductorSearchingPassengersScreenState
                                         ],
                                       ),
                                     ),
-                                    // Ubicación del cliente
+                                    // UbicaciÃ³n del cliente
                                     Expanded(
                                       child: Row(
                                         children: [
@@ -1645,7 +1645,7 @@ class _ConductorSearchingPassengersScreenState
                                                 ),
                                                 const SizedBox(height: 2),
                                                 Text(
-                                                  'Recoger aquí',
+                                                  'Recoger aquÃ­',
                                                   style: TextStyle(
                                                     color: Colors.white.withOpacity(0.9),
                                                     fontSize: 13,
@@ -1703,7 +1703,7 @@ class _ConductorSearchingPassengersScreenState
                                             children: [
                                               Text(
                                                 secondsLeft <= 10
-                                                    ? '⚠️ Solicitud expirando'
+                                                    ? 'âš ï¸ Solicitud expirando'
                                                     : 'Tiempo para responder',
                                                 style: TextStyle(
                                                   color: secondsLeft <= 10
@@ -1777,7 +1777,7 @@ class _ConductorSearchingPassengersScreenState
                                       icon: Icons.my_location,
                                       iconColor: const Color(0xFF4CAF50),
                                       label: 'Recoger en',
-                                      value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
+                                      value: _selectedRequest!['direccion_origen'] ?? 'Sin direcciÃ³n',
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1805,7 +1805,7 @@ class _ConductorSearchingPassengersScreenState
                                       icon: Icons.location_on,
                                       iconColor: const Color(0xFFFFD700),
                                       label: 'Dejar en',
-                                      value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
+                                      value: _selectedRequest!['direccion_destino'] ?? 'Sin direcciÃ³n',
                                     ),
                                   ],
                                 ),

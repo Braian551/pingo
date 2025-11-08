@@ -1,10 +1,10 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd pingo/backend && composer install --no-dev --optimize-autoloader"
+  "buildCommand": "cd backend && composer install --no-dev --optimize-autoloader"
   },
   "deploy": {
-    "startCommand": "cd pingo/backend && apache2-foreground",
+  "startCommand": "cd backend && apache2-foreground",
     "healthcheckPath": "/",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",

@@ -1,4 +1,4 @@
-// lib/src/widgets/dialogs/custom_dialog.dart
+﻿// lib/src/widgets/dialogs/custom_dialog.dart
 import 'package:flutter/material.dart';
 
 enum DialogType {
@@ -89,7 +89,7 @@ class CustomDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   
-                  // Título
+                  // TÃ­tulo
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
@@ -129,7 +129,7 @@ class CustomDialog extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
               child: Column(
                 children: [
-                  // Botón primario
+                  // BotÃ³n primario
                   if (primaryButtonText != null)
                     SizedBox(
                       width: double.infinity,
@@ -157,7 +157,7 @@ class CustomDialog extends StatelessWidget {
                       ),
                     ),
 
-                  // Botón secundario
+                  // BotÃ³n secundario
                   if (secondaryButtonText != null) ...[
                     const SizedBox(height: 12),
                     SizedBox(

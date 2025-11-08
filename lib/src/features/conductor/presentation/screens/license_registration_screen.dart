@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/driver_license_model.dart';
@@ -57,7 +57,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
     }
     // Las URLs relativas vienen como 'uploads/documentos/...'
     // Necesitamos construir la URL base sin el '/backend' del path
-    final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/pingo/backend', '');
+  final baseUrlWithoutPath = AppConfig.baseUrl.replaceAll('/viax/backend', '');
     return '$baseUrlWithoutPath/$relativeUrl';
   }
 
@@ -169,7 +169,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isEditing ? 'Actualizar Información' : 'Licencia de Conducción',
+                      isEditing ? 'Actualizar InformaciÃ³n' : 'Licencia de ConducciÃ³n',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -200,12 +200,12 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       children: [
         _buildTextField(
           controller: _licenseNumberController,
-          label: 'Número de Licencia',
+          label: 'NÃºmero de Licencia',
           hint: 'Ej: 12345678',
           icon: Icons.numbers_rounded,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Por favor ingresa el número de licencia';
+              return 'Por favor ingresa el nÃºmero de licencia';
             }
             return null;
           },
@@ -214,7 +214,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         _buildCategorySelector(),
         const SizedBox(height: 16),
         _buildDateField(
-          label: 'Fecha de Expedición',
+          label: 'Fecha de ExpediciÃ³n',
           selectedDate: _licenseExpedicion,
           onTap: () => _selectDate(context, isExpedicion: true),
         ),
@@ -274,7 +274,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
-                    'Tu licencia está vencida. Debes renovarla para poder recibir viajes.',
+                    'Tu licencia estÃ¡ vencida. Debes renovarla para poder recibir viajes.',
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 13,
@@ -349,7 +349,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
             dropdownColor: const Color(0xFF1A1A1A),
             style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
-              labelText: 'Categor�a de Licencia',
+              labelText: 'Categorï¿½a de Licencia',
               labelStyle: TextStyle(color: Colors.white70),
               border: InputBorder.none,
               prefixIcon: Icon(Icons.category_rounded, color: Color(0xFFFFFF00)),
@@ -516,7 +516,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
     if (_licenseExpedicion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor selecciona la fecha de expedición'),
+          content: Text('Por favor selecciona la fecha de expediciÃ³n'),
           backgroundColor: Colors.red,
         ),
       );
@@ -558,7 +558,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
       return;
     }
 
-    // Subir la foto si existe (después de guardar los datos)
+    // Subir la foto si existe (despuÃ©s de guardar los datos)
     bool photoUploaded = true;
     if (_licenceFotoPath != null && !_isRemoteUrl(_licenceFotoPath!)) {
       // Solo subir si es un archivo local (no una URL remota existente)
@@ -572,7 +572,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Licencia guardada pero no se pudo subir la foto. Puedes intentar subirla después.'),
+              content: Text('Licencia guardada pero no se pudo subir la foto. Puedes intentar subirla despuÃ©s.'),
               backgroundColor: Colors.orange,
               duration: Duration(seconds: 4),
             ),
@@ -583,7 +583,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
 
     if (mounted) {
       if (success) {
-        // Solo mostrar éxito si no hubo problema con la foto o si no había foto
+        // Solo mostrar Ã©xito si no hubo problema con la foto o si no habÃ­a foto
         if (photoUploaded) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -595,24 +595,24 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
           );
         }
         
-        // Si es registro nuevo (no edición), verificar si falta el vehículo
+        // Si es registro nuevo (no ediciÃ³n), verificar si falta el vehÃ­culo
         if (!isEditing && provider.profile != null) {
           final hasVehicle = provider.profile!.vehiculo != null && 
                              provider.profile!.vehiculo!.isBasicComplete;
           
           if (!hasVehicle) {
-            // Mostrar diálogo para ir a registrar vehículo
+            // Mostrar diÃ¡logo para ir a registrar vehÃ­culo
             final goToVehicle = await showDialog<bool>(
               context: context,
               builder: (context) => _buildNavigationDialog(
                 icon: Icons.directions_car_rounded,
-                title: 'Registrar Vehículo',
-                message: '¡Licencia guardada! ¿Deseas continuar registrando tu vehículo ahora?',
+                title: 'Registrar VehÃ­culo',
+                message: 'Â¡Licencia guardada! Â¿Deseas continuar registrando tu vehÃ­culo ahora?',
               ),
             );
 
             if (goToVehicle == true && mounted) {
-              // Ir a la pantalla de registro de vehículo
+              // Ir a la pantalla de registro de vehÃ­culo
               final vehicleResult = await Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -621,7 +621,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
                   ),
                 ),
               );
-              // Si guardó el vehículo, retornar true
+              // Si guardÃ³ el vehÃ­culo, retornar true
               if (vehicleResult == true) {
                 return;
               }
@@ -702,7 +702,7 @@ class _LicenseRegistrationScreenState extends State<LicenseRegistrationScreen> {
                           ),
                         ),
                         child: const Text(
-                          'Después',
+                          'DespuÃ©s',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 15,

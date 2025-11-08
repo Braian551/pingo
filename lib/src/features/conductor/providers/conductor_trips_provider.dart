@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/conductor_trips_service.dart';
 
 class ConductorTripsProvider with ChangeNotifier {
@@ -48,7 +48,7 @@ class ConductorTripsProvider with ChangeNotifier {
         print('ConductorTripsProvider: Error loading trips - $_errorMessage');
       }
     } catch (e, stackTrace) {
-      _errorMessage = 'Error de conexión: $e';
+      _errorMessage = 'Error de conexiÃ³n: $e';
       _trips = [];
       _filteredTrips = [];
       print('ConductorTripsProvider: Exception in loadTrips: $e');
@@ -80,7 +80,7 @@ class ConductorTripsProvider with ChangeNotifier {
     }
   }
 
-  /// Cargar más viajes (paginación)
+  /// Cargar mÃ¡s viajes (paginaciÃ³n)
   Future<void> loadMoreTrips(int conductorId) async {
     if (_pagination != null && _pagination!.page < _pagination!.totalPages) {
       final nextPage = _pagination!.page + 1;

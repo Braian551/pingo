@@ -1,12 +1,12 @@
-import 'package:ping_go/src/core/error/result.dart';
+﻿import 'package:viax/src/core/error/result.dart';
 import '../entities/location.dart';
 
 /// Contrato abstracto del repositorio de mapas
 abstract class MapRepository {
-  /// Geocoding: Obtener coordenadas de una dirección
+  /// Geocoding: Obtener coordenadas de una direcciÃ³n
   Future<Result<Location>> geocodeAddress(String address);
 
-  /// Reverse Geocoding: Obtener dirección de coordenadas
+  /// Reverse Geocoding: Obtener direcciÃ³n de coordenadas
   Future<Result<Location>> reverseGeocode(double lat, double lng);
 
   /// Calcular ruta entre dos puntos

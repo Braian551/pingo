@@ -1,9 +1,9 @@
-// lib/src/widgets/dialogs/dialog_helper.dart
+﻿// lib/src/widgets/dialogs/dialog_helper.dart
 import 'package:flutter/material.dart';
 import 'custom_dialog.dart';
 
 class DialogHelper {
-  /// Muestra un diálogo de éxito
+  /// Muestra un diÃ¡logo de Ã©xito
   static Future<void> showSuccess(
     BuildContext context, {
     required String title,
@@ -26,7 +26,7 @@ class DialogHelper {
     );
   }
 
-  /// Muestra un diálogo de error
+  /// Muestra un diÃ¡logo de error
   static Future<void> showError(
     BuildContext context, {
     required String title,
@@ -49,7 +49,7 @@ class DialogHelper {
     );
   }
 
-  /// Muestra un diálogo de advertencia
+  /// Muestra un diÃ¡logo de advertencia
   static Future<void> showWarning(
     BuildContext context, {
     required String title,
@@ -76,7 +76,7 @@ class DialogHelper {
     );
   }
 
-  /// Muestra un diálogo informativo
+  /// Muestra un diÃ¡logo informativo
   static Future<void> showInfo(
     BuildContext context, {
     required String title,
@@ -103,7 +103,7 @@ class DialogHelper {
     );
   }
 
-  /// Muestra un diálogo de confirmación
+  /// Muestra un diÃ¡logo de confirmaciÃ³n
   static Future<bool?> showConfirmation(
     BuildContext context, {
     required String title,

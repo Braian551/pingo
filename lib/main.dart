@@ -1,19 +1,19 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ping_go/src/routes/app_router.dart';
-import 'package:ping_go/src/providers/database_provider.dart';
-import 'package:ping_go/src/features/conductor/providers/conductor_provider.dart';
-import 'package:ping_go/src/features/conductor/providers/conductor_profile_provider.dart';
-import 'package:ping_go/src/features/conductor/providers/conductor_trips_provider.dart';
-import 'package:ping_go/src/features/conductor/providers/conductor_earnings_provider.dart';
-import 'package:ping_go/src/core/di/service_locator.dart';
+import 'package:viax/src/routes/app_router.dart';
+import 'package:viax/src/providers/database_provider.dart';
+import 'package:viax/src/features/conductor/providers/conductor_provider.dart';
+import 'package:viax/src/features/conductor/providers/conductor_profile_provider.dart';
+import 'package:viax/src/features/conductor/providers/conductor_trips_provider.dart';
+import 'package:viax/src/features/conductor/providers/conductor_earnings_provider.dart';
+import 'package:viax/src/core/di/service_locator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
 
-  // Inicializar Service Locator (Inyección de Dependencias)
+  // Inicializar Service Locator (InyecciÃ³n de Dependencias)
   // Esto configura todos los datasources, repositories y use cases
   final serviceLocator = ServiceLocator();
   await serviceLocator.init();
@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
     }
 
     return MaterialApp(
-      title: 'Ping-Go',
+  title: 'Viax',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.yellow,

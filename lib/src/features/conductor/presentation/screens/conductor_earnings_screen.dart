@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -552,7 +552,7 @@ class _ConductorEarningsScreenState extends State<ConductorEarningsScreen> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Los fondos se transferirán a tu cuenta bancaria registrada.',
+                  'Los fondos se transferirÃ¡n a tu cuenta bancaria registrada.',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,

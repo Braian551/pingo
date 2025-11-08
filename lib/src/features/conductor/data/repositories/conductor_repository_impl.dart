@@ -1,4 +1,4 @@
-import '../../domain/entities/conductor_profile.dart';
+﻿import '../../domain/entities/conductor_profile.dart';
 import '../../domain/repositories/conductor_repository.dart';
 import '../../../../core/error/result.dart';
 import '../../../../core/error/failures.dart';
@@ -6,21 +6,21 @@ import '../../../../core/error/exceptions.dart';
 import '../datasources/conductor_remote_datasource.dart';
 import '../models/conductor_profile_model.dart';
 
-/// Implementación concreta del repositorio de conductores
+/// ImplementaciÃ³n concreta del repositorio de conductores
 /// 
 /// RESPONSABILIDADES:
 /// 1. Coordina entre datasources (API, BD local, cache)
-/// 2. Convierte excepciones técnicas en Failures de negocio
+/// 2. Convierte excepciones tÃ©cnicas en Failures de negocio
 /// 3. Transforma modelos (DTOs) en entidades de dominio
 /// 
 /// ESTRATEGIA PARA MICROSERVICIOS:
-/// - Actualmente usa solo remoteDataSource (API monolítica)
-/// - En el futuro, podría combinar múltiples datasources:
+/// - Actualmente usa solo remoteDataSource (API monolÃ­tica)
+/// - En el futuro, podrÃ­a combinar mÃºltiples datasources:
 ///   * remoteDataSource: Para datos del microservicio de conductores
 ///   * paymentDataSource: Para consultar el microservicio de pagos
 ///   * localDataSource: Para cache offline
 /// 
-/// EJEMPLO DE ORQUESTACIÓN:
+/// EJEMPLO DE ORQUESTACIÃ“N:
 /// ```dart
 /// // Obtener perfil del conductor-service
 /// final profile = await conductorRemoteDataSource.getProfile(id);
@@ -110,7 +110,7 @@ class ConductorRepositoryImpl implements ConductorRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al actualizar vehículo: $e'));
+      return Error(UnknownFailure('Error al actualizar vehÃ­culo: $e'));
     }
   }
 
@@ -124,7 +124,7 @@ class ConductorRepositoryImpl implements ConductorRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al enviar para aprobación: $e'));
+      return Error(UnknownFailure('Error al enviar para aprobaciÃ³n: $e'));
     }
   }
 
@@ -154,7 +154,7 @@ class ConductorRepositoryImpl implements ConductorRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al obtener estadísticas: $e'));
+      return Error(UnknownFailure('Error al obtener estadÃ­sticas: $e'));
     }
   }
 
@@ -238,7 +238,7 @@ class ConductorRepositoryImpl implements ConductorRepository {
     } on NetworkException catch (e) {
       return Error(ConnectionFailure(e.message));
     } catch (e) {
-      return Error(UnknownFailure('Error al actualizar ubicación: $e'));
+      return Error(UnknownFailure('Error al actualizar ubicaciÃ³n: $e'));
     }
   }
 }

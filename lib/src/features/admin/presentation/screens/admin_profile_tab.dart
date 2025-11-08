@@ -1,7 +1,7 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ping_go/src/global/services/auth/user_service.dart';
-import 'package:ping_go/src/routes/route_names.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
+import 'package:viax/src/routes/route_names.dart';
 
 class AdminProfileTab extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -132,7 +132,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Información personal',
+          'InformaciÃ³n personal',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -150,14 +150,14 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
         const SizedBox(height: 12),
         _buildInfoCard(
           icon: Icons.email_outlined,
-          title: 'Correo electrónico',
+          title: 'Correo electrÃ³nico',
           value: email,
           accentColor: const Color(0xFF11998e),
         ),
         const SizedBox(height: 12),
         _buildInfoCard(
           icon: Icons.phone_outlined,
-          title: 'Teléfono',
+          title: 'TelÃ©fono',
           value: phone,
           accentColor: const Color(0xFFffa726),
         ),
@@ -236,7 +236,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Acciones rápidas',
+          'Acciones rÃ¡pidas',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -342,7 +342,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Configuración',
+          'ConfiguraciÃ³n',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -361,7 +361,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
         const SizedBox(height: 12),
         _buildSettingItem(
           icon: Icons.lock_outline_rounded,
-          title: 'Cambiar contraseña',
+          title: 'Cambiar contraseÃ±a',
           onTap: () {
             _showComingSoon();
           },
@@ -495,7 +495,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                 ),
                 SizedBox(width: 12),
                 Text(
-                  'Cerrar sesión',
+                  'Cerrar sesiÃ³n',
                   style: TextStyle(
                     color: Color(0xFFf5576c),
                     fontSize: 18,
@@ -544,7 +544,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  '¿Cerrar sesión?',
+                  'Â¿Cerrar sesiÃ³n?',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -553,7 +553,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '¿Estás seguro de que deseas cerrar sesión?',
+                  'Â¿EstÃ¡s seguro de que deseas cerrar sesiÃ³n?',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.6),
                     fontSize: 14,
@@ -595,7 +595,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                           ),
                         ),
                         child: const Text(
-                          'Cerrar sesión',
+                          'Cerrar sesiÃ³n',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -617,7 +617,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Función en desarrollo'),
+        content: const Text('FunciÃ³n en desarrollo'),
         backgroundColor: const Color(0xFF1A1A1A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -670,7 +670,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Versión 1.0.0',
+                    'VersiÃ³n 1.0.0',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 14,
@@ -678,7 +678,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Panel de administración del sistema PingGo',
+                    'Panel de administraciÃ³n del sistema PingGo',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 14,
