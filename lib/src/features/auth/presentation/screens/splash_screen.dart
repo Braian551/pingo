@@ -103,8 +103,8 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _scaleAnim;
   late final Animation<double> _fadeAnim;
   late final Animation<double> _pulseAnim;
-  late final Animation<double> _slideAnim;
-  late final Animation<double> _subtitleSlideAnim;
+  late final Animation<double> _slideAnim; // Ahora es opacidad del título
+  late final Animation<double> _subtitleSlideAnim; // Ahora es opacidad del subtítulo
   late final Animation<double> _textScaleAnim;
   late final Animation<double> _rotationAnim;
 
@@ -146,19 +146,19 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Efecto de slide desde abajo para el texto principal (más natural)
-    _slideAnim = Tween<double>(begin: 40.0, end: 0.0).animate(
+    // Fade in para el texto principal
+    _slideAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.35, 0.75, curve: Curves.easeOutBack),
+        curve: const Interval(0.35, 0.65, curve: Curves.easeIn),
       ),
     );
 
-    // Efecto de slide desde abajo para el subtítulo (más suave y retrasado)
-    _subtitleSlideAnim = Tween<double>(begin: 25.0, end: 0.0).animate(
+    // Fade in para el subtítulo (retrasado)
+    _subtitleSlideAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.55, 0.9, curve: Curves.easeOutBack),
+        curve: const Interval(0.55, 0.85, curve: Curves.easeIn),
       ),
     );
 
@@ -244,36 +244,33 @@ class _SplashScreenState extends State<SplashScreen>
 
                   const SizedBox(height: 12),
 
-                  // App name con animación de slide y escala
-                  Transform.translate(
-                    offset: Offset(0, _slideAnim.value),
-                    child: Transform.scale(
-                      scale: _textScaleAnim.value,
-                      child: Opacity(
-                        opacity: _fadeAnim.value,
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Viax',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.5,
-                                  foreground: Paint()
-                                    ..shader = LinearGradient(
-                                      colors: [
-                                        AppColors.primary,
-                                        AppColors.primaryLight,
-                                        AppColors.accent,
+                  // App name con animación de escala y fade in
+                  Transform.scale(
+                    scale: _textScaleAnim.value,
+                    child: Opacity(
+                      opacity: _slideAnim.value,
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Viax',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.5,
+                                foreground: Paint()
+                                  ..shader = LinearGradient(
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.primaryLight,
+                                      AppColors.accent,
                                     ],
                                     stops: const [0.0, 0.5, 1.0],
                                   ).createShader(const Rect.fromLTWH(0, 0, 200, 0)),
-                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -281,18 +278,15 @@ class _SplashScreenState extends State<SplashScreen>
 
                   const SizedBox(height: 6),
 
-                  // Subtítulo con fade y slide independiente
-                  Transform.translate(
-                    offset: Offset(0, _subtitleSlideAnim.value),
-                    child: Opacity(
-                      opacity: _fadeAnim.value * 0.9,
-                      child: Text(
-                        'Viaja fácil, llega rápido',
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 13,
-                          letterSpacing: 0.5,
-                        ),
+                  // Subtítulo con fade in independiente
+                  Opacity(
+                    opacity: _subtitleSlideAnim.value,
+                    child: Text(
+                      'Viaja fácil, llega rápido',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        fontSize: 13,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
