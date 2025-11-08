@@ -17,6 +17,11 @@ void main() async {
   // Configure robust global error handling as early as possible
   WidgetsFlutterBinding.ensureInitialized();
 
+  // NOTE: UI Color Scheme Update (November 2025)
+  // - Primary buttons changed from yellow (0xFFFFFF00) to blue (AppColors.primary)
+  // - Email auth screens now use consistent blue theming
+  // - All buttons maintain white text on blue background for accessibility
+
   // Forward Flutter framework errors to zone handler (and keep red-screen in debug)
   FlutterError.onError = (FlutterErrorDetails details) {
     // Print to console

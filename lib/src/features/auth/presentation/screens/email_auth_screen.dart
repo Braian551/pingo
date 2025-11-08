@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/widgets/entrance_fader.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class EmailAuthScreen extends StatefulWidget {
   const EmailAuthScreen({super.key});
@@ -22,22 +23,28 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface.withOpacity(0.8),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
             ),
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: Icon(
+              Icons.arrow_back_rounded, 
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              size: 20
+            ),
             onPressed: () => Navigator.pop(context),
             padding: EdgeInsets.zero,
           ),
@@ -52,24 +59,24 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
             children: [
               const SizedBox(height: 20),
 
-              // TÃ­tulo
-              const Text(
+              // Título
+              Text(
                 'Ingresa tu correo',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.displayMedium?.color,
                 ),
               ),
 
               const SizedBox(height: 8),
 
-              // SubtÃ­tulo
-              const Text(
-                'Te enviaremos un enlace de verificaciÃ³n',
+              // Subtítulo
+              Text(
+                'Te enviaremos un enlace de verificación',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                 ),
               ),
 
@@ -87,18 +94,22 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Colors.white.withOpacity(0.08),
-                            Colors.white.withOpacity(0.04),
+                            isDark 
+                              ? AppColors.darkSurface.withOpacity(0.8) 
+                              : AppColors.lightSurface.withOpacity(0.8),
+                            isDark 
+                              ? AppColors.darkCard.withOpacity(0.4) 
+                              : AppColors.lightCard.withOpacity(0.4),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
+                          color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: isDark ? AppColors.darkShadow : AppColors.lightShadow,
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),
@@ -107,8 +118,8 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                       child: TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
@@ -116,7 +127,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                         decoration: InputDecoration(
                           labelText: 'Correo electrÃ³nico',
                           labelStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
+                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -124,19 +135,19 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
+                              gradient: LinearGradient(
+                                colors: [AppColors.primary, AppColors.primaryLight],
                               ),
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  color: AppColors.primary.withOpacity(0.3),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.email_rounded, color: Colors.black, size: 20),
+                            child: const Icon(Icons.email_rounded, color: Colors.white, size: 20),
                           ),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -203,8 +214,8 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFFF00),
-                          foregroundColor: Colors.black,
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -216,6 +227,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
+                            color: Colors.white,
                           ),
                         ),
                       ),

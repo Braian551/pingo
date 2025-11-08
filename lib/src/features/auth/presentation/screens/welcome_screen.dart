@@ -49,7 +49,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.primary.withOpacity(0.15),
+                        AppColors.primary.withOpacity(isDark ? 0.25 : 0.15),
                         Colors.transparent,
                       ],
                       stops: const [0.1, 0.8],
@@ -147,21 +147,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     _buildSocialButton(
                       icon: Icon(
                         Icons.apple,
-                        color: isDark ? Colors.white : Colors.black,
+                        color: Colors.white,
                         size: 24,
                       ),
                       text: 'Continuar con Apple',
-                      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-                      textColor: isDark ? Colors.white : Colors.black,
-                      borderColor: isDark 
-                          ? Colors.white.withOpacity(0.3) 
-                          : Colors.black.withOpacity(0.2),
+                      backgroundColor: isDark ? AppColors.darkSurface : const Color(0xFF000000),
+                      textColor: Colors.white,
+                      borderColor: isDark
+                          ? Colors.white.withOpacity(0.3)
+                          : Colors.transparent,
                       onPressed: () {
                         // TODO: Integrar Apple Sign-In
                       },
-                    ),
-                    
-                    const SizedBox(height: 14),
+                    ),                    const SizedBox(height: 14),
                     
                     // Iniciar con correo
                     _buildSocialButton(

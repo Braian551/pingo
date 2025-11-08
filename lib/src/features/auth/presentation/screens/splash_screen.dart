@@ -232,7 +232,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: AnimatedLogo(
                           size: 86,
                           glowOpacity: Theme.of(context).brightness == Brightness.dark 
-                              ? _pulseAnim.value 
+                              ? _pulseAnim.value * 0.4
                               : _pulseAnim.value * 0.3,
                           scale: 1.0,
                           rotation: 0.0,

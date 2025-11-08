@@ -7,6 +7,7 @@ import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/widgets/entrance_fader.dart';
 import 'package:viax/src/widgets/dialogs/dialog_helper.dart';
 import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/theme/app_colors.dart';
 import 'dart:async';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -142,7 +143,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
-              message: 'Â¡Correo verificado! Ya tienes una cuenta',
+              message: '¡Correo verificado! Ya tienes una cuenta',
               duration: const Duration(milliseconds: 1200),
             );
             await Future.delayed(const Duration(milliseconds: 1200));
@@ -166,7 +167,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           if (mounted && !_isDisposed) {
             CustomSnackbar.showSuccess(
               context,
-              message: 'Â¡CÃ³digo verificado! Completa tu registro',
+              message: '¡Código verificado! Completa tu registro',
               duration: const Duration(milliseconds: 1200),
             );
             await Future.delayed(const Duration(milliseconds: 1200));
@@ -213,8 +214,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       // CÃ³digo incorrecto
       await DialogHelper.showError(
         context,
-        title: 'CÃ³digo Incorrecto',
-        message: 'El cÃ³digo de verificaciÃ³n que ingresaste no es vÃ¡lido. Por favor, verifica e intenta nuevamente.',
+        title: 'Código Incorrecto',
+        message: 'El código de verificación que ingresaste no es válido. Por favor, verifica e intenta nuevamente.',
         primaryButtonText: 'Reintentar',
       );
     }
@@ -233,22 +234,28 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface.withOpacity(0.8),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
             ),
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: Icon(
+              Icons.arrow_back_rounded, 
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              size: 20
+            ),
             onPressed: () {
               _countdownTimer?.cancel();
               if (Navigator.canPop(context)) {
@@ -268,22 +275,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             children: [
               const SizedBox(height: 40),
 
-              const Text(
+              Text(
                 'Verifica tu correo',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.displayLarge?.color,
                 ),
               ),
 
               const SizedBox(height: 8),
 
               Text(
-                'Hemos enviado un cÃ³digo de 6 dÃ­gitos a\n${widget.email}',
-                style: const TextStyle(
+                'Hemos enviado un código de 6 dígitos a\n${widget.email}',
+                style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                 ),
               ),
 
@@ -301,16 +308,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     borderRadius: BorderRadius.circular(12),
                     fieldHeight: 60,
                     fieldWidth: 50,
-                    activeFillColor: const Color(0xFF1A1A1A),
-                    inactiveFillColor: const Color(0xFF1A1A1A),
-                    selectedFillColor: const Color(0xFF1A1A1A),
-                    activeColor: const Color(0xFFFFFF00),
-                    inactiveColor: Colors.white30,
-                    selectedColor: const Color(0xFFFFFF00),
+                    activeFillColor: isDark ? AppColors.darkCard : AppColors.lightCard,
+                    inactiveFillColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                    selectedFillColor: isDark ? AppColors.darkCard : AppColors.lightCard,
+                    activeColor: AppColors.primary,
+                    inactiveColor: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+                    selectedColor: AppColors.primary,
                   ),
                   enableActiveFill: true,
-                  textStyle: const TextStyle(
-                    color: Colors.white,
+                  textStyle: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -330,8 +337,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 child: ElevatedButton(
                   onPressed: (_isLoading || _isResending || _isVerifying) ? null : _verifyCode,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFFF00),
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -339,12 +346,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   ),
                   child: _isVerifying
                       ? const CircularProgressIndicator(
-                          color: Colors.black,
+                          color: Colors.white,
                           strokeWidth: 2,
                         )
                       : _isLoading
                           ? const CircularProgressIndicator(
-                              color: Colors.black,
+                              color: Colors.white,
                               strokeWidth: 2,
                             )
                           : const Text(
@@ -353,7 +360,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
-                                color: Colors.black,
+                                color: Colors.white,
                               ),
                             ),
                 ),
@@ -369,7 +376,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
-                            color: Color(0xFFFFFF00),
+                            color: Colors.white,
                             strokeWidth: 2,
                           ),
                         )
@@ -379,8 +386,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               : 'Reenviar cÃ³digo',
                           style: TextStyle(
                             color: (_resendCountdown > 0 || _isVerifying)
-                                ? Colors.white54
-                                : const Color(0xFFFFFF00),
+                                ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)
+                                : AppColors.primary,
                             fontSize: 14,
                           ),
                         ),
@@ -393,26 +400,26 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.warning.withOpacity(0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Para desarrollo:',
                         style: TextStyle(
-                          color: Colors.orange,
+                          color: AppColors.warning,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'CÃ³digo: $_verificationCode',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        'Código: $_verificationCode',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           fontSize: 12,
                         ),
                       ),
