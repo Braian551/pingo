@@ -66,13 +66,13 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         
         if (!mounted) return;
         
-        // Verificar servicios de ubicaciÃ³n
+        // Verificar servicios de ubicación
         final serviceEnabled = await Geolocator.isLocationServiceEnabled();
         if (!serviceEnabled) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Activa los servicios de ubicaciÃ³n para usar Viax'),
+                content: Text('Activa los servicios de ubicación para usar Viax'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -93,7 +93,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Necesitamos tu ubicaciÃ³n para ofrecerte viajes cerca de ti'),
+                content: Text('Necesitamos tu ubicación para ofrecerte viajes cerca de ti'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -104,7 +104,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Â¡UbicaciÃ³n activada! Ahora puedes solicitar viajes'),
+                content: Text('¡Ubicación activada! Ahora puedes solicitar viajes'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
@@ -415,7 +415,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tus viajes aparecerÃ¡n aquÃ­',
+                        'Tus viajes aparecerán aquí',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 14,
@@ -442,7 +442,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           children: [
             const SizedBox(height: 20),
             const Text(
-              'MÃ©todos de pago',
+              'Métodos de pago',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
@@ -481,7 +481,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No hay mÃ©todos de pago',
+                        'No hay métodos de pago',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 18,
@@ -490,7 +490,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Agrega un mÃ©todo de pago para continuar',
+                        'Agrega un método de pago para continuar',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 14,
@@ -511,7 +511,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                           ),
                         ),
                         child: const Text(
-                          'Agregar mÃ©todo de pago',
+                          'Agregar método de pago',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -695,7 +695,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       children: [
         _buildProfileMenuItem(
           icon: Icons.settings,
-          title: 'ConfiguraciÃ³n',
+          title: 'Configuración',
           onTap: () => Navigator.pushNamed(context, '/settings'),
         ),
         const SizedBox(height: 12),
@@ -707,7 +707,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         const SizedBox(height: 12),
         _buildProfileMenuItem(
           icon: Icons.logout,
-          title: 'Cerrar sesiÃ³n',
+          title: 'Cerrar sesión',
           isLogout: true,
           onTap: () async {
             await UserService.clearSession();
@@ -823,7 +823,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
 
   Widget _buildWelcomeSection() {
     final hour = DateTime.now().hour;
-    String greeting = 'Buenos dÃ­as';
+    String greeting = 'Buenos días';
     if (hour >= 12 && hour < 18) {
       greeting = 'Buenas tardes';
     } else if (hour >= 18) {
@@ -894,7 +894,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    'Â¿A dÃ³nde vas?',
+                    '¿A dónde vas?',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
@@ -920,7 +920,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Â¿QuÃ© necesitas hoy?',
+          '¿Qué necesitas hoy?',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -935,7 +935,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               child: _ModernServiceCard(
                 icon: Icons.motorcycle,
                 title: 'Viaje',
-                subtitle: 'RÃ¡pido y seguro',
+                subtitle: 'Rápido y seguro',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
                 },
@@ -945,7 +945,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             Expanded(
               child: _ModernServiceCard(
                 icon: Icons.local_shipping_outlined,
-                title: 'EnvÃ­o',
+                title: 'Envío',
                 subtitle: 'Entrega express',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
@@ -963,7 +963,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Acceso rÃ¡pido',
+          'Acceso rápido',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -1040,7 +1040,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Â¡ObtÃ©n 20% OFF!',
+                    '¡Obtén 20% OFF!',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -1139,7 +1139,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tus viajes y envÃ­os aparecerÃ¡n aquÃ­',
+                    'Tus viajes y envíos aparecerán aquí',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.4),
                       fontSize: 14,

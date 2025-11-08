@@ -5,7 +5,7 @@ import '../features/map/providers/map_provider.dart';
 import '../global/services/quota_monitor_service.dart';
 
 /// Widget que muestra alertas sobre el uso de las cuotas de las APIs
-/// Se actualiza automÃ¡ticamente segÃºn el MapProvider
+/// Se actualiza automáticamente según el MapProvider
 class QuotaAlertWidget extends StatelessWidget {
   final bool compact;
   
@@ -126,7 +126,7 @@ class QuotaAlertWidget extends StatelessWidget {
         
         // TomTom Traffic
         _buildQuotaBar(
-          'TomTom - TrÃ¡fico',
+          'TomTom - Tráfico',
           status.tomtomTrafficUsed,
           status.tomtomTrafficLimit,
           status.tomtomTrafficPercentage,
@@ -134,7 +134,7 @@ class QuotaAlertWidget extends StatelessWidget {
         
         const SizedBox(height: 12),
         Text(
-          'Toca para mÃ¡s detalles',
+          'Toca para más detalles',
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 12,
@@ -267,7 +267,7 @@ class QuotaAlertWidget extends StatelessWidget {
               
               _buildDetailedQuotaSection(
                 'Mapbox - Routing',
-                'CÃ¡lculo de rutas y direcciones (mensual)',
+                'Cálculo de rutas y direcciones (mensual)',
                 status.mapboxRoutingUsed,
                 status.mapboxRoutingLimit,
                 status.mapboxRoutingPercentage,
@@ -278,7 +278,7 @@ class QuotaAlertWidget extends StatelessWidget {
               
               _buildDetailedQuotaSection(
                 'TomTom - Traffic',
-                'InformaciÃ³n de trÃ¡fico en tiempo real (diario)',
+                'Información de tráfico en tiempo real (diario)',
                 status.tomtomTrafficUsed,
                 status.tomtomTrafficLimit,
                 status.tomtomTrafficPercentage,
@@ -301,7 +301,7 @@ class QuotaAlertWidget extends StatelessWidget {
                         Icon(Icons.info, color: Colors.blue.shade700, size: 20),
                         const SizedBox(width: 8),
                         Text(
-                          'InformaciÃ³n',
+                          'Información',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade900,
@@ -311,9 +311,9 @@ class QuotaAlertWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Los contadores se resetean automÃ¡ticamente:\n'
+                      'Los contadores se resetean automáticamente:\n'
                       'â€¢ Mapbox: Cada mes\n'
-                      'â€¢ TomTom: Cada dÃ­a\n\n'
+                      '• TomTom: Cada día\n\n'
                       'Todas estas APIs tienen planes gratuitos generosos.',
                       style: TextStyle(
                         fontSize: 12,

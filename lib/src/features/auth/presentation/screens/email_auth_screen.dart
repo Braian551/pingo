@@ -125,7 +125,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                           letterSpacing: 0.3,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Correo electrÃ³nico',
+                          labelText: 'Correo electrónico',
                           labelStyle: TextStyle(
                             color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                             fontSize: 15,
@@ -155,11 +155,11 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                         ),
                         validator: (value) {
                         final email = value?.trim() ?? '';
-                        if (email.isEmpty) return 'Por favor ingresa tu correo electrÃ³nico';
+                        if (email.isEmpty) return 'Por favor ingresa tu correo electrónico';
 
                         // A forgiving but safe regex for common email addresses
                         final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
-                        if (!emailRegex.hasMatch(email)) return 'Por favor ingresa un correo vÃ¡lido';
+                        if (!emailRegex.hasMatch(email)) return 'Por favor ingresa un correo válido';
 
                           return null;
                         },
@@ -168,7 +168,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
 
                     const SizedBox(height: 30),
 
-                    // BotÃ³n de continuar
+                    // Botón de continuar
                     SizedBox(
                       width: double.infinity,
                       height: 56,

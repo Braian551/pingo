@@ -29,7 +29,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   String _verificationCode = '';
   bool _isLoading = false;
   bool _isResending = false;
-  bool _isVerifying = false; // Nuevo estado para verificaciÃ³n de usuario
+  bool _isVerifying = false; // Nuevo estado para verificación de usuario
   int _resendCountdown = 60;
   Timer? _countdownTimer;
   bool _isDisposed = false;
@@ -88,12 +88,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       setState(() => _isLoading = false);
 
       if (!success && mounted && !_isDisposed) {
-        _showErrorDialog('Error al enviar el cÃ³digo de verificaciÃ³n');
+        _showErrorDialog('Error al enviar el código de verificación');
       }
     } catch (e) {
       if (!mounted || _isDisposed) return;
       setState(() => _isLoading = false);
-      _showErrorDialog('Error al enviar el cÃ³digo de verificaciÃ³n');
+      _showErrorDialog('Error al enviar el código de verificación');
     }
   }
 
@@ -211,7 +211,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         setState(() => _isVerifying = false);
       }
     } else {
-      // CÃ³digo incorrecto
+      // Código incorrecto
       await DialogHelper.showError(
         context,
         title: 'Código Incorrecto',
@@ -382,8 +382,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         )
                       : Text(
                           _resendCountdown > 0
-                              ? 'Reenviar cÃ³digo en ${_resendCountdown}s'
-                              : 'Reenviar cÃ³digo',
+                              ? 'Reenviar código en ${_resendCountdown}s'
+                              : 'Reenviar código',
                           style: TextStyle(
                             color: (_resendCountdown > 0 || _isVerifying)
                                 ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)

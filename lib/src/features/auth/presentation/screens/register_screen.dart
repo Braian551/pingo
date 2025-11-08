@@ -50,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      // La direcciÃ³n ahora es opcional - no se valida
+      // La dirección ahora es opcional - no se valida
       
       setState(() => _isLoading = true);
       
@@ -87,10 +87,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           print('Register response: $response');
         } catch (_) {}
 
-        // Mostrar mensaje de Ã©xito
+        // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Â¡Registro exitoso!'),
+            content: const Text('¡Registro exitoso!'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 1),
           ),
@@ -235,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // TÃ­tulo del paso actual con animaciÃ³n
+          // Título del paso actual con animación
           Center(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
@@ -257,7 +257,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 key: ValueKey<int>(_currentStep),
                 children: [
-                  // Icono animado segÃºn el paso
+                  // Icono animado según el paso
                   Container(
                     width: 64,
                     height: 64,
@@ -456,9 +456,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _getStepDescription(int step) {
     switch (step) {
       case 0:
-        return 'InformaciÃ³n bÃ¡sica sobre ti';
+        return 'Información básica sobre ti';
       case 1:
-        return 'CÃ³mo contactarte';
+        return 'Cómo contactarte';
       case 2:
         return 'Protege tu cuenta';
       default:
@@ -490,7 +490,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // BotÃ³n AtrÃ¡s con efecto glass
+            // Botón Atrás con efecto glass
             if (_currentStep > 0)
               Expanded(
                 child: Container(
@@ -534,7 +534,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'AtrÃ¡s',
+                            'Atrás',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 16,
@@ -550,7 +550,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             else
               const SizedBox(width: 0),
             
-            // BotÃ³n Siguiente/Crear Cuenta con gradiente
+            // Botón Siguiente/Crear Cuenta con gradiente
             Expanded(
               flex: _currentStep > 0 ? 1 : 2,
               child: AnimatedContainer(
@@ -583,7 +583,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: InkWell(
                     onTap: _isLoading ? null : () {
                       if (_currentStep < 2) {
-                        // ValidaciÃ³n del paso actual
+                        // Validación del paso actual
                         if (_currentStep == 0) {
                           if (_nameController.text.isEmpty || _lastNameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -602,7 +602,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (_phoneController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Por favor ingresa tu telÃ©fono'),
+                                content: const Text('Por favor ingresa tu teléfono'),
                                 backgroundColor: Colors.red.shade600,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
@@ -839,15 +839,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 _buildModernTextField(
                   controller: _phoneController,
-                  label: 'TelÃ©fono',
+                  label: 'Teléfono',
                   icon: Icons.phone_rounded,
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu telÃ©fono';
+                      return 'Por favor ingresa tu teléfono';
                     }
                     if (value.length < 10) {
-                      return 'El telÃ©fono debe tener al menos 10 dÃ­gitos';
+                      return 'El teléfono debe tener al menos 10 dígitos';
                     }
                     return null;
                   },
@@ -875,7 +875,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 _buildModernTextField(
                   controller: _passwordController,
-                  label: 'ContraseÃ±a',
+                  label: 'Contraseña',
                   icon: Icons.lock_rounded,
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
@@ -903,7 +903,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
                 _buildModernTextField(
                   controller: _confirmPasswordController,
-                  label: 'Confirmar contraseÃ±a',
+                  label: 'Confirmar contraseña',
                   icon: Icons.lock_outline_rounded,
                   obscureText: _obscureConfirmPassword,
                   suffixIcon: IconButton(

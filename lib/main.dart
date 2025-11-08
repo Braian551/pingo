@@ -78,7 +78,7 @@ void main() async {
 
   await initializeDateFormatting('es_ES', null);
 
-  // Inicializar Service Locator (InyecciÃ³n de Dependencias)
+  // Inicializar Service Locator (Inyección de Dependencias)
   // Esto configura todos los datasources, repositories y use cases
   final serviceLocator = ServiceLocator();
   try {

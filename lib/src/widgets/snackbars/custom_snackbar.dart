@@ -77,7 +77,7 @@ class CustomSnackbar {
     );
   }
 
-  /// Muestra un snackbar de Ã©xito
+  /// Muestra un snackbar de éxito
   static void showSuccess(
     BuildContext context, {
     required String message,
