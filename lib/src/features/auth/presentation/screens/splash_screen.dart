@@ -5,88 +5,6 @@ import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/theme/app_colors.dart';
 import 'package:viax/src/features/auth/presentation/widgets/logo_transition.dart';
 
-/// Indicador de carga minimalista inspirado en TikTok
-class MinimalLoadingIndicator extends StatefulWidget {
-  const MinimalLoadingIndicator({super.key});
-
-  @override
-  State<MinimalLoadingIndicator> createState() => _MinimalLoadingIndicatorState();
-}
-
-class _MinimalLoadingIndicatorState extends State<MinimalLoadingIndicator>
-    with TickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _progressAnim;
-  late final Animation<double> _opacityAnim;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat();
-
-    _progressAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _opacityAnim = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          width: 60,
-          height: 2,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.1),
-            borderRadius: BorderRadius.circular(1),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: _progressAnim.value,
-            child: Container(
-              height: 2,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(_opacityAnim.value * (isDark ? 1.0 : 0.7)),
-                borderRadius: BorderRadius.circular(1),
-                boxShadow: isDark ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3 * _opacityAnim.value),
-                    blurRadius: 4,
-                    spreadRadius: 1,
-                  ),
-                ] : null,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -104,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _fadeAnim;
   late final Animation<double> _pulseAnim;
   late final Animation<double> _slideAnim;
+  late final Animation<double> _subtitleSlideAnim;
   late final Animation<double> _rotationAnim;
 
   @override
@@ -144,11 +63,19 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Efecto de slide desde abajo para el texto
-    _slideAnim = Tween<double>(begin: 50.0, end: 0.0).animate(
+    // Efecto de slide desde abajo para el texto principal
+    _slideAnim = Tween<double>(begin: 30.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.3, 0.8, curve: Curves.easeOutCubic),
+        curve: const Interval(0.4, 0.8, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    // Efecto de slide desde abajo para el subtítulo (más suave y retrasado)
+    _subtitleSlideAnim = Tween<double>(begin: 20.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.6, 1.0, curve: Curves.easeOutCubic),
       ),
     );
 
@@ -224,7 +151,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 12),
 
                   // App name con animación de slide
                   Transform.translate(
@@ -258,15 +185,15 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
-                  // Subtítulo con fade y slide
+                  // Subtítulo con fade y slide independiente
                   Transform.translate(
-                    offset: Offset(0, _slideAnim.value * 0.5),
+                    offset: Offset(0, _subtitleSlideAnim.value),
                     child: Opacity(
                       opacity: _fadeAnim.value * 0.9,
                       child: Text(
-                        'Transporte y entregas rápidas',
+                        'Viaja fácil, llega rápido',
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
                           fontSize: 13,
@@ -276,13 +203,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 40),
-
-                  // Indicador de carga minimalista
-                  Opacity(
-                    opacity: _fadeAnim.value * 0.7,
-                    child: const MinimalLoadingIndicator(),
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

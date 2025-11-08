@@ -98,7 +98,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Movilidad y entregas rápidas a tu alcance',
+                    'Viaja fácil, llega rápido',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -133,6 +133,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       text: 'Continuar con Google',
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
+                      borderColor: isDark 
+                          ? Colors.white.withOpacity(0.3) 
+                          : Colors.black.withOpacity(0.2),
                       onPressed: () {
                         // TODO: Integrar Google Sign-In
                       },
@@ -160,23 +163,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     const SizedBox(height: 14),
                     
-                    // Iniciar con teléfono
-                    _buildSocialButton(
-                      icon: const Icon(
-                        Icons.phone_iphone_outlined,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      text: 'Continuar con teléfono',
-                      backgroundColor: AppColors.primary,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        Navigator.pushNamed(context, RouteNames.phoneAuth);
-                      },
-                    ),
-                    
-                    const SizedBox(height: 14),
-                    
                     // Iniciar con correo
                     _buildSocialButton(
                       icon: const Icon(
@@ -190,6 +176,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       borderColor: AppColors.primary.withOpacity(0.5),
                       onPressed: () {
                         Navigator.pushNamed(context, RouteNames.emailAuth);
+                      },
+                    ),
+                    
+                    const SizedBox(height: 14),
+                    
+                    // Iniciar con teléfono
+                    _buildSocialButton(
+                      icon: const Icon(
+                        Icons.phone_iphone_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      text: 'Continuar con teléfono',
+                      backgroundColor: AppColors.primary,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        Navigator.pushNamed(context, RouteNames.phoneAuth);
                       },
                     ),
                     
