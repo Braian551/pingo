@@ -68,6 +68,8 @@ class _ConductorSearchingPassengersScreenState
   bool _showingRequest = false;
   Timer? _autoRejectTimer;
   bool _panelExpanded = false;
+  double _dragStartPosition = 0;
+  double _currentDragOffset = 0;
 
   @override
   void initState() {
@@ -1226,17 +1228,47 @@ class _ConductorSearchingPassengersScreenState
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: GestureDetector(
+                onVerticalDragStart: (details) {
+                  setState(() {
+                    _dragStartPosition = details.localPosition.dy;
+                  });
+                },
+                onVerticalDragUpdate: (details) {
+                  setState(() {
+                    _currentDragOffset = details.localPosition.dy - _dragStartPosition;
+                  });
+                },
                 onVerticalDragEnd: (details) {
+                  // Si el usuario arrastra hacia arriba (velocidad negativa) o el offset es significativo
                   if (details.primaryVelocity != null) {
                     final v = details.primaryVelocity!;
-                    if (v < -100) {
-                      setState(() => _panelExpanded = true);
-                    } else if (v > 100) {
-                      setState(() => _panelExpanded = false);
+                    if (v < -300 || _currentDragOffset < -50) {
+                      // Expandir
+                      setState(() {
+                        _panelExpanded = true;
+                        _currentDragOffset = 0;
+                      });
+                    } else if (v > 300 || _currentDragOffset > 50) {
+                      // Contraer
+                      setState(() {
+                        _panelExpanded = false;
+                        _currentDragOffset = 0;
+                      });
+                    } else {
+                      // Reset si no hay suficiente movimiento
+                      setState(() {
+                        _currentDragOffset = 0;
+                      });
                     }
+                  } else {
+                    setState(() {
+                      _currentDragOffset = 0;
+                    });
                   }
                 },
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A).withOpacity(0.95),
                   borderRadius: const BorderRadius.vertical(
@@ -1267,160 +1299,362 @@ class _ConductorSearchingPassengersScreenState
                           child: Container(
                             width: 50,
                             height: 5,
-                            margin: const EdgeInsets.only(top: 8),
+                            margin: const EdgeInsets.only(top: 8, bottom: 8),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
                         
-                        // Header con precio destacado estilo Uber/DiDi
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 600),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value.clamp(0.0, 1.0),
-                              child: Transform.translate(
-                                offset: Offset(0, 20 * (1 - value)),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFFFFD700).withOpacity(0.2),
-                                  const Color(0xFFFFD700).withOpacity(0.1),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFFFFD700).withOpacity(0.3),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                // Precio súper destacado
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFFFFD700), Color(0xFFFFC107)],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFFFFD700).withOpacity(0.4),
-                                        blurRadius: 20,
-                                        spreadRadius: 2,
-                                        offset: const Offset(0, 4),
-                                      ),
+                        // Contenido contraído (SIEMPRE VISIBLE)
+                        AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: 1.0,
+                          child: Column(
+                            children: [
+                              // Precio destacado estilo compacto
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFFFFD700).withOpacity(0.2),
+                                      const Color(0xFFFFD700).withOpacity(0.1),
                                     ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '\$',
-                                        style: TextStyle(
-                                          color: Colors.black.withOpacity(0.8),
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Text(
-                                        _formatPrice(precioEstimado),
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: -1,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'COP',
-                                        style: TextStyle(
-                                          color: Colors.black.withOpacity(0.7),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color(0xFFFFD700).withOpacity(0.3),
+                                    width: 1.5,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-                                // Info adicional: distancia y tiempo
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // Distancia
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: Colors.white.withOpacity(0.2),
-                                          width: 1,
+                                    // Precio
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '\$',
+                                          style: TextStyle(
+                                            color: const Color(0xFFFFD700).withOpacity(0.8),
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          _formatPrice(precioEstimado),
+                                          style: const TextStyle(
+                                            color: Color(0xFFFFD700),
+                                            fontSize: 36,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: -1,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'COP',
+                                          style: TextStyle(
+                                            color: const Color(0xFFFFD700).withOpacity(0.7),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Info rápida: distancia y tiempo
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.straighten,
+                                              color: const Color(0xFFFFD700),
+                                              size: 14,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '${distanciaKm.toStringAsFixed(1)} km',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.schedule,
+                                              color: const Color(0xFFFFD700),
+                                              size: 14,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '$duracionMinutos min',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              
+                              // Botones de acción (siempre visibles)
+                              Row(
+                                children: [
+                                  // Botón de rechazar compacto
+                                  Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2A2A2A),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.2),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(16),
+                                        onTap: _rejectRequest,
+                                        child: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.white,
+                                          size: 28,
                                         ),
                                       ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Botón de aceptar expandido con animación
+                                  Expanded(
+                                    child: AnimatedBuilder(
+                                      animation: _acceptButtonScaleAnimation,
+                                      builder: (context, child) {
+                                        return Transform.scale(
+                                          scale: _acceptButtonScaleAnimation.value,
+                                          child: child,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 56,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xFFFFD700).withOpacity(0.4),
+                                              blurRadius: 20,
+                                              spreadRadius: 2,
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: _acceptRequest,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFFFFD700),
+                                            foregroundColor: Colors.black,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                            padding: EdgeInsets.zero,
+                                            elevation: 0,
+                                          ),
+                                          child: const Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.check_circle,
+                                                size: 24,
+                                              ),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Aceptar viaje',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.3,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Contenido expandido (SOLO CUANDO _panelExpanded = true)
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 300),
+                          crossFadeState: _panelExpanded 
+                              ? CrossFadeState.showSecond 
+                              : CrossFadeState.showFirst,
+                          firstChild: const SizedBox.shrink(),
+                          secondChild: Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              
+                              // Ubicaciones: Conductor y Cliente
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.1),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Tu ubicación (conductor)
+                                    Expanded(
                                       child: Row(
                                         children: [
-                                          Icon(
-                                            Icons.straighten,
-                                            color: const Color(0xFFFFD700),
-                                            size: 16,
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFFD700).withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.navigation_rounded,
+                                              color: Color(0xFFFFD700),
+                                              size: 18,
+                                            ),
                                           ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '${distanciaKm.toStringAsFixed(1)} km',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Tu ubicación',
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.6),
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'Conductor',
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.9),
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    // Tiempo
+                                    // Separador con distancia
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: Colors.white.withOpacity(0.2),
-                                          width: 1,
-                                        ),
+                                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF4CAF50).withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: const Color(0xFF4CAF50).withOpacity(0.3),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.arrow_forward,
+                                                  color: Color(0xFF4CAF50),
+                                                  size: 12,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${distanciaConductorCliente.toStringAsFixed(1)} km',
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF4CAF50),
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    ),
+                                    // Ubicación del cliente
+                                    Expanded(
                                       child: Row(
                                         children: [
-                                          Icon(
-                                            Icons.schedule,
-                                            color: const Color(0xFFFFD700),
-                                            size: 16,
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF2196F3).withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.person_pin_circle,
+                                              color: Color(0xFF2196F3),
+                                              size: 18,
+                                            ),
                                           ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '$duracionMinutos min',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Cliente',
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.6),
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'Recoger aquí',
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.9),
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
@@ -1428,453 +1662,152 @@ class _ConductorSearchingPassengersScreenState
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        // Ubicaciones: Conductor y Cliente
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 700),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value.clamp(0.0, 1.0),
-                              child: Transform.translate(
-                                offset: Offset(0, 15 * (1 - value)),
-                                child: child,
                               ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A).withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                // Tu ubicación (conductor)
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFFFD700).withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(
-                                          Icons.navigation_rounded,
-                                          color: Color(0xFFFFD700),
-                                          size: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Tu ubicación',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.6),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'Conductor',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.9),
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Separador con distancia
-                                Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF4CAF50).withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: const Color(0xFF4CAF50).withOpacity(0.3),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.arrow_forward,
-                                              color: Color(0xFF4CAF50),
-                                              size: 12,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${distanciaConductorCliente.toStringAsFixed(1)} km',
-                                              style: const TextStyle(
-                                                color: Color(0xFF4CAF50),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Ubicación del cliente
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2196F3).withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(
-                                          Icons.person_pin_circle,
-                                          color: Color(0xFF2196F3),
-                                          size: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Cliente',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.6),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'Recoger aquí',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.9),
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        // Temporizador de auto-rechazo
-                        AnimatedBuilder(
-                          animation: _timerAnimation,
-                          builder: (context, child) {
-                            final secondsLeft = (_timerAnimation.value * 30).ceil();
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: secondsLeft <= 10
-                                    ? Colors.red.withOpacity(0.15)
-                                    : const Color(0xFF2A2A2A).withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: secondsLeft <= 10
-                                      ? Colors.red.withOpacity(0.3)
-                                      : Colors.white.withOpacity(0.1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.timer_outlined,
-                                    color: secondsLeft <= 10
-                                        ? Colors.red
-                                        : const Color(0xFFFFD700),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          secondsLeft <= 10
-                                              ? '⚠️ Solicitud expirando'
-                                              : 'Tiempo para responder',
-                                          style: TextStyle(
-                                            color: secondsLeft <= 10
-                                                ? Colors.red
-                                                : Colors.white.withOpacity(0.7),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(10),
-                                          child: LinearProgressIndicator(
-                                            value: _timerAnimation.value,
-                                            backgroundColor: Colors.white.withOpacity(0.1),
-                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                              secondsLeft <= 10
-                                                  ? Colors.red
-                                                  : const Color(0xFFFFD700),
-                                            ),
-                                            minHeight: 6,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Container(
+                              const SizedBox(height: 16),
+                              
+                              // Temporizador de auto-rechazo
+                              AnimatedBuilder(
+                                animation: _timerAnimation,
+                                builder: (context, child) {
+                                  final secondsLeft = (_timerAnimation.value * 30).ceil();
+                                  return Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
+                                      horizontal: 16,
+                                      vertical: 12,
                                     ),
                                     decoration: BoxDecoration(
                                       color: secondsLeft <= 10
-                                          ? Colors.red
-                                          : const Color(0xFFFFD700).withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${secondsLeft}s',
-                                      style: TextStyle(
+                                          ? Colors.red.withOpacity(0.15)
+                                          : const Color(0xFF2A2A2A).withOpacity(0.5),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
                                         color: secondsLeft <= 10
-                                            ? Colors.white
-                                            : const Color(0xFFFFD700),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                            ? Colors.red.withOpacity(0.3)
+                                            : Colors.white.withOpacity(0.1),
+                                        width: 1,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // Detalles del viaje (solo en expandido)
-                        if (_panelExpanded) ...[
-                          _buildAnimatedDetailRow(
-                            delay: 200,
-                            icon: Icons.straighten,
-                            label: 'Distancia',
-                            value: '${distanciaKm.toStringAsFixed(1)} km',
-                          ),
-                          const SizedBox(height: 12),
-                          _buildAnimatedDetailRow(
-                            delay: 300,
-                            icon: Icons.access_time,
-                            label: 'Tiempo estimado',
-                            value: '$duracionMinutos min',
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        
-                        // Direcciones (solo en expandido)
-                        if (_panelExpanded) ...[
-                          TweenAnimationBuilder<double>(
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOut,
-                            builder: (context, value, child) {
-                              return Opacity(
-                                opacity: value.clamp(0.0, 1.0),
-                                child: Transform.translate(
-                                  offset: Offset(0, 20 * (1 - value)),
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2A2A2A).withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildLocationInfo(
-                                    icon: Icons.my_location,
-                                    iconColor: const Color(0xFF4CAF50),
-                                    label: 'Recoger en',
-                                    value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
                                     child: Row(
                                       children: [
-                                        const SizedBox(width: 18),
-                                        Column(
-                                          children: List.generate(
-                                            3,
-                                            (index) => Container(
-                                              margin: const EdgeInsets.only(bottom: 3),
-                                              width: 3,
-                                              height: 3,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.3),
-                                                shape: BoxShape.circle,
+                                        Icon(
+                                          Icons.timer_outlined,
+                                          color: secondsLeft <= 10
+                                              ? Colors.red
+                                              : const Color(0xFFFFD700),
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                secondsLeft <= 10
+                                                    ? '⚠️ Solicitud expirando'
+                                                    : 'Tiempo para responder',
+                                                style: TextStyle(
+                                                  color: secondsLeft <= 10
+                                                      ? Colors.red
+                                                      : Colors.white.withOpacity(0.7),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
+                                              const SizedBox(height: 4),
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: LinearProgressIndicator(
+                                                  value: _timerAnimation.value,
+                                                  backgroundColor: Colors.white.withOpacity(0.1),
+                                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                                    secondsLeft <= 10
+                                                        ? Colors.red
+                                                        : const Color(0xFFFFD700),
+                                                  ),
+                                                  minHeight: 6,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: secondsLeft <= 10
+                                                ? Colors.red
+                                                : const Color(0xFFFFD700).withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            '${secondsLeft}s',
+                                            style: TextStyle(
+                                              color: secondsLeft <= 10
+                                                  ? Colors.white
+                                                  : const Color(0xFFFFD700),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  _buildLocationInfo(
-                                    icon: Icons.location_on,
-                                    iconColor: const Color(0xFFFFD700),
-                                    label: 'Dejar en',
-                                    value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        
-                        // Botones de acción con animaciones
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 800),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value.clamp(0.0, 1.0),
-                              child: Transform.translate(
-                                offset: Offset(0, 30 * (1 - value)),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              // Botón de rechazar compacto
+                              const SizedBox(height: 16),
+                              
+                              // Direcciones
                               Container(
-                                width: 56,
-                                height: 56,
+                                padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF2A2A2A),
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                    width: 1.5,
+                                    color: Colors.white.withOpacity(0.1),
+                                    width: 1,
                                   ),
                                 ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(16),
-                                    onTap: _rejectRequest,
-                                    child: const Icon(
-                                      Icons.close_rounded,
-                                      color: Colors.white,
-                                      size: 28,
+                                child: Column(
+                                  children: [
+                                    _buildLocationInfo(
+                                      icon: Icons.my_location,
+                                      iconColor: const Color(0xFF4CAF50),
+                                      label: 'Recoger en',
+                                      value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
                                     ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              // Botón de aceptar expandido con animación
-                              Expanded(
-                                child: AnimatedBuilder(
-                                  animation: _acceptButtonScaleAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _acceptButtonScaleAnimation.value,
-                                      child: child,
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 56,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFFFFD700).withOpacity(0.4),
-                                          blurRadius: 20,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: _acceptRequest,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFFFD700),
-                                        foregroundColor: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        elevation: 0,
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      child: Row(
                                         children: [
-                                          Icon(
-                                            Icons.check_circle,
-                                            size: 24,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Aceptar viaje',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.3,
+                                          const SizedBox(width: 18),
+                                          Column(
+                                            children: List.generate(
+                                              3,
+                                              (index) => Container(
+                                                margin: const EdgeInsets.only(bottom: 3),
+                                                width: 3,
+                                                height: 3,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withOpacity(0.3),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                    _buildLocationInfo(
+                                      icon: Icons.location_on,
+                                      iconColor: const Color(0xFFFFD700),
+                                      label: 'Dejar en',
+                                      value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -1889,80 +1822,6 @@ class _ConductorSearchingPassengersScreenState
           ),
         ),
       ),
-      ),
-    );
-  }
-  
-  Widget _buildAnimatedDetailRow({
-    required int delay,
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600 + delay),
-      curve: Curves.easeOut,
-      builder: (context, animValue, child) {
-        return Opacity(
-          opacity: animValue.clamp(0.0, 1.0),
-          child: Transform.translate(
-            offset: Offset(20 * (1 - animValue), 0),
-            child: child,
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A).withOpacity(0.5),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: const Color(0xFFFFD700),
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
