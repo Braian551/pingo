@@ -81,7 +81,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               EntranceFader(
                 delay: const Duration(milliseconds: 160),
                 child: Text(
-                  'Bienvenido a Ping-Go',
+                  'Bienvenido a Viax',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
