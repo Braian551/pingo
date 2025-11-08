@@ -74,14 +74,14 @@ class _SplashScreenState extends State<SplashScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFFFFF00).withOpacity(0.25),
+                        const Color(0xFF2196F3).withOpacity(0.25),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.9],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFFF00).withOpacity(0.12),
+                        color: const Color(0xFF2196F3).withOpacity(0.12),
                         blurRadius: 30,
                         spreadRadius: 8,
                       ),
@@ -113,22 +113,14 @@ class _SplashScreenState extends State<SplashScreen>
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Ping',
+                        text: 'Viax',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
                           foreground: Paint()
                             ..shader = const LinearGradient(
-                              colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
+                              colors: [Color(0xFF2196F3), Color(0xFF2196F3)],
                             ).createShader(Rect.fromLTWH(0, 0, 200, 0)),
-                        ),
-                      ),
-                      TextSpan(
-                        text: '-Go',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white.withOpacity(0.92),
                         ),
                       ),
                     ],
@@ -138,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 8),
 
                 const Text(
-                  'Movilidad y entregas rÃ¡pidas',
+                  'Transporte y entregas rápidas',
                   style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ],

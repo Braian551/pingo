@@ -38,7 +38,7 @@ class DatabaseProvider with ChangeNotifier {
       _errorMessage = 'Error al conectar con el backend: $e';
       print('âŒ Error al conectar con backend: $e');
       notifyListeners();
-      rethrow;
+      // Don't rethrow to prevent app crash
     }
   }
 

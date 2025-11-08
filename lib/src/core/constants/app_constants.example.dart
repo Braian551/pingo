@@ -17,16 +17,16 @@ class AppConstants {
   // ConfiguraciÃ³n de la base de datos
   static const String databaseHost = 'localhost';
   static const String databasePort = '3306';
-  static const String databaseName = 'pingo';
+  static const String databaseName = 'viax';
   static const String databaseUser = 'root';
   static const String databasePassword = '';
   
   // ConfiguraciÃ³n de la aplicaciÃ³n
-  static const String appName = 'PingGo';
+  static const String appName = 'Viax';
   static const String appVersion = '1.0.0';
   
   // URLs de la API
-  static const String baseApiUrl = 'https://api.pingo.com';
+  static const String baseApiUrl = 'https://api.viax.com';
   
   // ConfiguraciÃ³n de mapas
   static const double defaultLatitude = 4.6097; // BogotÃ¡, Colombia

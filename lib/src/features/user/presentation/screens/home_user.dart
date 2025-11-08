@@ -72,7 +72,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Activa los servicios de ubicaciÃ³n para usar Ping Go'),
+                content: Text('Activa los servicios de ubicaciÃ³n para usar Viax'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -218,7 +218,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFFFF00).withOpacity(0.1),
+              color: const Color(0xFF2196F3).withOpacity(0.1),
             ),
             child: ShaderMask(
               shaderCallback: (Rect bounds) {
@@ -226,8 +226,8 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFFFFF00),
-                    Color(0xFFFFFF00),
+                    Color(0xFF2196F3),
+                    Color(0xFF2196F3),
                   ],
                 ).createShader(bounds);
               },
@@ -240,7 +240,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           ),
           const SizedBox(width: 4),
           const Text(
-            'PingGo',
+              'Viax',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -267,7 +267,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFFFFF00),
+                      color: Color(0xFF2196F3),
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(minWidth: 8, minHeight: 8),
@@ -503,8 +503,8 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                           Navigator.pushNamed(context, '/payment_methods');
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFFF00),
-                          foregroundColor: Colors.black,
+                          backgroundColor: const Color(0xFF2196F3),
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -578,13 +578,13 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFFFFF00).withOpacity(0.1),
+                      color: const Color(0xFF2196F3).withOpacity(0.1),
                     ),
                     child: Center(
                       child: Text(
                         _userName != null && _userName!.isNotEmpty ? _userName![0].toUpperCase() : 'U',
                         style: const TextStyle(
-                          color: Color(0xFFFFFF00),
+                          color: Color(0xFF2196F3),
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                         ),
@@ -597,10 +597,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFFFF00),
+                        color: Color(0xFF2196F3),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.edit, color: Colors.black, size: 16),
+                      child: const Icon(Icons.edit, color: Colors.white, size: 16),
                     ),
                   ),
                 ],
@@ -629,7 +629,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             icon: Icons.route,
             title: 'Viajes',
             value: '0',
-            color: const Color(0xFFFFFF00),
+            color: const Color(0xFF2196F3),
           ),
         ),
       ],
@@ -753,12 +753,12 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   decoration: BoxDecoration(
                     color: isLogout
                         ? Colors.red.withOpacity(0.2)
-                        : const Color(0xFFFFFF00).withOpacity(0.2),
+                        : const Color(0xFF2196F3).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     icon, 
-                    color: isLogout ? Colors.red : const Color(0xFFFFFF00), 
+                    color: isLogout ? Colors.red : const Color(0xFF2196F3), 
                     size: 24,
                   ),
                 ),
@@ -879,11 +879,11 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFF00),
+                    color: const Color(0xFF2196F3),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        color: const Color(0xFF2196F3).withOpacity(0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1019,7 +1019,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       child: Container(
         height: 170,
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFF00),
+          color: const Color(0xFF2196F3),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
@@ -1042,16 +1042,16 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   const Text(
                     'Â¡ObtÃ©n 20% OFF!',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'En tu primer viaje con PingGo',
+                      'En tu primer viaje con Viax',
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1060,17 +1060,17 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.black,
+                        color: Colors.white,
                         width: 2,
                       ),
                     ),
                     child: const Text(
                       'BIENVENIDO',
                       style: TextStyle(
-                        color: Color(0xFFFFFF00),
+                        color: Color(0xFF2196F3),
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
@@ -1203,7 +1203,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFFF00) : Colors.transparent,
+            color: isSelected ? const Color(0xFF2196F3) : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: ScaleTransition(
@@ -1272,11 +1272,11 @@ class _ModernServiceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFF00),
+                    color: const Color(0xFF2196F3),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFFF00).withOpacity(0.3),
+                        color: const Color(0xFF2196F3).withOpacity(0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1350,10 +1350,10 @@ class _QuickActionItem extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFF00).withOpacity(0.15),
+                      color: const Color(0xFF2196F3).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: const Color(0xFFFFFF00), size: 24),
+                    child: Icon(icon, color: const Color(0xFF2196F3), size: 24),
                   ),
                   const SizedBox(height: 8),
                   Text(

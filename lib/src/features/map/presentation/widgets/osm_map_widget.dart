@@ -76,34 +76,33 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
         ),
         onTap: widget.interactive ? _handleMapTap : null,
         onPositionChanged: (position, hasGesture) {
-          if (hasGesture) {
-            _currentCenter = position.center;
+          if (!hasGesture) return;
+          _currentCenter = position.center;
 
-            // Notify start of movement once
-            if (!_isMoving) {
-              _isMoving = true;
-              if (widget.onMapMoveStart != null) widget.onMapMoveStart!();
-            }
-
-            // Notify map moved
-            if (widget.onMapMoved != null && position.center != null) {
-              widget.onMapMoved!(position.center!);
-            }
-
-            // Debounce to detect movement end
-            _moveEndDebounce?.cancel();
-            _moveEndDebounce = Timer(const Duration(milliseconds: 200), () {
-              _isMoving = false;
-              if (widget.onMapMoveEnd != null) widget.onMapMoveEnd!();
-            });
+          // Notify start of movement once
+          if (!_isMoving) {
+            _isMoving = true;
+            if (widget.onMapMoveStart != null) widget.onMapMoveStart!();
           }
+
+          // Notify map moved (center is non-null per flutter_map contract)
+            if (widget.onMapMoved != null) {
+              widget.onMapMoved!(position.center);
+            }
+
+          // Debounce to detect movement end
+          _moveEndDebounce?.cancel();
+          _moveEndDebounce = Timer(const Duration(milliseconds: 200), () {
+            _isMoving = false;
+            if (widget.onMapMoveEnd != null) widget.onMapMoveEnd!();
+          });
         },
       ),
       children: [
         // Capa de tiles de Mapbox (reemplaza OSM)
         TileLayer(
           urlTemplate: MapboxService.getTileUrl(style: 'streets-v12'),
-          userAgentPackageName: 'com.pingo.app',
+          userAgentPackageName: 'com.viax.app',
           additionalOptions: const {
             'accessToken': EnvConfig.mapboxPublicToken,
           },
@@ -280,7 +279,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
     switch (severity) {
       case 0:
       case 1:
-        return Colors.yellow.shade700;
+        return Colors.blue.shade700;
       case 2:
         return Colors.orange.shade700;
       case 3:

@@ -62,7 +62,7 @@ class TransportScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-          'PingGo',
+          'Viax',
           style: TextStyle(
             color: Colors.white,
             fontSize: 24,

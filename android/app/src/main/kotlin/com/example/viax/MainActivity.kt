@@ -1,4 +1,4 @@
-package com.example.ping_go
+package com.example.viax
 
 import io.flutter.embedding.android.FlutterActivity
 

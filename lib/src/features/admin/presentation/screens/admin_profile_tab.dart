@@ -24,7 +24,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
     super.build(context);
     
     final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
-    final adminEmail = widget.adminUser['correo_electronico'] ?? widget.adminUser['email'] ?? 'admin@pinggo.com';
+  final adminEmail = widget.adminUser['correo_electronico'] ?? widget.adminUser['email'] ?? 'admin@viax.com';
     final adminPhone = widget.adminUser['telefono'] ?? widget.adminUser['phone'] ?? 'No especificado';
 
     return SingleChildScrollView(
@@ -661,7 +661,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'PingGo Admin',
+                    'Viax Admin',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -678,7 +678,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Panel de administraciÃ³n del sistema PingGo',
+                    'Panel de administraciÃ³n del sistema Viax',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 14,

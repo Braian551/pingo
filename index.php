@@ -1,4 +1,4 @@
 <?php
 // Redirect all requests to backend
-header('Location: /pingo/backend/');
+header('Location: /backend/');
 exit();

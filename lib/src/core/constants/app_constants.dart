@@ -51,9 +51,9 @@ class AppConstants {
   // ============================================
   // CONFIGURACIÃ“N DE LA APLICACIÃ“N
   // ============================================
-  static const String appName = 'PingGo';
+  static const String appName = 'Viax';
   static const String appVersion = '1.0.0';
-  static const String baseApiUrl = 'https://api.pingo.com';
+  static const String baseApiUrl = 'https://api.viax.com'; // TODO: actualizar cuando exista dominio real
   
   // ============================================
   // CONFIGURACIÃ“N DE VALIDACIÃ“N

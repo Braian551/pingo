@@ -1,4 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:developer' as developer;
+import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import 'package:viax/src/routes/app_router.dart';
 import 'package:viax/src/providers/database_provider.dart';
@@ -10,43 +13,105 @@ import 'package:viax/src/core/di/service_locator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
+  // Configure robust global error handling as early as possible
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Forward Flutter framework errors to zone handler (and keep red-screen in debug)
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Print to console
+    try {
+      developer.log(
+        'FlutterError: \\n${details.exceptionAsString()}\\n${details.stack}',
+        name: 'GlobalError',
+      );
+    } catch (_) {}
+    // Also forward to the current zone so runZonedGuarded can capture
+    Zone.current.handleUncaughtError(details.exception, details.stack ?? StackTrace.current);
+  };
+
+  // Catch uncaught async and platform channel errors
+  ui.PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    try {
+      developer.log('PlatformDispatcher error: $error', name: 'GlobalError', stackTrace: stack);
+    } catch (_) {}
+    // Return true to indicate the error was handled to avoid process kill
+    return true;
+  };
+
+  // Friendly error widget in release to avoid hard crash during build failures
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Color(0xFF2196F3), size: 42),
+              const SizedBox(height: 12),
+              const Text(
+                'Se produjo un error en la interfaz',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                details.exceptionAsString(),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  };
+
   await initializeDateFormatting('es_ES', null);
 
   // Inicializar Service Locator (InyecciÃ³n de Dependencias)
   // Esto configura todos los datasources, repositories y use cases
   final serviceLocator = ServiceLocator();
-  await serviceLocator.init();
+  try {
+    await serviceLocator.init();
+  } catch (e) {
+    print('Error initializing service locator: $e');
+    // Continue without service locator for now
+  }
 
-  runApp(
-    MultiProvider(
-      providers: [
+  runZonedGuarded(() {
+    runApp(
+      MultiProvider(
+        providers: [
         // Database Provider (legacy)
         ChangeNotifierProvider(create: (_) => DatabaseProvider()),
         
         
         // User Microservice Provider
-        ChangeNotifierProvider(
+        if (serviceLocator.isInitialized) ChangeNotifierProvider(
           create: (_) => serviceLocator.createUserProvider(),
         ),
         
         // Conductor Microservice Provider
-        ChangeNotifierProvider(
+        if (serviceLocator.isInitialized) ChangeNotifierProvider(
           create: (_) => serviceLocator.createConductorProfileProvider(),
         ),
 
         // Trip Microservice Provider
-        ChangeNotifierProvider(
+        if (serviceLocator.isInitialized) ChangeNotifierProvider(
           create: (_) => serviceLocator.createTripProvider(),
         ),
 
         // Map Microservice Provider
-        ChangeNotifierProvider(
+        if (serviceLocator.isInitialized) ChangeNotifierProvider(
           create: (_) => serviceLocator.createMapProvider(),
         ),
 
         // Admin Microservice Provider
-        ChangeNotifierProvider(
+        if (serviceLocator.isInitialized) ChangeNotifierProvider(
           create: (_) => serviceLocator.createAdminProvider(),
         ),
 
@@ -57,10 +122,15 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ConductorProfileProvider()),
         ChangeNotifierProvider(create: (_) => ConductorTripsProvider()),
         ChangeNotifierProvider(create: (_) => ConductorEarningsProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+        ],
+        child: const MyApp(),
+      ),
+    );
+  }, (Object error, StackTrace stack) {
+    try {
+      developer.log('Uncaught (zoned): $error', name: 'GlobalError', stackTrace: stack);
+    } catch (_) {}
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -78,14 +148,21 @@ class MyApp extends StatelessWidget {
     // Inicializar la base de datos en background cuando se carga la app
     if (enableDatabaseInit) {
       // No bloqueamos la UI: inicializamos en background y dejamos que el RouterScreen se muestre.
-      Future.microtask(() => databaseProvider.initializeDatabase());
+      Future.microtask(() async {
+        try {
+          await databaseProvider.initializeDatabase();
+        } catch (e) {
+          print('Error initializing database: $e');
+          // Continue without crashing the app
+        }
+      });
     }
 
     return MaterialApp(
   title: 'Viax',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.standard,
         scaffoldBackgroundColor: Colors.black, // Fondo negro para toda la app
         appBarTheme: const AppBarTheme(

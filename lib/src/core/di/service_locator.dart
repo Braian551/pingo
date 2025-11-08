@@ -155,6 +155,9 @@ class ServiceLocator {
 
   bool _initialized = false;
 
+  /// Check if the service locator has been initialized
+  bool get isInitialized => _initialized;
+
   /// Inicializa todas las dependencias
   Future<void> init() async {
     if (_initialized) return;
