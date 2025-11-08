@@ -13,11 +13,17 @@ import 'dart:async';
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
   final String userName;
+  final String? deviceUuid; // para desafíos de dispositivo
+  final bool fromDeviceChallenge; // indica que esto viene del flujo de login con dispositivo desconocido
+  final bool directToHomeAfterCode; // si tras verificar el código vamos directo al home
 
   const EmailVerificationScreen({
     super.key,
     required this.email,
     required this.userName,
+    this.deviceUuid,
+    this.fromDeviceChallenge = false,
+    this.directToHomeAfterCode = false,
   });
 
   @override
@@ -265,14 +271,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
           if (!mounted || _isDisposed) return;
           
           print('EmailVerification: Navegando a login con email: ${widget.email}');
-          Navigator.pushReplacementNamed(
-            context,
-            RouteNames.login,
-            arguments: {
-              'email': widget.email,
-              'prefilled': true,
-            },
-          );
+          if (widget.fromDeviceChallenge && widget.deviceUuid != null && widget.directToHomeAfterCode) {
+            // Si venimos de bloqueo y queremos ir directo al home tras verificar
+            await _navigateToHomeAfterTrust(userExists: true);
+          } else {
+            Navigator.pushReplacementNamed(
+              context,
+              RouteNames.login,
+              arguments: {
+                'email': widget.email,
+                'prefilled': true,
+              },
+            );
+          }
         } else {
           // Usuario no existe - mostrar SnackBar breve y redirigir al registro
           print('EmailVerification: Usuario NO existe, redirigiendo a registro');
@@ -293,6 +304,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
             arguments: {
               'email': widget.email,
               'userName': widget.userName,
+              'deviceUuid': widget.deviceUuid,
             },
           );
         }
@@ -317,6 +329,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
           arguments: {
             'email': widget.email,
             'userName': widget.userName,
+            'deviceUuid': widget.deviceUuid,
           },
         );
       } finally {
@@ -330,6 +343,49 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
         title: 'Código Incorrecto',
         message: 'El código de verificación que ingresaste no es válido. Por favor, verifica e intenta nuevamente.',
         primaryButtonText: 'Reintentar',
+      );
+    }
+  }
+
+  Future<void> _navigateToHomeAfterTrust({required bool userExists}) async {
+    // Confía el dispositivo en backend (si venimos de challenge)
+    if (widget.deviceUuid != null && widget.fromDeviceChallenge) {
+      try {
+        final result = await UserService.verifyCodeAndTrustDevice(
+          email: widget.email,
+          code: _enteredCode,
+          deviceUuid: widget.deviceUuid,
+          markDeviceTrusted: true,
+        );
+        print('Device trust result: $result');
+      } catch (e) {
+        print('Error trusting device: $e');
+      }
+    }
+
+    // Obtener sesión guardada o perfil rápido
+    final session = await UserService.getSavedSession();
+    String? tipo = session?['tipo_usuario']?.toString();
+    // Si no hay sesión, pedimos perfil rápido (puede requerir otro endpoint, aquí se asume login previo se hará al ingresar contraseña)
+    // Para flujo directo -> podría necesitar un login silencioso pero no tenemos contraseña; navegamos por tipo y email
+
+    if (tipo == 'administrador') {
+      Navigator.pushReplacementNamed(
+        context,
+        RouteNames.adminHome,
+        arguments: {'email': widget.email},
+      );
+    } else if (tipo == 'conductor') {
+      Navigator.pushReplacementNamed(
+        context,
+        RouteNames.conductorHome,
+        arguments: {'email': widget.email},
+      );
+    } else {
+      Navigator.pushReplacementNamed(
+        context,
+        RouteNames.home,
+        arguments: {'email': widget.email},
       );
     }
   }

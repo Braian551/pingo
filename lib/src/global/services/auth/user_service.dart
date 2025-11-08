@@ -373,6 +373,7 @@ class UserService {
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
+    String? deviceUuid,
   }) async {
     try {
       final response = await http.post(
@@ -381,7 +382,11 @@ class UserService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          if (deviceUuid != null) 'device_uuid': deviceUuid,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -407,6 +412,58 @@ class UserService {
       return {'success': false, 'message': 'Error del servidor: ${response.statusCode}'};
     } catch (e) {
       print('Error en login: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  /// Check device status before deciding flow (login or verification)
+  static Future<Map<String, dynamic>> checkDevice({
+    required String email,
+    required String deviceUuid,
+  }) async {
+    try {
+      final resp = await http.post(
+        Uri.parse('${AppConfig.authServiceUrl}/check_device.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'email': email, 'device_uuid': deviceUuid}),
+      );
+      if (resp.statusCode == 200) {
+        final data = jsonDecode(resp.body) as Map<String, dynamic>;
+        return data;
+      }
+      return {'success': false, 'message': 'Error servidor (${resp.statusCode})'};
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  /// Verify code and optionally trust a device
+  static Future<Map<String, dynamic>> verifyCodeAndTrustDevice({
+    required String email,
+    required String code,
+    String? deviceUuid,
+    bool markDeviceTrusted = false,
+  }) async {
+    try {
+      final resp = await http.post(
+        Uri.parse('${AppConfig.authServiceUrl}/verify_code.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'code': code,
+          if (deviceUuid != null) 'device_uuid': deviceUuid,
+          'mark_device_trusted': markDeviceTrusted,
+        }),
+      );
+      final data = jsonDecode(resp.body) as Map<String, dynamic>;
+      return data;
+    } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }

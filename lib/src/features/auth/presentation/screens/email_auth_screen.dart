@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/widgets/entrance_fader.dart';
 import 'package:viax/src/theme/app_colors.dart';
+import 'package:viax/src/global/services/device_id_service.dart';
+import 'package:viax/src/global/services/auth/user_service.dart';
 
 class EmailAuthScreen extends StatefulWidget {
   const EmailAuthScreen({super.key});
@@ -173,7 +175,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           // Dismiss keyboard and use trimmed email to avoid accidental whitespace
                           FocusScope.of(context).unfocus();
                           final email = _emailController.text.trim();
@@ -196,22 +198,65 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                             return;
                           }
 
-                          // Provide quick feedback and navigate
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Redirigiendo...'),
-                              duration: Duration(milliseconds: 350),
-                            ),
-                          );
+                          // Obtener UUID de dispositivo
+                          final deviceUuid = await DeviceIdService.getOrCreateDeviceUuid();
 
-                          Navigator.pushNamed(
-                            context,
-                            RouteNames.emailVerification,
-                            arguments: {
-                              'email': email,
-                              'userName': email.split('@')[0],
-                            },
-                          );
+                          // Consultar estado del dispositivo en backend
+                          final check = await UserService.checkDevice(email: email, deviceUuid: deviceUuid);
+                          final success = check['success'] == true;
+                          final data = check['data'] as Map<String, dynamic>?;
+                          final status = data != null ? (data['status'] as String?) : null;
+
+                          if (success && data != null && data['exists'] == true) {
+                            // Usuario existe
+                            if (status == 'trusted') {
+                              // Ir directo a contraseña
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.login,
+                                arguments: {
+                                  'email': email,
+                                  'prefilled': true,
+                                },
+                              );
+                            } else if (status == 'locked') {
+                              // Enviar a verificación y luego directo al home
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.emailVerification,
+                                arguments: {
+                                  'email': email,
+                                  'userName': email.split('@')[0],
+                                  'deviceUuid': deviceUuid,
+                                  'fromDeviceChallenge': true,
+                                  'directToHomeAfterCode': true,
+                                },
+                              );
+                            } else {
+                              // unknown_device o needs_verification
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.emailVerification,
+                                arguments: {
+                                  'email': email,
+                                  'userName': email.split('@')[0],
+                                  'deviceUuid': deviceUuid,
+                                  'fromDeviceChallenge': true,
+                                  'directToHomeAfterCode': false,
+                                },
+                              );
+                            }
+                          } else {
+                            // Usuario no existe o error -> flujo de registro (verificación de email)
+                            Navigator.pushNamed(
+                              context,
+                              RouteNames.emailVerification,
+                              arguments: {
+                                'email': email,
+                                'userName': email.split('@')[0],
+                              },
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

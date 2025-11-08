@@ -4,6 +4,7 @@ import 'package:viax/src/routes/route_names.dart';
 import 'package:viax/src/widgets/entrance_fader.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
+import 'package:viax/src/global/services/device_id_service.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  int _localFailAttempts = 0;
 
   @override
   void initState() {
@@ -63,7 +65,12 @@ class _LoginScreenState extends State<LoginScreen> {
           return;
         }
 
-        final resp = await UserService.login(email: emailToUse, password: _passwordController.text);
+        final deviceUuid = await DeviceIdService.getOrCreateDeviceUuid();
+        final resp = await UserService.login(
+          email: emailToUse,
+          password: _passwordController.text,
+          deviceUuid: deviceUuid,
+        );
 
         if (resp['success'] == true) {
           _showSuccess('Â¡Bienvenido de nuevo!');
@@ -111,15 +118,39 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           }
         } else {
-          final message = resp['message'] ?? 'Credenciales invÃ¡lidas';
+          final message = (resp['message'] ?? 'Credenciales invÃ¡lidas').toString();
+          final data = resp['data'] is Map<String, dynamic> ? resp['data'] as Map<String, dynamic> : null;
+          final bool tooMany = data?['too_many_attempts'] == true;
+          final int failAttempts = (data?['fail_attempts'] is int) ? data!['fail_attempts'] as int : _localFailAttempts;
 
-          // Mostrar mensaje especÃ­fico segÃºn el error del backend
+          if (message.contains('Contrase')) {
+            _localFailAttempts = failAttempts;
+            if (tooMany || _localFailAttempts >= 5) {
+              // Redirigir a verificación por seguridad
+              Navigator.pushReplacementNamed(
+                context,
+                RouteNames.emailVerification,
+                arguments: {
+                  'email': emailToUse,
+                  'userName': emailToUse.split('@')[0],
+                  'deviceUuid': deviceUuid,
+                  'fromDeviceChallenge': true,
+                  'directToHomeAfterCode': true,
+                },
+              );
+              return;
+            }
+          }
+
+          // Mostrar mensaje específico según el error del backend
           if (message.contains('Email y password son requeridos')) {
             _showError('Por favor, completa todos los campos.');
           } else if (message.contains('Usuario no encontrado')) {
-            _showError('No se encontrÃ³ una cuenta con este email. Verifica que el email sea correcto.');
-          } else if (message.contains('ContraseÃ±a incorrecta')) {
-            _showError('La contraseÃ±a es incorrecta. IntÃ©ntalo de nuevo.');
+            _showError('No se encontró una cuenta con este email. Verifica que el email sea correcto.');
+          } else if (message.contains('Contrase')) {
+            _showError('La contraseña es incorrecta. Intento ${_localFailAttempts}/5');
+          } else if (tooMany) {
+            _showError('Demasiados intentos fallidos. Verifica tu correo.');
           } else {
             _showError(message);
           }
