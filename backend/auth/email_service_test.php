@@ -37,8 +37,9 @@ try {
     $code = $input['code'] ?? '';
     $userName = $input['userName'] ?? '';
 
-    if (!$email || strlen($code) !== 6 || empty($userName)) {
-        sendJsonResponse(false, 'Datos incompletos o invalidos');
+    // Ajustado a códigos de 4 dígitos (antes 6)
+    if (!$email || strlen($code) !== 4 || empty($userName)) {
+        sendJsonResponse(false, 'Datos incompletos o invalidos (se esperan 4 dígitos)');
     }
 
     // Verificar que las dependencias estén disponibles

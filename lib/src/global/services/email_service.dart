@@ -15,10 +15,10 @@ class EmailService {
     return '${AppConfig.authServiceUrl}/email_service.php';
   }
 
-  /// Genera un cÃ³digo de verificaciÃ³n de 6 dÃ­gitos
+  /// Genera un cÃ³digo de verificación de 4 dígitos
   static String generateVerificationCode() {
     final random = Random();
-    return (100000 + random.nextInt(900000)).toString();
+    return (1000 + random.nextInt(9000)).toString();
   }
 
   /// EnvÃ­a un cÃ³digo de verificaciÃ³n por correo usando el backend PHP

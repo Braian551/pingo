@@ -50,8 +50,30 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   @override
   void initState() {
     super.initState();
-    _digitControllers = List.generate(6, (_) => TextEditingController());
-    _focusNodes = List.generate(6, (_) => FocusNode());
+  _digitControllers = List.generate(4, (_) => TextEditingController());
+  _focusNodes = List.generate(4, (_) => FocusNode());
+
+    // Agregar listeners a los controladores para manejar el cambio de foco automáticamente
+    for (int i = 0; i < _digitControllers.length; i++) {
+      _digitControllers[i].addListener(() {
+        if (!mounted || _isDisposed) return;
+        
+        final text = _digitControllers[i].text;
+        if (text.isNotEmpty && text.length == 1) {
+          // Activar animación del pulso
+          _triggerPinPulse(i);
+          // Si se ingresó un dígito y no es el último campo, pasar al siguiente
+          if (i < 3) {
+            // Usar Timer con duración cero para cambiar foco después del frame actual
+            Timer(Duration.zero, () {
+              if (mounted && !_isDisposed) {
+                _focusNodes[i + 1].requestFocus();
+              }
+            });
+          }
+        }
+      });
+    }
 
     // Inicializar animaciones
     _animationController = AnimationController(
@@ -76,7 +98,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     ));
 
     // Inicializar animaciones de PIN (más rápidas y sutiles)
-    _pinControllers = List.generate(6, (index) => AnimationController(
+    _pinControllers = List.generate(4, (index) => AnimationController(
       duration: const Duration(milliseconds: 180), // pulso rápido
       vsync: this,
     ));
@@ -89,7 +111,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       curve: Curves.easeOutCubic,
     ))).toList();
 
-    _pinPulsing = List.generate(6, (index) => false);
+  _pinPulsing = List.generate(4, (index) => false);
 
     // Iniciar animación de entrada
     _animationController.forward();
@@ -130,8 +152,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     for (var controller in _pinControllers) {
       controller.dispose();
     }
-    for (final c in _digitControllers) {
-      c.dispose();
+    // Remover listeners de los controladores
+    for (final controller in _digitControllers) {
+      controller.dispose();
     }
     for (final f in _focusNodes) {
       f.dispose();
@@ -385,7 +408,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                       const SizedBox(height: 8),
 
                       Text(
-                        'Hemos enviado un código de 6 dígitos a\n${widget.email}',
+                        'Hemos enviado un código de 4 dígitos a\n${widget.email}',
                         style: TextStyle(
                           fontSize: 16,
                           color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
@@ -399,7 +422,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                           curve: Curves.easeInOut,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              const count = 6;
+                              const count = 4;
                               double gap = 8;
                               const double maxCellWidth = 54;
                               const double minCellWidth = 44;
@@ -494,13 +517,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                                             // Se eliminó animación por focus para que sólo ocurra al ingresar dígitos
                                           },
                                           onKeyEvent: (node, event) {
-                                            if (event is KeyDownEvent &&
-                                                event.logicalKey == LogicalKeyboardKey.backspace &&
-                                                _digitControllers[index].text.isEmpty &&
-                                                index > 0) {
-                                              _focusNodes[index - 1].requestFocus();
-                                              _digitControllers[index - 1].text = '';
-                                              return KeyEventResult.handled;
+                                            if (event is KeyDownEvent) {
+                                              // Mejorar manejo del backspace para mayor agilidad
+                                              if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                                                if (_digitControllers[index].text.isEmpty && index > 0) {
+                                                  // Si el campo actual está vacío, ir al anterior y limpiarlo
+                                                  Timer(Duration.zero, () {
+                                                    if (mounted && !_isDisposed) {
+                                                      _focusNodes[index - 1].requestFocus();
+                                                      _digitControllers[index - 1].text = '';
+                                                    }
+                                                  });
+                                                  return KeyEventResult.handled;
+                                                } else if (_digitControllers[index].text.isNotEmpty) {
+                                                  // Si hay texto, borrarlo normalmente
+                                                  _digitControllers[index].text = '';
+                                                  return KeyEventResult.handled;
+                                                }
+                                              }
                                             }
                                             return KeyEventResult.ignored;
                                           },
@@ -524,21 +558,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                                             ),
                                             onChanged: (value) async {
                                               if (!mounted || _isDisposed) return;
-                                              if (value.isNotEmpty) {
-                                                // Solo mantener el último dígito ingresado
-                                                _digitControllers[index].text = value[value.length - 1];
-                                                _digitControllers[index].selection = const TextSelection.collapsed(offset: 1);
-                                                _triggerPinPulse(index);
-                                                if (index < 5) {
-                                                  _focusNodes[index + 1].requestFocus();
-                                                } else {
-                                                  _focusNodes[index].unfocus();
-                                                  FocusScope.of(context).unfocus();
+
+                                              // Detección de pegado de los 4 dígitos completos
+                                              if (value.isNotEmpty && value.length == 4 && RegExp(r'^\d{4}$').hasMatch(value)) {
+                                                for (int i = 0; i < 4; i++) {
+                                                  _digitControllers[i].text = value[i];
+                                                  _triggerPinPulse(i);
                                                 }
+                                                Timer(Duration.zero, () {
+                                                  if (mounted && !_isDisposed) {
+                                                    _focusNodes[3].requestFocus();
+                                                  }
+                                                });
+                                              } else if (value.isNotEmpty) {
+                                                _triggerPinPulse(index);
                                               }
 
                                               final current = _enteredCode;
-                                              if (current.length == 6 && !current.contains(RegExp(r'[^0-9]')) &&
+                                              if (current.length == 4 && !current.contains(RegExp(r'[^0-9]')) &&
                                                   mounted && !_isLoading && !_isVerifying) {
                                                 await _verifyCode();
                                               }
@@ -571,11 +608,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                           onPressed: (_isLoading || _isResending || _isVerifying)
                               ? null
                               : () async {
-                                  if (_enteredCode.length < 6) {
+                                  if (_enteredCode.length < 4) {
                                     await DialogHelper.showWarning(
                                       context,
                                       title: 'Código incompleto',
-                                      message: 'Ingresa los 6 dígitos para continuar.',
+                                      message: 'Ingresa los 4 dígitos para continuar.',
                                       primaryButtonText: 'Entendido',
                                     );
                                     return;

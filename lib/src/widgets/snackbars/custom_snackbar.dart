@@ -18,54 +18,58 @@ class CustomSnackbar {
     String? actionLabel,
     VoidCallback? onAction,
   }) {
-    final config = _getSnackbarConfig(type);
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final config = _getSnackbarConfig(type, isDark);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Icono
+            // Icono con fondo suave
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: config.iconBackgroundColor,
                 shape: BoxShape.circle,
+                color: config.iconBackgroundColor,
+                border: Border.all(color: config.iconBorderColor, width: 1),
               ),
-              child: Icon(
-                config.icon,
-                color: config.iconColor,
-                size: 20,
+              child: Center(
+                child: Icon(
+                  config.icon,
+                  color: config.iconColor,
+                  size: 20,
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            
+            const SizedBox(width: 14),
             // Mensaje
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: config.messageColor,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.2,
+                  height: 1.3,
                 ),
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1F1F1F),
+        backgroundColor: config.backgroundColor,
         behavior: SnackBarBehavior.floating,
         duration: duration,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: config.borderColor.withOpacity(0.3),
-            width: 1.5,
-          ),
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: config.borderColor, width: 1),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        elevation: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        elevation: 10,
         action: actionLabel != null
             ? SnackBarAction(
                 label: actionLabel,
@@ -149,40 +153,18 @@ class CustomSnackbar {
     );
   }
 
-  static _SnackbarConfig _getSnackbarConfig(SnackbarType type) {
+  static _SnackbarConfig _getSnackbarConfig(SnackbarType type, bool isDark) {
+    final baseBg = isDark ? const Color(0xFF171A1D) : Colors.white;
+    final messageColor = isDark ? Colors.white.withOpacity(0.92) : const Color(0xFF2E3135);
     switch (type) {
       case SnackbarType.success:
-        return _SnackbarConfig(
-          icon: Icons.check_circle,
-          iconColor: const Color(0xFF4CAF50),
-          iconBackgroundColor: const Color(0xFF4CAF50).withOpacity(0.2),
-          borderColor: const Color(0xFF4CAF50),
-          actionColor: const Color(0xFF4CAF50),
-        );
+        return _SnackbarConfig.success(baseBg, messageColor);
       case SnackbarType.error:
-        return _SnackbarConfig(
-          icon: Icons.error,
-          iconColor: const Color(0xFFFF5252),
-          iconBackgroundColor: const Color(0xFFFF5252).withOpacity(0.2),
-          borderColor: const Color(0xFFFF5252),
-          actionColor: const Color(0xFFFF5252),
-        );
+        return _SnackbarConfig.error(baseBg, messageColor);
       case SnackbarType.warning:
-        return _SnackbarConfig(
-          icon: Icons.warning,
-          iconColor: const Color(0xFFFFA726),
-          iconBackgroundColor: const Color(0xFFFFA726).withOpacity(0.2),
-          borderColor: const Color(0xFFFFA726),
-          actionColor: const Color(0xFFFFA726),
-        );
+        return _SnackbarConfig.warning(baseBg, messageColor);
       case SnackbarType.info:
-        return _SnackbarConfig(
-          icon: Icons.info,
-          iconColor: const Color(0xFFFFFF00),
-          iconBackgroundColor: const Color(0xFFFFFF00).withOpacity(0.2),
-          borderColor: const Color(0xFFFFFF00),
-          actionColor: const Color(0xFFFFFF00),
-        );
+        return _SnackbarConfig.info(baseBg, messageColor);
     }
   }
 }
@@ -191,14 +173,72 @@ class _SnackbarConfig {
   final IconData icon;
   final Color iconColor;
   final Color iconBackgroundColor;
+  final Color iconBorderColor;
   final Color borderColor;
   final Color actionColor;
+  final Color messageColor;
+  final Color backgroundColor;
 
   _SnackbarConfig({
     required this.icon,
     required this.iconColor,
     required this.iconBackgroundColor,
+    required this.iconBorderColor,
     required this.borderColor,
     required this.actionColor,
+    required this.messageColor,
+    required this.backgroundColor,
   });
+
+  factory _SnackbarConfig.success(Color bg, Color messageColor) {
+    return _SnackbarConfig(
+      icon: Icons.check_circle,
+      iconColor: const Color(0xFF2E7D32),
+      iconBackgroundColor: const Color(0xFF4CAF50).withOpacity(0.15),
+      iconBorderColor: const Color(0xFF2E7D32).withOpacity(0.45),
+      borderColor: const Color(0xFF2E7D32).withOpacity(0.6),
+      actionColor: const Color(0xFF2E7D32),
+      messageColor: messageColor,
+      backgroundColor: bg,
+    );
+  }
+
+  factory _SnackbarConfig.error(Color bg, Color messageColor) {
+    return _SnackbarConfig(
+      icon: Icons.error,
+      iconColor: const Color(0xFFB00020),
+      iconBackgroundColor: const Color(0xFFEF5350).withOpacity(0.15),
+      iconBorderColor: const Color(0xFFB00020).withOpacity(0.45),
+      borderColor: const Color(0xFFB00020).withOpacity(0.65),
+      actionColor: const Color(0xFFB00020),
+      messageColor: messageColor,
+      backgroundColor: bg,
+    );
+  }
+
+  factory _SnackbarConfig.warning(Color bg, Color messageColor) {
+    return _SnackbarConfig(
+      icon: Icons.warning,
+      iconColor: const Color(0xFFED6C02),
+      iconBackgroundColor: const Color(0xFFFFA726).withOpacity(0.15),
+      iconBorderColor: const Color(0xFFED6C02).withOpacity(0.45),
+      borderColor: const Color(0xFFED6C02).withOpacity(0.6),
+      actionColor: const Color(0xFFED6C02),
+      messageColor: messageColor,
+      backgroundColor: bg,
+    );
+  }
+
+  factory _SnackbarConfig.info(Color bg, Color messageColor) {
+    return _SnackbarConfig(
+      icon: Icons.info,
+      iconColor: const Color(0xFF1565C0),
+      iconBackgroundColor: const Color(0xFF42A5F5).withOpacity(0.15),
+      iconBorderColor: const Color(0xFF1565C0).withOpacity(0.45),
+      borderColor: const Color(0xFF1565C0).withOpacity(0.6),
+      actionColor: const Color(0xFF1565C0),
+      messageColor: messageColor,
+      backgroundColor: bg,
+    );
+  }
 }

@@ -34,25 +34,32 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _getDialogConfig();
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final config = _getDialogConfig(theme, isDark);
     
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 340),
+        constraints: const BoxConstraints(maxWidth: 360),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(24),
+          color: config.backgroundColor,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: config.borderColor.withOpacity(0.3),
-            width: 1.5,
+            color: config.borderColor.withOpacity(0.28),
+            width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: config.glowColor.withOpacity(0.15),
-              blurRadius: 30,
-              spreadRadius: 0,
+              color: isDark ? Colors.black.withOpacity(0.6) : Colors.black.withOpacity(0.08),
+              blurRadius: 28,
+              offset: const Offset(0, 12),
+            ),
+            BoxShadow(
+              color: config.glowColor.withOpacity(isDark ? 0.18 : 0.12),
+              blurRadius: 36,
+              spreadRadius: 2,
             ),
           ],
         ),
@@ -61,33 +68,36 @@ class CustomDialog extends StatelessWidget {
           children: [
             // Header con icono
             Container(
-              padding: const EdgeInsets.only(top: 32, bottom: 20),
+              padding: const EdgeInsets.only(top: 28, bottom: 16),
               child: Column(
                 children: [
                   // Icono con efecto de glow
-                  Container(
-                    width: 70,
-                    height: 70,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          config.glowColor.withOpacity(0.2),
-                          config.glowColor.withOpacity(0.05),
-                        ],
-                        stops: const [0.3, 1.0],
-                      ),
+                      color: config.iconBackground,
+                      border: Border.all(color: config.iconBorderColor, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: config.glowColor.withOpacity(isDark ? 0.35 : 0.25),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
                     ),
                     child: Center(
-                      child: customIcon ??
-                          Icon(
-                            config.icon,
-                            size: 38,
-                            color: config.iconColor,
-                          ),
+                      child: customIcon ?? Icon(
+                        config.icon,
+                        size: 32,
+                        color: config.iconColor,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   
                   // TÃ­tulo
                   Padding(
@@ -95,11 +105,11 @@ class CustomDialog extends StatelessWidget {
                     child: Text(
                       title,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 22,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontSize: 21,
                         fontWeight: FontWeight.w700,
                         color: config.titleColor,
-                        letterSpacing: 0.3,
+                        letterSpacing: 0.2,
                       ),
                     ),
                   ),
@@ -113,16 +123,16 @@ class CustomDialog extends StatelessWidget {
               child: Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.white70,
-                  height: 1.5,
-                  letterSpacing: 0.2,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14.5,
+                  height: 1.48,
+                  letterSpacing: 0.15,
+                  color: config.messageColor,
                 ),
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
 
             // Botones
             Padding(
@@ -143,15 +153,17 @@ class CustomDialog extends StatelessWidget {
                           elevation: 0,
                           shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                         ),
                         child: Text(
                           primaryButtonText!,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
+                            letterSpacing: 0.2,
+                            color: config.primaryButtonTextColor,
                           ),
                         ),
                       ),
@@ -162,27 +174,27 @@ class CustomDialog extends StatelessWidget {
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 48,
                       child: OutlinedButton(
-                        onPressed: onSecondaryPressed ??
-                            () => Navigator.of(context).pop(),
+                        onPressed: onSecondaryPressed ?? () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white70,
+                          foregroundColor: config.secondaryButtonTextColor,
                           side: BorderSide(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 1.5,
+                            color: config.secondaryButtonBorderColor,
+                            width: 1,
                           ),
-                          elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                         ),
                         child: Text(
                           secondaryButtonText!,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
+                            letterSpacing: 0.2,
+                            color: config.secondaryButtonTextColor,
                           ),
                         ),
                       ),
@@ -197,48 +209,19 @@ class CustomDialog extends StatelessWidget {
     );
   }
 
-  _DialogConfig _getDialogConfig() {
+  _DialogConfig _getDialogConfig(ThemeData theme, bool isDark) {
+    // Base neutrals
+    final surface = isDark ? const Color(0xFF17191C) : Colors.white;
+    final messageColor = isDark ? Colors.white70 : const Color(0xFF424750);
     switch (type) {
       case DialogType.success:
-        return _DialogConfig(
-          icon: Icons.check_circle_outline,
-          iconColor: const Color(0xFF4CAF50),
-          titleColor: const Color(0xFF4CAF50),
-          borderColor: const Color(0xFF4CAF50),
-          glowColor: const Color(0xFF4CAF50),
-          primaryButtonColor: const Color(0xFF4CAF50),
-          primaryButtonTextColor: Colors.black,
-        );
+        return _DialogConfig.success(surface, messageColor, theme.colorScheme.secondary);
       case DialogType.error:
-        return _DialogConfig(
-          icon: Icons.error_outline,
-          iconColor: const Color(0xFFFF5252),
-          titleColor: const Color(0xFFFF5252),
-          borderColor: const Color(0xFFFF5252),
-          glowColor: const Color(0xFFFF5252),
-          primaryButtonColor: const Color(0xFFFF5252),
-          primaryButtonTextColor: Colors.white,
-        );
+        return _DialogConfig.error(surface, messageColor);
       case DialogType.warning:
-        return _DialogConfig(
-          icon: Icons.warning_amber_outlined,
-          iconColor: const Color(0xFFFFA726),
-          titleColor: const Color(0xFFFFA726),
-          borderColor: const Color(0xFFFFA726),
-          glowColor: const Color(0xFFFFA726),
-          primaryButtonColor: const Color(0xFFFFA726),
-          primaryButtonTextColor: Colors.black,
-        );
+        return _DialogConfig.warning(surface, messageColor);
       case DialogType.info:
-        return _DialogConfig(
-          icon: Icons.info_outline,
-          iconColor: const Color(0xFFFFFF00),
-          titleColor: const Color(0xFFFFFF00),
-          borderColor: const Color(0xFFFFFF00),
-          glowColor: const Color(0xFFFFFF00),
-          primaryButtonColor: const Color(0xFFFFFF00),
-          primaryButtonTextColor: Colors.black,
-        );
+        return _DialogConfig.info(surface, messageColor);
     }
   }
 }
@@ -251,6 +234,12 @@ class _DialogConfig {
   final Color glowColor;
   final Color primaryButtonColor;
   final Color primaryButtonTextColor;
+  final Color backgroundColor;
+  final Color messageColor;
+  final Color iconBackground;
+  final Color iconBorderColor;
+  final Color secondaryButtonBorderColor;
+  final Color secondaryButtonTextColor;
 
   _DialogConfig({
     required this.icon,
@@ -260,5 +249,83 @@ class _DialogConfig {
     required this.glowColor,
     required this.primaryButtonColor,
     required this.primaryButtonTextColor,
+    required this.backgroundColor,
+    required this.messageColor,
+    required this.iconBackground,
+    required this.iconBorderColor,
+    required this.secondaryButtonBorderColor,
+    required this.secondaryButtonTextColor,
   });
+
+  factory _DialogConfig.success(Color surface, Color messageColor, Color accent) {
+    return _DialogConfig(
+      icon: Icons.check_circle_outline,
+      iconColor: const Color(0xFF2E7D32),
+      titleColor: const Color(0xFF2E7D32),
+      borderColor: const Color(0xFF2E7D32),
+      glowColor: const Color(0xFF4CAF50),
+      primaryButtonColor: const Color(0xFF2E7D32),
+      primaryButtonTextColor: Colors.white,
+      backgroundColor: surface,
+      messageColor: messageColor,
+      iconBackground: const Color(0xFF2E7D32).withOpacity(0.12),
+      iconBorderColor: const Color(0xFF2E7D32).withOpacity(0.5),
+      secondaryButtonBorderColor: const Color(0xFF2E7D32).withOpacity(0.4),
+      secondaryButtonTextColor: const Color(0xFF2E7D32),
+    );
+  }
+
+  factory _DialogConfig.error(Color surface, Color messageColor) {
+    return _DialogConfig(
+      icon: Icons.error_outline,
+      iconColor: const Color(0xFFB00020),
+      titleColor: const Color(0xFFB00020),
+      borderColor: const Color(0xFFB00020),
+      glowColor: const Color(0xFFEF5350),
+      primaryButtonColor: const Color(0xFFB00020),
+      primaryButtonTextColor: Colors.white,
+      backgroundColor: surface,
+      messageColor: messageColor,
+      iconBackground: const Color(0xFFB00020).withOpacity(0.12),
+      iconBorderColor: const Color(0xFFB00020).withOpacity(0.5),
+      secondaryButtonBorderColor: const Color(0xFFB00020).withOpacity(0.4),
+      secondaryButtonTextColor: const Color(0xFFB00020),
+    );
+  }
+
+  factory _DialogConfig.warning(Color surface, Color messageColor) {
+    return _DialogConfig(
+      icon: Icons.warning_amber_outlined,
+      iconColor: const Color(0xFFED6C02),
+      titleColor: const Color(0xFFED6C02),
+      borderColor: const Color(0xFFED6C02),
+      glowColor: const Color(0xFFFFA726),
+      primaryButtonColor: const Color(0xFFED6C02),
+      primaryButtonTextColor: Colors.white,
+      backgroundColor: surface,
+      messageColor: messageColor,
+      iconBackground: const Color(0xFFED6C02).withOpacity(0.12),
+      iconBorderColor: const Color(0xFFED6C02).withOpacity(0.5),
+      secondaryButtonBorderColor: const Color(0xFFED6C02).withOpacity(0.4),
+      secondaryButtonTextColor: const Color(0xFFED6C02),
+    );
+  }
+
+  factory _DialogConfig.info(Color surface, Color messageColor) {
+    return _DialogConfig(
+      icon: Icons.info_outline,
+      iconColor: const Color(0xFF1565C0),
+      titleColor: const Color(0xFF1565C0),
+      borderColor: const Color(0xFF1565C0),
+      glowColor: const Color(0xFF42A5F5),
+      primaryButtonColor: const Color(0xFF1565C0),
+      primaryButtonTextColor: Colors.white,
+      backgroundColor: surface,
+      messageColor: messageColor,
+      iconBackground: const Color(0xFF1565C0).withOpacity(0.12),
+      iconBorderColor: const Color(0xFF1565C0).withOpacity(0.5),
+      secondaryButtonBorderColor: const Color(0xFF1565C0).withOpacity(0.4),
+      secondaryButtonTextColor: const Color(0xFF1565C0),
+    );
+  }
 }
