@@ -1,4 +1,4 @@
-/// Módulo de tema de la aplicación
+﻿/// Módulo de tema de la aplicación
 /// 
 /// Este módulo proporciona:
 /// - Definición de colores (app_colors.dart)

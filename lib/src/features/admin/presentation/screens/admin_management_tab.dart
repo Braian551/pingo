@@ -54,7 +54,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
             title: 'Usuarios',
             items: [
               _ManagementItem(
-                title: 'GestiÃ³n de Usuarios',
+                title: 'Gestión de Usuarios',
                 subtitle: 'Ver, editar y administrar todos los usuarios',
                 icon: Icons.people_outline_rounded,
                 accentColor: AppColors.blue600,
@@ -81,7 +81,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
               ),
               _ManagementItem(
                 title: 'Conductores',
-                subtitle: 'Administrar conductores y sus vehÃ­culos',
+                subtitle: 'Administrar conductores y sus vehículos',
                 icon: Icons.drive_eta_rounded,
                 accentColor: AppColors.accent,
                 onTap: () {
@@ -117,7 +117,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           ),
           const SizedBox(height: 24),
           _buildSection(
-            title: 'Reportes y AuditorÃ­a',
+            title: 'Reportes y Auditoría',
             items: [
               _ManagementItem(
                 title: 'Logs de AuditorÃ­a',
@@ -154,11 +154,11 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           ),
           const SizedBox(height: 24),
           _buildSection(
-            title: 'ConfiguraciÃ³n',
+            title: 'Configuración',
             items: [
               _ManagementItem(
                 title: 'Ajustes Generales',
-                subtitle: 'ConfiguraciÃ³n de la aplicaciÃ³n',
+                subtitle: 'Configuración de la aplicación',
                 icon: Icons.settings_rounded,
                 accentColor: AppColors.blue600,
                 onTap: () {
@@ -220,8 +220,6 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
   }
 
   Widget _buildManagementCard(_ManagementItem item) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return GestureDetector(
       onTap: item.onTap,
       child: ClipRRect(
@@ -230,9 +228,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: isDark
-                ? AppColors.darkSurface.withOpacity(0.6)
-                : AppColors.lightSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: item.accentColor.withOpacity(0.3),
@@ -292,9 +288,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: isDark
-                            ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05)
-                            : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -315,12 +309,10 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
   }
 
   void _showComingSoon() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('FunciÃ³n en desarrollo'),
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        content: const Text('Función en desarrollo'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

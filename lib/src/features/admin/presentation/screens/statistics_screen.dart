@@ -2,7 +2,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/admin/admin_service.dart';
-import 'package:viax/src/theme/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -32,6 +31,21 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
     _setupAnimations();
     _loadStats();
   }
+
+  // Theme colors
+  Color get _backgroundColor => Theme.of(context).scaffoldBackgroundColor;
+  Color get _surfaceColor => Theme.of(context).colorScheme.surfaceContainerHighest;
+  Color get _onSurfaceColor => Theme.of(context).colorScheme.onSurface;
+  Color get _onSurfaceVariantColor => Theme.of(context).colorScheme.onSurfaceVariant;
+  Color get _primaryColor => Theme.of(context).colorScheme.primary;
+  Color get _outlineColor => Theme.of(context).colorScheme.outline;
+  Color get _onPrimaryColor => Theme.of(context).colorScheme.onPrimary;
+  
+  // Theme-aware accent colors for stat cards
+  Color get _statCardColor1 => Theme.of(context).colorScheme.secondary;
+  Color get _statCardColor2 => Theme.of(context).colorScheme.tertiary;
+  Color get _statCardColor3 => const Color(0xFFf5576c); // Keep this one as it's a specific red for warnings/errors
+  Color get _statCardColor4 => _primaryColor;
 
   void _setupAnimations() {
     _animationController = AnimationController(
@@ -78,7 +92,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+      backgroundColor: _backgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(),
       body: _isLoading ? _buildShimmerLoading() : _buildContent(),
@@ -94,7 +108,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.8),
+              color: _backgroundColor.withOpacity(0.8),
             ),
           ),
         ),
@@ -103,10 +117,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+          color: _surfaceColor.withOpacity(0.1),
         ),
         child: IconButton(
-          icon: Icon(Icons.close, color: Colors.white, size: 20),
+          icon: Icon(Icons.close, color: _onSurfaceColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -115,13 +129,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, Color(0xFFFFD700)],
-              ),
+              color: _primaryColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: _primaryColor.withOpacity(0.3),
                   blurRadius: 8,
                   spreadRadius: 0,
                 ),
@@ -129,28 +141,28 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
             ),
             child: Icon(
               Icons.bar_chart_rounded,
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+              color: _onPrimaryColor,
               size: 24,
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'EstadÃ­sticas',
+                  'Estadísticas',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: _onPrimaryColor,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
                   ),
                 ),
                 Text(
-                  'MÃ©tricas y anÃ¡lisis',
+                  'Métricas y análisis',
                   style: TextStyle(
-                    color: Colors.white60,
+                    color: _onPrimaryColor.withOpacity(0.6),
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                   ),
@@ -165,10 +177,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+            color: _surfaceColor.withOpacity(0.1),
           ),
           child: IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+            icon: Icon(Icons.refresh_rounded, color: _primaryColor),
             onPressed: _loadStats,
             tooltip: 'Actualizar',
           ),
@@ -207,13 +219,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
 
   Widget _buildShimmerBox({required double height, double? width}) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFF1A1A1A),
-      highlightColor: const Color(0xFF2A2A2A),
+      baseColor: _surfaceColor.withOpacity(0.3),
+      highlightColor: _surfaceColor.withOpacity(0.5),
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+          color: _onSurfaceColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -226,8 +238,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
       child: SlideTransition(
         position: _slideAnimation,
         child: RefreshIndicator(
-          color: AppColors.primary,
-          backgroundColor: const Color(0xFF1A1A1A),
+          color: _primaryColor,
+          backgroundColor: _surfaceColor,
           onRefresh: _loadStats,
           child: SafeArea(
             child: SingleChildScrollView(
@@ -259,14 +271,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: _surfaceColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
+            border: Border.all(color: _outlineColor.withOpacity(0.1)),
           ),
           child: Row(
             children: [
-              _buildPeriodButton('7 dÃ­as', '7d'),
-              _buildPeriodButton('30 dÃ­as', '30d'),
+              _buildPeriodButton('7 días', '7d'),
+              _buildPeriodButton('30 días', '30d'),
               _buildPeriodButton('Todo', 'all'),
             ],
           ),
@@ -287,14 +299,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : Colors.transparent,
+            color: isSelected ? _primaryColor : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? Colors.black : Colors.white70,
+              color: isSelected ? _onPrimaryColor : _onSurfaceVariantColor,
               fontSize: 14,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
@@ -318,9 +330,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: _surfaceColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
+            border: Border.all(color: _outlineColor.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,33 +342,33 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.2),
+                      color: _primaryColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.trending_up_rounded,
-                      color: AppColors.primary,
+                      color: _primaryColor,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Registros Recientes',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: _onSurfaceColor,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
                           ),
                         ),
                         Text(
-                          'Ãšltimos 7 dÃ­as',
+                          'Últimos 7 días',
                           style: TextStyle(
-                            color: Colors.white60,
+                            color: _onSurfaceVariantColor,
                             fontSize: 13,
                           ),
                         ),
@@ -376,7 +388,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       horizontalInterval: 1,
                       getDrawingHorizontalLine: (value) {
                         return FlLine(
-                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
+                          color: _outlineColor.withOpacity(0.05),
                           strokeWidth: 1,
                         );
                       },
@@ -404,7 +416,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                                   child: Text(
                                     '${parts[2]}/${parts[1]}',
                                     style: TextStyle(
-                                      color: Colors.white60,
+                                      color: _onSurfaceVariantColor,
                                       fontSize: 10,
                                     ),
                                   ),
@@ -424,7 +436,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                             return Text(
                               value.toInt().toString(),
                               style: TextStyle(
-                                color: Colors.white60,
+                                color: _onSurfaceVariantColor,
                                 fontSize: 10,
                               ),
                             );
@@ -441,9 +453,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       LineChartBarData(
                         spots: _getChartSpots(registros),
                         isCurved: true,
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, Color(0xFFFFD700)],
-                        ),
+                        color: _primaryColor,
                         barWidth: 3,
                         isStrokeCapRound: true,
                         dotData: FlDotData(
@@ -451,22 +461,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                           getDotPainter: (spot, percent, barData, index) {
                             return FlDotCirclePainter(
                               radius: 4,
-                              color: AppColors.primary,
+                              color: _primaryColor,
                               strokeWidth: 2,
-                              strokeColor: Colors.black,
+                              strokeColor: Colors.white,
                             );
                           },
                         ),
                         belowBarData: BarAreaData(
                           show: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.primary.withOpacity(0.3),
-                              AppColors.primary.withOpacity(0.0),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
+                          color: _primaryColor.withOpacity(0.1),
                         ),
                       ),
                     ],
@@ -507,38 +510,38 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: _surfaceColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
+            border: Border.all(color: _outlineColor.withOpacity(0.1)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
+                  color: _onSurfaceColor.withOpacity(0.05),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.bar_chart_rounded,
-                  color: Colors.white30,
+                  color: _onSurfaceVariantColor,
                   size: 40,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'No hay datos disponibles',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: _onSurfaceVariantColor,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Las estadÃ­sticas aparecerÃ¡n aquÃ­',
+                'Las estadísticas aparecerán aquí',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: _onSurfaceColor.withOpacity(0.4),
                   fontSize: 13,
                 ),
               ),
@@ -556,10 +559,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'MÃ©tricas generales',
+        Text(
+          'Métricas generales',
           style: TextStyle(
-            color: Colors.white,
+            color: _onSurfaceColor,
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
@@ -578,25 +581,25 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
               'Total Usuarios',
               users['total_usuarios']?.toString() ?? '0',
               Icons.people_rounded,
-              const Color(0xFF667eea),
+              _statCardColor1,
             ),
             _buildStatCard(
               'Clientes',
               users['total_clientes']?.toString() ?? '0',
               Icons.person_rounded,
-              const Color(0xFF11998e),
+              _statCardColor2,
             ),
             _buildStatCard(
               'Conductores',
               users['total_conductores']?.toString() ?? '0',
               Icons.local_taxi_rounded,
-              const Color(0xFFf5576c),
+              _statCardColor3,
             ),
             _buildStatCard(
               'Solicitudes',
               solicitudes['total_solicitudes']?.toString() ?? '0',
               Icons.receipt_long_rounded,
-              AppColors.primary,
+              _statCardColor4,
             ),
           ],
         ),
@@ -612,9 +615,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: _surfaceColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
+            border: Border.all(color: _outlineColor.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,7 +645,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       child: Text(
                         value,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: _onSurfaceColor,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: -0.5,
@@ -653,7 +656,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                     Text(
                       label,
                       style: TextStyle(
-                        color: Colors.white60,
+                        color: _onSurfaceVariantColor,
                         fontSize: 11,
                       ),
                       maxLines: 1,
@@ -685,9 +688,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.8),
+            color: _surfaceColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
+            border: Border.all(color: _outlineColor.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -697,24 +700,24 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF667eea).withOpacity(0.2),
+                      color: _statCardColor1.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.pie_chart_rounded,
-                      color: Color(0xFF667eea),
+                      color: _statCardColor1,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'DistribuciÃ³n de Solicitudes',
+                          'Distribución de Solicitudes',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: _onSurfaceColor,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
@@ -723,7 +726,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                         Text(
                           'Estado actual',
                           style: TextStyle(
-                            color: Colors.white60,
+                            color: _onSurfaceVariantColor,
                             fontSize: 13,
                           ),
                         ),
@@ -747,7 +750,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                             PieChartSectionData(
                               value: completadas.toDouble(),
                               title: '${((completadas / total) * 100).toStringAsFixed(0)}%',
-                              color: const Color(0xFF11998e),
+                              color: _statCardColor2, // Green for completed
                               radius: 50,
                               titleStyle: TextStyle(
                                 fontSize: 12,
@@ -758,7 +761,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                             PieChartSectionData(
                               value: canceladas.toDouble(),
                               title: '${((canceladas / total) * 100).toStringAsFixed(0)}%',
-                              color: const Color(0xFFf5576c),
+                              color: _statCardColor3, // Red for cancelled
                               radius: 50,
                               titleStyle: TextStyle(
                                 fontSize: 12,
@@ -769,12 +772,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                             PieChartSectionData(
                               value: enProceso.toDouble(),
                               title: '${((enProceso / total) * 100).toStringAsFixed(0)}%',
-                              color: AppColors.primary,
+                              color: _primaryColor,
                               radius: 50,
                               titleStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -788,11 +791,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLegendItem('Completadas', completadas, const Color(0xFF11998e)),
+                        _buildLegendItem('Completadas', completadas, _statCardColor2),
                         const SizedBox(height: 12),
-                        _buildLegendItem('Canceladas', canceladas, const Color(0xFFf5576c)),
+                        _buildLegendItem('Canceladas', canceladas, _statCardColor3),
                         const SizedBox(height: 12),
-                        _buildLegendItem('En Proceso', enProceso, AppColors.primary),
+                        _buildLegendItem('En Proceso', enProceso, _primaryColor),
                       ],
                     ),
                   ),
@@ -824,14 +827,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: _onSurfaceVariantColor,
                   fontSize: 11,
                 ),
               ),
               Text(
                 value.toString(),
                 style: TextStyle(
-                  color: Colors.white,
+                  color: _onSurfaceColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

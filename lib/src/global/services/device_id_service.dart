@@ -1,4 +1,4 @@
-// lib/src/global/services/device_id_service.dart
+﻿// lib/src/global/services/device_id_service.dart
 import 'dart:async';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';

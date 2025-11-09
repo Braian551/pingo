@@ -53,7 +53,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
           _isLoading = false;
         });
       } else {
-        final errorMsg = response['message'] ?? 'No se pudieron cargar las estadÃ­sticas';
+        final errorMsg = response['message'] ?? 'No se pudieron cargar las estadísticas';
         _showError(errorMsg);
         setState(() {
           _dashboardData = _getDefaultDashboardData();
@@ -192,7 +192,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
 
   Widget _buildWelcomeSection(String adminName) {
     final hour = DateTime.now().hour;
-    String greeting = 'Buenos dÃ­as';
+    String greeting = 'Buenos días';
     IconData greetingIcon = Icons.wb_sunny_rounded;
     
     if (hour >= 12 && hour < 18) {
@@ -495,7 +495,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Las acciones del sistema aparecerÃ¡n aquÃ­',
+                      'Las acciones del sistema aparecerán aquí',
                       style: TextStyle(
                         color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
                         fontSize: 14,
@@ -555,7 +555,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                         ),
                       ),
                       title: Text(
-                        actividad['descripcion'] ?? 'Sin descripciÃ³n',
+                        actividad['descripcion'] ?? 'Sin descripción',
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: 14,

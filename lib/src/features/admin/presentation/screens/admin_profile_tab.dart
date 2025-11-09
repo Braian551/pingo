@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:viax/src/routes/route_names.dart';
-import 'package:viax/src/theme/app_colors.dart';
 
 class AdminProfileTab extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -19,6 +18,17 @@ class AdminProfileTab extends StatefulWidget {
 class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  // Theme colors
+  Color get _surfaceColor => Theme.of(context).colorScheme.surfaceContainerHighest;
+  Color get _onSurfaceColor => Theme.of(context).colorScheme.onSurface;
+  Color get _onSurfaceVariantColor => Theme.of(context).colorScheme.onSurfaceVariant;
+  Color get _outlineColor => Theme.of(context).colorScheme.outline;
+  Color get _inverseOnSurfaceColor => Theme.of(context).brightness == Brightness.dark 
+    ? Colors.black 
+    : Colors.white;
+  Color get _primaryColor => Theme.of(context).colorScheme.primary;
+  Color get _secondaryColor => Theme.of(context).colorScheme.secondary;
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +70,15 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primary.withOpacity(0.2),
-                AppColors.primaryLight.withOpacity(0.1),
+                _primaryColor.withOpacity(0.2),
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.3),
+              color: _primaryColor.withOpacity(0.3),
               width: 1.5,
             ),
           ),
@@ -77,10 +87,18 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  gradient: LinearGradient(
+                    colors: [_primaryColor, Theme.of(context).colorScheme.primaryContainer],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
                   boxShadow: [
-                    AppColors.primaryGlow(opacity: 0.3, blur: 12, spread: 0),
+                    BoxShadow(
+                      color: _primaryColor.withOpacity(0.3),
+                      blurRadius: 12,
+                      spreadRadius: 0,
+                    ),
                   ],
                 ),
                 child: Icon(
@@ -129,7 +147,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'InformaciÃ³n personal',
+          'Información personal',
           style: TextStyle(
             color: Theme.of(context).textTheme.displayMedium?.color,
             fontSize: 22,
@@ -142,21 +160,21 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
           icon: Icons.person_outline_rounded,
           title: 'Nombre completo',
           value: name,
-          accentColor: AppColors.blue600,
+          accentColor: _primaryColor,
         ),
         const SizedBox(height: 12),
         _buildInfoCard(
           icon: Icons.email_outlined,
-          title: 'Correo electrÃ³nico',
+          title: 'Correo electrónico',
           value: email,
-          accentColor: AppColors.accent,
+          accentColor: _secondaryColor,
         ),
         const SizedBox(height: 12),
         _buildInfoCard(
           icon: Icons.phone_outlined,
-          title: 'TelÃ©fono',
+          title: 'Teléfono',
           value: phone,
-          accentColor: AppColors.warning,
+          accentColor: Theme.of(context).colorScheme.tertiary,
         ),
       ],
     );
@@ -168,8 +186,6 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
     required String value,
     required Color accentColor,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -177,9 +193,9 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isDark
-              ? AppColors.darkSurface.withOpacity(0.6)
-              : AppColors.lightSurface.withOpacity(0.6),
+            color: Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.6)
+              : Theme.of(context).colorScheme.surfaceContainerLowest.withOpacity(0.6),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: accentColor.withOpacity(0.3),
@@ -237,7 +253,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Acciones rÃ¡pidas',
+          'Acciones rápidas',
           style: TextStyle(
             color: Theme.of(context).textTheme.displayMedium?.color,
             fontSize: 22,
@@ -343,7 +359,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ConfiguraciÃ³n',
+          'Configuración',
           style: TextStyle(
             color: Theme.of(context).textTheme.displayMedium?.color,
             fontSize: 22,
@@ -408,10 +424,10 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: _surfaceColor.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+                color: _outlineColor.withOpacity(0.1),
                 width: 1,
               ),
             ),
@@ -424,13 +440,13 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(icon, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.7), size: 24),
+                      Icon(icon, color: _onSurfaceColor.withOpacity(0.7), size: 24),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
                           title,
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            color: _onSurfaceColor,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -438,7 +454,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                       ),
                       Icon(
                         Icons.arrow_forward_ios_rounded,
-                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3),
+                        color: _onSurfaceVariantColor,
                         size: 16,
                       ),
                     ],
@@ -496,7 +512,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                 ),
                 SizedBox(width: 12),
                 Text(
-                  'Cerrar sesiÃ³n',
+                  'Cerrar sesión',
                   style: TextStyle(
                     color: Color(0xFFf5576c),
                     fontSize: 18,
@@ -521,10 +537,10 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              color: _surfaceColor.withOpacity(0.95),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+                color: _outlineColor.withOpacity(0.1),
                 width: 1.5,
               ),
             ),
@@ -547,16 +563,16 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                 Text(
                   '¿Cerrar sesión?',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                    color: _onSurfaceColor,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Â¿EstÃ¡s seguro de que deseas cerrar sesiÃ³n?',
+                  '¿Estás seguro de que deseas cerrar sesión?',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
+                    color: _onSurfaceVariantColor,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -569,7 +585,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                         onPressed: () => Navigator.pop(context, false),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+                          backgroundColor: _surfaceColor.withOpacity(0.1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -577,7 +593,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                         child: Text(
                           'Cancelar',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            color: _onSurfaceColor,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -598,7 +614,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                         child: Text(
                           'Cerrar sesión',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            color: _inverseOnSurfaceColor,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -618,8 +634,8 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('FunciÃ³n en desarrollo'),
-        backgroundColor: const Color(0xFF1A1A1A),
+        content: const Text('Función en desarrollo'),
+        backgroundColor: _surfaceColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -638,10 +654,10 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withOpacity(0.95),
+                color: _surfaceColor.withOpacity(0.95),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+                  color: _outlineColor.withOpacity(0.1),
                   width: 1.5,
                 ),
               ),
@@ -651,7 +667,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.15),
+                      color: _primaryColor.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Image.asset(
@@ -664,24 +680,24 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                   Text(
                     'Viax Admin',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                      color: _onSurfaceColor,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'VersiÃ³n 1.0.0',
+                    'Versión 1.0.0',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
+                      color: _onSurfaceVariantColor,
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Panel de administraciÃ³n del sistema Viax',
+                    'Panel de administración del sistema Viax',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
+                      color: _onSurfaceVariantColor,
                       fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
@@ -691,7 +707,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: _primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -699,7 +715,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
                     child: Text(
                       'Cerrar',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+                        color: _inverseOnSurfaceColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

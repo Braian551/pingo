@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:viax/src/theme/theme_provider.dart';
 import 'package:viax/src/theme/app_colors.dart';

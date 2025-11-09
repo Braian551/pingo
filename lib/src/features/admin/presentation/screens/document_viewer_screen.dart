@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:viax/src/theme/app_colors.dart';
 
 /// Pantalla para visualizar documentos en pantalla completa

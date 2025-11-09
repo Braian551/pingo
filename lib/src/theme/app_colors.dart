@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 /// Paleta de colores de la aplicación
 /// Color principal: Azul (#2196F3)
