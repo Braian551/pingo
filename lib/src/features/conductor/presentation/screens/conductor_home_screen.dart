@@ -34,6 +34,36 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   int? _conductorId;
   bool _hasShownProfileAlert = false;
 
+  double _toDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value == null) return 0;
+    return double.tryParse(value.toString()) ?? 0;
+  }
+
+  String _formatCurrency(double value) {
+    if (value >= 1000000) {
+      return '\$${(value / 1000000).toStringAsFixed(1)}M';
+    }
+    if (value >= 1000) {
+      return '\$${(value / 1000).toStringAsFixed(1)}k';
+    }
+    if (value % 1 == 0) {
+      return '\$${value.toInt()}';
+    }
+    return '\$${value.toStringAsFixed(2)}';
+  }
+
+  String _formatHours(double value) {
+    if (value <= 0) return '0h';
+    if (value % 1 == 0) return '${value.toInt()}h';
+    return '${value.toStringAsFixed(1)}h';
+  }
+
+  String _formatCount(double value) {
+    if (value % 1 == 0) return value.toInt().toString();
+    return value.toStringAsFixed(1);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -841,37 +871,45 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       builder: (context, provider, child) {
         final theme = Theme.of(context);
         final stats = provider.estadisticas;
+        final viajesHoy = _toDouble(stats['viajes_hoy']);
+        final gananciasHoy = _toDouble(stats['ganancias_hoy']);
+        final horasHoy = _toDouble(stats['horas_hoy']);
+        final promedioPorViaje =
+            viajesHoy > 0 ? gananciasHoy / viajesHoy : gananciasHoy;
 
         final statsData = [
-          {
-            'icon': Icons.local_taxi_rounded,
-            'label': 'Viajes hoy',
-            'value': stats['viajes_hoy']?.toString() ?? '0',
-            'color': const Color(0xFF6366F1),
-            'gradient': [const Color(0xFF6366F1), const Color(0xFF8B5CF6)],
-          },
-          {
-            'icon': Icons.payments_rounded,
-            'label': 'Ganancias',
-            'value': '\$${stats['ganancias_hoy']?.toString() ?? '0'}',
-            'color': const Color(0xFF10B981),
-            'gradient': [const Color(0xFF10B981), const Color(0xFF059669)],
-          },
-          {
-            'icon': Icons.schedule_rounded,
-            'label': 'Horas activo',
-            'value': '${stats['horas_hoy']?.toString() ?? '0'}h',
-            'color': const Color(0xFFF59E0B),
-            'gradient': [const Color(0xFFF59E0B), const Color(0xFFD97706)],
-          },
-          {
-            'icon': Icons.trending_up_rounded,
-            'label': 'Promedio',
-            'value':
-                '\$${((stats['ganancias_hoy'] ?? 0) / (stats['viajes_hoy'] ?? 1)).toStringAsFixed(0)}',
-            'color': const Color(0xFFEC4899),
-            'gradient': [const Color(0xFFEC4899), const Color(0xFFDB2777)],
-          },
+          _StatCardData(
+            icon: Icons.local_taxi_rounded,
+            title: 'Viajes completados',
+            value: _formatCount(viajesHoy),
+            description: 'Servicios finalizados hoy',
+            accent: const Color(0xFF6366F1),
+            gradient: const [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          ),
+          _StatCardData(
+            icon: Icons.payments_rounded,
+            title: 'Ganancias confirmadas',
+            value: _formatCurrency(gananciasHoy),
+            description: 'Ingresos acumulados hoy',
+            accent: const Color(0xFF10B981),
+            gradient: const [Color(0xFF10B981), Color(0xFF059669)],
+          ),
+          _StatCardData(
+            icon: Icons.schedule_rounded,
+            title: 'Horas activo',
+            value: _formatHours(horasHoy),
+            description: 'Tiempo en línea',
+            accent: const Color(0xFFF59E0B),
+            gradient: const [Color(0xFFF59E0B), Color(0xFFD97706)],
+          ),
+          _StatCardData(
+            icon: Icons.trending_up_rounded,
+            title: 'Ingreso promedio',
+            value: _formatCurrency(promedioPorViaje),
+            description: 'Por cada viaje completado',
+            accent: const Color(0xFFEC4899),
+            gradient: const [Color(0xFFEC4899), Color(0xFFDB2777)],
+          ),
         ];
 
         return Column(
@@ -906,98 +944,47 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 ],
               ),
             ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2.0,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: statsData.length,
-              itemBuilder: (context, index) {
-                final stat = statsData[index];
-                return TweenAnimationBuilder<double>(
-                  duration: Duration(milliseconds: 400 + (index * 100)),
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  builder: (context, value, child) {
-                    return Transform.scale(
-                      scale: 0.8 + (0.2 * value),
-                      child: Opacity(
-                        opacity: value,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                (stat['color'] as Color).withOpacity(0.1),
-                                (stat['color'] as Color).withOpacity(0.05),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: (stat['color'] as Color).withOpacity(0.2),
-                              width: 1.5,
-                            ),
+      LayoutBuilder(
+        builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth.isFinite
+          ? constraints.maxWidth
+          : MediaQuery.of(context).size.width;
+        final crossAxisCount = availableWidth >= 960
+          ? 4
+          : availableWidth >= 640
+            ? 3
+            : 2;
+        final tileWidth = (availableWidth -
+            (crossAxisCount - 1) * 12) /
+          crossAxisCount;
+                final desiredHeight = availableWidth < 360 ? 160 : 150;
+                final aspectRatio = tileWidth / desiredHeight;
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: aspectRatio,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: statsData.length,
+                  itemBuilder: (context, index) {
+                    final stat = statsData[index];
+                    return TweenAnimationBuilder<double>(
+                      duration: Duration(milliseconds: 350 + (index * 120)),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 16 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: child,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: stat['gradient'] as List<Color>,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: (stat['color'] as Color)
-                                          .withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  stat['icon'] as IconData,
-                                  color: Colors.white,
-                                  size: 22,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    stat['value'] as String,
-                                    style: TextStyle(
-                                      color:
-                                          theme.textTheme.displayMedium?.color,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    stat['label'] as String,
-                                    style: TextStyle(
-                                      color: theme.textTheme.bodyMedium?.color
-                                          ?.withOpacity(0.6),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                        );
+                      },
+                      child: _StatOverviewCard(data: stat),
                     );
                   },
                 );
@@ -1280,6 +1267,114 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _StatCardData {
+  final IconData icon;
+  final String title;
+  final String value;
+  final String description;
+  final List<Color> gradient;
+  final Color accent;
+
+  const _StatCardData({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.description,
+    required this.gradient,
+    required this.accent,
+  });
+}
+
+class _StatOverviewCard extends StatelessWidget {
+  final _StatCardData data;
+
+  const _StatOverviewCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final gradientColors = data.gradient
+        .map((color) => color.withOpacity(0.12))
+        .toList();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradientColors,
+        ),
+        border: Border.all(
+          color: data.accent.withOpacity(0.25),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: data.accent.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: data.accent.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  data.icon,
+                  color: data.accent,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  data.title,
+                  style: TextStyle(
+                    color: theme.textTheme.titleMedium?.color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            data.value,
+            style: TextStyle(
+              color: theme.textTheme.displayMedium?.color,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            data.description,
+            style: TextStyle(
+              color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
