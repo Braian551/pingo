@@ -121,7 +121,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   'Panel Admin',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.displayMedium?.color,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.3,
@@ -130,7 +130,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   adminName,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -147,9 +147,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isDark 
-                ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
-                : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
             ),
             child: IconButton(
               icon: Icon(
@@ -167,14 +165,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isDark 
-              ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
-              : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
           ),
           child: IconButton(
             icon: Icon(
               Icons.logout_rounded, 
-              color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7), 
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), 
               size: 22
             ),
             onPressed: () async {
@@ -261,8 +257,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               Icon(
                 icon,
                 color: isSelected 
-                  ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white 
-                  : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                  ? Theme.of(context).colorScheme.onPrimary 
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 size: 26,
               ),
               const SizedBox(height: 4),
@@ -270,8 +266,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 label,
                 style: TextStyle(
                   color: isSelected 
-                    ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white 
-                    : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                    ? Theme.of(context).colorScheme.onPrimary 
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),
@@ -325,7 +321,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   '¿Cerrar sesión?',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.displayMedium?.color,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -334,7 +330,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   '¿Estás seguro de que deseas cerrar sesión?',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -347,9 +343,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         onPressed: () => Navigator.pop(context, false),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: isDark
-                            ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
-                            : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
+                          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -357,7 +351,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         child: Text(
                           'Cancelar',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -375,10 +369,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Cerrar sesión',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            color: Theme.of(context).colorScheme.onError,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
