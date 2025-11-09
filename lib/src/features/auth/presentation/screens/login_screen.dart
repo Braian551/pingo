@@ -5,6 +5,7 @@ import 'package:viax/src/widgets/entrance_fader.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:viax/src/global/services/device_id_service.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -55,13 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
           if (sess != null && sess['email'] != null) {
             emailToUse = sess['email'] as String;
           } else {
-            _showError('No se pudo determinar el email. Por favor, intenta iniciar sesiÃ³n nuevamente.');
+            _showError('No se pudo determinar el email. Por favor, intenta iniciar sesión nuevamente.');
             return;
           }
         }
 
         if (emailToUse.isEmpty) {
-          _showError('El email es requerido para iniciar sesiÃ³n.');
+          _showError('El email es requerido para iniciar sesión.');
           return;
         }
 
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (resp['success'] == true) {
-          _showSuccess('Â¡Bienvenido de nuevo!');
+          _showSuccess('¡Bienvenido de nuevo!');
           await Future.delayed(const Duration(milliseconds: 500));
           
           // El backend siempre devuelve 'user', independientemente del tipo
@@ -84,18 +85,18 @@ class _LoginScreenState extends State<LoginScreen> {
           print('LoginScreen: Usuario recibido: ${user?['id']}, tipo: $tipoUsuario');
           
           try {
-            // Guardar sesiÃ³n con los datos del usuario
+            // Guardar sesión con los datos del usuario
             if (user != null) {
               await UserService.saveSession(user);
             } else {
               await UserService.saveSession({'email': emailToUse});
             }
           } catch (e) {
-            print('Error guardando sesiÃ³n: $e');
+            print('Error guardando sesión: $e');
           }
 
           if (mounted) {
-            // Redirigir segÃºn el tipo de usuario
+            // Redirigir según el tipo de usuario
             if (tipoUsuario == 'administrador') {
               Navigator.pushReplacementNamed(
                 context,
@@ -157,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } catch (e) {
         print('Error en login: $e');
-        _showError('Error al iniciar sesiÃ³n. Verifica tu conexiÃ³n a internet.');
+        _showError('Error al iniciar sesión. Verifica tu conexión a internet.');
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -182,22 +183,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface.withOpacity(0.8),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
             ),
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+            icon: Icon(
+              Icons.arrow_back_rounded, 
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              size: 20
+            ),
             onPressed: () => Navigator.pop(context),
             padding: EdgeInsets.zero,
           ),
@@ -212,22 +219,22 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 20),
 
-              const Text(
-                'Ingresa tu contraseÃ±a',
+              Text(
+                'Ingresa tu contraseña',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.displayMedium?.color,
                 ),
               ),
 
               const SizedBox(height: 8),
 
-              const Text(
+              Text(
                 'Confirma tu identidad para continuar',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                 ),
               ),
 
@@ -237,25 +244,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Campo de contraseÃ±a con estilo consistente
+                    // Campo de contraseña con estilo consistente
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Colors.white.withOpacity(0.08),
-                            Colors.white.withOpacity(0.04),
+                            isDark 
+                              ? AppColors.darkSurface.withOpacity(0.8) 
+                              : AppColors.lightSurface.withOpacity(0.8),
+                            isDark 
+                              ? AppColors.darkCard.withOpacity(0.4) 
+                              : AppColors.lightCard.withOpacity(0.4),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
+                          color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: isDark ? AppColors.darkShadow : AppColors.lightShadow,
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),
@@ -264,16 +275,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'ContraseÃ±a',
+                          labelText: 'Contraseña',
                           labelStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
+                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -281,13 +292,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             margin: const EdgeInsets.all(12),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFFF00), Color(0xFFFFDD00)],
+                              gradient: LinearGradient(
+                                colors: [AppColors.primary, AppColors.primaryLight],
                               ),
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  color: AppColors.primary.withOpacity(0.3),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
@@ -298,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                              color: Colors.white.withOpacity(0.6),
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                               size: 22,
                             ),
                             onPressed: () {
@@ -313,10 +324,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingresa tu contraseÃ±a';
+                          return 'Por favor ingresa tu contraseña';
                         }
                         if (value.length < 6) {
-                          return 'La contraseÃ±a debe tener al menos 6 caracteres';
+                          return 'La contraseña debe tener al menos 6 caracteres';
                         }
                         return null;
                       },
@@ -329,12 +340,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          _showError('FunciÃ³n en desarrollo');
+                          _showError('Función en desarrollo');
                         },
                         child: const Text(
-                          'Â¿Olvidaste tu contraseÃ±a?',
+                          '¿Olvidaste tu contraseña?',
                           style: TextStyle(
-                            color: Color(0xFFFFFF00),
+                            color: AppColors.primary,
                             fontSize: 14,
                           ),
                         ),
@@ -349,8 +360,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFFF00),
-                          foregroundColor: Colors.black,
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -361,7 +372,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   strokeWidth: 2,
                                 ),
                               )

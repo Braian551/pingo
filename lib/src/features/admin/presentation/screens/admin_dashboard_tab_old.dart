@@ -37,6 +37,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     setState(() => _isLoading = true);
 
     try {
+      // Debug: Verificar quÃ© datos estamos recibiendo en adminUser
       print('AdminDashboardTab: adminUser completo: ${widget.adminUser}');
       
       final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
@@ -107,15 +108,14 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     super.build(context);
     
     final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (_isLoading) {
       return _buildShimmerLoading();
     }
 
     return RefreshIndicator(
-      color: AppColors.primary,
-      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      color: const Color(0xFFFFFF00),
+      backgroundColor: const Color(0xFF1A1A1A),
       onRefresh: _loadDashboardData,
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -174,16 +174,14 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
   }
 
   Widget _buildShimmerBox({required double height, double? width}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Shimmer.fromColors(
-      baseColor: isDark ? AppColors.darkSurface : AppColors.lightDivider,
-      highlightColor: isDark ? AppColors.darkCard : AppColors.lightSurface,
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF2A2A2A),
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -210,10 +208,10 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: const Color(0xFFFFFF00).withOpacity(0.1),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.3),
+              color: const Color(0xFFFFFF00).withOpacity(0.3),
               width: 1.5,
             ),
           ),
@@ -222,13 +220,17 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: const Color(0xFFFFFF00).withOpacity(0.9),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
-                    AppColors.primaryGlow(opacity: 0.3, blur: 12, spread: 0),
+                    BoxShadow(
+                      color: const Color(0xFFFFFF00).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
-                child: Icon(greetingIcon, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 32),
+                child: Icon(greetingIcon, color: Colors.black, size: 32),
               ),
               const SizedBox(width: 20),
               Expanded(
@@ -238,7 +240,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     Text(
                       greeting,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.3,
@@ -247,8 +249,8 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     const SizedBox(height: 4),
                     Text(
                       adminName,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.displayMedium?.color,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.3,
@@ -275,10 +277,10 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Dashboard en vivo',
           style: TextStyle(
-            color: Theme.of(context).textTheme.displayMedium?.color,
+            color: Colors.white,
             fontSize: 22,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
@@ -298,8 +300,12 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               value: (users['total_usuarios'] ?? 0).toString(),
               subtitle: 'Activos: ${users['usuarios_activos'] ?? 0}',
               icon: Icons.people_rounded,
-              gradientColors: [AppColors.blue600, AppColors.blue800],
+              gradientColors: [
+                const Color(0xFF667eea).withOpacity(0.8),
+                const Color(0xFF764ba2).withOpacity(0.8),
+              ],
               onTap: () {
+                // Navegar a gestiÃ³n de usuarios
                 final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
                 Navigator.pushNamed(
                   context,
@@ -313,8 +319,12 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               value: (solicitudes['total_solicitudes'] ?? 0).toString(),
               subtitle: 'Hoy: ${solicitudes['solicitudes_hoy'] ?? 0}',
               icon: Icons.assignment_rounded,
-              gradientColors: [AppColors.accent, AppColors.accentDark],
+              gradientColors: [
+                const Color(0xFF11998e).withOpacity(0.8),
+                const Color(0xFF38ef7d).withOpacity(0.8),
+              ],
               onTap: () {
+                // Navegar a la pestaÃ±a de estadÃ­sticas
                 widget.onNavigateToTab?.call(2);
               },
             ),
@@ -323,8 +333,12 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               value: '\$${_formatNumber(ingresos['ingresos_totales'])}',
               subtitle: 'Hoy: \$${_formatNumber(ingresos['ingresos_hoy'])}',
               icon: Icons.attach_money_rounded,
-              gradientColors: [AppColors.success, AppColors.success.withOpacity(0.7)],
+              gradientColors: [
+                const Color(0xFFFFFF00).withOpacity(0.8),
+                const Color(0xFFffa726).withOpacity(0.8),
+              ],
               onTap: () {
+                // Navegar a la pestaÃ±a de estadÃ­sticas
                 widget.onNavigateToTab?.call(2);
               },
             ),
@@ -333,8 +347,12 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               value: (reportes['reportes_pendientes'] ?? 0).toString(),
               subtitle: 'Pendientes',
               icon: Icons.report_problem_rounded,
-              gradientColors: [AppColors.warning, AppColors.error],
+              gradientColors: [
+                const Color(0xFFf093fb).withOpacity(0.8),
+                const Color(0xFFf5576c).withOpacity(0.8),
+              ],
               onTap: () {
+                // Navegar a logs de auditorÃ­a
                 final adminId = int.tryParse(widget.adminUser['id']?.toString() ?? '0') ?? 0;
                 Navigator.pushNamed(
                   context,
@@ -390,8 +408,8 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     Expanded(
                       child: Text(
                         title,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.3,
@@ -412,8 +430,8 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 const Spacer(),
                 Text(
                   value,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.displayMedium?.color,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
@@ -423,7 +441,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Colors.white.withOpacity(0.7),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -437,16 +455,15 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
   }
 
   Widget _buildRecentActivity() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final actividades = _dashboardData?['actividades_recientes'] ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Actividad reciente',
           style: TextStyle(
-            color: Theme.of(context).textTheme.displayMedium?.color,
+            color: Colors.white,
             fontSize: 22,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
@@ -461,12 +478,10 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               child: Container(
                 padding: const EdgeInsets.all(40),
                 decoration: BoxDecoration(
-                  color: isDark
-                    ? AppColors.darkSurface.withOpacity(0.6)
-                    : AppColors.lightSurface.withOpacity(0.6),
+                  color: const Color(0xFF1A1A1A).withOpacity(0.6),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+                    color: Colors.white.withOpacity(0.15),
                     width: 1.5,
                   ),
                 ),
@@ -475,12 +490,12 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: Colors.white.withOpacity(0.05),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.notifications_none_rounded,
-                        color: AppColors.primary.withOpacity(0.5),
+                        color: Colors.white.withOpacity(0.3),
                         size: 48,
                       ),
                     ),
@@ -488,7 +503,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     Text(
                       'Sin actividad reciente',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -497,7 +512,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                     Text(
                       'Las acciones del sistema aparecerÃ¡n aquÃ­',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                        color: Colors.white.withOpacity(0.4),
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
@@ -514,12 +529,10 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDark
-                    ? AppColors.darkSurface.withOpacity(0.6)
-                    : AppColors.lightSurface.withOpacity(0.6),
+                  color: const Color(0xFF1A1A1A).withOpacity(0.6),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+                    color: Colors.white.withOpacity(0.15),
                     width: 1.5,
                   ),
                 ),
@@ -528,9 +541,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: actividades.length > 5 ? 5 : actividades.length,
                   separatorBuilder: (_, __) => Divider(
-                    color: isDark 
-                      ? AppColors.darkDivider.withOpacity(0.3)
-                      : AppColors.lightDivider.withOpacity(0.3),
+                    color: Colors.white.withOpacity(0.05),
                     height: 1,
                     indent: 72,
                   ),
@@ -541,23 +552,23 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                       leading: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.15),
+                          color: const Color(0xFFFFFF00).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: const Color(0xFFFFFF00).withOpacity(0.3),
                             width: 1,
                           ),
                         ),
                         child: const Icon(
                           Icons.notifications_active_rounded,
-                          color: AppColors.primary,
+                          color: Color(0xFFFFFF00),
                           size: 22,
                         ),
                       ),
                       title: Text(
                         actividad['descripcion'] ?? 'Sin descripciÃ³n',
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -567,7 +578,7 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
                         child: Text(
                           '${actividad['nombre'] ?? ''} ${actividad['apellido'] ?? ''} â€¢ ${_formatDate(actividad['fecha_creacion'])}',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                            color: Colors.white.withOpacity(0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -607,6 +618,3 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> with AutomaticKee
     }
   }
 }
-
-
-

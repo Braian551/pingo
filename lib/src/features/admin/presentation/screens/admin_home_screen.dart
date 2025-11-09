@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/theme/app_colors.dart';
 import 'admin_dashboard_tab.dart';
 import 'admin_management_tab.dart';
 import 'admin_statistics_wrapper.dart';
@@ -43,12 +44,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final adminName = widget.adminUser['nombre']?.toString() ?? 'Administrador';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Debug: verificar admin_user en HomeScreen
     print('AdminHomeScreen: adminUser recibido: ${widget.adminUser}');
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(adminName),
       body: SafeArea(
@@ -75,6 +77,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   PreferredSizeWidget _buildModernAppBar(String adminName) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -83,7 +87,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: isDark 
+                ? AppColors.darkSurface.withOpacity(0.95)
+                : AppColors.lightSurface.withOpacity(0.95),
             ),
           ),
         ),
@@ -94,15 +100,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFFFF00).withOpacity(0.15),
+              color: AppColors.primary.withOpacity(0.15),
               border: Border.all(
-                color: const Color(0xFFFFFF00).withOpacity(0.3),
+                color: AppColors.primary.withOpacity(0.3),
                 width: 1.5,
               ),
             ),
             child: const Icon(
               Icons.admin_panel_settings_rounded,
-              color: Color(0xFFFFFF00),
+              color: AppColors.primary,
               size: 28,
             ),
           ),
@@ -112,10 +118,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'Panel Admin',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.displayMedium?.color,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.3,
@@ -124,7 +130,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   adminName,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -141,10 +147,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.1),
+              color: isDark 
+                ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
+                : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
             ),
             child: IconButton(
-              icon: const Icon(Icons.refresh_rounded, color: Color(0xFFFFFF00), size: 22),
+              icon: Icon(
+                Icons.refresh_rounded, 
+                color: AppColors.primary, 
+                size: 22
+              ),
               onPressed: () {
                 setState(() {});
               },
@@ -155,10 +167,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.1),
+            color: isDark 
+              ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
+              : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
           ),
           child: IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 22),
+            icon: Icon(
+              Icons.logout_rounded, 
+              color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7), 
+              size: 22
+            ),
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
@@ -185,16 +203,22 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildBottomNav() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: isDark
+              ? AppColors.darkSurface.withOpacity(0.95)
+              : AppColors.lightSurface.withOpacity(0.95),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: isDark
+                  ? AppColors.darkDivider
+                  : AppColors.lightDivider,
                 width: 1,
               ),
             ),
@@ -228,7 +252,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFFF00) : Colors.transparent,
+            color: isSelected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -236,14 +260,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             children: [
               Icon(
                 icon,
-                color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                color: isSelected 
+                  ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white 
+                  : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
                 size: 26,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                  color: isSelected 
+                    ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white 
+                    : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),
@@ -256,6 +284,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildLogoutDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       child: ClipRRect(
@@ -265,10 +295,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              color: isDark
+                ? AppColors.darkSurface.withOpacity(0.95)
+                : AppColors.lightSurface.withOpacity(0.95),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: isDark
+                  ? AppColors.darkDivider
+                  : AppColors.lightDivider,
                 width: 1.5,
               ),
             ),
@@ -278,20 +312,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFf5576c).withOpacity(0.15),
+                    color: AppColors.error.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.logout_rounded,
-                    color: Color(0xFFf5576c),
+                    color: AppColors.error,
                     size: 40,
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   '¿Cerrar sesión?',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.displayMedium?.color,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -300,7 +334,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Text(
                   '¿Estás seguro de que deseas cerrar sesión?',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -313,15 +347,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         onPressed: () => Navigator.pop(context, false),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Colors.white.withOpacity(0.1),
+                          backgroundColor: isDark
+                            ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)
+                            : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Cancelar',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -334,7 +370,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         onPressed: () => Navigator.pop(context, true),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFf5576c),
+                          backgroundColor: AppColors.error,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -342,7 +378,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         child: const Text(
                           'Cerrar sesión',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -359,3 +395,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 }
+
+
+

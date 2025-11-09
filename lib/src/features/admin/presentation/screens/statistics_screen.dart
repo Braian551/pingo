@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/theme/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -77,7 +78,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(),
       body: _isLoading ? _buildShimmerLoading() : _buildContent(),
@@ -93,7 +94,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.8),
             ),
           ),
         ),
@@ -102,10 +103,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.1),
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
         ),
         child: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: Icon(Icons.close, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -115,20 +116,20 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFFFF00), Color(0xFFFFD700)],
+                colors: [AppColors.primary, Color(0xFFFFD700)],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                  color: AppColors.primary.withOpacity(0.3),
                   blurRadius: 8,
                   spreadRadius: 0,
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.bar_chart_rounded,
-              color: Colors.black,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
               size: 24,
             ),
           ),
@@ -164,10 +165,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.1),
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
           ),
           child: IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFFFFFF00)),
+            icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
             onPressed: _loadStats,
             tooltip: 'Actualizar',
           ),
@@ -212,7 +213,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -225,7 +226,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
       child: SlideTransition(
         position: _slideAnimation,
         child: RefreshIndicator(
-          color: const Color(0xFFFFFF00),
+          color: AppColors.primary,
           backgroundColor: const Color(0xFF1A1A1A),
           onRefresh: _loadStats,
           child: SafeArea(
@@ -260,7 +261,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Row(
             children: [
@@ -286,7 +287,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFFF00) : Colors.transparent,
+            color: isSelected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -319,7 +320,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,12 +330,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFF00).withOpacity(0.2),
+                      color: AppColors.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.trending_up_rounded,
-                      color: Color(0xFFFFFF00),
+                      color: AppColors.primary,
                       size: 20,
                     ),
                   ),
@@ -375,7 +376,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       horizontalInterval: 1,
                       getDrawingHorizontalLine: (value) {
                         return FlLine(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
                           strokeWidth: 1,
                         );
                       },
@@ -402,7 +403,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Text(
                                     '${parts[2]}/${parts[1]}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.white60,
                                       fontSize: 10,
                                     ),
@@ -422,7 +423,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                           getTitlesWidget: (double value, TitleMeta meta) {
                             return Text(
                               value.toInt().toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white60,
                                 fontSize: 10,
                               ),
@@ -441,7 +442,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                         spots: _getChartSpots(registros),
                         isCurved: true,
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFFFFF00), Color(0xFFFFD700)],
+                          colors: [AppColors.primary, Color(0xFFFFD700)],
                         ),
                         barWidth: 3,
                         isStrokeCapRound: true,
@@ -450,7 +451,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                           getDotPainter: (spot, percent, barData, index) {
                             return FlDotCirclePainter(
                               radius: 4,
-                              color: const Color(0xFFFFFF00),
+                              color: AppColors.primary,
                               strokeWidth: 2,
                               strokeColor: Colors.black,
                             );
@@ -460,8 +461,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                           show: true,
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFFFFFF00).withOpacity(0.3),
-                              const Color(0xFFFFFF00).withOpacity(0.0),
+                              AppColors.primary.withOpacity(0.3),
+                              AppColors.primary.withOpacity(0.0),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -508,20 +509,20 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.insert_chart_outlined_rounded,
-                  size: 48,
+                child: Icon(
+                  Icons.bar_chart_rounded,
                   color: Colors.white30,
+                  size: 40,
                 ),
               ),
               const SizedBox(height: 16),
@@ -595,7 +596,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
               'Solicitudes',
               solicitudes['total_solicitudes']?.toString() ?? '0',
               Icons.receipt_long_rounded,
-              const Color(0xFFFFFF00),
+              AppColors.primary,
             ),
           ],
         ),
@@ -613,7 +614,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +641,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                       fit: BoxFit.scaleDown,
                       child: Text(
                         value,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -651,7 +652,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                     const SizedBox(height: 2),
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white60,
                         fontSize: 11,
                       ),
@@ -686,7 +687,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -748,7 +749,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                               title: '${((completadas / total) * 100).toStringAsFixed(0)}%',
                               color: const Color(0xFF11998e),
                               radius: 50,
-                              titleStyle: const TextStyle(
+                              titleStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -759,7 +760,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                               title: '${((canceladas / total) * 100).toStringAsFixed(0)}%',
                               color: const Color(0xFFf5576c),
                               radius: 50,
-                              titleStyle: const TextStyle(
+                              titleStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -768,9 +769,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                             PieChartSectionData(
                               value: enProceso.toDouble(),
                               title: '${((enProceso / total) * 100).toStringAsFixed(0)}%',
-                              color: const Color(0xFFFFFF00),
+                              color: AppColors.primary,
                               radius: 50,
-                              titleStyle: const TextStyle(
+                              titleStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -791,7 +792,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
                         const SizedBox(height: 12),
                         _buildLegendItem('Canceladas', canceladas, const Color(0xFFf5576c)),
                         const SizedBox(height: 12),
-                        _buildLegendItem('En Proceso', enProceso, const Color(0xFFFFFF00)),
+                        _buildLegendItem('En Proceso', enProceso, AppColors.primary),
                       ],
                     ),
                   ),
@@ -822,14 +823,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white70,
                   fontSize: 11,
                 ),
               ),
               Text(
                 value.toString(),
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -842,3 +843,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerPr
     );
   }
 }
+
+
+
+

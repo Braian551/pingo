@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:viax/src/core/config/app_config.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class PricingManagementScreen extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -32,7 +33,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
   };
 
   final Map<String, Color> _vehicleTypeColors = {
-    'moto': const Color(0xFFFFFF00),
+    'moto': AppColors.primary,
   };
 
   @override
@@ -56,7 +57,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
         if (data['success'] == true) {
           final allConfigs = List<Map<String, dynamic>>.from(data['data'] ?? []);
           
-          // Filtrar para obtener solo la Ãºltima configuraciÃ³n activa por tipo de vehÃ­culo
+          // Filtrar para obtener solo la última configuración activa por tipo de vehículo
           final Map<String, Map<String, dynamic>> uniqueConfigs = {};
           
           for (var config in allConfigs) {
@@ -65,7 +66,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
             
             // Solo tomar configuraciones activas
             if (isActive) {
-              // Si no existe o si el ID es mayor (mÃ¡s reciente), actualizar
+              // Si no existe o si el ID es mayor (más reciente), actualizar
               if (!uniqueConfigs.containsKey(tipo) || 
                   (int.tryParse(config['id'].toString()) ?? 0) > 
                   (int.tryParse(uniqueConfigs[tipo]!['id'].toString()) ?? 0)) {
@@ -92,7 +93,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error de conexiÃ³n: $e';
+        _errorMessage = 'Error de conexión: $e';
         _isLoading = false;
       });
     }
@@ -101,7 +102,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: SafeArea(
@@ -123,23 +124,23 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
             ),
           ),
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+        icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         onPressed: () => Navigator.pop(context),
       ),
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.attach_money_rounded, color: Color(0xFFFFFF00), size: 28),
+          Icon(Icons.attach_money_rounded, color: AppColors.primary, size: 28),
           SizedBox(width: 12),
           Text(
             'Tarifas y Precios',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -148,7 +149,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.refresh_rounded, color: Color(0xFFFFFF00)),
+          icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
           onPressed: _loadPricingConfigs,
           tooltip: 'Recargar',
         ),
@@ -157,15 +158,15 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: Color(0xFFFFFF00)),
+          CircularProgressIndicator(color: AppColors.primary),
           SizedBox(height: 16),
           Text(
             'Cargando configuraciones...',
-            style: TextStyle(color: Colors.white70, fontSize: 16),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 16),
           ),
         ],
       ),
@@ -190,7 +191,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
             const SizedBox(height: 20),
             Text(
               _errorMessage ?? 'Error desconocido',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -199,8 +200,8 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Reintentar'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFFF00),
-                foregroundColor: Colors.black,
+                backgroundColor: AppColors.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -217,11 +218,11 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inventory_2_outlined, color: Colors.white.withOpacity(0.3), size: 80),
+            Icon(Icons.inventory_2_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 80),
             const SizedBox(height: 16),
             Text(
               'No hay configuraciones de precios',
-              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 16),
             ),
           ],
         ),
@@ -230,7 +231,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
 
     return RefreshIndicator(
       onRefresh: _loadPricingConfigs,
-      color: const Color(0xFFFFFF00),
+      color: AppColors.primary,
       backgroundColor: const Color(0xFF1A1A1A),
       child: ListView.builder(
         padding: const EdgeInsets.all(20),
@@ -265,7 +266,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
               color: const Color(0xFF1C1C1E).withOpacity(0.85),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: activo ? color.withOpacity(0.6) : Colors.white.withOpacity(0.1),
+                color: activo ? color.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 width: 1.5,
               ),
               boxShadow: [
@@ -306,8 +307,8 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                           children: [
                             Text(
                               nombre,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
@@ -319,19 +320,19 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                               decoration: BoxDecoration(
                                 color: activo 
                                     ? const Color(0xFF34C759).withOpacity(0.2)
-                                    : Colors.white.withOpacity(0.05),
+                                    : Theme.of(context).colorScheme.surface.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: activo 
                                       ? const Color(0xFF34C759).withOpacity(0.5)
-                                      : Colors.white.withOpacity(0.2),
+                                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                                   width: 1,
                                 ),
                               ),
                               child: Text(
                                 activo ? 'ACTIVO' : 'INACTIVO',
                                 style: TextStyle(
-                                  color: activo ? const Color(0xFF34C759) : Colors.white54,
+                                  color: activo ? const Color(0xFF34C759) : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1,
@@ -344,7 +345,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Theme.of(context).colorScheme.surface.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(Icons.edit_rounded, color: color, size: 22),
@@ -356,52 +357,52 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.surface.withOpacity(0.2),
                   ),
                   child: Column(
                     children: [
                       // Tarifas Base
                       _buildSectionTitle('Tarifas Base', Icons.attach_money_rounded),
-                      _buildInfoRow('Tarifa Base', '\$${_formatNumber(config['tarifa_base'])}', Colors.white),
-                      _buildInfoRow('Tarifa MÃ­nima', '\$${_formatNumber(config['tarifa_minima'])}', Colors.white),
-                      _buildInfoRow('Tarifa MÃ¡xima', config['tarifa_maxima'] != null ? '\$${_formatNumber(config['tarifa_maxima'])}' : 'Sin lÃ­mite', Colors.white70),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      _buildInfoRow('Tarifa Base', '\$${_formatNumber(config['tarifa_base'])}', Theme.of(context).colorScheme.onSurface),
+                      _buildInfoRow('Tarifa Mínima', '\$${_formatNumber(config['tarifa_minima'])}', Theme.of(context).colorScheme.onSurface),
+                      _buildInfoRow('Tarifa Máxima', config['tarifa_maxima'] != null ? '\$${_formatNumber(config['tarifa_maxima'])}' : 'Sin límite', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // Costos por Distancia y Tiempo
                       _buildSectionTitle('Costos por Distancia y Tiempo', Icons.straighten_rounded),
                       _buildInfoRow('Costo por Km', '\$${_formatNumber(config['costo_por_km'])}', color),
                       _buildInfoRow('Costo por Minuto', '\$${_formatNumber(config['costo_por_minuto'])}', color),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // Recargos
                       _buildSectionTitle('Recargos', Icons.trending_up_rounded),
                       _buildInfoRow('Hora Pico', '${config['recargo_hora_pico']}%', const Color(0xFFFF9500)),
                       _buildInfoRow('Nocturno', '${config['recargo_nocturno']}%', const Color(0xFF5E5CE6)),
                       _buildInfoRow('Festivo', '${config['recargo_festivo']}%', const Color(0xFF32D74B)),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // Descuentos
                       _buildSectionTitle('Descuentos', Icons.local_offer_rounded),
                       _buildInfoRow('Descuento Dist. Larga', '${config['descuento_distancia_larga']}%', const Color(0xFF30D158)),
-                      _buildInfoRow('Umbral para Descuento', '${_formatNumber(config['umbral_km_descuento'])} km', Colors.white70),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      _buildInfoRow('Umbral para Descuento', '${_formatNumber(config['umbral_km_descuento'])} km', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // Comisiones
                       _buildSectionTitle('Comisiones', Icons.credit_card_rounded),
                       _buildInfoRow('Plataforma', '${config['comision_plataforma']}%', const Color(0xFFFFD60A)),
                       _buildInfoRow('MÃ©todo de Pago', '${config['comision_metodo_pago']}%', const Color(0xFFFF9F0A)),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // LÃ­mites de Distancia
-                      _buildSectionTitle('LÃ­mites de Distancia', Icons.route_rounded),
-                      _buildInfoRow('Distancia MÃ­nima', '${_formatNumber(config['distancia_minima'])} km', Colors.white70),
-                      _buildInfoRow('Distancia MÃ¡xima', '${_formatNumber(config['distancia_maxima'])} km', Colors.white70),
-                      const Divider(color: Colors.white12, height: 28, thickness: 1),
+                      _buildSectionTitle('Límites de Distancia', Icons.route_rounded),
+                      _buildInfoRow('Distancia Mínima', '${_formatNumber(config['distancia_minima'])} km', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      _buildInfoRow('Distancia Máxima', '${_formatNumber(config['distancia_maxima'])} km', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12), height: 28, thickness: 1),
                       
                       // Tiempo de Espera
                       _buildSectionTitle('Tiempo de Espera', Icons.timer_rounded),
-                      _buildInfoRow('Espera Gratis', '${config['tiempo_espera_gratis']} min', Colors.white70),
-                      _buildInfoRow('Costo por Min Espera', '\$${_formatNumber(config['costo_tiempo_espera'])}', Colors.white70),
+                      _buildInfoRow('Espera Gratis', '${config['tiempo_espera_gratis']} min', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      _buildInfoRow('Costo por Min Espera', '\$${_formatNumber(config['costo_tiempo_espera'])}', Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                     ],
                   ),
                 ),
@@ -418,12 +419,12 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
       padding: const EdgeInsets.only(bottom: 12, top: 4),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.8), size: 18),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), size: 18),
           const SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
               fontSize: 15,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -443,7 +444,7 @@ class _PricingManagementScreenState extends State<PricingManagementScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -644,7 +645,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
           if (data['success'] == true) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('ConfiguraciÃ³n actualizada exitosamente'),
+                content: const Text('Configuración actualizada exitosamente'),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -744,10 +745,10 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Editar Tarifas',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
@@ -757,7 +758,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                             Text(
                               widget.vehicleTypeName,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -777,8 +778,8 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                       children: [
                         _buildFormSectionTitle('Tarifas Base', Icons.attach_money_rounded),
                         _buildTextField('Tarifa Base (\$)', widget.controllers['tarifa_base']!),
-                        _buildTextField('Tarifa MÃ­nima (\$)', widget.controllers['tarifa_minima']!),
-                        _buildTextField('Tarifa MÃ¡xima (\$) - Opcional', widget.controllers['tarifa_maxima']!, optional: true),
+                        _buildTextField('Tarifa Mínima (\$)', widget.controllers['tarifa_minima']!),
+                        _buildTextField('Tarifa Máxima (\$) - Opcional', widget.controllers['tarifa_maxima']!, optional: true),
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('Costos por Distancia y Tiempo', Icons.straighten_rounded),
@@ -798,8 +799,8 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('Comisiones (%)', Icons.credit_card_rounded),
-                        _buildTextField('ComisiÃ³n Plataforma (%)', widget.controllers['comision_plataforma']!),
-                        _buildTextField('ComisiÃ³n MÃ©todo Pago (%)', widget.controllers['comision_metodo_pago']!),
+                        _buildTextField('Comisión Plataforma (%)', widget.controllers['comision_plataforma']!),
+                        _buildTextField('Comisión Método Pago (%)', widget.controllers['comision_metodo_pago']!),
                         
                         const SizedBox(height: 24),
                         _buildFormSectionTitle('LÃ­mites de Distancia', Icons.route_rounded),
@@ -818,10 +819,10 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.surface.withOpacity(0.2),
                     border: Border(
                       top: BorderSide(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                         width: 1,
                       ),
                     ),
@@ -833,19 +834,19 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                           onPressed: _isSaving ? null : () => Navigator.pop(context),
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 18),
-                            backgroundColor: Colors.white.withOpacity(0.08),
+                            backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.08),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                               side: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                                 width: 1,
                               ),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Cancelar',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
                             ),
@@ -859,19 +860,19 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             backgroundColor: widget.vehicleTypeColor,
-                            foregroundColor: Colors.black,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
                           child: _isSaving
-                              ? const SizedBox(
+                              ? SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: Colors.black,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                   ),
                                 )
                               : const Text(
@@ -925,27 +926,27 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(optional ? r'^(\d+\.?\d{0,2})?' : r'^\d+\.?\d{0,2}')),
         ],
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             fontSize: 15,
           ),
           filled: true,
-          fillColor: Colors.white.withOpacity(0.06),
+          fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.06),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.15)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.15)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -956,3 +957,7 @@ class _EditPricingDialogState extends State<_EditPricingDialog> {
     );
   }
 }
+
+
+
+

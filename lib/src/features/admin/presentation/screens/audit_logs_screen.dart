@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/admin/admin_service.dart';
+import 'package:viax/src/theme/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 
@@ -80,7 +81,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
       extendBodyBehindAppBar: true,
       appBar: _buildModernAppBar(),
       body: _isLoading ? _buildShimmerLoading() : _buildContent(),
@@ -96,7 +97,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.8),
             ),
           ),
         ),
@@ -105,10 +106,10 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.1),
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
         ),
         child: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -129,7 +130,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.history_rounded,
               color: Colors.white,
               size: 24,
@@ -167,7 +168,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.1),
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
           ),
           child: IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFF667eea)),
@@ -208,7 +209,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -255,18 +256,21 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: TextField(
             controller: _searchController,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Buscar logs...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-              prefixIcon: Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.5)),
+              hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5)),
+              prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5)),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear_rounded, color: Colors.white60),
+                      icon: Icon(
+                        Icons.clear,
+                        color: Colors.white60,
+                      ),
                       onPressed: () {
                         _searchController.clear();
                         _loadLogs();
@@ -323,7 +327,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
               border: Border.all(
                 color: isSelected 
                     ? const Color(0xFF667eea)
-                    : Colors.white.withOpacity(0.1),
+                    : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
                 width: 1.5,
               ),
             ),
@@ -332,13 +336,13 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                 Icon(
                   icon,
                   size: 18,
-                  color: isSelected ? const Color(0xFF667eea) : Colors.white70,
+                  color: isSelected ? const Color(0xFF667eea) : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white70,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? const Color(0xFF667eea) : Colors.white70,
+                    color: isSelected ? const Color(0xFF667eea) : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white70,
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -358,7 +362,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Actividades recientes',
               style: TextStyle(
                 color: Colors.white,
@@ -388,7 +392,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           ),
           child: Text(
             '${_logs.length} registros',
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF667eea),
               fontSize: 13,
               fontWeight: FontWeight.bold,
@@ -409,24 +413,24 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.history_outlined,
-                  size: 48,
+                child: Icon(
+                  Icons.history_rounded,
                   color: Colors.white30,
+                  size: 40,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'No hay logs disponibles',
                 style: TextStyle(
                   color: Colors.white70,
@@ -438,7 +442,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
               Text(
                 'Los registros de actividad aparecerÃ¡n aquÃ­',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.4),
                   fontSize: 13,
                 ),
               ),
@@ -475,7 +479,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A).withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
           ),
           child: Material(
             color: Colors.transparent,
@@ -524,12 +528,12 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.1),
+                                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       fecha,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Colors.white60,
                                         fontSize: 10,
                                       ),
@@ -540,7 +544,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                               const SizedBox(height: 4),
                               Text(
                                 descripcion,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -558,9 +562,9 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.03),
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.03),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.05)),
+                          border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05)),
                         ),
                         child: Row(
                           children: [
@@ -584,7 +588,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                                   if (usuario.isNotEmpty)
                                     Text(
                                       usuario,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
@@ -593,7 +597,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                                   if (email.isNotEmpty)
                                     Text(
                                       email,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Colors.white60,
                                         fontSize: 11,
                                       ),
@@ -604,7 +608,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                             ),
                             Icon(
                               Icons.chevron_right_rounded,
-                              color: Colors.white.withOpacity(0.3),
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3),
                               size: 20,
                             ),
                           ],
@@ -625,7 +629,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
     final lower = accion.toLowerCase();
     if (lower.contains('login') || lower.contains('acceso')) return const Color(0xFF11998e);
     if (lower.contains('crear') || lower.contains('registro')) return const Color(0xFF667eea);
-    if (lower.contains('actualizar') || lower.contains('editar')) return const Color(0xFFFFFF00);
+    if (lower.contains('actualizar') || lower.contains('editar')) return AppColors.primary;
     if (lower.contains('eliminar') || lower.contains('desactivar')) return const Color(0xFFf5576c);
     return const Color(0xFF667eea);
   }
@@ -653,7 +657,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
             decoration: BoxDecoration(
               color: const Color(0xFF1A1A1A).withOpacity(0.95),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -685,7 +689,10 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, color: Colors.white60),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white60,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -717,7 +724,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white60,
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -728,13 +735,13 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1)),
             ),
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
               ),
@@ -773,3 +780,7 @@ class _AuditLogsScreenState extends State<AuditLogsScreen> with SingleTickerProv
     }
   }
 }
+
+
+
+

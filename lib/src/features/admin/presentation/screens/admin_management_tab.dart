@@ -1,6 +1,7 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:viax/src/routes/route_names.dart';
+import 'package:viax/src/theme/app_colors.dart';
 
 class AdminManagementTab extends StatefulWidget {
   final Map<String, dynamic> adminUser;
@@ -31,10 +32,10 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
-            'GestiÃ³n del sistema',
+          Text(
+            'Gestión del sistema',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).textTheme.displayMedium?.color,
               fontSize: 28,
               fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
@@ -44,7 +45,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           Text(
             'Administra todos los aspectos de la plataforma',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
               fontSize: 16,
             ),
           ),
@@ -56,7 +57,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'GestiÃ³n de Usuarios',
                 subtitle: 'Ver, editar y administrar todos los usuarios',
                 icon: Icons.people_outline_rounded,
-                accentColor: const Color(0xFF667eea),
+                accentColor: AppColors.blue600,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -69,7 +70,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Documentos de Conductores',
                 subtitle: 'Revisar y verificar documentos de conductores',
                 icon: Icons.description_rounded,
-                accentColor: const Color(0xFFFFFF00),
+                accentColor: AppColors.primary,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -82,7 +83,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Conductores',
                 subtitle: 'Administrar conductores y sus vehÃ­culos',
                 icon: Icons.drive_eta_rounded,
-                accentColor: const Color(0xFF11998e),
+                accentColor: AppColors.accent,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -99,7 +100,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Clientes',
                 subtitle: 'Ver y gestionar clientes registrados',
                 icon: Icons.person_outline_rounded,
-                accentColor: const Color(0xFF667eea),
+                accentColor: AppColors.blue600,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -122,7 +123,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Logs de AuditorÃ­a',
                 subtitle: 'Historial completo de acciones del sistema',
                 icon: Icons.history_rounded,
-                accentColor: const Color(0xFFf093fb),
+                accentColor: AppColors.warning,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -135,7 +136,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Reportes de Problemas',
                 subtitle: 'Reportes y quejas de usuarios',
                 icon: Icons.report_problem_rounded,
-                accentColor: const Color(0xFFf5576c),
+                accentColor: AppColors.error,
                 onTap: () {
                   _showComingSoon();
                 },
@@ -144,7 +145,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Actividad del Sistema',
                 subtitle: 'Monitoreo en tiempo real de la actividad',
                 icon: Icons.monitor_heart_rounded,
-                accentColor: const Color(0xFFffa726),
+                accentColor: AppColors.success,
                 onTap: () {
                   _showComingSoon();
                 },
@@ -159,7 +160,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Ajustes Generales',
                 subtitle: 'ConfiguraciÃ³n de la aplicaciÃ³n',
                 icon: Icons.settings_rounded,
-                accentColor: const Color(0xFF667eea),
+                accentColor: AppColors.blue600,
                 onTap: () {
                   _showComingSoon();
                 },
@@ -168,7 +169,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Tarifas y Comisiones',
                 subtitle: 'Gestionar precios y comisiones',
                 icon: Icons.attach_money_rounded,
-                accentColor: const Color(0xFFFFFF00),
+                accentColor: AppColors.primary,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -181,7 +182,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                 title: 'Notificaciones Push',
                 subtitle: 'Enviar notificaciones a usuarios',
                 icon: Icons.notifications_active_rounded,
-                accentColor: const Color(0xFF11998e),
+                accentColor: AppColors.accent,
                 onTap: () {
                   _showComingSoon();
                 },
@@ -202,8 +203,8 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             title,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.displayMedium?.color,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.3,
@@ -219,6 +220,8 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
   }
 
   Widget _buildManagementCard(_ManagementItem item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: item.onTap,
       child: ClipRRect(
@@ -227,7 +230,9 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: isDark
+                ? AppColors.darkSurface.withOpacity(0.6)
+                : AppColors.lightSurface.withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: item.accentColor.withOpacity(0.3),
@@ -264,8 +269,8 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                           children: [
                             Text(
                               item.title,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.2,
@@ -275,7 +280,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                             Text(
                               item.subtitle,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
+                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -287,12 +292,14 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: isDark
+                            ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05)
+                            : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
                           size: 16,
                         ),
                       ),
@@ -308,10 +315,12 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
   }
 
   void _showComingSoon() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('FunciÃ³n en desarrollo'),
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -334,3 +343,6 @@ class _ManagementItem {
     required this.onTap,
   });
 }
+
+
+

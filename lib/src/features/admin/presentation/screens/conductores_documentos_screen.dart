@@ -5,6 +5,8 @@ import 'package:viax/src/widgets/snackbars/custom_snackbar.dart';
 import 'package:viax/src/widgets/dialogs/admin_dialog_helper.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:viax/src/core/config/app_config.dart';
+import 'package:viax/src/theme/app_colors.dart';
+import 'document_viewer_screen.dart';
 
 class ConductoresDocumentosScreen extends StatefulWidget {
   final int adminId;
@@ -29,7 +31,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   final Map<String, String> _estadosLabels = {
     'todos': 'Todos',
     'pendiente': 'Pendientes',
-    'en_revision': 'En RevisiÃ³n',
+    'en_revision': 'En Revisión',
     'aprobado': 'Aprobados',
     'rechazado': 'Rechazados',
   };
@@ -78,7 +80,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
       appBar: _buildAppBar(),
       body: _isLoading ? _buildShimmerLoading() : _buildContent(),
     );
@@ -93,26 +95,26 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Color.fromRGBO(0, 0, 0, 0.8),
             ),
           ),
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: const Text(
+      title: Text(
         'Documentos de Conductores',
         style: TextStyle(
-          color: Colors.white,
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.refresh_rounded, color: Color(0xFFFFFF00)),
+          icon: Icon(Icons.refresh_rounded, color: AppColors.primary),
           onPressed: _loadDocumentos,
           tooltip: 'Actualizar',
         ),
@@ -122,7 +124,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
 
   Widget _buildContent() {
     return RefreshIndicator(
-      color: const Color(0xFFFFFF00),
+      color: AppColors.primary,
       backgroundColor: const Color(0xFF1A1A1A),
       onRefresh: _loadDocumentos,
       child: CustomScrollView(
@@ -144,10 +146,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Resumen General',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -215,8 +217,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                 fit: BoxFit.scaleDown,
                 child: Text(
                   value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     height: 1.0,
@@ -228,7 +230,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Color.fromRGBO(255, 255, 255, 0.8),
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -249,10 +251,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Filtrar por estado',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -277,19 +279,19 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFFFF00)
-                            : Colors.black.withOpacity(0.6),
+                            ? AppColors.primary
+                            : Theme.of(context).textTheme.bodyLarge?.color ?? Color.fromRGBO(0, 0, 0, 0.6),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFFFFFF00)
-                              : Colors.white.withOpacity(0.7),
+                              ? AppColors.primary
+                              : Theme.of(context).textTheme.bodyLarge?.color ?? Color.fromRGBO(255, 255, 255, 0.7),
                           width: 1.5,
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: const Color(0xFFFFFF00).withOpacity(0.3),
+                                  color: Color.fromRGBO(33, 150, 243, 0.3),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 )
@@ -302,7 +304,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                           Text(
                             entry.value,
                             style: TextStyle(
-                              color: isSelected ? Colors.black : Colors.white,
+                              color: isSelected ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -311,7 +313,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                             const SizedBox(width: 6),
                             Icon(
                               Icons.check_circle_rounded,
-                              color: Colors.black,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
                               size: 16,
                             ),
                           ],
@@ -339,13 +341,13 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
               Icon(
                 Icons.folder_open_rounded,
                 size: 64,
-                color: Colors.white.withOpacity(0.3),
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Color.fromRGBO(255, 255, 255, 0.3),
               ),
               const SizedBox(height: 16),
               Text(
-                'No hay conductores en esta categorÃ­a',
+                'No hay conductores en esta categoría',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                   fontSize: 16,
                 ),
               ),
@@ -417,8 +419,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                         children: [
                           Text(
                             conductor['nombre_completo'] ?? 'Sin nombre',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -427,7 +429,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                           Text(
                             conductor['email'] ?? 'Sin email',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                               fontSize: 13,
                             ),
                           ),
@@ -438,7 +440,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                   ],
                 ),
                 const SizedBox(height: 12),
-                Divider(color: Colors.white.withOpacity(0.1), height: 1),
+                Divider(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1), height: 1),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -464,7 +466,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     Expanded(
                       child: _buildInfoItem(
                         Icons.star_rounded,
-                        'CalificaciÃ³n',
+                        'Calificación',
                         '${conductor['calificacion_promedio'] ?? 0.0} (${conductor['total_calificaciones'] ?? 0})',
                       ),
                     ),
@@ -480,7 +482,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                 const SizedBox(height: 12),
                 LinearProgressIndicator(
                   value: (conductor['porcentaje_completitud'] ?? 0) / 100,
-                  backgroundColor: Colors.white.withOpacity(0.1),
+                  backgroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
                   valueColor: AlwaysStoppedAnimation(estadoColor),
                 ),
                 const SizedBox(height: 8),
@@ -490,7 +492,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     Text(
                       'Documentos: ${conductor['documentos_completos']}/${conductor['total_documentos_requeridos']}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -523,14 +525,14 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildEstadoBadge(String estado, Color color) {
     final Map<String, String> estadosTexto = {
       'pendiente': 'Pendiente',
-      'en_revision': 'En RevisiÃ³n',
+      'en_revision': 'En Revisión',
       'aprobado': 'Aprobado',
       'rechazado': 'Rechazado',
     };
@@ -557,7 +559,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   Widget _buildInfoItem(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.5), size: 16),
+        Icon(icon, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5), size: 16),
         const SizedBox(width: 6),
         Expanded(
           child: Column(
@@ -566,14 +568,14 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5),
                   fontSize: 11,
                 ),
               ),
               Text(
                 value,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -631,18 +633,18 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildDetailSection('InformaciÃ³n Personal', [
+                          _buildDetailSection('Información Personal', [
                             _buildDetailRow('Nombre completo', conductor['nombre_completo']),
                             _buildDetailRow('Email', conductor['email']),
-                            _buildDetailRow('TelÃ©fono', conductor['telefono']),
-                            _buildDetailRow('Usuario activo', conductor['es_activo'] == 1 ? 'SÃ­' : 'No'),
-                            _buildDetailRow('Verificado', conductor['es_verificado'] == 1 ? 'SÃ­' : 'No'),
+                            _buildDetailRow('Teléfono', conductor['telefono']),
+                            _buildDetailRow('Usuario activo', conductor['es_activo'] == 1 ? 'Sí' : 'No'),
+                            _buildDetailRow('Verificado', conductor['es_verificado'] == 1 ? 'Sí' : 'No'),
                           ]),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Licencia de ConducciÃ³n', [
-                            _buildDetailRow('NÃºmero', conductor['licencia_conduccion']),
-                            _buildDetailRow('CategorÃ­a', conductor['licencia_categoria']),
-                            _buildDetailRow('ExpediciÃ³n', _formatDate(conductor['licencia_expedicion'])),
+                          _buildDetailSection('Licencia de Conducción', [
+                            _buildDetailRow('Número', conductor['licencia_conduccion']),
+                            _buildDetailRow('Categoría', conductor['licencia_categoria']),
+                            _buildDetailRow('Expedición', _formatDate(conductor['licencia_expedicion'])),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['licencia_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
@@ -653,17 +655,17 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('VehÃ­culo', [
+                          _buildDetailSection('Vehículo', [
                             _buildDetailRow('Tipo', conductor['vehiculo_tipo']),
                             _buildDetailRow('Placa', conductor['vehiculo_placa']),
                             _buildDetailRow('Marca', conductor['vehiculo_marca']),
                             _buildDetailRow('Modelo', conductor['vehiculo_modelo']),
-                            _buildDetailRow('AÃ±o', conductor['vehiculo_anio']?.toString()),
+                            _buildDetailRow('Año', conductor['vehiculo_anio']?.toString()),
                             _buildDetailRow('Color', conductor['vehiculo_color']),
                           ]),
                           const SizedBox(height: 24),
                           _buildDetailSection('SOAT', [
-                            _buildDetailRow('NÃºmero', conductor['soat_numero']),
+                            _buildDetailRow('Número', conductor['soat_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['soat_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
@@ -674,21 +676,21 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('TecnomecÃ¡nica', [
-                            _buildDetailRow('NÃºmero', conductor['tecnomecanica_numero']),
+                          _buildDetailSection('Tecnomecánica', [
+                            _buildDetailRow('Número', conductor['tecnomecanica_numero']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['tecnomecanica_vencimiento'])),
                           ]),
                           const SizedBox(height: 16),
                           if (conductor['tecnomecanica_foto_url'] != null)
                             _buildDocumentButton(
-                              label: 'Ver Foto de TecnomecÃ¡nica',
+                              label: 'Ver Foto de Tecnomecánica',
                               documentUrl: conductor['tecnomecanica_foto_url'],
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
                           _buildDetailSection('Seguro', [
                             _buildDetailRow('Aseguradora', conductor['aseguradora']),
-                            _buildDetailRow('PÃ³liza', conductor['numero_poliza_seguro']),
+                            _buildDetailRow('Póliza', conductor['numero_poliza_seguro']),
                             _buildDetailRow('Vencimiento', _formatDate(conductor['vencimiento_seguro'])),
                           ]),
                           const SizedBox(height: 16),
@@ -710,19 +712,19 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               icon: Icons.photo_camera_rounded,
                             ),
                           const SizedBox(height: 24),
-                          _buildDetailSection('Estado de VerificaciÃ³n', [
+                          _buildDetailSection('Estado de Verificación', [
                             _buildDetailRow('Estado', conductor['estado_verificacion']),
-                            _buildDetailRow('Aprobado', conductor['aprobado'] == 1 ? 'SÃ­' : 'No'),
-                            _buildDetailRow('Ãšltima verificaciÃ³n', _formatDate(conductor['fecha_ultima_verificacion'])),
+                            _buildDetailRow('Aprobado', conductor['aprobado'] == 1 ? 'Sí' : 'No'),
+                            _buildDetailRow('Última verificación', _formatDate(conductor['fecha_ultima_verificacion'])),
                           ]),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
                             onPressed: () => _showDocumentHistory(conductor['usuario_id']),
                             icon: const Icon(Icons.history_rounded),
-                            label: const Text('Ver Historial de Documentos'),
+                            label: Text('Ver Historial de Documentos'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF667eea),
-                              foregroundColor: Colors.white,
+                              foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -770,8 +772,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                             const SizedBox(width: 8),
                                             Text(
                                               doc.toString(),
-                                              style: const TextStyle(
-                                                color: Colors.white,
+                                              style: TextStyle(
+                                                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                                 fontSize: 14,
                                               ),
                                             ),
@@ -793,10 +795,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                       child: ElevatedButton.icon(
                                         onPressed: () => _aprobarConductor(conductor),
                                         icon: const Icon(Icons.check_circle_rounded),
-                                        label: const Text('Aprobar'),
+                                        label: Text('Aprobar'),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: const Color(0xFF11998e),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                           padding: const EdgeInsets.symmetric(vertical: 16),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
@@ -809,10 +811,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                       child: ElevatedButton.icon(
                                         onPressed: () => _rechazarConductor(conductor),
                                         icon: const Icon(Icons.cancel_rounded),
-                                        label: const Text('Rechazar'),
+                                        label: Text('Rechazar'),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: const Color(0xFFf5576c),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                           padding: const EdgeInsets.symmetric(vertical: 16),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
@@ -843,7 +845,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       width: 40,
       height: 4,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
+        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3),
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -856,7 +858,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         Text(
           title,
           style: const TextStyle(
-            color: Color(0xFFFFFF00),
+            color: AppColors.primary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -865,10 +867,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
               width: 1,
             ),
           ),
@@ -892,7 +894,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -904,7 +906,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             child: Text(
               valueStr,
               style: TextStyle(
-                color: isEmpty ? Colors.white.withOpacity(0.3) : Colors.white,
+                color: isEmpty ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3) : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -1028,7 +1030,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       // Cerrar loading primero
       if (mounted) Navigator.pop(context);
 
-      // Esperar un poco para que el diÃ¡logo se cierre completamente
+      // Esperar un poco para que el diálogo se cierre completamente
       await Future.delayed(const Duration(milliseconds: 100));
 
       if (!mounted) return;
@@ -1089,12 +1091,12 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFFF00).withOpacity(0.2),
+                            color: AppColors.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
                             Icons.history_rounded, 
-                            color: Color(0xFFFFFF00), 
+                            color: AppColors.primary, 
                             size: 28,
                           ),
                         ),
@@ -1103,10 +1105,10 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Historial de Documentos',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1114,7 +1116,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                               Text(
                                 '${historial.length} ${historial.length == 1 ? 'registro' : 'registros'}',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                                   fontSize: 14,
                                 ),
                               ),
@@ -1158,9 +1160,9 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             : const Color(0xFFffa726);
 
     final Map<String, String> tiposDocumento = {
-      'licencia': 'Licencia de ConducciÃ³n',
+      'licencia': 'Licencia de Conducción',
       'soat': 'SOAT',
-      'tecnomecanica': 'TecnomecÃ¡nica',
+      'tecnomecanica': 'Tecnomecánica',
       'tarjeta_propiedad': 'Tarjeta de Propiedad',
       'seguro': 'Seguro',
     };
@@ -1177,7 +1179,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: estadoColor.withOpacity(0.3),
@@ -1218,8 +1220,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                           children: [
                             Text(
                               nombreDoc,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1230,13 +1232,13 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                 Icon(
                                   Icons.calendar_today_rounded,
                                   size: 14,
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   _formatDate(doc['fecha_subida']),
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.6),
+                                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
                                     fontSize: 13,
                                   ),
                                 ),
@@ -1282,11 +1284,11 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // InformaciÃ³n adicional del documento
+                      // Información adicional del documento
                       if (doc['numero_documento'] != null && doc['numero_documento'].toString().isNotEmpty)
                         _buildHistorialInfoRow(
                           Icons.numbers_rounded,
-                          'NÃºmero',
+                          'Número',
                           doc['numero_documento'],
                         ),
                       
@@ -1326,7 +1328,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                     Text(
                                       'Motivo de rechazo:',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
+                                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.7),
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -1335,7 +1337,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                                     Text(
                                       doc['motivo_rechazo'],
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.95),
+                                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.95),
                                         fontSize: 14,
                                       ),
                                     ),
@@ -1347,7 +1349,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                         ),
                       ],
                       
-                      // BotÃ³n para ver documento
+                      // Botón para ver documento
                       if (hasArchivo) ...[
                         const SizedBox(height: 12),
                         SizedBox(
@@ -1355,7 +1357,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                           child: ElevatedButton.icon(
                             onPressed: () {
                               Navigator.pop(context); // Cerrar el historial
-                              _viewDocument(context, doc['ruta_archivo'], nombreDoc);
+                              _viewDocument(doc['ruta_archivo'], nombreDoc);
                             },
                             icon: const Icon(Icons.visibility_rounded, size: 20),
                             label: const Text('Ver Documento'),
@@ -1379,22 +1381,21 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
-  /// Helper para construir una fila de informaciÃ³n en el historial
+  /// Helper para construir una fila de información en el historial
   Widget _buildHistorialInfoRow(IconData icon, String label, dynamic value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withOpacity(0.5)),
+          Icon(icon, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5)),
           const SizedBox(width: 8),
           Text(
             '$label: ',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.6),
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -1402,8 +1403,8 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
           Expanded(
             child: Text(
               value?.toString() ?? 'N/A',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -1415,7 +1416,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     );
   }
 
-  /// Helper para obtener el icono segÃºn el tipo de documento
+  /// Helper para obtener el icono según el tipo de documento
   IconData _getDocumentIcon(String? tipo) {
     switch (tipo) {
       case 'licencia':
@@ -1433,7 +1434,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     }
   }
 
-  /// Helper para obtener el icono segÃºn el estado
+  /// Helper para obtener el icono según el estado
   IconData _getEstadoIcon(String estado) {
     switch (estado) {
       case 'aprobado':
@@ -1456,7 +1457,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
       case 'rechazado':
         return 'Rechazado';
       case 'en_revision':
-        return 'En RevisiÃ³n';
+        return 'En Revisión';
       case 'pendiente':
       default:
         return 'Pendiente';
@@ -1464,7 +1465,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   }
 
   /// Muestra un documento en pantalla completa
-  void _viewDocument(BuildContext context, String? documentUrl, String documentName) {
+  void _viewDocument(String? documentUrl, String documentName) {
     if (documentUrl == null || documentUrl.isEmpty) {
       _showError('Documento no disponible');
       return;
@@ -1478,7 +1479,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => _DocumentViewerScreen(
+        builder: (context) => DocumentViewerScreen(
           documentUrl: fullUrl,
           documentName: documentName,
         ),
@@ -1486,7 +1487,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     );
   }
 
-  /// Widget para mostrar botÃ³n de documento con preview
+  /// Widget para mostrar botón de documento con preview
   Widget _buildDocumentButton({
     required String label,
     required String? documentUrl,
@@ -1496,7 +1497,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
     
     return GestureDetector(
       onTap: hasDocument 
-          ? () => _viewDocument(context, documentUrl, label)
+          ? () => _viewDocument(documentUrl, label)
           : null,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -1504,12 +1505,12 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
         decoration: BoxDecoration(
           color: hasDocument 
               ? const Color(0xFF667eea).withOpacity(0.15)
-              : Colors.white.withOpacity(0.05),
+              : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasDocument 
                 ? const Color(0xFF667eea).withOpacity(0.3)
-                : Colors.white.withOpacity(0.1),
+                : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -1520,12 +1521,12 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
               decoration: BoxDecoration(
                 color: hasDocument 
                     ? const Color(0xFF667eea).withOpacity(0.2)
-                    : Colors.white.withOpacity(0.05),
+                    : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: hasDocument ? const Color(0xFF667eea) : Colors.white.withOpacity(0.3),
+                color: hasDocument ? const Color(0xFF667eea) : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3),
                 size: 24,
               ),
             ),
@@ -1537,7 +1538,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                   Text(
                     label,
                     style: TextStyle(
-                      color: hasDocument ? Colors.white : Colors.white.withOpacity(0.5),
+                      color: hasDocument ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.5),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1548,7 +1549,7 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
                     style: TextStyle(
                       color: hasDocument 
                           ? const Color(0xFF667eea) 
-                          : Colors.white.withOpacity(0.3),
+                          : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.3),
                       fontSize: 12,
                     ),
                   ),
@@ -1593,139 +1594,6 @@ class _ConductoresDocumentosScreenState extends State<ConductoresDocumentosScree
   }
 }
 
-/// Pantalla para visualizar documentos en pantalla completa
-class _DocumentViewerScreen extends StatelessWidget {
-  final String documentUrl;
-  final String documentName;
 
-  const _DocumentViewerScreen({
-    required this.documentUrl,
-    required this.documentName,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          documentName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download_rounded, color: Color(0xFFFFFF00)),
-            onPressed: () => _showDownloadInfo(context),
-            tooltip: 'InformaciÃ³n de descarga',
-          ),
-        ],
-      ),
-      body: Center(
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: Image.network(
-            documentUrl,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  color: const Color(0xFFFFFF00),
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline_rounded,
-                    color: Colors.red,
-                    size: 64,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Error al cargar el documento',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    documentUrl,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
 
-  void _showDownloadInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.info_outline_rounded, color: Color(0xFFFFFF00)),
-            SizedBox(width: 12),
-            Text('URL del Documento', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Para descargar el documento, copia esta URL:',
-              style: TextStyle(color: Colors.white.withOpacity(0.8)),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SelectableText(
-                documentUrl,
-                style: const TextStyle(
-                  color: Color(0xFFFFFF00),
-                  fontSize: 12,
-                  fontFamily: 'monospace',
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar', style: TextStyle(color: Colors.white70)),
-          ),
-        ],
-      ),
-    );
-  }
-}
