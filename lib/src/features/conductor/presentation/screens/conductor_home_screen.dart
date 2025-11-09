@@ -16,6 +16,8 @@ import 'conductor_trips_screen.dart';
 import 'license_registration_screen.dart';
 import 'vehicle_only_registration_screen.dart';
 import 'conductor_searching_passengers_screen.dart';
+import '../../../../theme/app_colors.dart';
+import '../../../../theme/theme_provider.dart';
 
 class ConductorHomeScreen extends StatefulWidget {
   final Map<String, dynamic> conductorUser;
@@ -86,7 +88,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
       if (profile != null) {
-        // Verificar si debe mostrar alerta de aprobaciÃ³n
+        // Verificar si debe mostrar alerta de aprobación
         final shouldShowApproval = await ApprovalNotificationService.shouldShowApprovalAlert(
           _conductorId!,
           profile.estadoVerificacion.value,
@@ -94,7 +96,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         );
 
         if (shouldShowApproval && mounted) {
-          // Esperar un poco antes de mostrar el diÃ¡logo
+          // Esperar un poco antes de mostrar el diálogo
           await Future.delayed(const Duration(milliseconds: 500));
           
           if (mounted) {
@@ -216,8 +218,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: _isLoading ? _buildLoading() : _buildBody(),
@@ -247,15 +251,15 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFFFFFF00).withOpacity(0.15),
+                  AppColors.primary.withOpacity(0.15),
                   Colors.transparent,
                 ],
               ),
             ),
             child: ShaderMask(
               shaderCallback: (Rect bounds) {
-                return const LinearGradient(
-                  colors: [Color(0xFFFFFF00), Color(0xFFFFFF00)],
+                return LinearGradient(
+                  colors: [AppColors.primary, AppColors.primary],
                 ).createShader(bounds);
               },
               child: Image.asset(
@@ -283,8 +287,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
               margin: const EdgeInsets.only(right: 12),
               child: Switch(
                 value: provider.disponible,
-                activeColor: const Color(0xFFFFFF00),
-                activeTrackColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                activeColor: AppColors.primary,
+                activeTrackColor: AppColors.primary.withOpacity(0.5),
                 inactiveThumbColor: Colors.grey,
                 inactiveTrackColor: Colors.grey.withOpacity(0.3),
                 onChanged: (value) async {
@@ -338,7 +342,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       return;
                     }
                     
-                    // Perfil completo - navegar a pantalla de bÃºsqueda
+                    // Perfil completo - navegar a pantalla de búsqueda
                     final nombre = provider.conductor?.nombre ?? widget.conductorUser['nombre'] ?? 'Conductor';
                     final tipoVehiculo = profile.vehiculo?.tipo.value ?? 'moto';
                     
@@ -431,17 +435,24 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   }
 
   Widget _buildShimmerBox({required double height, double? width}) {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFF1A1A1A),
-      highlightColor: const Color(0xFF2A2A2A),
-      child: Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        
+        return Shimmer.fromColors(
+          baseColor: isDark ? AppColors.darkSurface : AppColors.lightSurface.withOpacity(0.1),
+          highlightColor: isDark ? AppColors.darkCard : AppColors.lightCard.withOpacity(0.2),
+          child: Container(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -487,6 +498,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   Widget _buildWelcomeSection() {
     return Consumer<ConductorProvider>(
       builder: (context, provider, child) {
+        final theme = Theme.of(context);
         final nombre = provider.conductor?.nombre ?? widget.conductorUser['nombre'] ?? 'Conductor';
         final hora = DateTime.now().hour;
         String saludo = 'Buenos dÃ­as';
@@ -502,7 +514,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
             Text(
               saludo,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7) ?? Colors.white.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -510,8 +522,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
             const SizedBox(height: 4),
             Text(
               nombre,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.textTheme.displayMedium?.color ?? Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
@@ -525,6 +537,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   Widget _buildDisponibilityCard() {
     return Consumer<ConductorProvider>(
       builder: (context, provider, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
         final disponible = provider.disponible;
         
         return ClipRRect(
@@ -535,13 +549,13 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: disponible
-                    ? const Color(0xFFFFFF00).withOpacity(0.1)
-                    : const Color(0xFF1A1A1A).withOpacity(0.6),
+                    ? AppColors.primary.withOpacity(0.1)
+                    : (isDark ? AppColors.darkCard.withOpacity(0.6) : AppColors.lightCard.withOpacity(0.6)),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: disponible
-                      ? const Color(0xFFFFFF00).withOpacity(0.3)
-                      : Colors.white.withOpacity(0.1),
+                      ? AppColors.primary.withOpacity(0.3)
+                      : theme.dividerColor.withOpacity(0.1),
                   width: 1.5,
                 ),
               ),
@@ -551,7 +565,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: disponible
-                          ? const Color(0xFFFFFF00)
+                          ? AppColors.primary
                           : Colors.grey.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -568,8 +582,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       children: [
                         Text(
                           disponible ? 'Disponible' : 'No disponible',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: theme.textTheme.headlineSmall?.color ?? Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -580,7 +594,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                               ? 'Buscando solicitudes cercanas...'
                               : 'Activa tu disponibilidad para recibir viajes',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
+                            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.white.withOpacity(0.6),
                             fontSize: 14,
                           ),
                         ),
@@ -599,16 +613,17 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   Widget _buildStatsSection() {
     return Consumer<ConductorProvider>(
       builder: (context, provider, child) {
+        final theme = Theme.of(context);
         final stats = provider.estadisticas;
         final conductor = provider.conductor;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'EstadÃ­sticas de hoy',
+            Text(
+              'Estadísticas de hoy',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.textTheme.headlineMedium?.color ?? Colors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -621,7 +636,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     icon: Icons.route,
                     title: 'Viajes',
                     value: stats['viajes_hoy']?.toString() ?? '0',
-                    color: const Color(0xFFFFFF00),
+                    color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -666,15 +681,17 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   Widget _buildViajesActivosSection() {
     return Consumer<ConductorProvider>(
       builder: (context, provider, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
         final viajesActivos = provider.viajesActivos;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Viajes activos',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.textTheme.headlineMedium?.color ?? Colors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -688,10 +705,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                      color: isDark ? AppColors.darkCard.withOpacity(0.6) : AppColors.lightCard.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.1),
+                        color: theme.dividerColor.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -699,14 +716,14 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       children: [
                         Icon(
                           Icons.inbox,
-                          color: Colors.white.withOpacity(0.3),
+                          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.3) ?? Colors.white.withOpacity(0.3),
                           size: 48,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No tienes viajes activos',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: theme.textTheme.titleMedium?.color?.withOpacity(0.7) ?? Colors.white.withOpacity(0.7),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -715,7 +732,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                         Text(
                           'Activa tu disponibilidad para recibir solicitudes',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.4) ?? Colors.white.withOpacity(0.4),
                             fontSize: 14,
                           ),
                           textAlign: TextAlign.center,
@@ -742,73 +759,89 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   }
 
   Widget _buildBottomNav() {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
-            border: Border(
-              top: BorderSide(
-                color: Colors.white.withOpacity(0.1),
-                width: 1,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface.withOpacity(0.95) : AppColors.lightSurface.withOpacity(0.95),
+                border: Border(
+                  top: BorderSide(
+                    color: theme.dividerColor.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildNavItem(0, Icons.home_rounded, 'Inicio'),
+                      _buildNavItem(1, Icons.route_rounded, 'Viajes'),
+                      _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Ganancias'),
+                      _buildNavItem(3, Icons.person_rounded, 'Perfil'),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(0, Icons.home_rounded, 'Inicio'),
-                  _buildNavItem(1, Icons.route_rounded, 'Viajes'),
-                  _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Ganancias'),
-                  _buildNavItem(3, Icons.person_rounded, 'Perfil'),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
   Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _selectedIndex == index;
-    
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedIndex = index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFFF00) : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-                size: 26,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        final theme = Theme.of(context);
+        final isSelected = _selectedIndex == index;
+        
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _selectedIndex = index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    color: isSelected 
+                        ? Colors.white 
+                        : theme.textTheme.bodyMedium?.color?.withOpacity(0.5) ?? Colors.white.withOpacity(0.5),
+                    size: 26,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected 
+                          ? Colors.white 
+                          : theme.textTheme.bodyMedium?.color?.withOpacity(0.5) ?? Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
