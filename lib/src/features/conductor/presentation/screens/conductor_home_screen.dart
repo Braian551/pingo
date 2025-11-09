@@ -566,7 +566,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 150)),
+              const SliverToBoxAdapter(child: SizedBox(height: 130)),
             ],
           ),
         ),
@@ -880,7 +880,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
         final statsData = [
           _StatCardData(
             icon: Icons.local_taxi_rounded,
-            title: 'Viajes completados',
+            title: 'Viajes',
             value: _formatCount(viajesHoy),
             description: 'Servicios finalizados hoy',
             accent: const Color(0xFF6366F1),
@@ -888,7 +888,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           ),
           _StatCardData(
             icon: Icons.payments_rounded,
-            title: 'Ganancias confirmadas',
+            title: 'Ganancias',
             value: _formatCurrency(gananciasHoy),
             description: 'Ingresos acumulados hoy',
             accent: const Color(0xFF10B981),
@@ -954,13 +954,11 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           : availableWidth >= 640
             ? 3
             : 2;
-        final tileWidth = (availableWidth -
-            (crossAxisCount - 1) * 12) /
-          crossAxisCount;
-                final desiredHeight = availableWidth < 360 ? 160 : 150;
-                final aspectRatio = tileWidth / desiredHeight;
-
-                return GridView.builder(
+                final tileWidth = (availableWidth -
+                        (crossAxisCount - 1) * 12) /
+                    crossAxisCount;
+                final desiredHeight = availableWidth < 360 ? 140 : 130;
+                final aspectRatio = tileWidth / desiredHeight;                return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -990,7 +988,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                 );
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
           ],
         );
       },
@@ -1302,7 +1300,7 @@ class _StatOverviewCard extends StatelessWidget {
         .toList();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
@@ -1328,7 +1326,7 @@ class _StatOverviewCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: data.accent.withOpacity(0.18),
                   borderRadius: BorderRadius.circular(12),
@@ -1336,16 +1334,16 @@ class _StatOverviewCard extends StatelessWidget {
                 child: Icon(
                   data.icon,
                   color: data.accent,
-                  size: 20,
+                  size: 18,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   data.title,
                   style: TextStyle(
                     color: theme.textTheme.titleMedium?.color,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
                   maxLines: 2,
@@ -1354,22 +1352,22 @@ class _StatOverviewCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           Text(
             data.value,
             style: TextStyle(
               color: theme.textTheme.displayMedium?.color,
-              fontSize: 26,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             data.description,
             style: TextStyle(
               color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
           ),
