@@ -491,44 +491,54 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   }
 
   Widget _buildHomeTab() {
-    return SafeArea(
-      child: RefreshIndicator(
-        onRefresh: _loadConductorData,
-        color: AppColors.primary,
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.primary.withOpacity(0.08), Colors.transparent],
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: _loadConductorData,
+          color: AppColors.primary,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              // Hero Header Section
+              SliverToBoxAdapter(child: _buildHeroSection()),
+
+              // Status Card
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildModernStatusCard(),
+                ),
+              ),
+
+              // Quick Stats
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildQuickStatsGrid(),
+                ),
+              ),
+
+              // Active Trips Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildActiveTripsSection(),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 150)),
+            ],
           ),
-          slivers: [
-            // Hero Header Section
-            SliverToBoxAdapter(child: _buildHeroSection()),
-
-            // Status Card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildModernStatusCard(),
-              ),
-            ),
-
-            // Quick Stats
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildQuickStatsGrid(),
-              ),
-            ),
-
-            // Active Trips Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildActiveTripsSection(),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
-          ],
         ),
       ),
     );
@@ -558,13 +568,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
 
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 32, 20, 28),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppColors.primary.withOpacity(0.08), Colors.transparent],
-            ),
-          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -575,7 +578,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                     size: 32,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 20),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -770,7 +773,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                                 Text(
                                   disponible
                                       ? 'Buscando viajes cerca de ti'
-                                      : 'ActÃ­vate para empezar a recibir viajes',
+                                      : 'Actívate para empezar a recibir viajes',
                                   style: TextStyle(
                                     color: disponible
                                         ? Colors.white.withOpacity(0.9)
@@ -908,7 +911,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1.5,
+                childAspectRatio: 2.0,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
@@ -924,7 +927,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       child: Opacity(
                         opacity: value,
                         child: Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
@@ -974,7 +977,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                                     style: TextStyle(
                                       color:
                                           theme.textTheme.displayMedium?.color,
-                                      fontSize: 24,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: -0.5,
                                     ),
@@ -985,7 +988,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                                     style: TextStyle(
                                       color: theme.textTheme.bodyMedium?.color
                                           ?.withOpacity(0.6),
-                                      fontSize: 12,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -1083,7 +1086,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                     child: Opacity(
                       opacity: value,
                       child: Container(
-                        padding: const EdgeInsets.all(40),
+                        padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
