@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../providers/conductor_provider.dart';
 import '../../providers/conductor_profile_provider.dart';
 import '../../models/conductor_profile_model.dart';
@@ -89,7 +90,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       // Check if profile is incomplete and show alert if not shown before
       final profile = profileProvider.profile;
       if (profile != null) {
-        // Verificar si debe mostrar alerta de aprobaciÃ³n
+        // Verificar si debe mostrar alerta de aprobación
         final shouldShowApproval =
             await ApprovalNotificationService.shouldShowApprovalAlert(
               _conductorId!,
@@ -125,8 +126,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   context,
                   missingItems: profile.pendingTasks.isEmpty
                       ? [
-                          'Registrar licencia de conducciÃƒÂ³n',
-                          'Registrar vehÃƒÂ­culo',
+                          'Registrar licencia de conducción',
+                          'Registrar vehículo',
                           'Completar documentos',
                         ]
                       : profile.pendingTasks,
@@ -202,7 +203,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       case ProfileAction.inReview:
       case ProfileAction.awaitingApproval:
         // Navegar a la pantalla de perfil
-        // La pantalla detectarÃƒÂ¡ automÃƒÂ¡ticamente si el conductor estÃƒÂ¡ aprobado
+        // La pantalla detectará automáticamente si el conductor está aprobado
         final profileProvider = Provider.of<ConductorProfileProvider>(
           context,
           listen: false,
@@ -334,8 +335,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                         context,
                         missingItems: profile.pendingTasks.isEmpty
                             ? [
-                                'Registrar licencia de conducciÃƒÂ³n',
-                                'Registrar vehÃƒÂ­culo',
+                                'Registrar licencia de conducción',
+                                'Registrar vehículo',
                                 'Completar documentos',
                               ]
                             : profile.pendingTasks,
@@ -349,7 +350,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       return;
                     }
 
-                    // Perfil completo - navegar a pantalla de bÃºsqueda
+                    // Perfil completo - navegar a pantalla de búsqueda
                     final nombre =
                         provider.conductor?.nombre ??
                         widget.conductorUser['nombre'] ??
@@ -368,7 +369,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                       ),
                     );
 
-                    // Si el conductor aceptÃƒÂ³ un viaje, recargar datos
+                    // Si el conductor aceptó un viaje, recargar datos
                     if (result == true && mounted) {
                       await provider.loadViajesActivos(_conductorId!);
                     }
@@ -544,15 +545,15 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
             widget.conductorUser['nombre'] ??
             'Conductor';
         final hora = DateTime.now().hour;
-        String emoji = 'ðŸŒ…';
-        String saludo = 'Buenos dÃ­as';
+        IconData greetingIcon = FontAwesomeIcons.cloudSun;
+        String saludo = 'Buenos días';
 
         if (hora >= 12 && hora < 18) {
           saludo = 'Buenas tardes';
-          emoji = 'â˜€ï¸';
+          greetingIcon = FontAwesomeIcons.sun;
         } else if (hora >= 18) {
           saludo = 'Buenas noches';
-          emoji = 'ðŸŒ™';
+          greetingIcon = FontAwesomeIcons.moon;
         }
 
         return Container(
@@ -569,7 +570,11 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
             children: [
               Row(
                 children: [
-                  Text(emoji, style: const TextStyle(fontSize: 32)),
+                  Icon(
+                    greetingIcon,
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                    size: 32,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -732,18 +737,34 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  disponible
-                                      ? 'ðŸš€ EstÃ¡s en lÃ­nea'
-                                      : 'â¸ï¸ Fuera de lÃ­nea',
-                                  style: TextStyle(
-                                    color: disponible
-                                        ? Colors.white
-                                        : theme.textTheme.headlineSmall?.color,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -0.5,
-                                  ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      disponible
+                                          ? FontAwesomeIcons.car
+                                          : FontAwesomeIcons.pause,
+                                      color: disponible
+                                          ? Colors.white
+                                          : theme.textTheme.headlineSmall?.color,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        disponible
+                                            ? 'Estás en línea'
+                                            : 'Fuera de línea',
+                                        style: TextStyle(
+                                          color: disponible
+                                              ? Colors.white
+                                              : theme.textTheme.headlineSmall?.color,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
@@ -871,7 +892,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Tu dÃ­a en nÃºmeros',
+                    'Tu día en números',
                     style: TextStyle(
                       color: theme.textTheme.headlineMedium?.color,
                       fontSize: 20,
