@@ -378,7 +378,7 @@ class _AdminProfileTabState extends State<AdminProfileTab> with AutomaticKeepAli
         const SizedBox(height: 12),
         _buildSettingItem(
           icon: Icons.lock_outline_rounded,
-          title: 'Cambiar contraseÃ±a',
+          title: 'Cambiar contraseña',
           onTap: () {
             _showComingSoon();
           },

@@ -124,7 +124,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
         ),
         child: IconButton(
           icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 20),
@@ -233,13 +233,13 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
 
   Widget _buildShimmerBox({required double height, double? width}) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFF1A1A1A),
-      highlightColor: const Color(0xFF2A2A2A),
+      baseColor: Theme.of(context).colorScheme.surface.withOpacity(0.1),
+      highlightColor: Theme.of(context).colorScheme.surface.withOpacity(0.2),
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -253,7 +253,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         position: _slideAnimation,
         child: RefreshIndicator(
           color: AppColors.primary,
-          backgroundColor: const Color(0xFF1A1A1A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           onRefresh: _loadUsers,
           child: SafeArea(
             child: SingleChildScrollView(
@@ -287,7 +287,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -402,7 +402,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         child: Container(
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -473,7 +473,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
             decoration: BoxDecoration(
               color: isSelected
                   ? AppColors.primary.withOpacity(0.15)
-                  : const Color(0xFF1A1A1A).withValues(alpha: 0.6),
+                  : Theme.of(context).colorScheme.surface.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
@@ -521,7 +521,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: userColor.withOpacity(0.3),
@@ -692,7 +692,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                           size: 22,
                         ),
-                        color: const Color(0xFF1A1A1A),
+                        color: Theme.of(context).colorScheme.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
@@ -840,7 +840,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.95),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               border: Border.all(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -971,7 +971,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                 top: 24,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.95),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -1061,7 +1061,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -1072,7 +1072,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                         child: DropdownButton<String>(
                           value: selectedTipoUsuario,
                           isExpanded: true,
-                          dropdownColor: const Color(0xFF1A1A1A),
+                          dropdownColor: Theme.of(context).colorScheme.surface,
                           icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                           style: const TextStyle(
@@ -1139,7 +1139,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
                     // Estado activo
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
@@ -1313,7 +1313,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> with Sing
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),

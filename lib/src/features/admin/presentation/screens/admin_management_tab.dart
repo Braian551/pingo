@@ -120,7 +120,7 @@ class _AdminManagementTabState extends State<AdminManagementTab> with AutomaticK
             title: 'Reportes y Auditoría',
             items: [
               _ManagementItem(
-                title: 'Logs de AuditorÃ­a',
+                title: 'Logs de Auditoría',
                 subtitle: 'Historial completo de acciones del sistema',
                 icon: Icons.history_rounded,
                 accentColor: AppColors.warning,

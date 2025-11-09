@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../../core/config/app_config.dart';
 
-/// Servicio para envÃ­o de correos electrÃ³nicos
+/// Servicio para envío de correos electrónicos
 /// 
-/// NOTA: email_service.php ahora estÃ¡ en el microservicio de auth
+/// NOTA: email_service.php ahora está en el microservicio de auth
 /// URL: AppConfig.authServiceUrl/email_service.php
 class EmailService {
   /// URL del servicio de email
@@ -15,20 +15,20 @@ class EmailService {
     return '${AppConfig.authServiceUrl}/email_service.php';
   }
 
-  /// Genera un cÃ³digo de verificación de 4 dígitos
+  /// Genera un código de verificación de 4 dígitos
   static String generateVerificationCode() {
     final random = Random();
     return (1000 + random.nextInt(9000)).toString();
   }
 
-  /// EnvÃ­a un cÃ³digo de verificaciÃ³n por correo usando el backend PHP
+  /// Envía un código de verificación por correo usando el backend PHP
   static Future<bool> sendVerificationCode({
     required String email,
     required String code,
     required String userName,
   }) async {
     try {
-      print('Enviando cÃ³digo de verificaciÃ³n a: $email');
+      print('Enviando código de verificación a: $email');
       
       final response = await http.post(
         Uri.parse(_apiUrl),
@@ -59,7 +59,7 @@ class EmailService {
     }
   }
 
-  /// Simula el envÃ­o de correo para desarrollo (sin API real)
+  /// Simula el envío de correo para desarrollo (sin API real)
   static Future<bool> sendVerificationCodeMock({
     required String email,
     required String code,
@@ -69,13 +69,13 @@ class EmailService {
     await Future.delayed(const Duration(seconds: 2));
     
     // Para desarrollo, siempre retorna true
-    // En producciÃ³n, reemplaza con tu servicio real de correo
-    print('ðŸ”§ MODO DESARROLLO - CÃ³digo de verificaciÃ³n para $email: $code');
-    print('ðŸ“§ En producciÃ³n, este cÃ³digo se enviarÃ­a por email real');
+    // En producción, reemplaza con tu servicio real de correo
+    print('🔧 MODO DESARROLLO - Código de verificación para $email: $code');
+    print('📧 En producción, este código se enviaría por email real');
     return true;
   }
 
-  /// MÃ©todo de conveniencia que usa el servicio real o mock segÃºn la configuraciÃ³n
+  /// Método de conveniencia que usa el servicio real o mock según la configuración
   static Future<bool> sendVerificationCodeWithFallback({
     required String email,
     required String code,

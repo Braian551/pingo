@@ -1,5 +1,8 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:viax/src/theme/theme_provider.dart';
+import 'package:viax/src/theme/widgets/theme_toggle_button.dart';
 
 /// Pantalla de configuraciÃ³n y ajustes del usuario
 /// Incluye notificaciones, privacidad, idioma, etc.
@@ -16,8 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _emailNotifications = true;
   bool _smsNotifications = false;
   bool _promotionalEmails = true;
-  String _selectedLanguage = 'EspaÃ±ol';
-  String _selectedTheme = 'Oscuro';
+  String _selectedLanguage = 'Español';
 
   @override
   Widget build(BuildContext context) {
@@ -118,14 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _showLanguageSelector();
                         },
                       ),
-                      _buildSelectionTile(
-                        icon: Icons.palette_outlined,
-                        title: 'Tema',
-                        subtitle: _selectedTheme,
-                        onTap: () {
-                          _showThemeSelector();
-                        },
-                      ),
+                      _buildThemeTile(),
                       _buildNavigationTile(
                         icon: Icons.volume_up_outlined,
                         title: 'Sonidos',
@@ -444,7 +439,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showLanguageSelector() {
+  Widget _buildThemeTile() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFF00).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.palette_outlined, color: const Color(0xFFFFFF00), size: 22),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Tema',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        themeProvider.themeModeDisplayName,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ThemeToggleButton(
+                  size: 40,
+                  showBorder: false,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }  void _showLanguageSelector() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -503,80 +561,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Expanded(
               child: Text(
                 language,
-                style: TextStyle(
-                  color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
-              ),
-            ),
-            if (isSelected)
-              const Icon(Icons.check, color: Color(0xFFFFFF00)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showThemeSelector() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Seleccionar tema',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildThemeOption('Oscuro'),
-            _buildThemeOption('Claro'),
-            _buildThemeOption('Sistema'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildThemeOption(String theme) {
-    final isSelected = _selectedTheme == theme;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() => _selectedTheme = theme);
-        Navigator.pop(context);
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFFFFF00).withOpacity(0.2)
-              : Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFFFFFF00)
-                : Colors.white.withOpacity(0.1),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                theme,
                 style: TextStyle(
                   color: isSelected ? const Color(0xFFFFFF00) : Colors.white,
                   fontSize: 16,

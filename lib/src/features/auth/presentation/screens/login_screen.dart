@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           }
         } else {
-          final message = (resp['message'] ?? 'Credenciales invÃ¡lidas').toString();
+          final message = (resp['message'] ?? 'Credenciales inválidas').toString();
           final data = resp['data'] is Map<String, dynamic> ? resp['data'] as Map<String, dynamic> : null;
           final bool tooMany = data?['too_many_attempts'] == true;
           final int failAttempts = (data?['fail_attempts'] is int) ? data!['fail_attempts'] as int : _localFailAttempts;
