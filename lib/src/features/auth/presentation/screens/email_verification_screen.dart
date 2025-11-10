@@ -39,6 +39,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   bool _isLoading = false;
   bool _isResending = false;
   bool _isVerifying = false; // Nuevo estado para verificación de usuario
+  bool _isProgrammaticFill = false; // Evita recursión al completar campos por código
+  late List<String> _previousValues; // Guarda el valor anterior de cada casilla
   int _resendCountdown = 60;
   Timer? _countdownTimer;
   bool _isDisposed = false;
@@ -51,36 +53,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   // Animaciones para PIN fields
   late List<AnimationController> _pinControllers;
   late List<Animation<double>> _pinAnimations;
-  late List<bool> _pinPulsing;
 
   @override
   void initState() {
     super.initState();
-  _digitControllers = List.generate(4, (_) => TextEditingController());
-  _focusNodes = List.generate(4, (_) => FocusNode());
-
-    // Agregar listeners a los controladores para manejar el cambio de foco automáticamente
-    for (int i = 0; i < _digitControllers.length; i++) {
-      final int idx = i; // capturar índice correctamente para evitar cierre tardío
-      _digitControllers[idx].addListener(() {
-        if (!mounted || _isDisposed) return;
-        
-        final text = _digitControllers[idx].text;
-        if (text.isNotEmpty && text.length == 1) {
-          // Activar animación del pulso
-          _triggerPinPulse(idx);
-          // Si se ingresó un dígito y no es el último campo, pasar al siguiente
-          if (idx < 3) {
-            // Usar Timer con duración cero para cambiar foco después del frame actual
-            Timer(Duration.zero, () {
-              if (mounted && !_isDisposed) {
-                _focusNodes[idx + 1].requestFocus();
-              }
-            });
-          }
-        }
-      });
-    }
+    _digitControllers = List.generate(4, (_) => TextEditingController());
+    _focusNodes = List.generate(4, (_) => FocusNode());
+    _previousValues = List.filled(4, '');
 
     // Inicializar animaciones
     _animationController = AnimationController(
@@ -118,8 +97,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       curve: Curves.easeOutCubic,
     ))).toList();
 
-  _pinPulsing = List.generate(4, (index) => false);
-
     // Iniciar animación de entrada
     _animationController.forward();
 
@@ -136,17 +113,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
   void _triggerPinPulse(int index) {
     if (index >= 0 && index < _pinControllers.length) {
-      setState(() {
-        _pinPulsing[index] = true;
-      });
-      _pinControllers[index].forward().then((_) {
-        _pinControllers[index].reverse().then((_) {
-          if (mounted && !_isDisposed) {
-            setState(() {
-              _pinPulsing[index] = false;
-            });
-          }
-        });
+      final controller = _pinControllers[index];
+      controller.stop();
+      controller.forward(from: 0.0).then((_) {
+        if (mounted && !_isDisposed) {
+          controller.reverse();
+        }
       });
     }
   }
@@ -568,84 +540,123 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                                             ),
                                           ],
                                         ),
-                                        child: Focus(
+                                        child: TextField(
+                                          controller: _digitControllers[index],
                                           focusNode: _focusNodes[index],
-                                          onFocusChange: (hasFocus) {
-                                            // Se eliminó animación por focus para que sólo ocurra al ingresar dígitos
-                                          },
-                                          onKeyEvent: (node, event) {
-                                            if (event is KeyDownEvent) {
-                                              // Mejorar manejo del backspace para mayor agilidad
-                                              if (event.logicalKey == LogicalKeyboardKey.backspace) {
-                                                if (_digitControllers[index].text.isEmpty && index > 0) {
-                                                  // Si el campo actual está vacío, ir al anterior y limpiarlo
-                                                  Timer(Duration.zero, () {
-                                                    if (mounted && !_isDisposed) {
-                                                      _focusNodes[index - 1].requestFocus();
-                                                      _digitControllers[index - 1].text = '';
-                                                    }
-                                                  });
-                                                  return KeyEventResult.handled;
-                                                } else if (_digitControllers[index].text.isNotEmpty) {
-                                                  // Si hay texto, borrarlo normalmente
-                                                  _digitControllers[index].text = '';
-                                                  return KeyEventResult.handled;
-                                                }
-                                              }
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          textAlign: TextAlign.center,
+                                          maxLength: 1,
+                                          textInputAction:
+                                              index < 3 ? TextInputAction.next : TextInputAction.done,
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 1.0,
+                                          ),
+                                          cursorColor: AppColors.primary,
+                                          decoration: const InputDecoration(
+                                            counterText: '',
+                                            border: InputBorder.none,
+                                            contentPadding: EdgeInsets.symmetric(vertical: 18),
+                                          ),
+                                          onChanged: (value) async {
+                                            if (!mounted || _isDisposed) {
+                                              return;
                                             }
-                                            return KeyEventResult.ignored;
-                                          },
-                                          child: TextField(
-                                            controller: _digitControllers[index],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                            textAlign: TextAlign.center,
-                                            maxLength: 1,
-                                            style: TextStyle(
-                                              color: Theme.of(context).textTheme.bodyLarge?.color,
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 1.0,
-                                            ),
-                                            cursorColor: AppColors.primary,
-                                            decoration: const InputDecoration(
-                                              counterText: '',
-                                              border: InputBorder.none,
-                                              contentPadding: EdgeInsets.symmetric(vertical: 18),
-                                            ),
-                                            onChanged: (value) async {
-                                              if (!mounted || _isDisposed) return;
 
-                                              // Detección de pegado de los 4 dígitos completos
-                                              if (value.isNotEmpty && value.length == 4 && RegExp(r'^\d{4}$').hasMatch(value)) {
-                                                for (int i = 0; i < 4; i++) {
-                                                  _digitControllers[i].text = value[i];
-                                                  _triggerPinPulse(i);
+                                            if (_isProgrammaticFill) {
+                                              return;
+                                            }
+
+                                            final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+
+                                            if (digitsOnly.length > 1) {
+                                              final limited = digitsOnly.length > _digitControllers.length
+                                                  ? digitsOnly.substring(0, _digitControllers.length)
+                                                  : digitsOnly;
+                                              final chars = limited.split('');
+                                              _isProgrammaticFill = true;
+                                              try {
+                                                for (int i = 0; i < _digitControllers.length; i++) {
+                                                  final char = i < chars.length ? chars[i] : '';
+                                                  _digitControllers[i].text = char;
+                                                  _previousValues[i] = char;
+                                                  if (char.isNotEmpty) {
+                                                    _triggerPinPulse(i);
+                                                  }
                                                 }
-                                                Timer(Duration.zero, () {
-                                                  if (mounted && !_isDisposed) {
-                                                    _focusNodes[3].requestFocus();
+                                              } finally {
+                                                _isProgrammaticFill = false;
+                                              }
+
+                                              Future.microtask(() async {
+                                                if (!mounted || _isDisposed) {
+                                                  return;
+                                                }
+                                                final filled = chars.length > _digitControllers.length
+                                                    ? _digitControllers.length
+                                                    : chars.length;
+                                                final targetIndex = filled == 0 ? 0 : filled - 1;
+                                                _focusNodes[targetIndex].requestFocus();
+
+                                                final current = _enteredCode;
+                                                if (current.length == 4 &&
+                                                    !current.contains(RegExp(r'[^0-9]')) &&
+                                                    !_isLoading &&
+                                                    !_isVerifying) {
+                                                  await _verifyCode();
+                                                }
+                                              });
+                                              return;
+                                            }
+
+                                            if (digitsOnly.isEmpty) {
+                                              final hadValue = _previousValues[index].isNotEmpty;
+                                              _previousValues[index] = '';
+                                              if (hadValue) {
+                                                return;
+                                              }
+                                              if (index > 0) {
+                                                Future.microtask(() {
+                                                  if (!mounted || _isDisposed) {
+                                                    return;
+                                                  }
+                                                  _focusNodes[index - 1].requestFocus();
+                                                  _isProgrammaticFill = true;
+                                                  try {
+                                                    _digitControllers[index - 1].text = '';
+                                                    _previousValues[index - 1] = '';
+                                                  } finally {
+                                                    _isProgrammaticFill = false;
                                                   }
                                                 });
-                                              } else if (value.isNotEmpty) {
-                                                _triggerPinPulse(index);
-                                                // Avanzar foco inmediatamente en ingreso normal
-                                                if (value.length == 1 && index < 3) {
-                                                  Timer(Duration.zero, () {
-                                                    if (mounted && !_isDisposed) {
-                                                      _focusNodes[index + 1].requestFocus();
-                                                    }
-                                                  });
-                                                }
                                               }
+                                              return;
+                                            }
 
-                                              final current = _enteredCode;
-                                              if (current.length == 4 && !current.contains(RegExp(r'[^0-9]')) &&
-                                                  mounted && !_isLoading && !_isVerifying) {
-                                                await _verifyCode();
-                                              }
-                                            },
-                                          ),
+                                            final digit = digitsOnly[0];
+                                            _previousValues[index] = digit;
+                                            _triggerPinPulse(index);
+
+                                            if (index < 3) {
+                                              Future.microtask(() {
+                                                if (!mounted || _isDisposed) {
+                                                  return;
+                                                }
+                                                _focusNodes[index + 1].requestFocus();
+                                              });
+                                            }
+
+                                            final current = _enteredCode;
+                                            if (current.length == 4 &&
+                                                !current.contains(RegExp(r'[^0-9]')) &&
+                                                !_isLoading &&
+                                                !_isVerifying) {
+                                              await _verifyCode();
+                                            }
+                                          },
                                         ),
                                       ),
                                     ),
