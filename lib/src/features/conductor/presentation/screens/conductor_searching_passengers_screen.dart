@@ -545,14 +545,9 @@ class _ConductorSearchingPassengersScreenState
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => _buildExitConfirmDialog(),
-                );
-              },
+              onTap: _rejectRequest,
               child: Icon(
-                Icons.arrow_back_rounded,
+                Icons.close_rounded,
                 color: isDark ? Colors.white : Colors.grey[800],
               ),
             ),
@@ -595,149 +590,6 @@ class _ConductorSearchingPassengersScreenState
     );
   }
 
-  Widget _buildExitConfirmDialog() {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: AppColors.darkCard.withValues(alpha: 0.95),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 30,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Ícono
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.logout_rounded,
-                    color: AppColors.primary,
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Título
-                const Text(
-                  '¿Salir del modo en línea?',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                // Descripción
-                Text(
-                  'Dejarás de recibir solicitudes de viaje hasta que vuelvas a conectarte',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 28),
-                // Botones
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => Navigator.pop(context),
-                            child: const Center(
-                              child: Text(
-                                'Cancelar',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
-                              blurRadius: 15,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context); // Cerrar diálogo
-                            Navigator.pop(context, false); // Salir de la pantalla
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: const Text(
-                            'Salir',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildMap() {
     final theme = Theme.of(context);
@@ -1014,15 +866,6 @@ class _ConductorSearchingPassengersScreenState
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.3,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Tienes 30 segundos para responder',
-                                style: TextStyle(
-                                  color: AppColors.primary.withValues(alpha: 0.9),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
