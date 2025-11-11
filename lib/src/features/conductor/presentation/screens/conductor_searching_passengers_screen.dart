@@ -56,10 +56,6 @@ class _ConductorSearchingPassengersScreenState
   late AnimationController _acceptButtonController;
   late Animation<double> _acceptButtonScaleAnimation;
   
-  late AnimationController _topPanelController;
-  late Animation<Offset> _topPanelSlideAnimation;
-  late Animation<double> _topPanelFadeAnimation;
-  
   late AnimationController _timerController;
   late Animation<double> _timerAnimation;
   
@@ -82,7 +78,6 @@ class _ConductorSearchingPassengersScreenState
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _requestPanelController.forward();
-          _topPanelController.forward();
           
           // Iniciar temporizador de auto-rechazo
           _timerController.reset();
@@ -112,7 +107,6 @@ class _ConductorSearchingPassengersScreenState
     _pulseAnimationController.dispose();
     _requestPanelController.dispose();
     _acceptButtonController.dispose();
-    _topPanelController.dispose();
     _timerController.dispose();
     _autoRejectTimer?.cancel();
     
@@ -183,35 +177,6 @@ class _ConductorSearchingPassengersScreenState
       parent: _acceptButtonController,
       curve: Curves.easeInOut,
     ));
-
-    // Animación del panel superior (entrada)
-    _topPanelController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    _topPanelSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _topPanelController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    _topPanelFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _topPanelController,
-      curve: Curves.easeOut,
-    ));
-
-    // Iniciar animación del panel superior
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        _topPanelController.forward();
-      }
-    });
 
     // Temporizador para auto-rechazar solicitud (30 segundos)
     _timerController = AnimationController(
@@ -506,9 +471,6 @@ class _ConductorSearchingPassengersScreenState
           // Mapa
           _buildMap(),
           
-          // Panel superior con estado (solo cuando hay solicitud)
-          if (_selectedRequest != null) _buildTopPanel(),
-          
           // Panel inferior con solicitud (si hay)
           if (_selectedRequest != null) _buildRequestPanel(),
         ],
@@ -787,99 +749,6 @@ class _ConductorSearchingPassengersScreenState
             ],
           ),
       ],
-    );
-  }
-
-  Widget _buildTopPanel() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: SafeArea(
-        child: SlideTransition(
-          position: _topPanelSlideAnimation,
-          child: FadeTransition(
-            opacity: _topPanelFadeAnimation,
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: isDark 
-                        ? AppColors.darkCard.withValues(alpha: 0.9)
-                        : Colors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        // Icono animado
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 800),
-                          curve: Curves.elasticOut,
-                          builder: (context, value, child) {
-                            return Transform.scale(
-                              scale: value,
-                              child: Container(
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Icon(
-                                  Icons.near_me,
-                                  color: AppColors.primary,
-                                  size: 28,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 16),
-                        // Texto informativo
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Nueva solicitud',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
