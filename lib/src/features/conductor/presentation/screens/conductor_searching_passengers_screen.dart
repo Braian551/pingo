@@ -1,19 +1,21 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../../../../global/services/mapbox_service.dart';
 import '../../../../global/services/sound_service.dart';
+import '../../../../theme/app_colors.dart';
 import '../../services/trip_request_search_service.dart';
 import '../../services/conductor_service.dart';
 import 'conductor_active_trip_screen.dart';
 
-/// Pantalla de bÃºsqueda de pasajeros (lÃ³gica Uber/DiDi)
+/// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
 /// 
-/// Muestra el mapa con la ubicaciÃ³n del conductor y busca solicitudes cercanas
+/// Muestra el mapa con la ubicación del conductor y busca solicitudes cercanas
 /// Cuando encuentra solicitudes, muestra un panel para aceptar o rechazar
 class ConductorSearchingPassengersScreen extends StatefulWidget {
   final int conductorId;
@@ -43,7 +45,7 @@ class _ConductorSearchingPassengersScreenState
   List<Map<String, dynamic>> _pendingRequests = [];
   Map<String, dynamic>? _selectedRequest;
   
-  // IDs de solicitudes ya mostradas para evitar reproducir sonido mÃºltiples veces
+  // IDs de solicitudes ya mostradas para evitar reproducir sonido múltiples veces
   final Set<int> _notifiedRequestIds = {};
   
   String _searchMessage = 'Buscando solicitudes cercanas...';
@@ -108,7 +110,7 @@ class _ConductorSearchingPassengersScreenState
   }
 
   void _setupAnimations() {
-    // AnimaciÃ³n de pulso para el marcador del conductor (mÃ¡s suave)
+    // Animación de pulso para el marcador del conductor (más suave)
     _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -122,7 +124,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeInOut,
     ));
 
-    // AnimaciÃ³n del panel de solicitud (mÃ¡s fluida)
+    // Animación del panel de solicitud (más fluida)
     _requestPanelController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -144,7 +146,7 @@ class _ConductorSearchingPassengersScreenState
       curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
     ));
 
-    // AnimaciÃ³n del botÃ³n de aceptar (efecto de pulso)
+    // Animación del botón de aceptar (efecto de pulso)
     _acceptButtonController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -158,7 +160,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeInOut,
     ));
 
-    // AnimaciÃ³n del panel superior (entrada)
+    // Animación del panel superior (entrada)
     _topPanelController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -180,7 +182,7 @@ class _ConductorSearchingPassengersScreenState
       curve: Curves.easeOut,
     ));
 
-    // Iniciar animaciÃ³n del panel superior
+    // Iniciar animación del panel superior
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
         _topPanelController.forward();
@@ -204,18 +206,18 @@ class _ConductorSearchingPassengersScreenState
 
   Future<void> _startLocationTracking() async {
     try {
-      print('ðŸ“ Iniciando tracking de ubicaciÃ³n...');
+      print('📍 Iniciando tracking de ubicación...');
       
-      // Verificar si el servicio de ubicaciÃ³n estÃ¡ habilitado
+      // Verificar si el servicio de ubicación está habilitado
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('âŒ Servicio de ubicaciÃ³n deshabilitado');
+        print('❌ Servicio de ubicación deshabilitado');
         _showError('Por favor activa el GPS en tu dispositivo');
-        // Usar ubicaciÃ³n por defecto para pruebas
+        // Usar ubicación por defecto para pruebas
         setState(() {
-          _currentLocation = const LatLng(4.6097, -74.0817); // BogotÃ¡
+          _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
         });
-        // Mover mapa despuÃ©s de que se haya construido
+        // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -227,22 +229,22 @@ class _ConductorSearchingPassengersScreenState
 
       // Verificar permisos
       LocationPermission permission = await Geolocator.checkPermission();
-      print('ðŸ“ Permiso actual: $permission');
+      print('📍 Permiso actual: $permission');
       
       if (permission == LocationPermission.denied) {
-        print('ðŸ“ Solicitando permisos...');
+        print('📍 Solicitando permisos...');
         permission = await Geolocator.requestPermission();
-        print('ðŸ“ Permiso otorgado: $permission');
+        print('📍 Permiso otorgado: $permission');
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print('âŒ Permisos denegados permanentemente');
-        _showError('Permisos de ubicaciÃ³n denegados. HabilÃ­talos en configuraciÃ³n.');
-        // Usar ubicaciÃ³n por defecto
+        print('❌ Permisos denegados permanentemente');
+        _showError('Permisos de ubicación denegados. Habilítalos en configuración.');
+        // Usar ubicación por defecto
         setState(() {
           _currentLocation = const LatLng(4.6097, -74.0817);
         });
-        // Mover mapa despuÃ©s de que se haya construido
+        // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -253,13 +255,13 @@ class _ConductorSearchingPassengersScreenState
       }
 
       if (permission == LocationPermission.denied) {
-        print('âŒ Permisos denegados');
-        _showError('Se necesitan permisos de ubicaciÃ³n');
-        // Usar ubicaciÃ³n por defecto
+        print('❌ Permisos denegados');
+        _showError('Se necesitan permisos de ubicación');
+        // Usar ubicación por defecto
         setState(() {
           _currentLocation = const LatLng(4.6097, -74.0817);
         });
-        // Mover mapa despuÃ©s de que se haya construido
+        // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _mapController.move(_currentLocation!, 15);
@@ -269,27 +271,27 @@ class _ConductorSearchingPassengersScreenState
         return;
       }
 
-      print('âœ… Obteniendo ubicaciÃ³n actual...');
-      // Obtener ubicaciÃ³n actual con timeout mÃ¡s largo para emuladores
+      print('✅ Obteniendo ubicación actual...');
+      // Obtener ubicación actual con timeout más largo para emuladores
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 30), // Timeout mÃ¡s largo
+        timeLimit: const Duration(seconds: 30), // Timeout más largo
       );
 
-      print('âœ… UbicaciÃ³n obtenida: ${position.latitude}, ${position.longitude}');
+      print('✅ Ubicación obtenida: ${position.latitude}, ${position.longitude}');
       
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
       });
 
-      // Centrar mapa en ubicaciÃ³n actual despuÃ©s de que se haya construido
+      // Centrar mapa en ubicación actual después de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _mapController.move(_currentLocation!, 15);
         }
       });
 
-      // Escuchar cambios de ubicaciÃ³n
+      // Escuchar cambios de ubicación
       _positionStream = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -298,12 +300,12 @@ class _ConductorSearchingPassengersScreenState
         ),
       ).listen(
         (Position position) {
-          print('ðŸ“ UbicaciÃ³n actualizada: ${position.latitude}, ${position.longitude}');
+          print('📍 Ubicación actualizada: ${position.latitude}, ${position.longitude}');
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
           });
 
-          // Actualizar ubicaciÃ³n en el servidor
+          // Actualizar ubicación en el servidor
           TripRequestSearchService.updateLocation(
             conductorId: widget.conductorId,
             latitude: position.latitude,
@@ -311,17 +313,17 @@ class _ConductorSearchingPassengersScreenState
           );
         },
         onError: (error) {
-          print('âŒ Error en stream de ubicaciÃ³n: $error');
+          print('❌ Error en stream de ubicación: $error');
         },
       );
     } catch (e) {
-      print('âŒ Error crÃ­tico obteniendo ubicaciÃ³n: $e');
-      _showError('Error obteniendo ubicaciÃ³n. Usando ubicaciÃ³n de prueba.');
-      // Usar ubicaciÃ³n por defecto para que la app siga funcionando
+      print('❌ Error crítico obteniendo ubicación: $e');
+      _showError('Error obteniendo ubicación. Usando ubicación de prueba.');
+      // Usar ubicación por defecto para que la app siga funcionando
       setState(() {
-        _currentLocation = const LatLng(4.6097, -74.0817); // BogotÃ¡
+        _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
       });
-      // Mover mapa despuÃ©s de que se haya construido
+      // Mover mapa después de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _mapController.move(_currentLocation!, 15);
@@ -333,13 +335,13 @@ class _ConductorSearchingPassengersScreenState
 
   Future<void> _startSearching() async {
     if (_currentLocation == null) {
-      print('âš ï¸ UbicaciÃ³n aÃºn no disponible, reintentando en 1 segundo...');
+      print('⚠️ Ubicación aún no disponible, reintentando en 1 segundo...');
       Future.delayed(const Duration(seconds: 1), _startSearching);
       return;
     }
 
-    print('ðŸ” Iniciando bÃºsqueda de solicitudes...');
-    print('ðŸ“ UbicaciÃ³n: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+    print('🔍 Iniciando búsqueda de solicitudes...');
+    print('📍 Ubicación: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
     
     // Activar disponibilidad del conductor primero
     try {
@@ -347,9 +349,9 @@ class _ConductorSearchingPassengersScreenState
         conductorId: widget.conductorId,
         disponible: true,
       );
-      print('âœ… Disponibilidad activada');
+      print('✅ Disponibilidad activada');
     } catch (e) {
-      print('âŒ Error activando disponibilidad: $e');
+      print('❌ Error activando disponibilidad: $e');
     }
     
     TripRequestSearchService.startSearching(
@@ -359,7 +361,7 @@ class _ConductorSearchingPassengersScreenState
       onRequestsFound: (requests) {
         if (!mounted) return;
         
-        print('âœ… [DEBUG] Solicitudes encontradas: ${requests.length}');
+        print('✅ [DEBUG] Solicitudes encontradas: ${requests.length}');
         
         setState(() {
           _pendingRequests = requests;
@@ -376,13 +378,13 @@ class _ConductorSearchingPassengersScreenState
             
             // Mostrar la primera solicitud si no hay una seleccionada
             if (_selectedRequest == null && !_showingRequest) {
-              print('ðŸŽ¯ [DEBUG] Mostrando nueva solicitud al conductor');
+              print('🎯 [DEBUG] Mostrando nueva solicitud al conductor');
               _selectedRequest = requests.first;
               _showingRequest = true;
               _panelExpanded = false;
               _requestPanelController.forward();
               
-              // Ajustar cÃ¡mara para mostrar conductor y cliente
+              // Ajustar cámara para mostrar conductor y cliente
               if (_currentLocation != null) {
                 final origin = LatLng(
                   double.parse(requests.first['latitud_origen'].toString()),
@@ -393,7 +395,7 @@ class _ConductorSearchingPassengersScreenState
                 final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
                 final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
                 
-                // Validar que los bounds tengan Ã¡rea suficiente (no sean un solo punto)
+                // Validar que los bounds tengan área suficiente (no sean un solo punto)
                 final latDiff = (maxLat - minLat).abs();
                 final lngDiff = (maxLng - minLng).abs();
                 
@@ -407,20 +409,20 @@ class _ConductorSearchingPassengersScreenState
                     ),
                   );
                 } else {
-                  // Si estÃ¡n muy cerca, solo centrarse en el punto origen con zoom fijo
+                  // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
                   _mapController.move(origin, 15);
                 }
               }
               
-              // ðŸ”Š Reproducir sonido de notificaciÃ³n si es una solicitud nueva
+              // 🔊 Reproducir sonido de notificación si es una solicitud nueva
               final requestId = requests.first['id'] as int;
-              print('ðŸ”Š [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
+              print('🔊 [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
               if (!_notifiedRequestIds.contains(requestId)) {
                 _notifiedRequestIds.add(requestId);
-                print('ðŸ”Š [DEBUG] Reproduciendo sonido para solicitud #$requestId');
+                print('🔊 [DEBUG] Reproduciendo sonido para solicitud #$requestId');
                 SoundService.playRequestNotification();
               } else {
-                print('ðŸ”Š [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
+                print('🔊 [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
               }
               
               // Iniciar temporizador de auto-rechazo
@@ -430,7 +432,7 @@ class _ConductorSearchingPassengersScreenState
               _autoRejectTimer?.cancel();
               _autoRejectTimer = Timer(const Duration(seconds: 30), () {
                 if (mounted && _selectedRequest != null) {
-                  print('â° [DEBUG] Auto-rechazando solicitud por timeout');
+                  print('⏰ [DEBUG] Auto-rechazando solicitud por timeout');
                   _rejectRequest();
                 }
               });
@@ -440,7 +442,7 @@ class _ConductorSearchingPassengersScreenState
       },
       onError: (error) {
         if (!mounted) return;
-        print('âŒ Error en bÃºsqueda: $error');
+        print('❌ Error en búsqueda: $error');
         _showError(error);
       },
     );
@@ -472,7 +474,7 @@ class _ConductorSearchingPassengersScreenState
     // Detener el loop de sonido continuo
     SoundService.stopSound();
     
-    // ðŸ”Š Reproducir sonido de confirmaciÃ³n
+    // 🔊 Reproducir sonido de confirmación
     SoundService.playAcceptSound();
 
     // Mostrar loading
@@ -480,7 +482,7 @@ class _ConductorSearchingPassengersScreenState
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+        child: CircularProgressIndicator(color: AppColors.primary),
       ),
     );
 
@@ -493,19 +495,19 @@ class _ConductorSearchingPassengersScreenState
     Navigator.pop(context); // Cerrar loading
 
     if (result['success'] == true) {
-      // Detener bÃºsqueda
+      // Detener búsqueda
       _stopSearching();
       
-      // Mostrar Ã©xito y navegar a pantalla de viaje activo
+      // Mostrar éxito y navegar a pantalla de viaje activo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Â¡Viaje aceptado! DirÃ­gete al punto de recogida'),
+          content: Text('¡Viaje aceptado! Dirígete al punto de recogida'),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ),
       );
       
-      // Navegar a la pantalla de navegaciÃ³n activa (ruta)
+      // Navegar a la pantalla de navegación activa (ruta)
       final origenLat = double.tryParse(_selectedRequest!['latitud_origen']?.toString() ?? '0') ?? 0;
       final origenLng = double.tryParse(_selectedRequest!['longitud_origen']?.toString() ?? '0') ?? 0;
       final destinoLat = double.tryParse(_selectedRequest!['latitud_destino']?.toString() ?? '0') ?? 0;
@@ -544,13 +546,13 @@ class _ConductorSearchingPassengersScreenState
     _autoRejectTimer?.cancel();
     _timerController.stop();
     
-    // Detener cualquier sonido que se estÃ© reproduciendo
+    // Detener cualquier sonido que se esté reproduciendo
     SoundService.stopSound();
 
     final result = await TripRequestSearchService.rejectRequest(
       solicitudId: _selectedRequest!['id'],
       conductorId: widget.conductorId,
-      motivo: 'Conductor rechazÃ³',
+      motivo: 'Conductor rechazó',
     );
 
     if (!mounted) return;
@@ -580,8 +582,11 @@ class _ConductorSearchingPassengersScreenState
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: Stack(
@@ -589,7 +594,7 @@ class _ConductorSearchingPassengersScreenState
           // Mapa
           _buildMap(),
           
-          // Panel superior con estado (solo cuando estÃ¡ buscando sin solicitudes)
+          // Panel superior con estado (solo cuando est� buscando sin solicitudes)
           if (_pendingRequests.isEmpty) _buildTopPanel(),
           
           // Panel inferior con solicitud (si hay)
@@ -600,24 +605,27 @@ class _ConductorSearchingPassengersScreenState
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.9),
+            color: isDark ? AppColors.darkCard : Colors.white,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFFFFD700).withOpacity(0.3),
-              width: 1.5,
-            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-                spreadRadius: 2,
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -626,20 +634,51 @@ class _ConductorSearchingPassengersScreenState
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
               onTap: () {
-                // Confirmar antes de salir
                 showDialog(
                   context: context,
                   builder: (context) => _buildExitConfirmDialog(),
                 );
               },
-              child: const Icon(
-                Icons.arrow_back_ios_new,
-                color: Colors.white,
-                size: 20,
+              child: Icon(
+                Icons.arrow_back_rounded,
+                color: isDark ? Colors.white : Colors.grey[800],
               ),
             ),
           ),
         ),
+      ),
+      title: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkCard : Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 24,
+              height: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            'Buscando pasajeros',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -654,10 +693,10 @@ class _ConductorSearchingPassengersScreenState
           child: Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              color: AppColors.darkCard.withOpacity(0.95),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: const Color(0xFFFFD700).withOpacity(0.2),
+                color: AppColors.primary.withOpacity(0.2),
                 width: 1.5,
               ),
               boxShadow: [
@@ -671,23 +710,23 @@ class _ConductorSearchingPassengersScreenState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Ãcono
+                // Ícono
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700).withOpacity(0.15),
+                    color: AppColors.primary.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.logout_rounded,
-                    color: Color(0xFFFFD700),
+                    color: AppColors.primary,
                     size: 48,
                   ),
                 ),
                 const SizedBox(height: 24),
-                // TÃ­tulo
+                // Título
                 const Text(
-                  'Â¿Salir del modo en lÃ­nea?',
+                  '¿Salir del modo en línea?',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -697,9 +736,9 @@ class _ConductorSearchingPassengersScreenState
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // DescripciÃ³n
+                // Descripción
                 Text(
-                  'DejarÃ¡s de recibir solicitudes de viaje hasta que vuelvas a conectarte',
+                  'Dejarás de recibir solicitudes de viaje hasta que vuelvas a conectarte',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 14,
@@ -748,7 +787,7 @@ class _ConductorSearchingPassengersScreenState
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFFD700).withOpacity(0.3),
+                              color: AppColors.primary.withOpacity(0.3),
                               blurRadius: 15,
                               spreadRadius: 2,
                             ),
@@ -756,11 +795,11 @@ class _ConductorSearchingPassengersScreenState
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Cerrar diÃ¡logo
+                            Navigator.pop(context); // Cerrar diálogo
                             Navigator.pop(context, false); // Salir de la pantalla
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD700),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -830,7 +869,7 @@ class _ConductorSearchingPassengersScreenState
                         height: 70 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFFFFD700).withOpacity(
+                          color: AppColors.primary.withOpacity(
                             0.2 / _pulseAnimation.value,
                           ),
                         ),
@@ -841,7 +880,7 @@ class _ConductorSearchingPassengersScreenState
                         height: 50 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFFFFD700).withOpacity(
+                          color: AppColors.primary.withOpacity(
                             0.3 / _pulseAnimation.value,
                           ),
                         ),
@@ -861,20 +900,20 @@ class _ConductorSearchingPassengersScreenState
                           ],
                         ),
                       ),
-                      // CÃ­rculo principal con borde
+                      // Círculo principal con borde
                       Container(
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
+                          color: AppColors.darkCard,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFFFD700),
+                            color: AppColors.primary,
                             width: 3.5,
                           ),
                         ),
                       ),
-                      // Ãcono del conductor
+                      // Ícono del conductor
                       Container(
                         width: 48,
                         height: 48,
@@ -883,7 +922,7 @@ class _ConductorSearchingPassengersScreenState
                         ),
                         child: const Icon(
                           Icons.directions_car,
-                          color: Color(0xFFFFD700),
+                          color: AppColors.primary,
                           size: 26,
                         ),
                       ),
@@ -895,7 +934,7 @@ class _ConductorSearchingPassengersScreenState
           ],
         ),
         
-        // Marcadores de solicitudes pendientes con animaciÃ³n mejorada
+        // Marcadores de solicitudes pendientes con animación mejorada
         if (_pendingRequests.isNotEmpty)
           MarkerLayer(
             markers: _pendingRequests.map((request) {
@@ -927,7 +966,7 @@ class _ConductorSearchingPassengersScreenState
                         }
                       });
 
-                      // Ajustar cÃ¡mara para mostrar conductor y cliente
+                      // Ajustar cámara para mostrar conductor y cliente
                       if (_currentLocation != null) {
                         final origin = LatLng(
                           double.parse(request['latitud_origen'].toString()),
@@ -938,7 +977,7 @@ class _ConductorSearchingPassengersScreenState
                         final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
                         final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
                         
-                        // Validar que los bounds tengan Ã¡rea suficiente (no sean un solo punto)
+                        // Validar que los bounds tengan área suficiente (no sean un solo punto)
                         final latDiff = (maxLat - minLat).abs();
                         final lngDiff = (maxLng - minLng).abs();
                         
@@ -952,7 +991,7 @@ class _ConductorSearchingPassengersScreenState
                             ),
                           );
                         } else {
-                          // Si estÃ¡n muy cerca, solo centrarse en el punto origen con zoom fijo
+                          // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
                           _mapController.move(origin, 15);
                         }
                       }
@@ -960,7 +999,7 @@ class _ConductorSearchingPassengersScreenState
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Pulso de fondo si estÃ¡ seleccionado
+                        // Pulso de fondo si está seleccionado
                         if (isSelected)
                           AnimatedBuilder(
                             animation: _pulseAnimation,
@@ -970,7 +1009,7 @@ class _ConductorSearchingPassengersScreenState
                                 height: 60 * _pulseAnimation.value,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: const Color(0xFFFFD700).withOpacity(
+                                  color: AppColors.primary.withOpacity(
                                     0.3 / _pulseAnimation.value,
                                   ),
                                 ),
@@ -985,19 +1024,19 @@ class _ConductorSearchingPassengersScreenState
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xFFFFD700)
+                                    ? AppColors.primary
                                     : Colors.white,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: isSelected
-                                      ? const Color(0xFFFFD700)
+                                      ? AppColors.primary
                                       : Colors.grey.shade300,
                                   width: 3,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: isSelected
-                                        ? const Color(0xFFFFD700).withOpacity(0.5)
+                                        ? AppColors.primary.withOpacity(0.5)
                                         : Colors.black.withOpacity(0.3),
                                     blurRadius: isSelected ? 15 : 8,
                                     spreadRadius: isSelected ? 3 : 1,
@@ -1034,6 +1073,9 @@ class _ConductorSearchingPassengersScreenState
   }
 
   Widget _buildTopPanel() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Positioned(
       top: 0,
       left: 0,
@@ -1052,15 +1094,17 @@ class _ConductorSearchingPassengersScreenState
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A).withOpacity(0.7),
+                      color: isDark 
+                        ? AppColors.darkCard.withOpacity(0.9)
+                        : Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: const Color(0xFFFFD700).withOpacity(0.2),
+                        color: AppColors.primary.withOpacity(0.2),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 4),
                         ),
@@ -1079,12 +1123,12 @@ class _ConductorSearchingPassengersScreenState
                               child: Container(
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700).withOpacity(0.15),
+                                  color: AppColors.primary.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.near_me,
-                                  color: Color(0xFFFFD700),
+                                  color: AppColors.primary,
                                   size: 28,
                                 ),
                               ),
@@ -1098,7 +1142,7 @@ class _ConductorSearchingPassengersScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'ðŸŸ¢ En lÃ­nea',
+                                '🟢 En línea',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -1117,7 +1161,7 @@ class _ConductorSearchingPassengersScreenState
                                     child: Text(
                                       _searchMessage,
                                       style: TextStyle(
-                                        color: const Color(0xFFFFD700).withOpacity(0.9),
+                                        color: AppColors.primary.withOpacity(0.9),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -1128,7 +1172,7 @@ class _ConductorSearchingPassengersScreenState
                             ],
                           ),
                         ),
-                        // Indicador de bÃºsqueda
+                        // Indicador de búsqueda
                         if (_pendingRequests.isEmpty)
                           SizedBox(
                             width: 24,
@@ -1136,21 +1180,21 @@ class _ConductorSearchingPassengersScreenState
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                const Color(0xFFFFD700).withOpacity(0.8),
+                                AppColors.primary.withOpacity(0.8),
                               ),
                             ),
                           ),
-                        // ðŸ”Š BOTÃ“N DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
+                        // 🔊 BOTÓN DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
                         if (_pendingRequests.isEmpty)
                           Padding(
                             padding: const EdgeInsets.only(left: 12),
                             child: GestureDetector(
                               onTap: () {
-                                print('ðŸ§ª Probando sonido de notificaciÃ³n...');
+                                print('🧪 Probando sonido de notificación...');
                                 SoundService.playRequestNotification();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('ðŸ”Š Reproduciendo sonido de prueba'),
+                                    content: Text('🔊 Reproduciendo sonido de prueba'),
                                     backgroundColor: Colors.blue,
                                     duration: Duration(seconds: 2),
                                   ),
@@ -1188,6 +1232,9 @@ class _ConductorSearchingPassengersScreenState
 
   Widget _buildRequestPanel() {
     if (_selectedRequest == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final distanciaKm = double.tryParse(
       _selectedRequest!['distancia_km']?.toString() ?? '0',
@@ -1269,23 +1316,25 @@ class _ConductorSearchingPassengersScreenState
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A).withOpacity(0.95),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  border: Border.all(
-                    color: const Color(0xFFFFD700).withOpacity(0.2),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      blurRadius: 30,
-                      offset: const Offset(0, -10),
+                  decoration: BoxDecoration(
+                    color: isDark 
+                      ? AppColors.darkCard.withOpacity(0.95)
+                      : Colors.white.withOpacity(0.95),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
                     ),
-                  ],
-                ),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(isDark ? 0.5 : 0.15),
+                        blurRadius: 30,
+                        offset: const Offset(0, -10),
+                      ),
+                    ],
+                  ),
                 child: SafeArea(
                   top: false, // No aplicar SafeArea arriba para evitar espacio extra
                   child: Padding(
@@ -1307,7 +1356,7 @@ class _ConductorSearchingPassengersScreenState
                           ),
                         ),
                         
-                        // Contenido contraÃ­do (SIEMPRE VISIBLE)
+                        // Contenido contraído (SIEMPRE VISIBLE)
                         AnimatedOpacity(
                           duration: const Duration(milliseconds: 300),
                           opacity: 1.0,
@@ -1319,15 +1368,15 @@ class _ConductorSearchingPassengersScreenState
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      const Color(0xFFFFD700).withOpacity(0.2),
-                                      const Color(0xFFFFD700).withOpacity(0.1),
+                                      AppColors.primary.withOpacity(0.2),
+                                      AppColors.primary.withOpacity(0.1),
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: const Color(0xFFFFD700).withOpacity(0.3),
+                                    color: AppColors.primary.withOpacity(0.3),
                                     width: 1.5,
                                   ),
                                 ),
@@ -1340,7 +1389,7 @@ class _ConductorSearchingPassengersScreenState
                                         Text(
                                           '\$',
                                           style: TextStyle(
-                                            color: const Color(0xFFFFD700).withOpacity(0.8),
+                                            color: AppColors.primary.withOpacity(0.8),
                                             fontSize: 24,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -1348,7 +1397,7 @@ class _ConductorSearchingPassengersScreenState
                                         Text(
                                           _formatPrice(precioEstimado),
                                           style: const TextStyle(
-                                            color: Color(0xFFFFD700),
+                                            color: AppColors.primary,
                                             fontSize: 36,
                                             fontWeight: FontWeight.w900,
                                             letterSpacing: -1,
@@ -1358,14 +1407,14 @@ class _ConductorSearchingPassengersScreenState
                                         Text(
                                           'COP',
                                           style: TextStyle(
-                                            color: const Color(0xFFFFD700).withOpacity(0.7),
+                                            color: AppColors.primary.withOpacity(0.7),
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    // Info rÃ¡pida: distancia y tiempo
+                                    // Info rápida: distancia y tiempo
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
@@ -1373,7 +1422,7 @@ class _ConductorSearchingPassengersScreenState
                                           children: [
                                             Icon(
                                               Icons.straighten,
-                                              color: const Color(0xFFFFD700),
+                                              color: AppColors.primary,
                                               size: 14,
                                             ),
                                             const SizedBox(width: 4),
@@ -1392,7 +1441,7 @@ class _ConductorSearchingPassengersScreenState
                                           children: [
                                             Icon(
                                               Icons.schedule,
-                                              color: const Color(0xFFFFD700),
+                                              color: AppColors.primary,
                                               size: 14,
                                             ),
                                             const SizedBox(width: 4),
@@ -1413,10 +1462,10 @@ class _ConductorSearchingPassengersScreenState
                               ),
                               const SizedBox(height: 16),
                               
-                              // Botones de acciÃ³n (siempre visibles)
+                              // Botones de acción (siempre visibles)
                               Row(
                                 children: [
-                                  // BotÃ³n de rechazar compacto
+                                  // Botón de rechazar compacto
                                   Container(
                                     width: 56,
                                     height: 56,
@@ -1442,7 +1491,7 @@ class _ConductorSearchingPassengersScreenState
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  // BotÃ³n de aceptar expandido con animaciÃ³n
+                                  // Botón de aceptar expandido con animación
                                   Expanded(
                                     child: AnimatedBuilder(
                                       animation: _acceptButtonScaleAnimation,
@@ -1458,7 +1507,7 @@ class _ConductorSearchingPassengersScreenState
                                           borderRadius: BorderRadius.circular(16),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color(0xFFFFD700).withOpacity(0.4),
+                                              color: AppColors.primary.withOpacity(0.4),
                                               blurRadius: 20,
                                               spreadRadius: 2,
                                             ),
@@ -1467,8 +1516,8 @@ class _ConductorSearchingPassengersScreenState
                                         child: ElevatedButton(
                                           onPressed: _acceptRequest,
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFFFFD700),
-                                            foregroundColor: Colors.black,
+                                            backgroundColor: AppColors.primary,
+                                            foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(16),
                                             ),
@@ -1527,19 +1576,19 @@ class _ConductorSearchingPassengersScreenState
                                 ),
                                 child: Row(
                                   children: [
-                                    // Tu ubicaciÃ³n (conductor)
+                                    // Tu ubicación (conductor)
                                     Expanded(
                                       child: Row(
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFFFD700).withOpacity(0.15),
+                                              color: AppColors.primary.withOpacity(0.15),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                             child: const Icon(
                                               Icons.navigation_rounded,
-                                              color: Color(0xFFFFD700),
+                                              color: AppColors.primary,
                                               size: 18,
                                             ),
                                           ),
@@ -1549,7 +1598,7 @@ class _ConductorSearchingPassengersScreenState
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Tu ubicaciÃ³n',
+                                                  'Tu ubicación',
                                                   style: TextStyle(
                                                     color: Colors.white.withOpacity(0.6),
                                                     fontSize: 11,
@@ -1614,7 +1663,7 @@ class _ConductorSearchingPassengersScreenState
                                         ],
                                       ),
                                     ),
-                                    // UbicaciÃ³n del cliente
+                                    // Ubicación del cliente
                                     Expanded(
                                       child: Row(
                                         children: [
@@ -1645,7 +1694,7 @@ class _ConductorSearchingPassengersScreenState
                                                 ),
                                                 const SizedBox(height: 2),
                                                 Text(
-                                                  'Recoger aquÃ­',
+                                                  'Recoger aquí',
                                                   style: TextStyle(
                                                     color: Colors.white.withOpacity(0.9),
                                                     fontSize: 13,
@@ -1693,7 +1742,7 @@ class _ConductorSearchingPassengersScreenState
                                           Icons.timer_outlined,
                                           color: secondsLeft <= 10
                                               ? Colors.red
-                                              : const Color(0xFFFFD700),
+                                              : AppColors.primary,
                                           size: 20,
                                         ),
                                         const SizedBox(width: 12),
@@ -1703,7 +1752,7 @@ class _ConductorSearchingPassengersScreenState
                                             children: [
                                               Text(
                                                 secondsLeft <= 10
-                                                    ? 'âš ï¸ Solicitud expirando'
+                                                    ? '⚠️ Solicitud expirando'
                                                     : 'Tiempo para responder',
                                                 style: TextStyle(
                                                   color: secondsLeft <= 10
@@ -1722,7 +1771,7 @@ class _ConductorSearchingPassengersScreenState
                                                   valueColor: AlwaysStoppedAnimation<Color>(
                                                     secondsLeft <= 10
                                                         ? Colors.red
-                                                        : const Color(0xFFFFD700),
+                                                        : AppColors.primary,
                                                   ),
                                                   minHeight: 6,
                                                 ),
@@ -1739,7 +1788,7 @@ class _ConductorSearchingPassengersScreenState
                                           decoration: BoxDecoration(
                                             color: secondsLeft <= 10
                                                 ? Colors.red
-                                                : const Color(0xFFFFD700).withOpacity(0.2),
+                                                : AppColors.primary.withOpacity(0.2),
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Text(
@@ -1747,7 +1796,7 @@ class _ConductorSearchingPassengersScreenState
                                             style: TextStyle(
                                               color: secondsLeft <= 10
                                                   ? Colors.white
-                                                  : const Color(0xFFFFD700),
+                                                  : AppColors.primary,
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -1777,7 +1826,7 @@ class _ConductorSearchingPassengersScreenState
                                       icon: Icons.my_location,
                                       iconColor: const Color(0xFF4CAF50),
                                       label: 'Recoger en',
-                                      value: _selectedRequest!['direccion_origen'] ?? 'Sin direcciÃ³n',
+                                      value: _selectedRequest!['direccion_origen'] ?? 'Sin dirección',
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1803,9 +1852,9 @@ class _ConductorSearchingPassengersScreenState
                                     ),
                                     _buildLocationInfo(
                                       icon: Icons.location_on,
-                                      iconColor: const Color(0xFFFFD700),
+                                      iconColor: AppColors.primary,
                                       label: 'Dejar en',
-                                      value: _selectedRequest!['direccion_destino'] ?? 'Sin direcciÃ³n',
+                                      value: _selectedRequest!['direccion_destino'] ?? 'Sin dirección',
                                     ),
                                   ],
                                 ),

@@ -4,7 +4,7 @@
  * Este script NO crea usuarios nuevos, usa los que ya están en la BD
  */
 
-require_once 'backend-deploy/config/database.php';
+require_once 'backend/config/database.php';
 
 echo "==========================================================\n";
 echo "🧪 TEST: CREAR SOLICITUD CON USUARIOS EXISTENTES\n";
