@@ -238,7 +238,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
       // Detener búsqueda temporalmente
       _stopSearchingRequests();
       
-      // Navegar a pantalla de solicitud con la primera solicitud
+      // Navegar a pantalla de solicitud con TODAS las solicitudes disponibles
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -246,7 +246,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
             conductorId: widget.conductorUser['id'] as int,
             conductorNombre: widget.conductorUser['nombre']?.toString() ?? 'Conductor',
             tipoVehiculo: widget.conductorUser['tipo_vehiculo']?.toString() ?? 'Sedan',
-            solicitud: requests.first,
+            solicitudes: requests, // Pasar TODAS las solicitudes
           ),
         ),
       ).then((result) {
