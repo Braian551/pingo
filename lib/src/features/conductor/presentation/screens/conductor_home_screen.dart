@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../global/services/mapbox_service.dart';
 import '../../providers/conductor_provider.dart';
+import 'conductor_searching_passengers_screen.dart';
 
 /// Pantalla principal del conductor - Diseño profesional y minimalista
 /// Inspirado en Uber/Didi pero con identidad propia
@@ -213,13 +214,32 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
   }
 
   void _toggleOnlineStatus() {
-    setState(() => _isOnline = !_isOnline);
-    
-    if (_isOnline) {
+    if (!_isOnline) {
+      // Conectarse: Navegar a la pantalla de búsqueda
+      setState(() => _isOnline = true);
       _connectionController.forward();
       HapticFeedback.mediumImpact();
-      _showStatusSnackbar('Estás en línea', AppColors.success);
+      
+      // Navegar a la pantalla de búsqueda de pasajeros
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConductorSearchingPassengersScreen(
+            conductorId: widget.conductorUser['id'] as int,
+            conductorNombre: widget.conductorUser['nombre']?.toString() ?? 'Conductor',
+            tipoVehiculo: widget.conductorUser['tipo_vehiculo']?.toString() ?? 'Sedan',
+          ),
+        ),
+      ).then((value) {
+        // Cuando regresa de la pantalla de búsqueda, desconectar
+        if (mounted) {
+          setState(() => _isOnline = false);
+          _connectionController.reverse();
+        }
+      });
     } else {
+      // Desconectarse
+      setState(() => _isOnline = false);
       _connectionController.reverse();
       HapticFeedback.lightImpact();
       _showStatusSnackbar('Estás fuera de línea', Colors.grey);
