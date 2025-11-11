@@ -13,20 +13,22 @@ import '../../services/trip_request_search_service.dart';
 import '../../services/conductor_service.dart';
 import 'conductor_active_trip_screen.dart';
 
-/// Pantalla de búsqueda de pasajeros (lógica Uber/DiDi)
+/// Pantalla para mostrar y gestionar solicitudes de viaje
 /// 
-/// Muestra el mapa con la ubicación del conductor y busca solicitudes cercanas
-/// Cuando encuentra solicitudes, muestra un panel para aceptar o rechazar
+/// Recibe una solicitud existente y permite al conductor aceptarla o rechazarla
+/// Si no hay solicitud o se rechaza, regresa automáticamente al HOME
 class ConductorSearchingPassengersScreen extends StatefulWidget {
   final int conductorId;
   final String conductorNombre;
   final String tipoVehiculo;
+  final Map<String, dynamic>? solicitud; // Solicitud a mostrar (opcional)
 
   const ConductorSearchingPassengersScreen({
     super.key,
     required this.conductorId,
     required this.conductorNombre,
     required this.tipoVehiculo,
+    this.solicitud,
   });
 
   @override
@@ -44,9 +46,6 @@ class _ConductorSearchingPassengersScreenState
   
   List<Map<String, dynamic>> _pendingRequests = [];
   Map<String, dynamic>? _selectedRequest;
-  
-  // IDs de solicitudes ya mostradas para evitar reproducir sonido múltiples veces
-  final Set<int> _notifiedRequestIds = {};
   
   String _searchMessage = 'Buscando solicitudes cercanas...';
   
@@ -78,12 +77,42 @@ class _ConductorSearchingPassengersScreenState
     super.initState();
     _setupAnimations();
     _startLocationTracking();
-    _startSearching();
+    
+    // Si se pasó una solicitud, mostrarla
+    if (widget.solicitud != null) {
+      _selectedRequest = widget.solicitud;
+      _showingRequest = true;
+      
+      // Mostrar panel de solicitud después de que se construya el widget
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _requestPanelController.forward();
+          _topPanelController.forward();
+          
+          // Iniciar temporizador de auto-rechazo
+          _timerController.reset();
+          _timerController.forward();
+          
+          _autoRejectTimer = Timer(const Duration(seconds: 30), () {
+            if (mounted && _selectedRequest != null) {
+              print('⏰ Auto-rechazando solicitud por timeout');
+              _rejectRequest();
+            }
+          });
+        }
+      });
+    } else {
+      // Si no hay solicitud, regresar al home
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
-    _stopSearching();
     _positionStream?.cancel();
     _pulseAnimationController.dispose();
     _requestPanelController.dispose();
@@ -223,7 +252,6 @@ class _ConductorSearchingPassengersScreenState
             _mapController.move(_currentLocation!, 15);
           }
         });
-        _startSearching();
         return;
       }
 
@@ -250,7 +278,6 @@ class _ConductorSearchingPassengersScreenState
             _mapController.move(_currentLocation!, 15);
           }
         });
-        _startSearching();
         return;
       }
 
@@ -267,7 +294,6 @@ class _ConductorSearchingPassengersScreenState
             _mapController.move(_currentLocation!, 15);
           }
         });
-        _startSearching();
         return;
       }
 
@@ -329,128 +355,10 @@ class _ConductorSearchingPassengersScreenState
           _mapController.move(_currentLocation!, 15);
         }
       });
-      _startSearching();
     }
   }
 
-  Future<void> _startSearching() async {
-    if (_currentLocation == null) {
-      print('⚠️ Ubicación aún no disponible, reintentando en 1 segundo...');
-      Future.delayed(const Duration(seconds: 1), _startSearching);
-      return;
-    }
 
-    print('🔍 Iniciando búsqueda de solicitudes...');
-    print('📍 Ubicación: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
-    
-    // Activar disponibilidad del conductor primero
-    try {
-      await ConductorService.actualizarDisponibilidad(
-        conductorId: widget.conductorId,
-        disponible: true,
-      );
-      print('✅ Disponibilidad activada');
-    } catch (e) {
-      print('❌ Error activando disponibilidad: $e');
-    }
-    
-    TripRequestSearchService.startSearching(
-      conductorId: widget.conductorId,
-      currentLat: _currentLocation!.latitude,
-      currentLng: _currentLocation!.longitude,
-      onRequestsFound: (requests) {
-        if (!mounted) return;
-        
-        print('✅ [DEBUG] Solicitudes encontradas: ${requests.length}');
-        
-        setState(() {
-          _pendingRequests = requests;
-          
-          if (requests.isEmpty) {
-            _searchMessage = 'Buscando solicitudes cercanas...';
-            if (_showingRequest) {
-              _selectedRequest = null;
-              _requestPanelController.reverse();
-              _showingRequest = false;
-            }
-          } else {
-            _searchMessage = '${requests.length} solicitud${requests.length > 1 ? "es" : ""} disponible${requests.length > 1 ? "s" : ""}';
-            
-            // Mostrar la primera solicitud si no hay una seleccionada
-            if (_selectedRequest == null && !_showingRequest) {
-              print('🎯 [DEBUG] Mostrando nueva solicitud al conductor');
-              _selectedRequest = requests.first;
-              _showingRequest = true;
-              _panelExpanded = false;
-              _requestPanelController.forward();
-              
-              // Ajustar cámara para mostrar conductor y cliente
-              if (_currentLocation != null) {
-                final origin = LatLng(
-                  double.parse(requests.first['latitud_origen'].toString()),
-                  double.parse(requests.first['longitud_origen'].toString()),
-                );
-                final minLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a < b ? a : b);
-                final maxLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a > b ? a : b);
-                final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
-                final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
-                
-                // Validar que los bounds tengan área suficiente (no sean un solo punto)
-                final latDiff = (maxLat - minLat).abs();
-                final lngDiff = (maxLng - minLng).abs();
-                
-                if (latDiff > 0.0001 && lngDiff > 0.0001) {
-                  // Solo hacer fit si hay una distancia significativa
-                  final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
-                  _mapController.fitCamera(
-                    CameraFit.bounds(
-                      bounds: bounds,
-                      padding: const EdgeInsets.only(top: 120, bottom: 240, left: 60, right: 60),
-                    ),
-                  );
-                } else {
-                  // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
-                  _mapController.move(origin, 15);
-                }
-              }
-              
-              // 🔊 Reproducir sonido de notificación si es una solicitud nueva
-              final requestId = requests.first['id'] as int;
-              print('🔊 [DEBUG] Verificando si solicitud #$requestId ya fue notificada');
-              if (!_notifiedRequestIds.contains(requestId)) {
-                _notifiedRequestIds.add(requestId);
-                print('🔊 [DEBUG] Reproduciendo sonido para solicitud #$requestId');
-                SoundService.playRequestNotification();
-              } else {
-                print('🔊 [DEBUG] Solicitud #$requestId ya fue notificada, omitiendo sonido');
-              }
-              
-              // Iniciar temporizador de auto-rechazo
-              _timerController.reset();
-              _timerController.forward();
-              
-              _autoRejectTimer?.cancel();
-              _autoRejectTimer = Timer(const Duration(seconds: 30), () {
-                if (mounted && _selectedRequest != null) {
-                  print('⏰ [DEBUG] Auto-rechazando solicitud por timeout');
-                  _rejectRequest();
-                }
-              });
-            }
-          }
-        });
-      },
-      onError: (error) {
-        if (!mounted) return;
-        print('❌ Error en búsqueda: $error');
-        _showError(error);
-      },
-    );
-  }
-
-  void _stopSearching() {
-    TripRequestSearchService.stopSearching();
-  }
 
   void _showError(String message) {
     if (!mounted) return;
@@ -495,9 +403,6 @@ class _ConductorSearchingPassengersScreenState
     Navigator.pop(context); // Cerrar loading
 
     if (result['success'] == true) {
-      // Detener búsqueda
-      _stopSearching();
-      
       // Mostrar éxito y navegar a pantalla de viaje activo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
