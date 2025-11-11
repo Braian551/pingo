@@ -36,7 +36,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
   StreamSubscription<geo.Position>? _positionStream;
   
   // Variables para búsqueda de solicitudes
-  List<Map<String, dynamic>> _pendingRequests = [];
   bool _isSearchingRequests = false;
   String _searchStatus = 'Buscando solicitudes cercanas...';
   
@@ -219,7 +218,6 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
     
     setState(() {
       _isSearchingRequests = false;
-      _pendingRequests = [];
       _searchStatus = 'Buscando solicitudes cercanas...';
     });
   }
@@ -227,18 +225,15 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
   void _onRequestsFound(List<Map<String, dynamic>> requests) {
     if (!mounted || !_isOnline) return;
 
-    setState(() {
-      _pendingRequests = requests;
-    });
-
     if (requests.isNotEmpty) {
-      // Hay solicitudes disponibles - navegar a pantalla de solicitud
-      debugPrint('🎯 Solicitud encontrada! Navegando...');
+      // Hay solicitudes disponibles - mostrar LA PRIMERA solicitud
+      debugPrint('🎯 ${requests.length} solicitudes encontradas! Mostrando la primera...');
       
       // Detener búsqueda temporalmente
       _stopSearchingRequests();
       
-      // Navegar a pantalla de solicitud con TODAS las solicitudes disponibles
+      // Navegar a pantalla de solicitud con LA PRIMERA solicitud únicamente
+      // Lógica tipo Uber/InDrive: muestra una a la vez
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -246,13 +241,15 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
             conductorId: widget.conductorUser['id'] as int,
             conductorNombre: widget.conductorUser['nombre']?.toString() ?? 'Conductor',
             tipoVehiculo: widget.conductorUser['tipo_vehiculo']?.toString() ?? 'Sedan',
-            solicitudes: requests, // Pasar TODAS las solicitudes
+            solicitud: requests.first, // SOLO LA PRIMERA solicitud
           ),
         ),
       ).then((result) {
         // Cuando regresa de la pantalla de solicitud
+        // SIEMPRE vuelve al home después de aceptar/rechazar
         if (mounted && _isOnline) {
-          // Reiniciar búsqueda si sigue conectado
+          // Reiniciar búsqueda para encontrar la siguiente solicitud
+          debugPrint('🔄 Reiniciando búsqueda de solicitudes...');
           _startSearchingRequests();
         }
       });
@@ -306,6 +303,9 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
       _connectionController.forward();
       HapticFeedback.mediumImpact();
       
+      // Limpiar caché de solicitudes procesadas (para permitir ver solicitudes que antes rechazó)
+      TripRequestSearchService.clearProcessedRequests();
+      
       // Iniciar búsqueda continua de solicitudes
       _startSearchingRequests();
       
@@ -318,6 +318,9 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
       
       // Detener búsqueda de solicitudes
       _stopSearchingRequests();
+      
+      // Limpiar caché de solicitudes procesadas
+      TripRequestSearchService.clearProcessedRequests();
       
       _showStatusSnackbar('Estás fuera de línea', Colors.grey);
     }

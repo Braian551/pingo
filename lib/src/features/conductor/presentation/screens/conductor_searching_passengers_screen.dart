@@ -13,22 +13,25 @@ import '../../services/trip_request_search_service.dart';
 import '../../services/conductor_service.dart';
 import 'conductor_active_trip_screen.dart';
 
-/// Pantalla para mostrar y gestionar solicitudes de viaje
+/// Pantalla para mostrar y gestionar UNA solicitud de viaje a la vez
 /// 
-/// Recibe una lista de solicitudes disponibles y permite al conductor
-/// aceptar o rechazar cada una secuencialmente
+/// Lógica tipo Uber/InDrive/Didi:
+/// - Muestra UNA solicitud a la vez
+/// - Al aceptar: navega a pantalla de viaje activo
+/// - Al rechazar: regresa al home para que busque la siguiente
+/// - Otros conductores también pueden ver las mismas solicitudes
 class ConductorSearchingPassengersScreen extends StatefulWidget {
   final int conductorId;
   final String conductorNombre;
   final String tipoVehiculo;
-  final List<Map<String, dynamic>> solicitudes; // Lista de solicitudes disponibles
+  final Map<String, dynamic> solicitud; // UNA solicitud a mostrar
 
   const ConductorSearchingPassengersScreen({
     super.key,
     required this.conductorId,
     required this.conductorNombre,
     required this.tipoVehiculo,
-    required this.solicitudes,
+    required this.solicitud,
   });
 
   @override
@@ -45,8 +48,6 @@ class _ConductorSearchingPassengersScreenState
   StreamSubscription<Position>? _positionStream;
   
   Map<String, dynamic>? _selectedRequest;
-  List<Map<String, dynamic>> _pendingRequests = []; // Cola de solicitudes pendientes
-  int _currentRequestIndex = 0; // Índice de la solicitud actual
   
   late AnimationController _pulseAnimationController;
   late Animation<double> _pulseAnimation;
@@ -66,7 +67,6 @@ class _ConductorSearchingPassengersScreenState
   double _dragStartPosition = 0;
   double _currentDragOffset = 0;
   bool _requestProcessed = false; // Flag para evitar procesar la misma solicitud dos veces
-  int? _processedRequestId; // ID de la solicitud ya procesada
 
   @override
   void initState() {
@@ -74,49 +74,26 @@ class _ConductorSearchingPassengersScreenState
     _setupAnimations();
     _startLocationTracking();
     
-    // Inicializar cola de solicitudes
-    _pendingRequests = List.from(widget.solicitudes);
-    _currentRequestIndex = 0;
+    // Asignar la solicitud única
+    _selectedRequest = widget.solicitud;
     
-    // Si hay solicitudes disponibles, mostrar la primera
-    if (_pendingRequests.isNotEmpty) {
-      final currentRequest = _pendingRequests[_currentRequestIndex];
-      final requestId = currentRequest['id'] as int?;
-      
-      // Verificar si esta solicitud ya fue procesada
-      if (_processedRequestId != null && _processedRequestId == requestId) {
-        print('⚠️ Solicitud ya procesada anteriormente, pasando a la siguiente...');
-        _showNextRequest();
-        return;
+    // Mostrar panel de solicitud después de que se construya el widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _requestPanelController.forward();
+        
+        // Iniciar temporizador de auto-rechazo
+        _timerController.reset();
+        _timerController.forward();
+        
+        _autoRejectTimer = Timer(const Duration(seconds: 30), () {
+          if (mounted && _selectedRequest != null && !_requestProcessed) {
+            print('⏰ Auto-rechazando solicitud por timeout');
+            _rejectRequest();
+          }
+        });
       }
-      
-      _selectedRequest = currentRequest;
-      
-      // Mostrar panel de solicitud después de que se construya el widget
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _requestPanelController.forward();
-          
-          // Iniciar temporizador de auto-rechazo
-          _timerController.reset();
-          _timerController.forward();
-          
-          _autoRejectTimer = Timer(const Duration(seconds: 30), () {
-            if (mounted && _selectedRequest != null && !_requestProcessed) {
-              print('⏰ Auto-rechazando solicitud por timeout');
-              _rejectRequest();
-            }
-          });
-        }
-      });
-    } else {
-      // Si no hay solicitudes, volver al home inmediatamente
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.pop(context);
-        }
-      });
-    }
+    });
   }
 
   @override
@@ -367,7 +344,13 @@ class _ConductorSearchingPassengersScreenState
 
     // Marcar como procesada para evitar doble procesamiento
     _requestProcessed = true;
-    _processedRequestId = _selectedRequest!['id'];
+    
+    // Detener temporizador
+    _autoRejectTimer?.cancel();
+    _timerController.stop();
+    
+    // Detener cualquier sonido
+    SoundService.stopSound();
     
     // Guardar referencia a la solicitud antes de limpiarla
     final solicitudData = _selectedRequest!;
@@ -395,14 +378,8 @@ class _ConductorSearchingPassengersScreenState
     Navigator.pop(context); // Cerrar loading
 
     if (result['success'] == true) {
-      // Mostrar éxito y navegar a pantalla de viaje activo
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Viaje aceptado! Dirígete al punto de recogida'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      // Marcar solicitud como aceptada en el servicio
+      TripRequestSearchService.markRequestAsProcessed(solicitudData['id']);
       
       // Navegar a la pantalla de navegación activa (ruta)
       final origenLat = double.tryParse(solicitudData['latitud_origen']?.toString() ?? '0') ?? 0;
@@ -414,7 +391,9 @@ class _ConductorSearchingPassengersScreenState
       final viajeId = int.tryParse(result['viaje_id']?.toString() ?? '0');
 
       if (!mounted) return;
-      Navigator.pushReplacement(
+      
+      // Reemplazar TODA la pila de navegación con la pantalla de viaje activo
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => ConductorActiveTripScreen(
@@ -430,12 +409,21 @@ class _ConductorSearchingPassengersScreenState
             clienteNombre: solicitudData['cliente_nombre']?.toString(),
           ),
         ),
+        (route) => false, // Eliminar todas las pantallas anteriores
       );
     } else {
-      // Error al aceptar - volver al home
-      _showError(result['message'] ?? 'Error al aceptar solicitud');
+      // Error al aceptar (otro conductor la tomó primero)
+      // Marcar como procesada para no volver a mostrarla
+      TripRequestSearchService.markRequestAsProcessed(solicitudData['id']);
+      
+      _showError(result['message'] ?? 'Solicitud ya no disponible');
+      
+      // Esperar un momento para que el usuario vea el mensaje
+      await Future.delayed(const Duration(milliseconds: 1500));
+      
       if (mounted) {
-        Navigator.pop(context); // Volver al home
+        // Regresar al home para buscar otra solicitud
+        Navigator.pop(context);
       }
     }
   }
@@ -445,7 +433,13 @@ class _ConductorSearchingPassengersScreenState
 
     // Marcar como procesada para evitar doble procesamiento
     _requestProcessed = true;
-    _processedRequestId = _selectedRequest!['id'];
+    
+    // Detener temporizador
+    _autoRejectTimer?.cancel();
+    _timerController.stop();
+    
+    // Detener cualquier sonido que se esté reproduciendo
+    SoundService.stopSound();
     
     // Guardar referencia a la solicitud antes de limpiarla
     final solicitudData = _selectedRequest!;
@@ -455,14 +449,11 @@ class _ConductorSearchingPassengersScreenState
       _selectedRequest = null;
     });
 
-    // Detener temporizador
-    _autoRejectTimer?.cancel();
-    _timerController.stop();
+    // Marcar como rechazada para no volver a mostrarla a ESTE conductor
+    TripRequestSearchService.markRequestAsProcessed(solicitudData['id']);
     
-    // Detener cualquier sonido que se esté reproduciendo
-    SoundService.stopSound();
-
-    final result = await TripRequestSearchService.rejectRequest(
+    // Rechazar en el backend (opcional - para estadísticas)
+    await TripRequestSearchService.rejectRequest(
       solicitudId: solicitudData['id'],
       conductorId: widget.conductorId,
       motivo: 'Conductor rechazó',
@@ -470,70 +461,16 @@ class _ConductorSearchingPassengersScreenState
 
     if (!mounted) return;
 
-    if (result['success'] == true) {
-      // Solicitud rechazada exitosamente - mostrar siguiente solicitud
-      print('❌ Solicitud rechazada, mostrando siguiente...');
-      _showNextRequest();
-    } else {
-      // Error al rechazar - mostrar error y mostrar siguiente solicitud
-      _showError(result['message'] ?? 'Error al rechazar solicitud');
-      _showNextRequest();
-    }
+    print('❌ Solicitud rechazada, regresando al home para buscar otra...');
+    
+    // SIEMPRE regresar al home después de rechazar
+    // Esto permite que el servicio busque la siguiente solicitud disponible
+    Navigator.pop(context);
   }
 
   String _formatPrice(double price) {
     final formatter = NumberFormat('#,###', 'es_CO');
     return formatter.format(price.round());
-  }
-
-  /// Muestra la siguiente solicitud en la cola
-  void _showNextRequest() {
-    _currentRequestIndex++;
-    
-    // Resetear flags de procesamiento
-    _requestProcessed = false;
-    _processedRequestId = null;
-    
-    // Si hay más solicitudes, mostrar la siguiente
-    if (_currentRequestIndex < _pendingRequests.length) {
-      final nextRequest = _pendingRequests[_currentRequestIndex];
-      final requestId = nextRequest['id'] as int?;
-      
-      // Verificar si esta solicitud ya fue procesada
-      if (_processedRequestId != null && _processedRequestId == requestId) {
-        print('⚠️ Solicitud ya procesada, saltando...');
-        _showNextRequest(); // Recursivo para saltar solicitudes procesadas
-        return;
-      }
-      
-      setState(() {
-        _selectedRequest = nextRequest;
-      });
-      
-      // Reiniciar animaciones y temporizador
-      _requestPanelController.reset();
-      _requestPanelController.forward();
-      
-      _timerController.reset();
-      _timerController.forward();
-      
-      // Reiniciar temporizador de auto-rechazo
-      _autoRejectTimer?.cancel();
-      _autoRejectTimer = Timer(const Duration(seconds: 30), () {
-        if (mounted && _selectedRequest != null && !_requestProcessed) {
-          print('⏰ Auto-rechazando solicitud por timeout');
-          _rejectRequest();
-        }
-      });
-      
-      print('🎯 Mostrando siguiente solicitud (${_currentRequestIndex + 1}/${_pendingRequests.length})');
-    } else {
-      // No hay más solicitudes, volver al home
-      print('🏠 No hay más solicitudes, regresando al home');
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    }
   }
 
   @override
