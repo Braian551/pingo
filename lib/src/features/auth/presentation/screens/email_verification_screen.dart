@@ -615,24 +615,33 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                                             if (digitsOnly.isEmpty) {
                                               final hadValue = _previousValues[index].isNotEmpty;
                                               _previousValues[index] = '';
-                                              if (hadValue) {
+
+                                              if (index == 0) {
                                                 return;
                                               }
-                                              if (index > 0) {
-                                                Future.microtask(() {
-                                                  if (!mounted || _isDisposed) {
-                                                    return;
-                                                  }
-                                                  _focusNodes[index - 1].requestFocus();
+
+                                              Future.microtask(() {
+                                                if (!mounted || _isDisposed) {
+                                                  return;
+                                                }
+                                                final previousIndex = index - 1;
+                                                _focusNodes[previousIndex].requestFocus();
+
+                                                if (!hadValue) {
                                                   _isProgrammaticFill = true;
                                                   try {
-                                                    _digitControllers[index - 1].text = '';
-                                                    _previousValues[index - 1] = '';
+                                                    _digitControllers[previousIndex].text = '';
+                                                    _previousValues[previousIndex] = '';
                                                   } finally {
                                                     _isProgrammaticFill = false;
                                                   }
-                                                });
-                                              }
+                                                }
+
+                                                final previousText = _digitControllers[previousIndex].text;
+                                                _digitControllers[previousIndex].selection = TextSelection.collapsed(
+                                                  offset: previousText.length,
+                                                );
+                                              });
                                               return;
                                             }
 
