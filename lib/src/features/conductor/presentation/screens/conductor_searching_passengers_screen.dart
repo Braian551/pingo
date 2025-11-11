@@ -44,10 +44,7 @@ class _ConductorSearchingPassengersScreenState
   LatLng? _currentLocation;
   StreamSubscription<Position>? _positionStream;
   
-  List<Map<String, dynamic>> _pendingRequests = [];
   Map<String, dynamic>? _selectedRequest;
-  
-  String _searchMessage = 'Buscando solicitudes cercanas...';
   
   late AnimationController _pulseAnimationController;
   late Animation<double> _pulseAnimation;
@@ -66,7 +63,6 @@ class _ConductorSearchingPassengersScreenState
   late AnimationController _timerController;
   late Animation<double> _timerAnimation;
   
-  bool _showingRequest = false;
   Timer? _autoRejectTimer;
   bool _panelExpanded = false;
   double _dragStartPosition = 0;
@@ -81,7 +77,6 @@ class _ConductorSearchingPassengersScreenState
     // Si se pasó una solicitud, mostrarla
     if (widget.solicitud != null) {
       _selectedRequest = widget.solicitud;
-      _showingRequest = true;
       
       // Mostrar panel de solicitud después de que se construya el widget
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,7 +97,7 @@ class _ConductorSearchingPassengersScreenState
         }
       });
     } else {
-      // Si no hay solicitud, regresar al home
+      // Si no hay solicitud, volver al home inmediatamente
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           Navigator.pop(context);
@@ -243,9 +238,11 @@ class _ConductorSearchingPassengersScreenState
         print('❌ Servicio de ubicación deshabilitado');
         _showError('Por favor activa el GPS en tu dispositivo');
         // Usar ubicación por defecto para pruebas
-        setState(() {
-          _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
-        });
+        if (mounted) {
+          setState(() {
+            _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
+          });
+        }
         // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -269,9 +266,11 @@ class _ConductorSearchingPassengersScreenState
         print('❌ Permisos denegados permanentemente');
         _showError('Permisos de ubicación denegados. Habilítalos en configuración.');
         // Usar ubicación por defecto
-        setState(() {
-          _currentLocation = const LatLng(4.6097, -74.0817);
-        });
+        if (mounted) {
+          setState(() {
+            _currentLocation = const LatLng(4.6097, -74.0817);
+          });
+        }
         // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -285,9 +284,11 @@ class _ConductorSearchingPassengersScreenState
         print('❌ Permisos denegados');
         _showError('Se necesitan permisos de ubicación');
         // Usar ubicación por defecto
-        setState(() {
-          _currentLocation = const LatLng(4.6097, -74.0817);
-        });
+        if (mounted) {
+          setState(() {
+            _currentLocation = const LatLng(4.6097, -74.0817);
+          });
+        }
         // Mover mapa después de que se haya construido
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -306,9 +307,11 @@ class _ConductorSearchingPassengersScreenState
 
       print('✅ Ubicación obtenida: ${position.latitude}, ${position.longitude}');
       
-      setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-      });
+      if (mounted) {
+        setState(() {
+          _currentLocation = LatLng(position.latitude, position.longitude);
+        });
+      }
 
       // Centrar mapa en ubicación actual después de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -326,6 +329,8 @@ class _ConductorSearchingPassengersScreenState
         ),
       ).listen(
         (Position position) {
+          if (!mounted) return;
+          
           print('📍 Ubicación actualizada: ${position.latitude}, ${position.longitude}');
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
@@ -346,9 +351,11 @@ class _ConductorSearchingPassengersScreenState
       print('❌ Error crítico obteniendo ubicación: $e');
       _showError('Error obteniendo ubicación. Usando ubicación de prueba.');
       // Usar ubicación por defecto para que la app siga funcionando
-      setState(() {
-        _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
-      });
+      if (mounted) {
+        setState(() {
+          _currentLocation = const LatLng(4.6097, -74.0817); // Bogotá
+        });
+      }
       // Mover mapa después de que se haya construido
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -440,7 +447,11 @@ class _ConductorSearchingPassengersScreenState
         ),
       );
     } else {
+      // Error al aceptar - volver al home
       _showError(result['message'] ?? 'Error al aceptar solicitud');
+      if (mounted) {
+        Navigator.pop(context); // Volver al home
+      }
     }
   }
 
@@ -463,20 +474,16 @@ class _ConductorSearchingPassengersScreenState
     if (!mounted) return;
 
     if (result['success'] == true) {
-      // Remover de la lista
-      setState(() {
-        _pendingRequests.removeWhere((r) => r['id'] == _selectedRequest!['id']);
-        
-        if (_pendingRequests.isEmpty) {
-          _selectedRequest = null;
-          _requestPanelController.reverse();
-          _searchMessage = 'Buscando solicitudes cercanas...';
-        } else {
-          _selectedRequest = _pendingRequests.first;
-        }
-      });
+      // Solicitud rechazada exitosamente - volver al home
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } else {
+      // Error al rechazar - mostrar error y volver al home
       _showError(result['message'] ?? 'Error al rechazar solicitud');
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -499,8 +506,8 @@ class _ConductorSearchingPassengersScreenState
           // Mapa
           _buildMap(),
           
-          // Panel superior con estado (solo cuando est� buscando sin solicitudes)
-          if (_pendingRequests.isEmpty) _buildTopPanel(),
+          // Panel superior con estado (solo cuando hay solicitud)
+          if (_selectedRequest != null) _buildTopPanel(),
           
           // Panel inferior con solicitud (si hay)
           if (_selectedRequest != null) _buildRequestPanel(),
@@ -839,15 +846,14 @@ class _ConductorSearchingPassengersScreenState
           ],
         ),
         
-        // Marcadores de solicitudes pendientes con animación mejorada
-        if (_pendingRequests.isNotEmpty)
+        // Marcador de solicitud actual (si hay)
+        if (_selectedRequest != null)
           MarkerLayer(
-            markers: _pendingRequests.map((request) {
-              final isSelected = _selectedRequest?['id'] == request['id'];
-              return Marker(
+            markers: [
+              Marker(
                 point: LatLng(
-                  double.parse(request['latitud_origen'].toString()),
-                  double.parse(request['longitud_origen'].toString()),
+                  double.parse(_selectedRequest!['latitud_origen'].toString()),
+                  double.parse(_selectedRequest!['longitud_origen'].toString()),
                 ),
                 width: 80,
                 height: 80,
@@ -861,117 +867,69 @@ class _ConductorSearchingPassengersScreenState
                       child: child,
                     );
                   },
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedRequest = request;
-                        if (!_showingRequest) {
-                          _showingRequest = true;
-                          _requestPanelController.forward();
-                        }
-                      });
-
-                      // Ajustar cámara para mostrar conductor y cliente
-                      if (_currentLocation != null) {
-                        final origin = LatLng(
-                          double.parse(request['latitud_origen'].toString()),
-                          double.parse(request['longitud_origen'].toString()),
-                        );
-                        final minLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a < b ? a : b);
-                        final maxLat = [_currentLocation!.latitude, origin.latitude].reduce((a, b) => a > b ? a : b);
-                        final minLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a < b ? a : b);
-                        final maxLng = [_currentLocation!.longitude, origin.longitude].reduce((a, b) => a > b ? a : b);
-                        
-                        // Validar que los bounds tengan área suficiente (no sean un solo punto)
-                        final latDiff = (maxLat - minLat).abs();
-                        final lngDiff = (maxLng - minLng).abs();
-                        
-                        if (latDiff > 0.0001 && lngDiff > 0.0001) {
-                          // Solo hacer fit si hay una distancia significativa
-                          final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
-                          _mapController.fitCamera(
-                            CameraFit.bounds(
-                              bounds: bounds,
-                              padding: const EdgeInsets.only(top: 120, bottom: 300, left: 60, right: 60),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Pulso de fondo
+                      AnimatedBuilder(
+                        animation: _pulseAnimation,
+                        builder: (context, child) {
+                          return Container(
+                            width: 60 * _pulseAnimation.value,
+                            height: 60 * _pulseAnimation.value,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.primary.withOpacity(
+                                0.3 / _pulseAnimation.value,
+                              ),
                             ),
                           );
-                        } else {
-                          // Si están muy cerca, solo centrarse en el punto origen con zoom fijo
-                          _mapController.move(origin, 15);
-                        }
-                      }
-                    },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Pulso de fondo si está seleccionado
-                        if (isSelected)
-                          AnimatedBuilder(
-                            animation: _pulseAnimation,
-                            builder: (context, child) {
-                              return Container(
-                                width: 60 * _pulseAnimation.value,
-                                height: 60 * _pulseAnimation.value,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.primary.withOpacity(
-                                    0.3 / _pulseAnimation.value,
-                                  ),
+                        },
+                      ),
+                      // Pin del pasajero
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.5),
+                                  blurRadius: 15,
+                                  spreadRadius: 3,
                                 ),
-                              );
-                            },
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.person_pin_circle_rounded,
+                              color: Colors.black,
+                              size: 32,
+                            ),
                           ),
-                        // Pin del pasajero
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : Colors.grey.shade300,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: isSelected
-                                        ? AppColors.primary.withOpacity(0.5)
-                                        : Colors.black.withOpacity(0.3),
-                                    blurRadius: isSelected ? 15 : 8,
-                                    spreadRadius: isSelected ? 3 : 1,
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.person_pin_circle_rounded,
-                                color: isSelected ? Colors.black : const Color(0xFF2196F3),
-                                size: 32,
-                              ),
+                          // Sombra en el suelo
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            width: 25,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            // Sombra en el suelo
-                            Container(
-                              margin: const EdgeInsets.only(top: 4),
-                              width: 25,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              );
-            }).toList(),
+              ),
+            ],
           ),
       ],
     );
@@ -1047,7 +1005,7 @@ class _ConductorSearchingPassengersScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                '🟢 En línea',
+                                'Nueva solicitud',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -1056,73 +1014,17 @@ class _ConductorSearchingPassengersScreenState
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              TweenAnimationBuilder<double>(
-                                tween: Tween(begin: 0.0, end: 1.0),
-                                duration: const Duration(milliseconds: 1000),
-                                curve: Curves.easeOut,
-                                builder: (context, value, child) {
-                                  return Opacity(
-                                    opacity: value.clamp(0.0, 1.0),
-                                    child: Text(
-                                      _searchMessage,
-                                      style: TextStyle(
-                                        color: AppColors.primary.withOpacity(0.9),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  );
-                                },
+                              Text(
+                                'Tienes 30 segundos para responder',
+                                style: TextStyle(
+                                  color: AppColors.primary.withOpacity(0.9),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        // Indicador de búsqueda
-                        if (_pendingRequests.isEmpty)
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.primary.withOpacity(0.8),
-                              ),
-                            ),
-                          ),
-                        // 🔊 BOTÓN DE PRUEBA DE SONIDO (SOLO PARA DESARROLLO)
-                        if (_pendingRequests.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: GestureDetector(
-                              onTap: () {
-                                print('🧪 Probando sonido de notificación...');
-                                SoundService.playRequestNotification();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('🔊 Reproduciendo sonido de prueba'),
-                                    backgroundColor: Colors.blue,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.blue.withOpacity(0.5),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.volume_up,
-                                  color: Colors.blue,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -1181,16 +1083,22 @@ class _ConductorSearchingPassengersScreenState
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: GestureDetector(
                 onVerticalDragStart: (details) {
+                  if (!mounted) return;
+                  
                   setState(() {
                     _dragStartPosition = details.localPosition.dy;
                   });
                 },
                 onVerticalDragUpdate: (details) {
+                  if (!mounted) return;
+                  
                   setState(() {
                     _currentDragOffset = details.localPosition.dy - _dragStartPosition;
                   });
                 },
                 onVerticalDragEnd: (details) {
+                  if (!mounted) return;
+                  
                   // Si el usuario arrastra hacia arriba (velocidad negativa) o el offset es significativo
                   if (details.primaryVelocity != null) {
                     final v = details.primaryVelocity!;

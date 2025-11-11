@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../global/services/mapbox_service.dart';
 import '../../providers/conductor_provider.dart';
+import '../../services/trip_request_search_service.dart';
 import 'conductor_searching_passengers_screen.dart';
 
 /// Pantalla principal del conductor - Diseño profesional y minimalista
@@ -32,6 +33,11 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
   bool _isMapReady = false;
   bool _isOnline = false;
   StreamSubscription<geo.Position>? _positionStream;
+  
+  // Variables para búsqueda de solicitudes
+  List<Map<String, dynamic>> _pendingRequests = [];
+  bool _isSearchingRequests = false;
+  String _searchStatus = 'Buscando solicitudes cercanas...';
   
   late AnimationController _pulseController;
   late AnimationController _connectionController;
@@ -187,6 +193,85 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
     _centerMapOnLocation(position);
   }
 
+  void _startSearchingRequests() {
+    if (_currentPosition == null) {
+      debugPrint('❌ No hay ubicación actual para buscar solicitudes');
+      return;
+    }
+
+    setState(() {
+      _isSearchingRequests = true;
+      _searchStatus = 'Buscando solicitudes cercanas...';
+    });
+
+    TripRequestSearchService.startSearching(
+      conductorId: widget.conductorUser['id'] as int,
+      currentLat: _currentPosition!.latitude,
+      currentLng: _currentPosition!.longitude,
+      onRequestsFound: _onRequestsFound,
+      onError: _onSearchError,
+    );
+  }
+
+  void _stopSearchingRequests() {
+    TripRequestSearchService.stopSearching();
+    
+    setState(() {
+      _isSearchingRequests = false;
+      _pendingRequests = [];
+      _searchStatus = 'Buscando solicitudes cercanas...';
+    });
+  }
+
+  void _onRequestsFound(List<Map<String, dynamic>> requests) {
+    if (!mounted || !_isOnline) return;
+
+    setState(() {
+      _pendingRequests = requests;
+    });
+
+    if (requests.isNotEmpty) {
+      // Hay solicitudes disponibles - navegar a pantalla de solicitud
+      debugPrint('🎯 Solicitud encontrada! Navegando...');
+      
+      // Detener búsqueda temporalmente
+      _stopSearchingRequests();
+      
+      // Navegar a pantalla de solicitud con la primera solicitud
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConductorSearchingPassengersScreen(
+            conductorId: widget.conductorUser['id'] as int,
+            conductorNombre: widget.conductorUser['nombre']?.toString() ?? 'Conductor',
+            tipoVehiculo: widget.conductorUser['tipo_vehiculo']?.toString() ?? 'Sedan',
+            solicitud: requests.first,
+          ),
+        ),
+      ).then((result) {
+        // Cuando regresa de la pantalla de solicitud
+        if (mounted && _isOnline) {
+          // Reiniciar búsqueda si sigue conectado
+          _startSearchingRequests();
+        }
+      });
+    } else {
+      // No hay solicitudes, continuar buscando
+      setState(() {
+        _searchStatus = 'Buscando solicitudes cercanas...';
+      });
+    }
+  }
+
+  void _onSearchError(String error) {
+    if (!mounted) return;
+    
+    debugPrint('❌ Error en búsqueda: $error');
+    setState(() {
+      _searchStatus = 'Error de conexión. Reintentando...';
+    });
+  }
+
   void _showPermissionDeniedDialog() {
     showDialog(
       context: context,
@@ -215,33 +300,24 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
 
   void _toggleOnlineStatus() {
     if (!_isOnline) {
-      // Conectarse: Navegar a la pantalla de búsqueda
+      // Conectarse: Iniciar búsqueda de solicitudes
       setState(() => _isOnline = true);
       _connectionController.forward();
       HapticFeedback.mediumImpact();
       
-      // Navegar a la pantalla de búsqueda de pasajeros
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ConductorSearchingPassengersScreen(
-            conductorId: widget.conductorUser['id'] as int,
-            conductorNombre: widget.conductorUser['nombre']?.toString() ?? 'Conductor',
-            tipoVehiculo: widget.conductorUser['tipo_vehiculo']?.toString() ?? 'Sedan',
-          ),
-        ),
-      ).then((value) {
-        // Cuando regresa de la pantalla de búsqueda, desconectar
-        if (mounted) {
-          setState(() => _isOnline = false);
-          _connectionController.reverse();
-        }
-      });
+      // Iniciar búsqueda continua de solicitudes
+      _startSearchingRequests();
+      
+      _showStatusSnackbar('¡Conectado! Buscando pasajeros...', AppColors.success);
     } else {
-      // Desconectarse
+      // Desconectarse: Detener búsqueda
       setState(() => _isOnline = false);
       _connectionController.reverse();
       HapticFeedback.lightImpact();
+      
+      // Detener búsqueda de solicitudes
+      _stopSearchingRequests();
+      
       _showStatusSnackbar('Estás fuera de línea', Colors.grey);
     }
   }
@@ -284,6 +360,10 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
     _connectionController.dispose();
     _positionStream?.cancel();
     _mapController.dispose();
+    
+    // Detener búsqueda si está activa
+    _stopSearchingRequests();
+    
     super.dispose();
   }
 
@@ -585,7 +665,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
                     const SizedBox(height: 4),
                     Text(
                       _isOnline
-                          ? 'Buscando pasajeros cerca...'
+                          ? (_isSearchingRequests ? _searchStatus : 'Conectado')
                           : 'Conéctate para recibir viajes',
                       style: TextStyle(
                         color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
