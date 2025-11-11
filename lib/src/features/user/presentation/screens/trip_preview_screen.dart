@@ -469,7 +469,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> with TickerProvid
       children: [
         // Tiles de Mapbox con estilo oscuro
         TileLayer(
-          urlTemplate: MapboxService.getTileUrl(style: 'dark-v11'),
+          urlTemplate: MapboxService.getTileUrl(isDarkMode: true),
           userAgentPackageName: 'com.example.ping_go',
         ),
         

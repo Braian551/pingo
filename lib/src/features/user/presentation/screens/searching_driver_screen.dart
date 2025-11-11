@@ -194,7 +194,7 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen> with Tick
             ),
             children: [
               TileLayer(
-                urlTemplate: MapboxService.getTileUrl(style: 'dark-v11'),
+                urlTemplate: MapboxService.getTileUrl(isDarkMode: true),
                 userAgentPackageName: 'com.example.ping_go',
               ),
               // Marcador de origen

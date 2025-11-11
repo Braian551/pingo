@@ -9,7 +9,7 @@ class ApprovalSuccessDialog extends StatefulWidget {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.7),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
       builder: (context) => const ApprovalSuccessDialog(),
     );
   }
@@ -82,18 +82,18 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFF1A1A1A).withOpacity(0.95),
-                            const Color(0xFF0D0D0D).withOpacity(0.95),
+                            const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                            const Color(0xFF0D0D0D).withValues(alpha: 0.95),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(
                           width: 1.5,
-                          color: const Color(0xFF11998e).withOpacity(0.4),
+                          color: const Color(0xFF11998e).withValues(alpha: 0.4),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF11998e).withOpacity(0.25),
+                            color: const Color(0xFF11998e).withValues(alpha: 0.25),
                             blurRadius: 40,
                             spreadRadius: 0,
                             offset: const Offset(0, 10),
@@ -132,7 +132,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF11998e).withOpacity(0.15),
+            const Color(0xFF11998e).withValues(alpha: 0.15),
             Colors.transparent,
           ],
         ),
@@ -154,16 +154,16 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF11998e).withOpacity(0.4),
-                        const Color(0xFF11998e).withOpacity(0.2),
-                        const Color(0xFF11998e).withOpacity(0.05),
+                        const Color(0xFF11998e).withValues(alpha: 0.4),
+                        const Color(0xFF11998e).withValues(alpha: 0.2),
+                        const Color(0xFF11998e).withValues(alpha: 0.05),
                         Colors.transparent,
                       ],
                       stops: const [0.2, 0.4, 0.7, 1.0],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF11998e).withOpacity(0.3),
+                        color: const Color(0xFF11998e).withValues(alpha: 0.3),
                         blurRadius: 30,
                         spreadRadius: 5,
                       ),
@@ -275,7 +275,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                 backgroundColor: const Color(0xFF11998e),
                 foregroundColor: Colors.white,
                 elevation: 8,
-                shadowColor: const Color(0xFF11998e).withOpacity(0.5),
+                shadowColor: const Color(0xFF11998e).withValues(alpha: 0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -295,7 +295,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
+                      color: Colors.white.withValues(alpha: 0.25),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -323,10 +323,10 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 14 : 18),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -335,11 +335,11 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
           Container(
             padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   spreadRadius: 0,
                 ),
@@ -370,7 +370,7 @@ class _ApprovalSuccessDialogState extends State<ApprovalSuccessDialog>
                   description,
                   style: TextStyle(
                     fontSize: isSmallScreen ? 12 : 14,
-                    color: Colors.white.withOpacity(0.75),
+                    color: Colors.white.withValues(alpha: 0.75),
                     height: 1.3,
                   ),
                 ),

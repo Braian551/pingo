@@ -146,7 +146,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
       flexibleSpace: ClipRect(
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
           ),
         ),
       ),
@@ -194,13 +194,13 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
               color: isCompleted
                   ? const Color(0xFFFFFF00)
                   : isActive
-                      ? const Color(0xFFFFFF00).withOpacity(0.15)
-                      : Colors.white.withOpacity(0.05),
+                      ? const Color(0xFFFFFF00).withValues(alpha: 0.15)
+                      : Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
               border: Border.all(
                 color: isActive || isCompleted 
                     ? const Color(0xFFFFFF00) 
-                    : Colors.white.withOpacity(0.2),
+                    : Colors.white.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -240,7 +240,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         margin: const EdgeInsets.only(bottom: 30),
         color: step < _currentStep
             ? const Color(0xFFFFFF00)
-            : Colors.white.withOpacity(0.1),
+            : Colors.white.withValues(alpha: 0.1),
       ),
     );
   }
@@ -518,7 +518,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFF00).withOpacity(0.15),
+            color: const Color(0xFFFFFF00).withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFFFFFF00), size: 24),
@@ -554,10 +554,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -570,7 +570,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
               labelText: label,
               hintText: hint,
               labelStyle: const TextStyle(color: Colors.white70),
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
               prefixIcon: Icon(icon, color: const Color(0xFFFFFF00)),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(20),
@@ -591,10 +591,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -626,13 +626,13 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFFFF00).withOpacity(0.15)
-                            : Colors.white.withOpacity(0.05),
+                            ? const Color(0xFFFFFF00).withValues(alpha: 0.15)
+                            : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFFFFFF00).withOpacity(0.5)
-                              : Colors.white.withOpacity(0.1),
+                              ? const Color(0xFFFFFF00).withValues(alpha: 0.5)
+                              : Colors.white.withValues(alpha: 0.1),
                           width: 1.5,
                         ),
                       ),
@@ -681,10 +681,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -718,7 +718,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   size: 16,
                 ),
               ],
@@ -736,10 +736,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -753,7 +753,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                       onPressed: () => setState(() => _currentStep--),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.white.withOpacity(0.1),
+                        backgroundColor: Colors.white.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1042,10 +1042,10 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.95),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -1055,7 +1055,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFF00).withOpacity(0.15),
+                    color: const Color(0xFFFFFF00).withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -1090,7 +1090,7 @@ class _VehicleOnlyRegistrationScreenState extends State<VehicleOnlyRegistrationS
                         onPressed: () => Navigator.pop(context, false),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.white.withOpacity(0.1),
+                          backgroundColor: Colors.white.withValues(alpha: 0.1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

@@ -243,8 +243,15 @@ class MapboxService {
   // ============================================
   
   /// Obtener URL para tiles de Mapbox (para flutter_map)
-  static String getTileUrl({String style = 'streets-v12'}) {
+  /// [isDarkMode] - Si es true, usa estilo oscuro, si es false usa estilo claro
+  static String getTileUrl({bool isDarkMode = false}) {
+    final style = isDarkMode ? 'dark-v11' : 'streets-v12';
     return 'https://api.mapbox.com/styles/v1/mapbox/$style/tiles/{z}/{x}/{y}@2x?access_token=${EnvConfig.mapboxPublicToken}';
+  }
+
+  /// Obtener estilo de mapa según el tema
+  static String getMapStyle({bool isDarkMode = false}) {
+    return isDarkMode ? 'dark-v11' : 'streets-v12';
   }
 
   // ============================================

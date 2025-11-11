@@ -89,7 +89,7 @@ class AppRouter {
             builder: (_) => LocationPickerScreen(
               initialAddress: args?['initialAddress'],
               initialLocation: args?['initialLocation'],
-              screenTitle: args?['screenTitle'] ?? 'Seleccionar ubicaciÃ³n',
+              screenTitle: args?['screenTitle'] ?? 'Seleccionar ubicación',
               showConfirmButton: args?['showConfirmButton'] ?? true,
             ),
           );
@@ -140,7 +140,7 @@ class AppRouter {
             backgroundColor: Colors.black,
             appBar: AppBar(
               backgroundColor: Colors.black,
-              title: const Text('PrÃ³ximamente', style: TextStyle(color: Colors.white)),
+              title: const Text('Próximamente', style: TextStyle(color: Colors.white)),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.of(context).pop(),
@@ -148,7 +148,7 @@ class AppRouter {
             ),
             body: const Center(
               child: Text(
-                'Esta funciÃ³n estarÃ¡ disponible pronto',
+                'Esta función estará disponible pronto',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),

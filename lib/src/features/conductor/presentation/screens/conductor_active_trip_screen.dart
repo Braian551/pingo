@@ -1,5 +1,4 @@
 ﻿import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -102,8 +101,10 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
       }
 
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 20),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 20),
+        ),
       );
       setState(() {
         _driverLocation = LatLng(pos.latitude, pos.longitude);
@@ -203,10 +204,10 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
           padding: const EdgeInsets.all(8.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.9),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.9),
               shape: BoxShape.circle,
               border: Border.all(
-                color: const Color(0xFFFFD700).withOpacity(0.3),
+                color: const Color(0xFFFFD700).withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -241,7 +242,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.9),
+                  color: Colors.red.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -269,7 +270,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
       ),
       children: [
         TileLayer(
-          urlTemplate: MapboxService.getTileUrl(style: 'dark-v11'),
+          urlTemplate: MapboxService.getTileUrl(isDarkMode: true),
           userAgentPackageName: 'com.example.ping_go',
         ),
 
@@ -303,7 +304,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
                           height: 50 * _pulseAnim.value,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFFFD700).withOpacity(0.2 / _pulseAnim.value),
+                            color: const Color(0xFFFFD700).withValues(alpha: 0.2 / _pulseAnim.value),
                           ),
                         ),
                         Container(
@@ -365,9 +366,9 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
         top: false,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
           ),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Column(
@@ -379,7 +380,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFD700).withOpacity(0.15),
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -394,7 +395,7 @@ class _ConductorActiveTripScreenState extends State<ConductorActiveTripScreen>
                       children: [
                         Text(
                           _toPickup ? 'Recoger en' : 'Destino',
-                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
                         ),
                         const SizedBox(height: 2),
                         Text(

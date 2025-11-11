@@ -535,7 +535,7 @@ class _ConductorSearchingPassengersScreenState
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -568,7 +568,7 @@ class _ConductorSearchingPassengersScreenState
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -605,15 +605,15 @@ class _ConductorSearchingPassengersScreenState
           child: Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              color: AppColors.darkCard.withOpacity(0.95),
+              color: AppColors.darkCard.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 30,
                   spreadRadius: 5,
                 ),
@@ -626,7 +626,7 @@ class _ConductorSearchingPassengersScreenState
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
+                    color: AppColors.primary.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -652,7 +652,7 @@ class _ConductorSearchingPassengersScreenState
                 Text(
                   'Dejarás de recibir solicitudes de viaje hasta que vuelvas a conectarte',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
                     height: 1.4,
                   ),
@@ -668,7 +668,7 @@ class _ConductorSearchingPassengersScreenState
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             width: 1.5,
                           ),
                         ),
@@ -699,7 +699,7 @@ class _ConductorSearchingPassengersScreenState
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 15,
                               spreadRadius: 2,
                             ),
@@ -740,6 +740,9 @@ class _ConductorSearchingPassengersScreenState
   }
 
   Widget _buildMap() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     if (_currentLocation == null) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFFFFFF00)),
@@ -758,7 +761,7 @@ class _ConductorSearchingPassengersScreenState
       children: [
         // Tiles oscuros
         TileLayer(
-          urlTemplate: MapboxService.getTileUrl(style: 'dark-v11'),
+          urlTemplate: MapboxService.getTileUrl(isDarkMode: isDark),
           userAgentPackageName: 'com.example.ping_go',
         ),
         
@@ -781,7 +784,7 @@ class _ConductorSearchingPassengersScreenState
                         height: 70 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.primary.withOpacity(
+                          color: AppColors.primary.withValues(alpha:
                             0.2 / _pulseAnimation.value,
                           ),
                         ),
@@ -792,7 +795,7 @@ class _ConductorSearchingPassengersScreenState
                         height: 50 * _pulseAnimation.value,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.primary.withOpacity(
+                          color: AppColors.primary.withValues(alpha:
                             0.3 / _pulseAnimation.value,
                           ),
                         ),
@@ -805,7 +808,7 @@ class _ConductorSearchingPassengersScreenState
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.4),
+                              color: Colors.black.withValues(alpha: 0.4),
                               blurRadius: 15,
                               spreadRadius: 3,
                             ),
@@ -879,7 +882,7 @@ class _ConductorSearchingPassengersScreenState
                             height: 60 * _pulseAnimation.value,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.primary.withOpacity(
+                              color: AppColors.primary.withValues(alpha:
                                 0.3 / _pulseAnimation.value,
                               ),
                             ),
@@ -901,7 +904,7 @@ class _ConductorSearchingPassengersScreenState
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.5),
+                                  color: AppColors.primary.withValues(alpha: 0.5),
                                   blurRadius: 15,
                                   spreadRadius: 3,
                                 ),
@@ -919,7 +922,7 @@ class _ConductorSearchingPassengersScreenState
                             width: 25,
                             height: 6,
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
@@ -958,16 +961,16 @@ class _ConductorSearchingPassengersScreenState
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: isDark 
-                        ? AppColors.darkCard.withOpacity(0.9)
-                        : Colors.white.withOpacity(0.9),
+                        ? AppColors.darkCard.withValues(alpha: 0.9)
+                        : Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: AppColors.primary.withValues(alpha: 0.2),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 4),
                         ),
@@ -986,7 +989,7 @@ class _ConductorSearchingPassengersScreenState
                               child: Container(
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.15),
+                                  color: AppColors.primary.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Icon(
@@ -1017,7 +1020,7 @@ class _ConductorSearchingPassengersScreenState
                               Text(
                                 'Tienes 30 segundos para responder',
                                 style: TextStyle(
-                                  color: AppColors.primary.withOpacity(0.9),
+                                  color: AppColors.primary.withValues(alpha: 0.9),
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -1131,18 +1134,18 @@ class _ConductorSearchingPassengersScreenState
                   curve: Curves.easeOut,
                   decoration: BoxDecoration(
                     color: isDark 
-                      ? AppColors.darkCard.withOpacity(0.95)
-                      : Colors.white.withOpacity(0.95),
+                      ? AppColors.darkCard.withValues(alpha: 0.95)
+                      : Colors.white.withValues(alpha: 0.95),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(32),
                     ),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.5 : 0.15),
+                        color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.15),
                         blurRadius: 30,
                         offset: const Offset(0, -10),
                       ),
@@ -1163,7 +1166,7 @@ class _ConductorSearchingPassengersScreenState
                             height: 5,
                             margin: const EdgeInsets.only(top: 8, bottom: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
@@ -1181,15 +1184,15 @@ class _ConductorSearchingPassengersScreenState
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.primary.withOpacity(0.2),
-                                      AppColors.primary.withOpacity(0.1),
+                                      AppColors.primary.withValues(alpha: 0.2),
+                                      AppColors.primary.withValues(alpha: 0.1),
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.3),
+                                    color: AppColors.primary.withValues(alpha: 0.3),
                                     width: 1.5,
                                   ),
                                 ),
@@ -1202,7 +1205,7 @@ class _ConductorSearchingPassengersScreenState
                                         Text(
                                           '\$',
                                           style: TextStyle(
-                                            color: AppColors.primary.withOpacity(0.8),
+                                            color: AppColors.primary.withValues(alpha: 0.8),
                                             fontSize: 24,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -1220,7 +1223,7 @@ class _ConductorSearchingPassengersScreenState
                                         Text(
                                           'COP',
                                           style: TextStyle(
-                                            color: AppColors.primary.withOpacity(0.7),
+                                            color: AppColors.primary.withValues(alpha: 0.7),
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -1286,7 +1289,7 @@ class _ConductorSearchingPassengersScreenState
                                       color: const Color(0xFF2A2A2A),
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white.withValues(alpha: 0.2),
                                         width: 1.5,
                                       ),
                                     ),
@@ -1320,7 +1323,7 @@ class _ConductorSearchingPassengersScreenState
                                           borderRadius: BorderRadius.circular(16),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.primary.withOpacity(0.4),
+                                              color: AppColors.primary.withValues(alpha: 0.4),
                                               blurRadius: 20,
                                               spreadRadius: 2,
                                             ),
@@ -1380,10 +1383,10 @@ class _ConductorSearchingPassengersScreenState
                               Container(
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                                  color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.white.withValues(alpha: 0.1),
                                     width: 1,
                                   ),
                                 ),
@@ -1396,7 +1399,7 @@ class _ConductorSearchingPassengersScreenState
                                           Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: AppColors.primary.withOpacity(0.15),
+                                              color: AppColors.primary.withValues(alpha: 0.15),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                             child: const Icon(
@@ -1413,7 +1416,7 @@ class _ConductorSearchingPassengersScreenState
                                                 Text(
                                                   'Tu ubicación',
                                                   style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.6),
+                                                    color: Colors.white.withValues(alpha: 0.6),
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -1422,7 +1425,7 @@ class _ConductorSearchingPassengersScreenState
                                                 Text(
                                                   'Conductor',
                                                   style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.9),
+                                                    color: Colors.white.withValues(alpha: 0.9),
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -1446,10 +1449,10 @@ class _ConductorSearchingPassengersScreenState
                                               vertical: 4,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFF4CAF50).withOpacity(0.2),
+                                              color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                                               borderRadius: BorderRadius.circular(8),
                                               border: Border.all(
-                                                color: const Color(0xFF4CAF50).withOpacity(0.3),
+                                                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
                                                 width: 1,
                                               ),
                                             ),
@@ -1483,7 +1486,7 @@ class _ConductorSearchingPassengersScreenState
                                           Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFF2196F3).withOpacity(0.15),
+                                              color: const Color(0xFF2196F3).withValues(alpha: 0.15),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                             child: const Icon(
@@ -1500,7 +1503,7 @@ class _ConductorSearchingPassengersScreenState
                                                 Text(
                                                   'Cliente',
                                                   style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.6),
+                                                    color: Colors.white.withValues(alpha: 0.6),
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -1509,7 +1512,7 @@ class _ConductorSearchingPassengersScreenState
                                                 Text(
                                                   'Recoger aquí',
                                                   style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.9),
+                                                    color: Colors.white.withValues(alpha: 0.9),
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -1539,13 +1542,13 @@ class _ConductorSearchingPassengersScreenState
                                     ),
                                     decoration: BoxDecoration(
                                       color: secondsLeft <= 10
-                                          ? Colors.red.withOpacity(0.15)
-                                          : const Color(0xFF2A2A2A).withOpacity(0.5),
+                                          ? Colors.red.withValues(alpha: 0.15)
+                                          : const Color(0xFF2A2A2A).withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
                                         color: secondsLeft <= 10
-                                            ? Colors.red.withOpacity(0.3)
-                                            : Colors.white.withOpacity(0.1),
+                                            ? Colors.red.withValues(alpha: 0.3)
+                                            : Colors.white.withValues(alpha: 0.1),
                                         width: 1,
                                       ),
                                     ),
@@ -1570,7 +1573,7 @@ class _ConductorSearchingPassengersScreenState
                                                 style: TextStyle(
                                                   color: secondsLeft <= 10
                                                       ? Colors.red
-                                                      : Colors.white.withOpacity(0.7),
+                                                      : Colors.white.withValues(alpha: 0.7),
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -1580,7 +1583,7 @@ class _ConductorSearchingPassengersScreenState
                                                 borderRadius: BorderRadius.circular(10),
                                                 child: LinearProgressIndicator(
                                                   value: _timerAnimation.value,
-                                                  backgroundColor: Colors.white.withOpacity(0.1),
+                                                  backgroundColor: Colors.white.withValues(alpha: 0.1),
                                                   valueColor: AlwaysStoppedAnimation<Color>(
                                                     secondsLeft <= 10
                                                         ? Colors.red
@@ -1601,7 +1604,7 @@ class _ConductorSearchingPassengersScreenState
                                           decoration: BoxDecoration(
                                             color: secondsLeft <= 10
                                                 ? Colors.red
-                                                : AppColors.primary.withOpacity(0.2),
+                                                : AppColors.primary.withValues(alpha: 0.2),
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Text(
@@ -1626,10 +1629,10 @@ class _ConductorSearchingPassengersScreenState
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF2A2A2A).withOpacity(0.6),
+                                  color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.white.withValues(alpha: 0.1),
                                     width: 1,
                                   ),
                                 ),
@@ -1654,7 +1657,7 @@ class _ConductorSearchingPassengersScreenState
                                                 width: 3,
                                                 height: 3,
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white.withOpacity(0.3),
+                                                  color: Colors.white.withValues(alpha: 0.3),
                                                   shape: BoxShape.circle,
                                                 ),
                                               ),
@@ -1701,7 +1704,7 @@ class _ConductorSearchingPassengersScreenState
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.15),
+            color: iconColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: iconColor, size: 20),
@@ -1714,7 +1717,7 @@ class _ConductorSearchingPassengersScreenState
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,

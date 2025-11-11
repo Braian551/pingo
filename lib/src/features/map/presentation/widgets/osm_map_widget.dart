@@ -101,7 +101,7 @@ class _OSMMapWidgetState extends State<OSMMapWidget> {
       children: [
         // Capa de tiles de Mapbox (reemplaza OSM)
         TileLayer(
-          urlTemplate: MapboxService.getTileUrl(style: 'streets-v12'),
+          urlTemplate: MapboxService.getTileUrl(isDarkMode: false),
           userAgentPackageName: 'com.viax.app',
           additionalOptions: const {
             'accessToken': EnvConfig.mapboxPublicToken,

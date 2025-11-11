@@ -141,7 +141,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withValues(alpha: 0.8),
             ),
           ),
         ),
@@ -199,13 +199,13 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFFFFF00).withOpacity(0.2)
-              : const Color(0xFF1A1A1A).withOpacity(0.6),
+              ? const Color(0xFFFFFF00).withValues(alpha: 0.2)
+              : const Color(0xFF1A1A1A).withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFFFFFF00)
-                : Colors.white.withOpacity(0.1),
+                : Colors.white.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),
@@ -241,7 +241,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
             Icon(
               Icons.inbox_rounded,
               size: 80,
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -296,10 +296,10 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -320,7 +320,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.2),
+                              color: statusColor.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -356,7 +356,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFFF00).withOpacity(0.2),
+                              color: const Color(0xFFFFFF00).withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
@@ -440,10 +440,10 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     border: Border(
                       top: BorderSide(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -510,8 +510,8 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFFFFFF00).withOpacity(0.5),
-              Colors.red.withOpacity(0.5),
+              const Color(0xFFFFFF00).withValues(alpha: 0.5),
+              Colors.red.withValues(alpha: 0.5),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -525,10 +525,10 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -565,12 +565,12 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
         child: Container(
           height: MediaQuery.of(context).size.height * 0.7,
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(24),
             ),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -582,7 +582,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -663,10 +663,10 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -675,7 +675,7 @@ class _ConductorTripsScreenState extends State<ConductorTripsScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFF00).withOpacity(0.2),
+              color: const Color(0xFFFFFF00).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: const Color(0xFFFFFF00), size: 20),

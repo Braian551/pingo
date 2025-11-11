@@ -150,7 +150,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
       flexibleSpace: ClipRect(
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
           ),
         ),
       ),
@@ -200,13 +200,13 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
               color: isCompleted
                   ? const Color(0xFFFFFF00)
                   : isActive
-                      ? const Color(0xFFFFFF00).withOpacity(0.2)
-                      : Colors.white.withOpacity(0.1),
+                      ? const Color(0xFFFFFF00).withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(
                 color: isActive || isCompleted 
                     ? const Color(0xFFFFFF00) 
-                    : Colors.white.withOpacity(0.2),
+                    : Colors.white.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -246,7 +246,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         margin: const EdgeInsets.only(bottom: 30),
         color: step < _currentStep
             ? const Color(0xFFFFFF00)
-            : Colors.white.withOpacity(0.1),
+            : Colors.white.withValues(alpha: 0.1),
       ),
     );
   }
@@ -563,7 +563,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFF00).withOpacity(0.2),
+            color: const Color(0xFFFFFF00).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFFFFFF00), size: 24),
@@ -597,10 +597,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -613,7 +613,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
               labelText: label,
               hintText: hint,
               labelStyle: const TextStyle(color: Colors.white70),
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
               prefixIcon: Icon(icon, color: const Color(0xFFFFFF00)),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(20),
@@ -634,10 +634,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -668,13 +668,13 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFFFF00).withOpacity(0.2)
-                            : Colors.white.withOpacity(0.05),
+                            ? const Color(0xFFFFFF00).withValues(alpha: 0.2)
+                            : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
                               ? const Color(0xFFFFFF00)
-                              : Colors.white.withOpacity(0.1),
+                              : Colors.white.withValues(alpha: 0.1),
                           width: 2,
                         ),
                       ),
@@ -715,10 +715,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -772,10 +772,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -809,7 +809,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   size: 16,
                 ),
               ],
@@ -827,10 +827,10 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -844,7 +844,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                       onPressed: () => setState(() => _currentStep--),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.white.withOpacity(0.1),
+                        backgroundColor: Colors.white.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

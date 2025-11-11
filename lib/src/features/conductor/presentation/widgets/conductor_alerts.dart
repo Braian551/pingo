@@ -93,18 +93,18 @@ class ProfileIncompleteAlert extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1A1A1A).withOpacity(0.95),
-                  const Color(0xFF0D0D0D).withOpacity(0.95),
+                  const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                  const Color(0xFF0D0D0D).withValues(alpha: 0.95),
                 ],
               ),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: const Color(0xFFFFFF00).withOpacity(0.4),
+                color: const Color(0xFFFFFF00).withValues(alpha: 0.4),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFFF00).withOpacity(0.2),
+                  color: const Color(0xFFFFFF00).withValues(alpha: 0.2),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -120,8 +120,8 @@ class ProfileIncompleteAlert extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFFFFFF00).withOpacity(0.25),
-                          const Color(0xFFFFFF00).withOpacity(0.1),
+                          const Color(0xFFFFFF00).withValues(alpha: 0.25),
+                          const Color(0xFFFFFF00).withValues(alpha: 0.1),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -157,10 +157,10 @@ class ProfileIncompleteAlert extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(isSmallScreen ? 14 : 18),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -213,7 +213,7 @@ class ProfileIncompleteAlert extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                 vertical: isSmallScreen ? 14 : 16,
                               ),
-                              backgroundColor: Colors.white.withOpacity(0.1),
+                              backgroundColor: Colors.white.withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -241,7 +241,7 @@ class ProfileIncompleteAlert extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             elevation: 8,
-                            shadowColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                            shadowColor: const Color(0xFFFFFF00).withValues(alpha: 0.5),
                           ),
                           child: Text(
                             buttonText,
@@ -324,7 +324,7 @@ class ProfileIncompleteAlert extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       barrierDismissible: dismissible,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => ProfileIncompleteAlert(
         missingItems: missingItems,
         actionType: actionType,
@@ -376,20 +376,20 @@ class DocumentExpiryAlert extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1A1A1A).withOpacity(0.95),
-                  const Color(0xFF0D0D0D).withOpacity(0.95),
+                  const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                  const Color(0xFF0D0D0D).withValues(alpha: 0.95),
                 ],
               ),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: isExpired
-                    ? Colors.red.withOpacity(0.4)
-                    : Colors.orange.withOpacity(0.4),
+                    ? Colors.red.withValues(alpha: 0.4)
+                    : Colors.orange.withValues(alpha: 0.4),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.25),
+                  color: (isExpired ? Colors.red : Colors.orange).withValues(alpha: 0.25),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -405,8 +405,8 @@ class DocumentExpiryAlert extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: RadialGradient(
                         colors: [
-                          (isExpired ? Colors.red : Colors.orange).withOpacity(0.25),
-                          (isExpired ? Colors.red : Colors.orange).withOpacity(0.1),
+                          (isExpired ? Colors.red : Colors.orange).withValues(alpha: 0.25),
+                          (isExpired ? Colors.red : Colors.orange).withValues(alpha: 0.1),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -443,10 +443,10 @@ class DocumentExpiryAlert extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                     decoration: BoxDecoration(
-                      color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.1),
+                      color: (isExpired ? Colors.red : Colors.orange).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: (isExpired ? Colors.red : Colors.orange).withOpacity(0.3),
+                        color: (isExpired ? Colors.red : Colors.orange).withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -470,7 +470,7 @@ class DocumentExpiryAlert extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                 vertical: isSmallScreen ? 14 : 16,
                               ),
-                              backgroundColor: Colors.white.withOpacity(0.1),
+                              backgroundColor: Colors.white.withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -498,7 +498,7 @@ class DocumentExpiryAlert extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             elevation: 8,
-                            shadowColor: (isExpired ? Colors.red : const Color(0xFFFFFF00)).withOpacity(0.5),
+                            shadowColor: (isExpired ? Colors.red : const Color(0xFFFFFF00)).withValues(alpha: 0.5),
                           ),
                           child: Text(
                             'Renovar Ahora',
@@ -530,7 +530,7 @@ class DocumentExpiryAlert extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       barrierDismissible: dismissible,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => DocumentExpiryAlert(
         documentName: documentName,
         expiryDate: expiryDate,
@@ -586,13 +586,13 @@ class ConfirmationAlert extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1A1A1A).withOpacity(0.95),
-                  const Color(0xFF0D0D0D).withOpacity(0.95),
+                  const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                  const Color(0xFF0D0D0D).withValues(alpha: 0.95),
                 ],
               ),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 width: 1.5,
               ),
             ),
@@ -607,8 +607,8 @@ class ConfirmationAlert extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: RadialGradient(
                           colors: [
-                            color.withOpacity(0.25),
-                            color.withOpacity(0.1),
+                            color.withValues(alpha: 0.25),
+                            color.withValues(alpha: 0.1),
                           ],
                         ),
                         shape: BoxShape.circle,
@@ -679,7 +679,7 @@ class ConfirmationAlert extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             elevation: 8,
-                            shadowColor: color.withOpacity(0.5),
+                            shadowColor: color.withValues(alpha: 0.5),
                           ),
                           child: Text(
                             confirmText,
@@ -713,7 +713,7 @@ class ConfirmationAlert extends StatelessWidget {
   }) {
     return showDialog<bool>(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => ConfirmationAlert(
         title: title,
         message: message,
@@ -809,18 +809,18 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF1A1A1A).withOpacity(0.95),
-                    const Color(0xFF0D0D0D).withOpacity(0.95),
+                    const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                    const Color(0xFF0D0D0D).withValues(alpha: 0.95),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
-                  color: const Color(0xFFFFFF00).withOpacity(0.4),
+                  color: const Color(0xFFFFFF00).withValues(alpha: 0.4),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFFF00).withOpacity(0.25),
+                    color: const Color(0xFFFFFF00).withValues(alpha: 0.25),
                     blurRadius: 40,
                     offset: const Offset(0, 10),
                   ),
@@ -839,12 +839,12 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: _remainingSeconds <= 10
-                                ? [Colors.red.withOpacity(0.3), Colors.red.withOpacity(0.15)]
-                                : [const Color(0xFFFFFF00).withOpacity(0.3), const Color(0xFFFFFF00).withOpacity(0.15)],
+                                ? [Colors.red.withValues(alpha: 0.3), Colors.red.withValues(alpha: 0.15)]
+                                : [const Color(0xFFFFFF00).withValues(alpha: 0.3), const Color(0xFFFFFF00).withValues(alpha: 0.15)],
                           ),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: (_remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00)).withOpacity(0.4),
+                            color: (_remainingSeconds <= 10 ? Colors.red : const Color(0xFFFFFF00)).withValues(alpha: 0.4),
                             width: 1.5,
                           ),
                         ),
@@ -943,7 +943,7 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 elevation: 8,
-                                shadowColor: Colors.red.withOpacity(0.5),
+                                shadowColor: Colors.red.withValues(alpha: 0.5),
                               ),
                               child: const Text(
                                 'Rechazar',
@@ -972,7 +972,7 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 elevation: 8,
-                                shadowColor: const Color(0xFFFFFF00).withOpacity(0.5),
+                                shadowColor: const Color(0xFFFFFF00).withValues(alpha: 0.5),
                               ),
                               child: const Text(
                                 'Aceptar Viaje',
@@ -1006,10 +1006,10 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -1018,7 +1018,7 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFF00).withOpacity(0.2),
+              color: const Color(0xFFFFFF00).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: const Color(0xFFFFFF00), size: 20),
@@ -1063,7 +1063,7 @@ class _TripRequestModalState extends State<TripRequestModal> with SingleTickerPr
     return showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.90),
+      barrierColor: Colors.black.withValues(alpha: 0.90),
       builder: (context) => TripRequestModal(
         tripData: tripData,
         onAccept: onAccept,
@@ -1096,13 +1096,13 @@ class EarningsNotification extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.green.withOpacity(0.2),
-              Colors.green.withOpacity(0.1),
+              Colors.green.withValues(alpha: 0.2),
+              Colors.green.withValues(alpha: 0.1),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.green.withOpacity(0.3),
+            color: Colors.green.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -1111,7 +1111,7 @@ class EarningsNotification extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -1169,7 +1169,7 @@ class SuccessNotification {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -1197,7 +1197,7 @@ class SuccessNotification {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: Colors.green.withOpacity(0.3),
+            color: Colors.green.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -1221,7 +1221,7 @@ class ErrorNotification {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.red.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -1249,7 +1249,7 @@ class ErrorNotification {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: Colors.red.withOpacity(0.3),
+            color: Colors.red.withValues(alpha: 0.3),
             width: 1,
           ),
         ),

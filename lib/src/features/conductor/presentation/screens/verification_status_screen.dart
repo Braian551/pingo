@@ -61,7 +61,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       flexibleSpace: ClipRect(
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
           ),
         ),
       ),
@@ -198,10 +198,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.15),
+          color: statusColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: statusColor.withOpacity(0.3),
+            color: statusColor.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -210,7 +210,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.3),
+                color: statusColor.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(statusIcon, color: statusColor, size: 48),
@@ -238,10 +238,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
+                  color: Colors.red.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.red.withOpacity(0.3),
+                    color: Colors.red.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -275,10 +275,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A).withOpacity(0.6),
+          color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),
@@ -311,7 +311,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: percentage,
-                backgroundColor: Colors.white.withOpacity(0.1),
+                backgroundColor: Colors.white.withValues(alpha: 0.1),
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFFF00)),
                 minHeight: 12,
               ),
@@ -365,10 +365,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.15),
+          color: Colors.orange.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.orange.withOpacity(0.3),
+            color: Colors.orange.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -420,10 +420,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.15),
+          color: Colors.red.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.red.withOpacity(0.3),
+            color: Colors.red.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -520,13 +520,13 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isComplete
-              ? const Color(0xFF11998e).withOpacity(0.15)
-              : const Color(0xFF1A1A1A).withOpacity(0.6),
+              ? const Color(0xFF11998e).withValues(alpha: 0.15)
+              : const Color(0xFF1A1A1A).withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isComplete
-                ? const Color(0xFF11998e).withOpacity(0.3)
-                : Colors.white.withOpacity(0.1),
+                ? const Color(0xFF11998e).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),
@@ -539,8 +539,8 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isComplete
-                        ? const Color(0xFF11998e).withOpacity(0.3)
-                        : Colors.white.withOpacity(0.1),
+                        ? const Color(0xFF11998e).withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -573,7 +573,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
               child: Text(
                 detail,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
                 ),
               ),

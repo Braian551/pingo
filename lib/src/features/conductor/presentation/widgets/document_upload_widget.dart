@@ -46,12 +46,12 @@ class DocumentUploadWidget extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: hasFile
-                    ? const Color(0xFFFFFF00).withOpacity(0.3)
-                    : Colors.white.withOpacity(0.1),
+                    ? const Color(0xFFFFFF00).withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -87,7 +87,7 @@ class DocumentUploadWidget extends StatelessWidget {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.2),
+                                    color: Colors.red.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Text(
@@ -137,7 +137,7 @@ class DocumentUploadWidget extends StatelessWidget {
                             : Icons.add_circle_outline_rounded,
                         color: hasFile
                             ? const Color(0xFFFFFF00)
-                            : Colors.white.withOpacity(0.3),
+                            : Colors.white.withValues(alpha: 0.3),
                         size: 28,
                       ),
                   ],
@@ -167,7 +167,7 @@ class DocumentUploadWidget extends StatelessWidget {
                           horizontal: 12,
                           vertical: 8,
                         ),
-                        backgroundColor: const Color(0xFFFFFF00).withOpacity(0.1),
+                        backgroundColor: const Color(0xFFFFFF00).withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -188,13 +188,13 @@ class DocumentUploadWidget extends StatelessWidget {
       height: 80,
       decoration: BoxDecoration(
         color: hasFile
-            ? const Color(0xFFFFFF00).withOpacity(0.15)
-            : Colors.white.withOpacity(0.05),
+            ? const Color(0xFFFFFF00).withValues(alpha: 0.15)
+            : Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: hasFile
-              ? const Color(0xFFFFFF00).withOpacity(0.3)
-              : Colors.white.withOpacity(0.1),
+              ? const Color(0xFFFFFF00).withValues(alpha: 0.3)
+              : Colors.white.withValues(alpha: 0.1),
           width: 1.5,
         ),
       ),
@@ -265,7 +265,7 @@ class DocumentUploadWidget extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.3),
+                  Colors.black.withValues(alpha: 0.3),
                 ],
               ),
             ),
@@ -300,7 +300,7 @@ class DocumentUploadWidget extends StatelessWidget {
   Widget _buildEmptyPreview() {
     return Icon(
       icon,
-      color: Colors.white.withOpacity(0.4),
+      color: Colors.white.withValues(alpha: 0.4),
       size: 36,
     );
   }
@@ -353,10 +353,10 @@ class DocumentUploadWidget extends StatelessWidget {
                       maxWidth: MediaQuery.of(context).size.width * 0.9,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.9),
+                      color: Colors.black.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -381,7 +381,7 @@ class DocumentUploadWidget extends StatelessWidget {
                                       Text(
                                         'No se pudo cargar la imagen',
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.7),
+                                          color: Colors.white.withValues(alpha: 0.7),
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
@@ -420,7 +420,7 @@ class DocumentUploadWidget extends StatelessWidget {
                                       Text(
                                         'No se pudo cargar la imagen',
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.7),
+                                          color: Colors.white.withValues(alpha: 0.7),
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
@@ -441,7 +441,7 @@ class DocumentUploadWidget extends StatelessWidget {
                 right: 16,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -467,7 +467,7 @@ class DocumentUploadWidget extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -630,7 +630,7 @@ class _DocumentPickerBottomSheet extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -640,7 +640,7 @@ class _DocumentPickerBottomSheet extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -710,7 +710,7 @@ class _DocumentPickerBottomSheet extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: optionColor.withOpacity(0.15),
+            color: optionColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: optionColor, size: 24),
@@ -734,7 +734,7 @@ class _DocumentPickerBottomSheet extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        tileColor: Colors.white.withOpacity(0.05),
+        tileColor: Colors.white.withValues(alpha: 0.05),
       ),
     );
   }

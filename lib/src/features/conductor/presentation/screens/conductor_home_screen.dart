@@ -400,7 +400,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkCard : Colors.white,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -433,7 +433,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
         Container(
           margin: const EdgeInsets.only(right: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? AppColors.darkCard : Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -446,7 +446,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
           child: IconButton(
             icon: Icon(
               Icons.menu_rounded,
-              color: Colors.grey[800],
+              color: isDark ? Colors.white : Colors.grey[800],
             ),
             onPressed: () {
               // TODO: Abrir drawer o menú
@@ -458,10 +458,13 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
   }
 
   Widget _buildMap() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     // Si no hay ubicación, mostrar pantalla de carga
     if (_isLoadingLocation) {
       return Container(
-        color: AppColors.lightBackground,
+        color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
         child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -488,7 +491,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
     // Si no hay posición, mostrar error
     if (_currentPosition == null) {
       return Container(
-        color: AppColors.lightBackground,
+        color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -534,7 +537,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen>
       children: [
         // Capa de tiles de Mapbox
         TileLayer(
-          urlTemplate: MapboxService.getTileUrl(style: 'streets-v12'),
+          urlTemplate: MapboxService.getTileUrl(isDarkMode: isDark),
           userAgentPackageName: 'com.viax.app',
         ),
         

@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:viax/src/global/services/auth/user_service.dart';
 import 'package:shimmer/shimmer.dart';
@@ -66,13 +66,13 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         
         if (!mounted) return;
         
-        // Verificar servicios de ubicación
+        // Verificar servicios de ubicaci�n
         final serviceEnabled = await Geolocator.isLocationServiceEnabled();
         if (!serviceEnabled) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Activa los servicios de ubicación para usar Viax'),
+                content: Text('Activa los servicios de ubicaci�n para usar Viax'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -93,7 +93,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Necesitamos tu ubicación para ofrecerte viajes cerca de ti'),
+                content: Text('Necesitamos tu ubicaci�n para ofrecerte viajes cerca de ti'),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -104,7 +104,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('¡Ubicación activada! Ahora puedes solicitar viajes'),
+                content: Text('�Ubicaci�n activada! Ahora puedes solicitar viajes'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
@@ -218,7 +218,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF2196F3).withOpacity(0.1),
+              color: const Color(0xFF2196F3).withValues(alpha: 0.1),
             ),
             child: ShaderMask(
               shaderCallback: (Rect bounds) {
@@ -255,7 +255,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
           child: IconButton(
             icon: Stack(
@@ -383,10 +383,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                    color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1.5,
                     ),
                   ),
@@ -395,12 +395,12 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.receipt_long,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           size: 48,
                         ),
                       ),
@@ -408,16 +408,16 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       Text(
                         'Sin viajes registrados',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tus viajes aparecerán aquí',
+                        'Tus viajes aparecer�n aqu�',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           fontSize: 14,
                         ),
                         textAlign: TextAlign.center,
@@ -458,10 +458,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                    color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1.5,
                     ),
                   ),
@@ -470,12 +470,12 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.credit_card,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           size: 48,
                         ),
                       ),
@@ -483,7 +483,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       Text(
                         'No hay métodos de pago',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -492,7 +492,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                       Text(
                         'Agrega un método de pago para continuar',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           fontSize: 14,
                         ),
                         textAlign: TextAlign.center,
@@ -562,10 +562,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -578,7 +578,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF2196F3).withOpacity(0.1),
+                      color: const Color(0xFF2196F3).withValues(alpha: 0.1),
                     ),
                     child: Center(
                       child: Text(
@@ -649,10 +649,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -661,7 +661,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -679,7 +679,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 12,
                 ),
               ),
@@ -695,7 +695,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       children: [
         _buildProfileMenuItem(
           icon: Icons.settings,
-          title: 'Configuración',
+          title: 'Configuraci�n',
           onTap: () => Navigator.pushNamed(context, '/settings'),
         ),
         const SizedBox(height: 12),
@@ -707,7 +707,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         const SizedBox(height: 12),
         _buildProfileMenuItem(
           icon: Icons.logout,
-          title: 'Cerrar sesión',
+          title: 'Cerrar sesi�n',
           isLogout: true,
           onTap: () async {
             await UserService.clearSession();
@@ -736,13 +736,13 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isLogout 
-                  ? Colors.red.withOpacity(0.1) 
-                  : const Color(0xFF1A1A1A).withOpacity(0.6),
+                  ? Colors.red.withValues(alpha: 0.1) 
+                  : const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isLogout 
-                    ? Colors.red.withOpacity(0.3)
-                    : Colors.white.withOpacity(0.1),
+                    ? Colors.red.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -752,8 +752,8 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isLogout
-                        ? Colors.red.withOpacity(0.2)
-                        : const Color(0xFF2196F3).withOpacity(0.2),
+                        ? Colors.red.withValues(alpha: 0.2)
+                        : const Color(0xFF2196F3).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -776,8 +776,8 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 Icon(
                   Icons.arrow_forward_ios, 
                   color: isLogout 
-                      ? Colors.red.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.3), 
+                      ? Colors.red.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.3), 
                   size: 18,
                 ),
               ],
@@ -823,7 +823,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
 
   Widget _buildWelcomeSection() {
     final hour = DateTime.now().hour;
-    String greeting = 'Buenos días';
+    String greeting = 'Buenos d�as';
     if (hour >= 12 && hour < 18) {
       greeting = 'Buenas tardes';
     } else if (hour >= 18) {
@@ -836,7 +836,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         Text(
           greeting,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -867,10 +867,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -883,7 +883,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF2196F3).withOpacity(0.3),
+                        color: const Color(0xFF2196F3).withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -894,9 +894,9 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    '¿A dónde vas?',
+                    '�A d�nde vas?',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -904,7 +904,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   size: 18,
                 ),
               ],
@@ -920,7 +920,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          '¿Qué necesitas hoy?',
+          '�Qu� necesitas hoy?',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -935,7 +935,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               child: _ModernServiceCard(
                 icon: Icons.motorcycle,
                 title: 'Viaje',
-                subtitle: 'Rápido y seguro',
+                subtitle: 'R�pido y seguro',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
                 },
@@ -945,7 +945,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             Expanded(
               child: _ModernServiceCard(
                 icon: Icons.local_shipping_outlined,
-                title: 'Envío',
+                title: 'Env�o',
                 subtitle: 'Entrega express',
                 onTap: () {
                   Navigator.pushNamed(context, '/request_trip');
@@ -963,7 +963,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Acceso rápido',
+          'Acceso r�pido',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
@@ -1030,7 +1030,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               child: Icon(
                 Icons.card_giftcard,
                 size: 120,
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
               ),
             ),
             Padding(
@@ -1040,7 +1040,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    '¡Obtén 20% OFF!',
+                    '�Obt�n 20% OFF!',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -1107,10 +1107,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1.5,
                 ),
               ),
@@ -1119,12 +1119,12 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.route,
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       size: 48,
                     ),
                   ),
@@ -1132,16 +1132,16 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
                   Text(
                     'Sin actividad reciente',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tus viajes y envíos aparecerán aquí',
+                    'Tus viajes y env�os aparecer�n aqu�',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
@@ -1162,10 +1162,10 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A).withOpacity(0.95),
+            color: const Color(0xFF1A1A1A).withValues(alpha: 0.95),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -1213,14 +1213,14 @@ class _HomeUserScreenState extends State<HomeUserScreen> with TickerProviderStat
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                  color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
                   size: 26,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                    color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   ),
@@ -1259,10 +1259,10 @@ class _ModernServiceCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -1276,7 +1276,7 @@ class _ModernServiceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF2196F3).withOpacity(0.3),
+                        color: const Color(0xFF2196F3).withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1297,7 +1297,7 @@ class _ModernServiceCard extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1337,10 +1337,10 @@ class _QuickActionItem extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -1350,7 +1350,7 @@ class _QuickActionItem extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2196F3).withOpacity(0.15),
+                      color: const Color(0xFF2196F3).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(icon, color: const Color(0xFF2196F3), size: 24),

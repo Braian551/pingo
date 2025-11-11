@@ -253,7 +253,7 @@ class _ConfirmTripScreenState extends State<ConfirmTripScreen> {
                     ),
                     children: [
                       TileLayer(
-                        urlTemplate: MapboxService.getTileUrl(style: 'streets-v12'),
+                        urlTemplate: MapboxService.getTileUrl(isDarkMode: false),
                         userAgentPackageName: 'com.example.ping_go',
                         additionalOptions: const {
                           'access_token': EnvConfig.mapboxPublicToken,
